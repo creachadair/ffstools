@@ -18,7 +18,7 @@
 // storage backends, "file" and "memory. To build with additional storage
 // support, add build tags for each, for example:
 //
-//   go install -tags badger,s3 github.com/creachadair/ffs/cmd/blobd@latest
+//   go install -tags badger,s3 github.com/creachadair/ffstools/blobd@latest
 //
 // To include all available storage implementations, use the tag "all".
 //
