@@ -27,8 +27,8 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/cmd/ffs/config"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
 )

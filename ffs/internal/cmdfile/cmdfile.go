@@ -25,11 +25,11 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/cmd/ffs/config"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
+	"github.com/creachadair/ffstools/ffs/config"
 )
 
 const fileCmdUsage = `root:<root-key>[/path] ...
