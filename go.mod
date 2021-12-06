@@ -8,17 +8,17 @@ require (
 	github.com/creachadair/boltstore v0.0.0-20211206041748-b75dcd2db87f
 	github.com/creachadair/command v0.0.0-20211126171518-aeb2c1414eea
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20211205171150-f64ca058f193
-	github.com/creachadair/ffs/storage v0.0.0-20211205171150-f64ca058f193
-	github.com/creachadair/gcsstore v0.0.0-20211205170850-01ac042345b6
+	github.com/creachadair/ffs v0.0.0-20211206042038-f49f2ca18ab1
+	github.com/creachadair/ffs/storage v0.0.0-20211206042038-f49f2ca18ab1
+	github.com/creachadair/gcsstore v0.0.0-20211206041757-8bba701248cf
 	github.com/creachadair/jrpc2 v0.33.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20211206041859-9498a5715bb2
-	github.com/creachadair/pebblestore v0.0.0-20211205171022-bff351859b28
-	github.com/creachadair/pogrebstore v0.0.0-20211205171031-c7c3c769dd38
+	github.com/creachadair/pebblestore v0.0.0-20211206041931-53cca538f6e8
+	github.com/creachadair/pogrebstore v0.0.0-20211206041941-d8f2cdd52256
 	github.com/creachadair/rpcstore v0.0.0-20211206041948-b809eabda1e2
-	github.com/creachadair/s3store v0.0.0-20211205171142-ed72dcbf5a34
-	github.com/creachadair/sqlitestore v0.0.0-20211205171044-31409558bc93
+	github.com/creachadair/s3store v0.0.0-20211206042029-42b081c0229e
+	github.com/creachadair/sqlitestore v0.0.0-20211206041959-a21dee1a9f08
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.4
 	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
