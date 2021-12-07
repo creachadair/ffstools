@@ -67,7 +67,7 @@ func startNetServer(ctx context.Context, opts startConfig) (closer, <-chan error
 	go func() {
 		defer close(errc)
 		acc := server.NetAccepter(lst, channel.Line)
-		errc <- server.Loop(acc, server.Static(opts.Methods), &server.LoopOptions{
+		errc <- server.Loop(ctx, acc, server.Static(opts.Methods), &server.LoopOptions{
 			ServerOptions: opts.ServerOptions,
 		})
 	}()
