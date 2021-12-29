@@ -4,23 +4,23 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.3
-	github.com/creachadair/bitcaskstore v0.0.0-20211207165453-bac9d056b40b
-	github.com/creachadair/boltstore v0.0.0-20211207165543-73c93201b4ae
+	github.com/creachadair/bitcaskstore v0.0.0-20211229161430-a0153573a020
+	github.com/creachadair/boltstore v0.0.0-20211229161521-f6246dc89d0f
 	github.com/creachadair/command v0.0.0-20211126171518-aeb2c1414eea
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20211207080200-4aff01c85684
-	github.com/creachadair/gcsstore v0.0.0-20211207165601-39dd3e74e10c
+	github.com/creachadair/gcsstore v0.0.0-20211229161542-f194507ac1be
 	github.com/creachadair/jrpc2 v0.35.1
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c
-	github.com/creachadair/pebblestore v0.0.0-20211207165731-e017e62fa284
+	github.com/creachadair/pebblestore v0.0.0-20211229161652-9b9957ad2e8b
 	github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77
-	github.com/creachadair/rpcstore v0.0.0-20211207165748-d7e70c7e46fe
-	github.com/creachadair/s3store v0.0.0-20211207165802-baef8cd89b19
+	github.com/creachadair/rpcstore v0.0.0-20211227020113-06644b0511f5
+	github.com/creachadair/s3store v0.0.0-20211222165926-ebec44d97300
 	github.com/creachadair/sqlitestore v0.0.0-20211207165756-afaa2c87a458
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.4
-	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -34,15 +34,15 @@ require (
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.42.20 // indirect
+	github.com/aws/aws-sdk-go v1.42.25 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
-	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
+	github.com/cncf/xds/go v0.0.0-20211216145620-d92e9ce0af51 // indirect
 	github.com/cockroachdb/errors v1.8.6 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20211207171803-218cfbf8fe7b // indirect
+	github.com/cockroachdb/pebble v0.0.0-20211222161641-06e42cfa82c0 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/cockroachdb/sentry-go v0.6.1-cockroachdb.2 // indirect
 	github.com/creachadair/atomicfile v0.2.2 // indirect
@@ -57,7 +57,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/flatbuffers v2.0.0+incompatible // indirect
+	github.com/google/flatbuffers v2.0.5+incompatible // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -66,20 +66,20 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plar/go-adaptive-radix-tree v1.0.4 // indirect
-	github.com/rogpeppe/go-internal v1.8.0 // indirect
+	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20211207001050-4f2595aad9e7 // indirect
-	golang.org/x/net v0.0.0-20211206223403-eba003a116a9 // indirect
+	golang.org/x/exp v0.0.0-20211221223016-e29036178569 // indirect
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/api v0.61.0 // indirect
+	google.golang.org/api v0.63.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211207154714-918901c715cf // indirect
-	google.golang.org/grpc v1.42.0 // indirect
+	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb // indirect
+	google.golang.org/grpc v1.43.0 // indirect
 )
