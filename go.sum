@@ -180,8 +180,9 @@ github.com/creachadair/ffs v0.0.0-20211207080200-4aff01c85684/go.mod h1:ZlurDf9E
 github.com/creachadair/gcsstore v0.0.0-20211229161542-f194507ac1be h1:ZvmXrm4YR0NvhOyvWFPJdXHyHbINrUppqytwnxFNoqM=
 github.com/creachadair/gcsstore v0.0.0-20211229161542-f194507ac1be/go.mod h1:B1RxpsVjMdYGUp7HW2VT4F55LksPRmrej+FPK3LS31g=
 github.com/creachadair/getpass v0.1.1/go.mod h1:amWqqvJdxnT/Tk6PPgpFWX5Ik2RH4dnvfXequlcSXSc=
-github.com/creachadair/jrpc2 v0.35.1 h1:o4p9wJJ5Tj7pSL+piggZ6bj34QkS9lNoyKl4E/grD6A=
 github.com/creachadair/jrpc2 v0.35.1/go.mod h1:AfylEsH795IqdyEn9WEPt2eC7J53LC2mz3SclnIcfzc=
+github.com/creachadair/jrpc2 v0.35.2 h1:coyKDPJmbFKHKpsMZ728nRfCqljDQ1zu+bfVzLKBe7w=
+github.com/creachadair/jrpc2 v0.35.2/go.mod h1:AfylEsH795IqdyEn9WEPt2eC7J53LC2mz3SclnIcfzc=
 github.com/creachadair/keyfile v0.7.1 h1:XN5VztUPSIbUv4xKCZ2lULM+UsYHAkqz1EvgmXCu3YA=
 github.com/creachadair/keyfile v0.7.1/go.mod h1:kzXUh2yqee7jLtZuJPBute2307T9ryGBKuX+hiuwF8I=
 github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c h1:nL2vBh1HwWRaeBc40TpLP20pTEz6D9yjlmLULTpzZ2k=
