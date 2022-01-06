@@ -15,8 +15,8 @@ require (
 	github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c
 	github.com/creachadair/pebblestore v0.0.0-20211229161652-9b9957ad2e8b
 	github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77
-	github.com/creachadair/rpcstore v0.0.0-20211227020113-06644b0511f5
-	github.com/creachadair/s3store v0.0.0-20211222165926-ebec44d97300
+	github.com/creachadair/rpcstore v0.0.0-20211230014004-afed600df359
+	github.com/creachadair/s3store v0.0.0-20220106163600-478a833bc3c8
 	github.com/creachadair/sqlitestore v0.0.0-20211207165756-afaa2c87a458
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.4
@@ -27,14 +27,16 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.99.0 // indirect
+	cloud.google.com/go v0.100.2 // indirect
+	cloud.google.com/go/compute v0.1.0 // indirect
+	cloud.google.com/go/iam v0.1.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
 	crawshaw.io/sqlite v0.3.3-0.20211110021503-9d454769e7b5 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.42.25 // indirect
+	github.com/aws/aws-sdk-go v1.42.28 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -42,7 +44,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20211216145620-d92e9ce0af51 // indirect
 	github.com/cockroachdb/errors v1.8.6 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20211222161641-06e42cfa82c0 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220105215928-90d9c97f8c62 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/cockroachdb/sentry-go v0.6.1-cockroachdb.2 // indirect
 	github.com/creachadair/atomicfile v0.2.2 // indirect
@@ -71,8 +73,8 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20211221223016-e29036178569 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/exp v0.0.0-20220104160115-025e73f80486 // indirect
+	golang.org/x/net v0.0.0-20220105145211-5b0dc2dfae98 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
@@ -80,6 +82,6 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.63.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb // indirect
+	google.golang.org/genproto v0.0.0-20220106162220-2482ccee2e38 // indirect
 	google.golang.org/grpc v1.43.0 // indirect
 )
