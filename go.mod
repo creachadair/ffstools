@@ -4,11 +4,11 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.3
-	github.com/creachadair/bitcaskstore v0.0.0-20220114172257-945de66b3f66
+	github.com/creachadair/bitcaskstore v0.0.0-20220120005525-afbd6d93059d
 	github.com/creachadair/boltstore v0.0.0-20220120005615-345a7b608183
 	github.com/creachadair/command v0.0.0-20211126171518-aeb2c1414eea
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20211207080200-4aff01c85684
+	github.com/creachadair/ffs v0.0.0-20220120005444-cd9ab97e8698
 	github.com/creachadair/gcsstore v0.0.0-20220120005655-f3e5b1255477
 	github.com/creachadair/jrpc2 v0.35.3
 	github.com/creachadair/keyfile v0.7.1
