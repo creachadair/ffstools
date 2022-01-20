@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/jrpc2 v0.35.3
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c
-	github.com/creachadair/pebblestore v0.0.0-20220114172649-fe27ee7339f3
+	github.com/creachadair/pebblestore v0.0.0-20220120010924-01a13fe238f5
 	github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77
 	github.com/creachadair/rpcstore v0.0.0-20220120010038-671dd1aa2bdd
 	github.com/creachadair/s3store v0.0.0-20220119162946-278ae07bdf4f

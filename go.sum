@@ -141,7 +141,6 @@ github.com/cockroachdb/errors v1.8.6/go.mod h1:hOm5fabihW+xEyY1kuypGwqT+Vt7rafg0
 github.com/cockroachdb/logtags v0.0.0-20190617123548-eb05cc24525f/go.mod h1:i/u985jwjWRlyHXQbwatDASoW0RMlZ/3i9yJHE2xLkI=
 github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f h1:6jduT9Hfc0njg5jJ1DdKCFPdMBrp/mdZfCpa5h+WM74=
 github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f/go.mod h1:Vz9DsVWQQhf3vs21MhPMZpMGSht7O/2vFW2xusFUVOs=
-github.com/cockroachdb/pebble v0.0.0-20220113024134-d4f0a8d4e985/go.mod h1:buxOO9GBtOcq1DiXDpIPYrmxY020K2A8lOrwno5FetU=
 github.com/cockroachdb/pebble v0.0.0-20220119170834-7f1a70dc4fb5 h1:5npxfLojUuhrhn4letlcSd+vRDGIxKtz6TNJJVKxRzA=
 github.com/cockroachdb/pebble v0.0.0-20220119170834-7f1a70dc4fb5/go.mod h1:buxOO9GBtOcq1DiXDpIPYrmxY020K2A8lOrwno5FetU=
 github.com/cockroachdb/redact v1.0.8/go.mod h1:BVNblN9mBWFyMyqK1k3AAiSxhvhfK2oOZZ2lK+dpvRg=
@@ -190,8 +189,8 @@ github.com/creachadair/keyfile v0.7.1 h1:XN5VztUPSIbUv4xKCZ2lULM+UsYHAkqz1EvgmXC
 github.com/creachadair/keyfile v0.7.1/go.mod h1:kzXUh2yqee7jLtZuJPBute2307T9ryGBKuX+hiuwF8I=
 github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c h1:nL2vBh1HwWRaeBc40TpLP20pTEz6D9yjlmLULTpzZ2k=
 github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c/go.mod h1:YjBnaly5/BTK2wTPJdh8NvXZygVC13xOILtcXPzyb4k=
-github.com/creachadair/pebblestore v0.0.0-20220114172649-fe27ee7339f3 h1:nra6resoHhF3ox5Vc9fFOd/4YVB12sIj746vfCdMjC0=
-github.com/creachadair/pebblestore v0.0.0-20220114172649-fe27ee7339f3/go.mod h1:aHW3sY1s9iNGFwCKhV/HwvO5AtLEy3zW91YQpRcIvdU=
+github.com/creachadair/pebblestore v0.0.0-20220120010924-01a13fe238f5 h1:QG3mKn80nkx3I0z17iUYqkFbhtbkWoOQGIaHFqCi9oQ=
+github.com/creachadair/pebblestore v0.0.0-20220120010924-01a13fe238f5/go.mod h1:h4mdw5Uk/qxiw+tCIF176FPDY0LZg08JCucYCFQas3g=
 github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77 h1:rxFack84o+HYrd7beeq2NKDTTHXazlq1JFRXcCtc5xI=
 github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77/go.mod h1:aStA0cJbh5aFOgVp0ZalzNHKBNO2mIokxExrWklSiHM=
 github.com/creachadair/rpcstore v0.0.0-20220120010038-671dd1aa2bdd h1:r8Jy+/yXTi3069yXwTSy1UNxwvda9uZWtVeNrumPTco=
@@ -945,7 +944,6 @@ golang.org/x/sys v0.0.0-20211124211545-fe61309f8881/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20211205182925-97ca703d548d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211210111614-af8b64212486/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220111092808-5a964db01320/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 h1:XfKQ4OlFl8okEOr5UvAqFRVj8pY/4yfcXrddB8qAbU0=
 golang.org/x/sys v0.0.0-20220114195835-da31bd327af9/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
