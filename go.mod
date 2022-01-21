@@ -4,20 +4,20 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.3
-	github.com/creachadair/bitcaskstore v0.0.0-20220120005525-afbd6d93059d
-	github.com/creachadair/boltstore v0.0.0-20220120005615-345a7b608183
-	github.com/creachadair/command v0.0.0-20211126171518-aeb2c1414eea
+	github.com/creachadair/bitcaskstore v0.0.0-20220120010704-1c79f87b201e
+	github.com/creachadair/boltstore v0.0.0-20220120010755-5f007f2a3d79
+	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220120005444-cd9ab97e8698
-	github.com/creachadair/gcsstore v0.0.0-20220120005655-f3e5b1255477
+	github.com/creachadair/gcsstore v0.0.0-20220120010801-2b73286d4092
 	github.com/creachadair/jrpc2 v0.35.3
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20211207165704-9891a133532c
+	github.com/creachadair/leveldbstore v0.0.0-20220120010907-fb3814fd5091
 	github.com/creachadair/pebblestore v0.0.0-20220120010924-01a13fe238f5
-	github.com/creachadair/pogrebstore v0.0.0-20211207165741-4366a74e4e77
-	github.com/creachadair/rpcstore v0.0.0-20220120010038-671dd1aa2bdd
-	github.com/creachadair/s3store v0.0.0-20220119162946-278ae07bdf4f
-	github.com/creachadair/sqlitestore v0.0.0-20211207165756-afaa2c87a458
+	github.com/creachadair/pogrebstore v0.0.0-20220120010929-3017ee4bbc57
+	github.com/creachadair/rpcstore v0.0.0-20220120010934-acb59646536d
+	github.com/creachadair/s3store v0.0.0-20220120011025-f238e4700a0b
+	github.com/creachadair/sqlitestore v0.0.0-20220120011019-ac1c701cecbe
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.4
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
@@ -36,12 +36,12 @@ require (
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.42.37 // indirect
+	github.com/aws/aws-sdk-go v1.42.38 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.8.6 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220119170834-7f1a70dc4fb5 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220120225425-b510eb6b70c9 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/cockroachdb/sentry-go v0.6.1-cockroachdb.2 // indirect
 	github.com/creachadair/atomicfile v0.2.2 // indirect
