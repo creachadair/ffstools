@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.3
-	github.com/creachadair/bitcaskstore v0.0.0-20220120010704-1c79f87b201e
+	github.com/creachadair/bitcaskstore v0.0.0-20220122160137-1b10a623e97a
 	github.com/creachadair/boltstore v0.0.0-20220120010755-5f007f2a3d79
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
 	github.com/creachadair/ctrl v0.1.1
@@ -13,10 +13,10 @@ require (
 	github.com/creachadair/jrpc2 v0.35.3
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220120010907-fb3814fd5091
-	github.com/creachadair/pebblestore v0.0.0-20220121004112-8a2a9ba7ee37
+	github.com/creachadair/pebblestore v0.0.0-20220122160238-dcbcba5c4934
 	github.com/creachadair/pogrebstore v0.0.0-20220120010929-3017ee4bbc57
 	github.com/creachadair/rpcstore v0.0.0-20220120010934-acb59646536d
-	github.com/creachadair/s3store v0.0.0-20220121004150-0964e5ef5e9e
+	github.com/creachadair/s3store v0.0.0-20220122160310-a8c36af08c8e
 	github.com/creachadair/sqlitestore v0.0.0-20220120011019-ac1c701cecbe
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.4
