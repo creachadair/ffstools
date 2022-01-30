@@ -24,10 +24,11 @@
 // The storage implementations currently supported include:
 //
 //   Tag      | Description
-//   ---------|----------------------------------------------------------------------
+//   ---------|--------------------------------------------------------------------------
 //   badger   | BadgerDB   https://godoc.org/github.com/dgraph-io/badger/v3
 //   bitcask  | Bitcask    https://godoc.org/git.mills.io/prologic/bitcask
 //   bolt     | BoltDB     https://godoc.org/go.etcd.io/bbolt
+//   file     | Files      https://godoc.org/github.com/creachadair/ffs/storage/filestore
 //   gcs      | GCS        https://godoc.org/cloud.google.com/go/storage
 //   leveldb  | LevelDB    https://godoc.org/github.com/syndtr/goleveldb/leveldb
 //   memory   | In-memory  https://godoc.org/github.com/creachadair/ffs/blob/memstore
