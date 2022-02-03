@@ -19,7 +19,7 @@ require (
 	github.com/creachadair/s3store v0.0.0-20220128162423-0d271a8afddc
 	github.com/creachadair/sqlitestore v0.0.0-20220120011019-ac1c701cecbe
 	github.com/creachadair/taskgroup v0.3.1
-	github.com/pkg/xattr v0.4.4
+	github.com/pkg/xattr v0.4.5
 	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	google.golang.org/protobuf v1.27.1
