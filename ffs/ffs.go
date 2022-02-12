@@ -24,6 +24,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 
 	// Subcommands.
+	"github.com/creachadair/ffstools/ffs/internal/cmdexport"
 	"github.com/creachadair/ffstools/ffs/internal/cmdfile"
 	"github.com/creachadair/ffstools/ffs/internal/cmdgc"
 	"github.com/creachadair/ffstools/ffs/internal/cmdindex"
@@ -72,6 +73,7 @@ help [<command>]`,
 			cmdroot.Command,
 			cmdfile.Command,
 			cmdput.Command,
+			cmdexport.Command,
 			cmdgc.Command,
 			cmdindex.Command,
 			cmdsync.Command,
