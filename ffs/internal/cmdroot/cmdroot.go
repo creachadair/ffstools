@@ -136,7 +136,7 @@ var createFlags struct {
 }
 
 func runCreate(env *command.Env, args []string) error {
-	if len(args) < 2 {
+	if len(args) == 0 {
 		return env.Usagef("usage is: <name> <description>...")
 	}
 	key := config.RootKey(args[0])
