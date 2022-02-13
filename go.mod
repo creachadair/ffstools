@@ -20,7 +20,7 @@ require (
 	github.com/creachadair/sqlitestore v0.0.0-20220213164602-01fffa5105b0
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.5
-	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2
+	golang.org/x/crypto v0.0.0-20220213190939-1e6e3497d506
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
