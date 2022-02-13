@@ -163,11 +163,10 @@ github.com/cpuguy83/go-md2man v1.0.10/go.mod h1:SmD6nW6nTyfqj6ABTjUi3V3JVMnlJmwc
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/creachadair/atomicfile v0.2.1/go.mod h1:Tvr/wsb3lQY4dj+9utcmJ7Gp6wi3LKA8jRNqoxUhA2M=
-github.com/creachadair/atomicfile v0.2.2/go.mod h1:BRq8Une6ckFneYXZQ+kO7p1ZZP3I2fzVzf28JxrIkBc=
 github.com/creachadair/atomicfile v0.2.4 h1:GRjpQLmz/78I4+nBQpGMFrRa9yrL157AUTrA6hnF0YU=
 github.com/creachadair/atomicfile v0.2.4/go.mod h1:BRq8Une6ckFneYXZQ+kO7p1ZZP3I2fzVzf28JxrIkBc=
-github.com/creachadair/badgerstore v0.1.3 h1:VfKkV+q8fDxMsNj8Q5o0dzyV1lk6R+f0Y84kxS8YFW4=
-github.com/creachadair/badgerstore v0.1.3/go.mod h1:eqGRPpc9qpQntGS6bbQ+feSeiLtpGBuZqH4eeyeygKc=
+github.com/creachadair/badgerstore v0.1.4 h1:fvwbHMHXSFenOzjDpue+cgP3aQ28olcuMTas0i9YQwA=
+github.com/creachadair/badgerstore v0.1.4/go.mod h1:7N8iKq81L8Ptj6woxq+LTwHC8871Rtz+2R+srZSmwyI=
 github.com/creachadair/bitcaskstore v0.0.0-20220212145504-670c950d5468 h1:dpIpb0+RBKW0Q0tm1REmE1zv2wQ+CZTa1s7uZaMut2g=
 github.com/creachadair/bitcaskstore v0.0.0-20220212145504-670c950d5468/go.mod h1:3ATDUKD3E829cC6UfM6WLo4+T3Mi78nD7qWkHNNYVak=
 github.com/creachadair/boltstore v0.0.0-20220212145601-6248829ef137 h1:IEUzXUwtXk+bJg8BM+Kg0jHN4LcWFkNKpjdsruso1Tk=
@@ -176,7 +175,6 @@ github.com/creachadair/command v0.0.0-20220120005405-e6811e045833 h1:urF4aznFPc9
 github.com/creachadair/command v0.0.0-20220120005405-e6811e045833/go.mod h1:bAM+qFQb/KwWyCc9MLC4U1jvn3XyakqP5QRkds5T6cY=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.0.0-20211207080200-4aff01c85684/go.mod h1:ZlurDf9E8z3nBY8WUt2BzKHG2qH3mGwmZ2Ch03uvqrU=
 github.com/creachadair/ffs v0.0.0-20220212145432-089856c9d756 h1:G65n46/x4vWAyFhUju/9ffuy/RI5QU8b0ZSpv2n7Pjc=
 github.com/creachadair/ffs v0.0.0-20220212145432-089856c9d756/go.mod h1:ZfRSxYFbv8/H/fvlTxx4pYnzwkEo/MIaViSl4bdEnJY=
 github.com/creachadair/gcsstore v0.0.0-20220212145633-4b24138eeb5a h1:PDtRKLLIUU+ILe72K/o1fcPD37xl0fsCtlUssb+QtBg=
@@ -192,12 +190,12 @@ github.com/creachadair/pebblestore v0.0.0-20220212145755-14fc85536ab1 h1:JqFg6gA
 github.com/creachadair/pebblestore v0.0.0-20220212145755-14fc85536ab1/go.mod h1:3dDZNPSrolw1/JW35lH9mGVZJLP2OT4RUrTepSxzt+o=
 github.com/creachadair/pogrebstore v0.0.0-20220212145801-0af30e9b364a h1:rdSh4X2KNbv1ErVozVx8rlvaH7d9nTkWq10+fkobKSg=
 github.com/creachadair/pogrebstore v0.0.0-20220212145801-0af30e9b364a/go.mod h1:zHXQHIA/XMKLThLgnvYDEkUESxxItJztfCRS9Kq4r20=
-github.com/creachadair/rpcstore v0.0.0-20220212145809-0230fbe3b7a9 h1:OV/ITYwVWJSejSTQgQJ0O/8M9wt16a9n6ChS/Hd9yOE=
-github.com/creachadair/rpcstore v0.0.0-20220212145809-0230fbe3b7a9/go.mod h1:K4RmXGDnUeR6y9oPRRpVVBZ9eF8NQVz/SsFqpmMu/7I=
+github.com/creachadair/rpcstore v0.0.0-20220213164602-851ea0285e25 h1:v9ajKu2srexJab8E803cuH4087sPU3oVPGTxxgF8exY=
+github.com/creachadair/rpcstore v0.0.0-20220213164602-851ea0285e25/go.mod h1:K4RmXGDnUeR6y9oPRRpVVBZ9eF8NQVz/SsFqpmMu/7I=
 github.com/creachadair/s3store v0.0.0-20220212150037-b027e91a00d9 h1:5R0cjGKJ6q4Edhf9V3JKhkH8xTAJhdA/G3icw0PsXbQ=
 github.com/creachadair/s3store v0.0.0-20220212150037-b027e91a00d9/go.mod h1:4u0/6OV0b2nrSlSkntaHWbIYeDfdNT8FpSxE00WXv8o=
-github.com/creachadair/sqlitestore v0.0.0-20220212145944-d40e77845c02 h1:m6keIs2YgRd6JrJDIeGrf7WBPjlSFdC0PErEWvnTDIU=
-github.com/creachadair/sqlitestore v0.0.0-20220212145944-d40e77845c02/go.mod h1:ApxhKUhv3XaXvEMaL2UzLie5m2EpY46PnrotiOaITYo=
+github.com/creachadair/sqlitestore v0.0.0-20220213164602-01fffa5105b0 h1:4QEF6Q8yFPFHH7jfvxP4N9iwhizIjKH46vrea9VvWJ0=
+github.com/creachadair/sqlitestore v0.0.0-20220213164602-01fffa5105b0/go.mod h1:ApxhKUhv3XaXvEMaL2UzLie5m2EpY46PnrotiOaITYo=
 github.com/creachadair/taskgroup v0.3.1 h1:Mpi0sc005YWdsDEJsh8vGPOygp9b0rLR0OW6VBOp9Pc=
 github.com/creachadair/taskgroup v0.3.1/go.mod h1:q490pQxvbLXtIe4w8xlf5tcO6RR1AhRfWHXO0MotmHs=
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
@@ -332,7 +330,6 @@ github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38/go.mod h1:B4C85q
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/flatbuffers v1.12.1/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
-github.com/google/flatbuffers v2.0.0+incompatible/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
 github.com/google/flatbuffers v2.0.5+incompatible h1:ANsW0idDAXIY+mNHzIHxWRfabV2x5LUEEIIWcwsYgB8=
 github.com/google/flatbuffers v2.0.5+incompatible/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
@@ -460,7 +457,6 @@ github.com/klauspost/compress v1.8.2/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0
 github.com/klauspost/compress v1.9.0/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/compress v1.11.7/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
 github.com/klauspost/compress v1.12.3/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
-github.com/klauspost/compress v1.13.6/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/compress v1.14.2 h1:S0OHlFk/Gbon/yauFJ4FfJJF5V0fc5HbBTJazi28pRw=
 github.com/klauspost/compress v1.14.2/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/cpuid v1.2.1/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
@@ -828,7 +824,6 @@ golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420/go.mod h1:9nx3DQGgdP8bBQD5qx
 golang.org/x/net v0.0.0-20210614182718-04defd469f4e/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
-golang.org/x/net v0.0.0-20211206223403-eba003a116a9/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.0.0-20211216030914-fe4d6282115f/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd h1:O7DYs+zxREGLKzKoMQrtrEacpb0ZVXA5rIwylE2Xchk=
 golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd/go.mod h1:CfG3xpIq0wQ8r1q4Su4UZFWDARRcnwPjda9FqA0JpMk=
@@ -936,7 +931,6 @@ golang.org/x/sys v0.0.0-20210908233432-aa78b53d3365/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210909193231-528a39cd75f3/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211019181941-9d821ace8654/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211124211545-fe61309f8881/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20211205182925-97ca703d548d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211210111614-af8b64212486/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220114195835-da31bd327af9/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

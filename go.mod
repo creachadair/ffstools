@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.17
 
 require (
-	github.com/creachadair/badgerstore v0.1.3
+	github.com/creachadair/badgerstore v0.1.4
 	github.com/creachadair/bitcaskstore v0.0.0-20220212145504-670c950d5468
 	github.com/creachadair/boltstore v0.0.0-20220212145601-6248829ef137
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
@@ -15,9 +15,9 @@ require (
 	github.com/creachadair/leveldbstore v0.0.0-20220212145739-c15ee10076cb
 	github.com/creachadair/pebblestore v0.0.0-20220212145755-14fc85536ab1
 	github.com/creachadair/pogrebstore v0.0.0-20220212145801-0af30e9b364a
-	github.com/creachadair/rpcstore v0.0.0-20220212145809-0230fbe3b7a9
+	github.com/creachadair/rpcstore v0.0.0-20220213164602-851ea0285e25
 	github.com/creachadair/s3store v0.0.0-20220212150037-b027e91a00d9
-	github.com/creachadair/sqlitestore v0.0.0-20220212145944-d40e77845c02
+	github.com/creachadair/sqlitestore v0.0.0-20220213164602-01fffa5105b0
 	github.com/creachadair/taskgroup v0.3.1
 	github.com/pkg/xattr v0.4.5
 	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2
