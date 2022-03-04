@@ -3,17 +3,17 @@ module github.com/creachadair/ffstools
 go 1.17
 
 require (
-	github.com/creachadair/badgerstore v0.1.4
+	github.com/creachadair/badgerstore v0.1.5
 	github.com/creachadair/bitcaskstore v0.0.0-20220304185113-576445525908
 	github.com/creachadair/boltstore v0.0.0-20220301183621-0b4f45100f5a
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220221122908-85114e17bf06
-	github.com/creachadair/gcsstore v0.0.0-20220301183638-671e652308ee
+	github.com/creachadair/gcsstore v0.0.0-20220304185136-5d6c04a4796f
 	github.com/creachadair/jrpc2 v0.37.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220221174945-772eaa8b4271
-	github.com/creachadair/pebblestore v0.0.0-20220301183711-8feac39b9559
+	github.com/creachadair/pebblestore v0.0.0-20220304185348-6d54b14485bc
 	github.com/creachadair/pogrebstore v0.0.0-20220221175014-aee34afb42f2
 	github.com/creachadair/rpcstore v0.0.0-20220226220356-78865e72fcf7
 	github.com/creachadair/s3store v0.0.0-20220304171150-edb833d5b8c5
