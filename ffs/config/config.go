@@ -40,22 +40,49 @@ type Settings struct {
 	// Context value governing the execution of the tool.
 	Context context.Context `json:"-" yaml:"-"`
 
-	// The default address for the blob store service (required).
-	StoreAddress string `json:"storeAddress" yaml:"store-address"`
+	// The default address for the blob store service (required).  This must be
+	// either a store tag (@name) or an address.
+	DefaultStore string `json:"defaultStore" yaml:"default-store"`
+
+	// Well-known store specifications, addressable by tag.
+	Stores []*StoreSpec `json:"stores" yaml:"stores"`
+}
+
+// A StoreSpec associates a tag (handle) with a storage address.
+type StoreSpec struct {
+	Tag     string `json:"tag" yaml:"tag"`
+	Address string `json:"address" yaml:"address"`
+}
+
+func (s *Settings) findAddress() (string, bool) {
+	if s.DefaultStore == "" {
+		return "", false
+	} else if strings.HasPrefix(s.DefaultStore, "@") {
+		tag := strings.TrimPrefix(s.DefaultStore, "@")
+		for _, st := range s.Stores {
+			if tag == st.Tag {
+				ExpandString(&st.Address)
+				return st.Address, true
+			}
+		}
+		return tag, false
+	}
+	return s.DefaultStore, true
 }
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
 func (s *Settings) OpenStore(ctx context.Context) (blob.CAS, error) {
-	return OpenStore(ctx, s.StoreAddress)
+	addr, ok := s.findAddress()
+	if !ok {
+		return nil, errors.New("no store service address")
+	}
+	return OpenStore(ctx, addr)
 }
 
 // OpenStore connects to the store service at addr.  The caller is responsible
 // for closing the store when it is no longer needed.
 func OpenStore(_ context.Context, addr string) (blob.CAS, error) {
-	if addr == "" {
-		return nil, errors.New("no store service address")
-	}
 	conn, err := net.Dial(jrpc2.Network(addr))
 	if err != nil {
 		return nil, fmt.Errorf("dialing store: %w", err)
@@ -67,7 +94,11 @@ func OpenStore(_ context.Context, addr string) (blob.CAS, error) {
 // WithStore calls f with a store opened from the configuration. The store is
 // closed after f returns. The error returned by f is returned by WithStore.
 func (s *Settings) WithStore(ctx context.Context, f func(blob.CAS) error) error {
-	return WithStore(ctx, s.StoreAddress, f)
+	addr, ok := s.findAddress()
+	if !ok {
+		return errors.New("no store service address")
+	}
+	return WithStore(ctx, addr, f)
 }
 
 // WithStore calls f with a store opened at addr. The store is closed after f

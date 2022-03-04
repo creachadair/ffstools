@@ -59,12 +59,12 @@ help [<command>]`,
 				return err
 			}
 			if storeAddr != "" {
-				cfg.StoreAddress = storeAddr
-			} else if bs := os.Getenv("BLOB_STORE"); bs != "" {
-				cfg.StoreAddress = bs
+				cfg.DefaultStore = storeAddr
+			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
+				cfg.DefaultStore = bs
 			}
 			cfg.Context = context.Background()
-			config.ExpandString(&cfg.StoreAddress)
+			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
 			return nil
 		},
