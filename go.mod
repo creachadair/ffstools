@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.4
-	github.com/creachadair/bitcaskstore v0.0.0-20220301183531-37c2dd981ce6
+	github.com/creachadair/bitcaskstore v0.0.0-20220304185113-576445525908
 	github.com/creachadair/boltstore v0.0.0-20220301183621-0b4f45100f5a
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
 	github.com/creachadair/ctrl v0.1.1
@@ -16,7 +16,7 @@ require (
 	github.com/creachadair/pebblestore v0.0.0-20220301183711-8feac39b9559
 	github.com/creachadair/pogrebstore v0.0.0-20220221175014-aee34afb42f2
 	github.com/creachadair/rpcstore v0.0.0-20220226220356-78865e72fcf7
-	github.com/creachadair/s3store v0.0.0-20220301170405-d705a67d98f0
+	github.com/creachadair/s3store v0.0.0-20220304171150-edb833d5b8c5
 	github.com/creachadair/sqlitestore v0.0.0-20220221175155-b8dda49d66a8
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.5
@@ -29,19 +29,19 @@ require (
 require (
 	cloud.google.com/go v0.100.2 // indirect
 	cloud.google.com/go/compute v1.5.0 // indirect
-	cloud.google.com/go/iam v0.2.0 // indirect
+	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/storage v1.21.0 // indirect
 	crawshaw.io/sqlite v0.3.3-0.20211227050848-2cdb5c1a86a1 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.43.8 // indirect
+	github.com/aws/aws-sdk-go v1.43.11 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.8.9 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220228203422-db4b6dca750d // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220303224620-9d0c3914df4b // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/atomicfile v0.2.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.14.4 // indirect
+	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -68,7 +68,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20220218215828-6cf2b201936e // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
@@ -77,6 +77,6 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.70.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220301145929-1ac2ace0dbf7 // indirect
+	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8 // indirect
 	google.golang.org/grpc v1.44.0 // indirect
 )
