@@ -149,8 +149,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsr
 github.com/creachadair/atomicfile v0.2.1/go.mod h1:Tvr/wsb3lQY4dj+9utcmJ7Gp6wi3LKA8jRNqoxUhA2M=
 github.com/creachadair/atomicfile v0.2.4 h1:GRjpQLmz/78I4+nBQpGMFrRa9yrL157AUTrA6hnF0YU=
 github.com/creachadair/atomicfile v0.2.4/go.mod h1:BRq8Une6ckFneYXZQ+kO7p1ZZP3I2fzVzf28JxrIkBc=
-github.com/creachadair/badgerstore v0.1.5 h1:lXCyArcYKLOQqiiGP4vFh4rBFSHJAmDCLuuz5xlsvrc=
-github.com/creachadair/badgerstore v0.1.5/go.mod h1:kKj/mPbg2IkXSUpSVMDi3AdgDXb5j2uiXZj12iImZKo=
+github.com/creachadair/badgerstore v0.1.6 h1:jdgCi7VIjvG1T8gRNTYJMMgfLt2TwYlalFZ4OIq9AZQ=
+github.com/creachadair/badgerstore v0.1.6/go.mod h1:Brx71T8Pirs7X1y6xjSRzrK2nT06vDcRESZVBnrPBhU=
 github.com/creachadair/bitcaskstore v0.0.0-20220311212707-ae934fb058a1 h1:bNXSH936wPeQhQxk1YeF686KHjbFedHI5IqV8ioh6tk=
 github.com/creachadair/bitcaskstore v0.0.0-20220311212707-ae934fb058a1/go.mod h1:CV3aknQaVRoFdEPc17ACbIkwdKzwF6Dee8v2M3s95sA=
 github.com/creachadair/boltstore v0.0.0-20220317165733-dff89e3a6075 h1:uP0DOJbFX7CEwqQqJOMwOylDwTB/fcf8VWbpJW+M3JQ=
@@ -429,7 +429,6 @@ github.com/klauspost/compress v1.9.0/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0
 github.com/klauspost/compress v1.9.7/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/compress v1.11.7/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
 github.com/klauspost/compress v1.12.3/go.mod h1:8dP1Hq4DHOhN9w426knH3Rhby4rFm6D8eO+e+Dq5Gzg=
-github.com/klauspost/compress v1.15.0/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/compress v1.15.1 h1:y9FcTHGyrebwfP0ZZqFiaxTaiDnUrGkJkI+f583BL1A=
 github.com/klauspost/compress v1.15.1/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/cpuid v1.2.1/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
