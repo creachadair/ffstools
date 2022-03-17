@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.17
 
 require (
-	github.com/creachadair/badgerstore v0.1.5
+	github.com/creachadair/badgerstore v0.1.6
 	github.com/creachadair/bitcaskstore v0.0.0-20220311212707-ae934fb058a1
 	github.com/creachadair/boltstore v0.0.0-20220317165733-dff89e3a6075
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
