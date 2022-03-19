@@ -4,12 +4,12 @@ go 1.17
 
 require (
 	github.com/creachadair/badgerstore v0.1.6
-	github.com/creachadair/bitcaskstore v0.0.0-20220311212707-ae934fb058a1
+	github.com/creachadair/bitcaskstore v0.0.0-20220317165644-392e07af479a
 	github.com/creachadair/boltstore v0.0.0-20220317165733-dff89e3a6075
 	github.com/creachadair/command v0.0.0-20220120005405-e6811e045833
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220221122908-85114e17bf06
-	github.com/creachadair/gcsstore v0.0.0-20220316043936-18e850b620ab
+	github.com/creachadair/gcsstore v0.0.0-20220317165751-b164a02f3f63
 	github.com/creachadair/jrpc2 v0.37.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220221174945-772eaa8b4271
@@ -36,12 +36,12 @@ require (
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.43.20 // indirect
+	github.com/aws/aws-sdk-go v1.43.21 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220316164928-2c7b5358bae4 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220318150003-0ad186894f6d // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/atomicfile v0.2.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
@@ -68,11 +68,11 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20220317015231-48e79f11773a // indirect
+	golang.org/x/exp v0.0.0-20220318154914-8dddf5d87bd8 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220317061510-51cd9980dadf // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.73.0 // indirect
