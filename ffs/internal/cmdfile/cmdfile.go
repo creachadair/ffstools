@@ -99,7 +99,7 @@ func runShow(env *command.Env, args []string) error {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			parts := strings.SplitN(arg, "/", 2)
+			parts := splitPath(arg)
 			of, err := openFile(cfg.Context, s, parts[0], parts[1:]...)
 			if err != nil {
 				return err
@@ -121,7 +121,7 @@ func runRead(env *command.Env, args []string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		parts := strings.SplitN(args[0], "/", 2)
+		parts := splitPath(args[0])
 		of, err := openFile(cfg.Context, s, parts[0], parts[1:]...)
 		if err != nil {
 			return err
@@ -135,7 +135,7 @@ func runSet(env *command.Env, args []string) error {
 	if len(args) != 2 {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
 	}
-	originPath := strings.SplitN(args[0], "/", 2)
+	originPath := splitPath(args[0])
 	if len(originPath) == 1 {
 		return env.Usagef("path must not be empty")
 	}
@@ -184,7 +184,7 @@ func runRemove(env *command.Env, args []string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		for _, arg := range args {
-			parts := strings.SplitN(arg, "/", 2)
+			parts := splitPath(arg)
 			if len(parts) == 1 {
 				return fmt.Errorf("missing path %q", parts[0])
 			}
@@ -269,4 +269,14 @@ func openFile(ctx context.Context, s blob.CAS, spec string, path ...string) (*op
 	}
 	out.targetKey, _ = out.targetFile.Flush(ctx)
 	return &out, nil
+}
+
+func splitPath(s string) []string {
+	eq := strings.Index(s, "=")
+	if len(s) == eq+1 {
+		return []string{s}
+	} else if len(s) > eq+1 && s[eq+1] == '/' {
+		return []string{s[:eq], s[eq+2:]}
+	}
+	return strings.SplitN(s, "/", 2)
 }
