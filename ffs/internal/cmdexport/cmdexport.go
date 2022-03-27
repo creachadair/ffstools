@@ -40,6 +40,7 @@ var exportFlags struct {
 	XAttr   bool
 	Verbose bool
 	Target  string
+	Update  bool
 }
 
 var Command = &command.C{
@@ -52,6 +53,7 @@ var Command = &command.C{
 		fs.BoolVar(&exportFlags.Stat, "stat", false, "Update permissions and modification times")
 		fs.BoolVar(&exportFlags.XAttr, "xattr", false, "Restore extended attributes")
 		fs.BoolVar(&exportFlags.Verbose, "v", false, "Enable verbose logging")
+		fs.BoolVar(&exportFlags.Update, "update", false, "Update target if it exists")
 		fs.StringVar(&exportFlags.Target, "to", "", "Export to this path (required)")
 	},
 	Run: runExport,
@@ -97,7 +99,9 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	if mode.IsDir() {
 		logPrintf("Create directory %q", path)
 		if err := os.Mkdir(path, 0700); err != nil {
-			return err
+			if !exportFlags.Update || !os.IsExist(err) {
+				return err
+			}
 		}
 	} else if mode.Type()&fs.ModeSymlink != 0 {
 		logPrintf("Create symlink %q", path)
@@ -106,6 +110,12 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 		}
 		link = true
 	} else {
+		if !exportFlags.Update {
+			_, err := os.Lstat(path)
+			if err == nil {
+				return fmt.Errorf("file %q exists", path)
+			}
+		}
 		logPrintf("Export file %q", path)
 		if err := copyFile(ctx, f, path); err != nil {
 			return err
