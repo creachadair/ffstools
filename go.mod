@@ -3,21 +3,22 @@ module github.com/creachadair/ffstools
 go 1.17
 
 require (
+	github.com/creachadair/atomicfile v0.2.5
 	github.com/creachadair/badgerstore v0.1.7
-	github.com/creachadair/bitcaskstore v0.0.0-20220413091820-e1001c2a25e6
-	github.com/creachadair/boltstore v0.0.0-20220413091912-fc28bb6cb658
-	github.com/creachadair/command v0.0.0-20220330011755-dd63e44ff6a7
+	github.com/creachadair/bitcaskstore v0.0.0-20220416191213-079629b7fabc
+	github.com/creachadair/boltstore v0.0.0-20220416191309-ae47cdbe9ddc
+	github.com/creachadair/command v0.0.0-20220416190544-40bc5760515e
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220322155852-b9ea0b340867
-	github.com/creachadair/gcsstore v0.0.0-20220413234245-0c6f3a3fd825
+	github.com/creachadair/ffs v0.0.0-20220416191121-07217a8a1b12
+	github.com/creachadair/gcsstore v0.0.0-20220416191347-93c1f572425b
 	github.com/creachadair/jrpc2 v0.37.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20220330011706-c371cd17af17
-	github.com/creachadair/pebblestore v0.0.0-20220413234323-befefadf2728
-	github.com/creachadair/pogrebstore v0.0.0-20220330011629-21a61763e0de
-	github.com/creachadair/rpcstore v0.0.0-20220330011735-198aac3bf1cd
-	github.com/creachadair/s3store v0.0.0-20220413234429-8aea5d949c1d
-	github.com/creachadair/sqlitestore v0.0.0-20220330011744-7dfcd2927e36
+	github.com/creachadair/leveldbstore v0.0.0-20220416191453-d9793619312e
+	github.com/creachadair/pebblestore v0.0.0-20220416191523-202ea8a3d2b2
+	github.com/creachadair/pogrebstore v0.0.0-20220416191532-034fb2fed03a
+	github.com/creachadair/rpcstore v0.0.0-20220416191546-9c04012eca98
+	github.com/creachadair/s3store v0.0.0-20220416191711-011ae3a049c4
+	github.com/creachadair/sqlitestore v0.0.0-20220416191615-0b794f6848da
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.6
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
@@ -36,14 +37,13 @@ require (
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.43.40 // indirect
+	github.com/aws/aws-sdk-go v1.43.41 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
 	github.com/cockroachdb/pebble v0.0.0-20220414212822-4e77c07790d3 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
-	github.com/creachadair/atomicfile v0.2.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
