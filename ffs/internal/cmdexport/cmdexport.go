@@ -32,6 +32,7 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
 )
 
@@ -86,14 +87,34 @@ func runExport(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		return fpath.Walk(cfg.Context, f, func(e fpath.Entry) error {
-			opath := filepath.Join(exportFlags.Target, filepath.FromSlash(e.Path))
-			return exportFile(cfg.Context, e.File, opath)
+		cctx, cancel := context.WithCancel(cfg.Context)
+		defer cancel()
+		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(32)
+
+		g.Go(func() error {
+			return fpath.Walk(cctx, f, func(e fpath.Entry) error {
+				if err := cctx.Err(); err != nil {
+					return err
+				}
+
+				opath := filepath.Join(exportFlags.Target, filepath.FromSlash(e.Path))
+				if !e.File.Stat().Mode.IsDir() {
+					start(func() error {
+						return exportFile(cctx, e.File, opath)
+					})
+					return nil
+				}
+				return exportFile(cctx, e.File, opath)
+			})
 		})
+		return g.Wait()
 	})
 }
 
 func exportFile(ctx context.Context, f *file.File, path string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	mode := f.Stat().Mode
 	var link bool
 	if mode.IsDir() {
@@ -116,7 +137,7 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 				return fmt.Errorf("file %q exists", path)
 			}
 		}
-		logPrintf("Export file %q", path)
+		logPrintf("Export %q", path)
 		if err := copyFile(ctx, f, path); err != nil {
 			return err
 		}
@@ -125,8 +146,8 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	// Restore permissions and modification times, if requested and available.
 	if exportFlags.Stat && f.Stat().Persistent() && !link {
 		stat := f.Stat()
-		logPrintf("- Restore permissions %v and modtime %v",
-			stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
+		logPrintf("Restore %q mode %v and modtime %v",
+			path, stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
 
 		if err := os.Chmod(path, stat.Mode); err != nil {
 			return fmt.Errorf("setting permissions: %w", err)
@@ -143,7 +164,7 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 		var xerr error
 		f.XAttr().List(func(key, value string) {
 			if xerr == nil {
-				logPrintf("- Restore xattr %q", key)
+				logPrintf("Restore %q xattr %q", path, key)
 				xerr = xattr.LSet(path, key, []byte(value))
 			}
 		})
