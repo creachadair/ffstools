@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
@@ -176,15 +177,8 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 }
 
 func copyFile(ctx context.Context, f *file.File, path string) error {
-	out, err := os.Create(path)
-	if err != nil {
-		return fmt.Errorf("creating output file: %w", err)
-	}
-	if _, err := io.Copy(out, f.Cursor(ctx)); err != nil {
-		out.Close()
-		return fmt.Errorf("copying file contents: %w", err)
-	}
-	return out.Close()
+	_, err := atomicfile.WriteAll(path, f.Cursor(ctx), 0600)
+	return err
 }
 
 func linkFile(ctx context.Context, f *file.File, path string) error {
