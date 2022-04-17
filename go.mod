@@ -5,22 +5,22 @@ go 1.17
 require (
 	github.com/creachadair/atomicfile v0.2.5
 	github.com/creachadair/badgerstore v0.1.8
-	github.com/creachadair/bitcaskstore v0.0.0-20220416191213-079629b7fabc
-	github.com/creachadair/boltstore v0.0.0-20220416191309-ae47cdbe9ddc
-	github.com/creachadair/command v0.0.0-20220416190544-40bc5760515e
+	github.com/creachadair/bitcaskstore v0.0.0-20220416213235-8e929c5ceefd
+	github.com/creachadair/boltstore v0.0.0-20220416213235-bd9cb8bb5a90
+	github.com/creachadair/command v0.0.0-20220416213235-6b42ff5d5398
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220416191121-07217a8a1b12
-	github.com/creachadair/gcsstore v0.0.0-20220416191347-93c1f572425b
+	github.com/creachadair/ffs v0.0.0-20220416213235-6388f88050e4
+	github.com/creachadair/gcsstore v0.0.0-20220417232102-a6ae3c911897
 	github.com/creachadair/jrpc2 v0.37.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20220416191453-d9793619312e
-	github.com/creachadair/pebblestore v0.0.0-20220416191523-202ea8a3d2b2
-	github.com/creachadair/pogrebstore v0.0.0-20220416191532-034fb2fed03a
-	github.com/creachadair/rpcstore v0.0.0-20220416191546-9c04012eca98
-	github.com/creachadair/s3store v0.0.0-20220416191711-011ae3a049c4
-	github.com/creachadair/sqlitestore v0.0.0-20220416191615-0b794f6848da
+	github.com/creachadair/leveldbstore v0.0.0-20220416213235-f36987b0f071
+	github.com/creachadair/pebblestore v0.0.0-20220416213235-106e0bd7d69e
+	github.com/creachadair/pogrebstore v0.0.0-20220416213235-2cb86b49201f
+	github.com/creachadair/rpcstore v0.0.0-20220416213235-fabf059c2849
+	github.com/creachadair/s3store v0.0.0-20220416213235-66035d0b5c39
+	github.com/creachadair/sqlitestore v0.0.0-20220416213235-9f7ab7e786e4
 	github.com/creachadair/taskgroup v0.3.2
-	github.com/pkg/xattr v0.4.6
+	github.com/pkg/xattr v0.4.7
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171
 	google.golang.org/protobuf v1.28.0
@@ -42,7 +42,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220414212822-4e77c07790d3 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220416213254-b9bcae653ce6 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
