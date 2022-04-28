@@ -5,23 +5,23 @@ go 1.17
 require (
 	github.com/creachadair/atomicfile v0.2.5
 	github.com/creachadair/badgerstore v0.1.9
-	github.com/creachadair/bitcaskstore v0.0.0-20220427000034-f4404c7a0327
-	github.com/creachadair/boltstore v0.0.0-20220427000121-53cf255a93ab
+	github.com/creachadair/bitcaskstore v0.0.0-20220428203513-d55823f3a982
+	github.com/creachadair/boltstore v0.0.0-20220427000910-2ac5e1047ef6
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220426235939-589f835c0a18
-	github.com/creachadair/gcsstore v0.0.0-20220427000150-7429c761f7b2
+	github.com/creachadair/gcsstore v0.0.0-20220427000936-95cda7992a29
 	github.com/creachadair/jrpc2 v0.39.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20220427000251-bda1c09ce7c7
-	github.com/creachadair/pebblestore v0.0.0-20220427000302-b2f8eeff6668
-	github.com/creachadair/pogrebstore v0.0.0-20220427000309-2f8dc4e9a038
-	github.com/creachadair/rpcstore v0.0.0-20220427000313-3a1e714741a8
-	github.com/creachadair/s3store v0.0.0-20220427000331-8c8c6f9f3b65
-	github.com/creachadair/sqlitestore v0.0.0-20220427000320-ff86b565b636
+	github.com/creachadair/leveldbstore v0.0.0-20220427001036-3d2ff96864fd
+	github.com/creachadair/pebblestore v0.0.0-20220428203609-ff7f9fb118ae
+	github.com/creachadair/pogrebstore v0.0.0-20220427001047-d2f5b92d76f2
+	github.com/creachadair/rpcstore v0.0.0-20220427001051-c35b07925d20
+	github.com/creachadair/s3store v0.0.0-20220428203642-e82fa35768fe
+	github.com/creachadair/sqlitestore v0.0.0-20220427001055-07e2bc7b8baa
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -37,12 +37,12 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.1 // indirect
+	github.com/aws/aws-sdk-go v1.44.3 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220426173801-b33d6e173cae // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220428162328-d8f63bef04f9 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/codahale/hdrhistogram v0.9.0 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
@@ -70,7 +70,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20220426173459-3bcf042a4bf5 // indirect
+	golang.org/x/exp v0.0.0-20220428152302-39d4317da171 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
