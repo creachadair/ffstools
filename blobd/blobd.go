@@ -41,12 +41,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"syscall"
@@ -70,6 +72,7 @@ var (
 	cacheSize  = flag.Int("cache", 0, "Memory cache size in MiB (0 means no cache)")
 	doDebug    = flag.Bool("debug", false, "Enable server debug logging")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
+	doVersion  = flag.Bool("version", false, "Print version information and exit")
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
@@ -112,6 +115,8 @@ func main() {
 	flag.Parse()
 	ctrl.Run(func() error {
 		switch {
+		case *doVersion:
+			return printVersion()
 		case *listenAddr == "":
 			ctrl.Exitf(1, "You must provide a non-empty -listen address")
 		case *storeAddr == "":
@@ -186,4 +191,24 @@ func main() {
 		}()
 		return <-errc
 	})
+}
+
+func printVersion() error {
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return errors.New("no version information is available")
+	}
+	rev := "(unknown)"
+	time := "(unknown)"
+	for _, s := range bi.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			rev = s.Value
+		case "vcs.time":
+			time = s.Value
+		}
+	}
+	fmt.Printf("%s built by %s at time %s rev %s\n",
+		filepath.Base(os.Args[0]), bi.GoVersion, time, rev)
+	return nil
 }
