@@ -40,11 +40,8 @@ var Command = &command.C{
 		fs.BoolVar(&indexFlags.Force, "f", false, "Force reindexing")
 	},
 
-	Run: func(env *command.Env, args []string) error {
-		keys, err := config.RootKeys(args)
-		if err != nil {
-			return err
-		} else if len(keys) == 0 {
+	Run: func(env *command.Env, keys []string) error {
+		if len(keys) == 0 {
 			return env.Usagef("missing required <root-key>")
 		}
 
@@ -55,7 +52,7 @@ var Command = &command.C{
 				return err
 			}
 			for _, key := range keys {
-				rp, err := root.Open(cfg.Context, s, key)
+				rp, err := root.Open(cfg.Context, config.Roots(s), key)
 				if err != nil {
 					return err
 				}
@@ -63,7 +60,7 @@ var Command = &command.C{
 					fmt.Fprintf(env, "Root %q is already indexed\n", key)
 					continue
 				}
-				fp, err := rp.File(cfg.Context)
+				fp, err := rp.File(cfg.Context, s)
 				if err != nil {
 					return err
 				}
