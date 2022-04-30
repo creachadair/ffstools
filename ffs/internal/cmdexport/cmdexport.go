@@ -190,12 +190,12 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 }
 
 func openFile(ctx context.Context, s blob.CAS, spec string) (*file.File, error) {
-	if strings.HasPrefix(spec, "root:") {
-		rp, err := root.Open(ctx, s, spec)
+	if strings.HasPrefix(spec, "@") {
+		rp, err := root.Open(ctx, config.Roots(s), spec[1:])
 		if err != nil {
 			return nil, err
 		}
-		return rp.File(ctx)
+		return rp.File(ctx, s)
 	}
 	key, err := config.ParseKey(spec)
 	if err != nil {
