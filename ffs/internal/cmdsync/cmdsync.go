@@ -43,7 +43,7 @@ func debug(msg string, args ...interface{}) {
 
 var Command = &command.C{
 	Name:  "sync",
-	Usage: `<target-store> (<file-key>|root:<root-key>) ...`,
+	Usage: `<target-store> (<file-key>|@<root-key>) ...`,
 	Help: `Synchronize file trees between stores.
 
 Transfer all the blobs reachable from the specified file or root
@@ -68,9 +68,9 @@ func runSync(env *command.Env, args []string) error {
 			debug("Target store: %q", addr)
 			for _, elt := range keys {
 				var err error
-				if strings.HasPrefix(elt, "root:") {
+				if strings.HasPrefix(elt, "@") {
 					debug("Copying root %q...", elt)
-					err = copyRoot(cfg.Context, src, tgt, elt)
+					err = copyRoot(cfg.Context, src, tgt, elt[1:])
 				} else if pk, perr := config.ParseKey(elt); perr != nil {
 					return perr
 				} else if fp, oerr := file.Open(cfg.Context, src, pk); oerr != nil {
@@ -90,7 +90,7 @@ func runSync(env *command.Env, args []string) error {
 }
 
 func copyRoot(ctx context.Context, src, tgt blob.CAS, key string) error {
-	rp, err := root.Open(ctx, src, key)
+	rp, err := root.Open(ctx, config.Roots(src), key)
 	if err != nil {
 		return err
 	}
@@ -105,14 +105,14 @@ func copyRoot(ctx context.Context, src, tgt blob.CAS, key string) error {
 			return err
 		}
 	}
-	fp, err := rp.File(ctx)
+	fp, err := rp.File(ctx, src)
 	if err != nil {
 		return err
 	}
 	if err := copyFile(ctx, src, tgt, fp); err != nil {
 		return fmt.Errorf("copying root file: %w", err)
 	}
-	return root.New(tgt, &root.Options{
+	return root.New(config.Roots(tgt), &root.Options{
 		OwnerKey:    rp.OwnerKey,
 		Description: rp.Description,
 		FileKey:     rp.FileKey,
