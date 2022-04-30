@@ -30,6 +30,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/creachadair/jrpc2/jhttp"
@@ -247,11 +248,12 @@ func copyCmd(env *command.Env, args []string) error {
 }
 
 func statCmd(env *command.Env, args []string) error {
+	env.Config.(*settings).Bucket = ""
 	s, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	si, err := s.ServerInfo(getContext(env))
+	si, err := s.(rpcstore.CAS).ServerInfo(getContext(env))
 	if err != nil {
 		return err
 	}
@@ -305,7 +307,7 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 	return
 }
 
-func storeFromEnv(env *command.Env) (rpcstore.CAS, error) {
+func storeFromEnv(env *command.Env) (blob.CAS, error) {
 	t := env.Config.(*settings)
 	if t.Store == "" {
 		return rpcstore.CAS{}, errors.New("no -store address was specified")
@@ -323,7 +325,11 @@ func storeFromEnv(env *command.Env) (rpcstore.CAS, error) {
 		logger = jrpc2.StdLogger(log.New(os.Stderr, "[client] ", log.LstdFlags))
 	}
 	cli := jrpc2.NewClient(ch, &jrpc2.ClientOptions{Logger: logger})
-	return rpcstore.NewCAS(cli, nil), nil
+	bs := rpcstore.NewCAS(cli, nil)
+	if t.Bucket == "" {
+		return bs, nil
+	}
+	return prefixed.NewCAS(bs).Derive(t.Bucket), nil
 }
 
 func isAllHex(s string) bool {

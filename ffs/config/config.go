@@ -29,6 +29,7 @@ import (
 	"strings"
 
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/creachadair/rpcstore"
@@ -88,7 +89,8 @@ func OpenStore(_ context.Context, addr string) (blob.CAS, error) {
 		return nil, fmt.Errorf("dialing store: %w", err)
 	}
 	ch := channel.Line(conn, conn)
-	return rpcstore.NewCAS(jrpc2.NewClient(ch, nil), nil), nil
+	bs := rpcstore.NewCAS(jrpc2.NewClient(ch, nil), nil)
+	return prefixed.NewCAS(bs).Derive(" "), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
@@ -112,6 +114,9 @@ func WithStore(ctx context.Context, addr string, f func(blob.CAS) error) error {
 	return f(bs)
 }
 
+// Roots derives a view of roots from bs.
+func Roots(bs blob.CAS) prefixed.CAS { return prefixed.NewCAS(bs).Derive("@") }
+
 // ParseKey parses the string encoding of a key.  By default, s must be hex
 // encoded. If s begins with "@", it is taken literally. If s begins with "+"
 // it is taken as base64.
@@ -132,34 +137,6 @@ func ParseKey(s string) (string, error) {
 		return "", fmt.Errorf("invalid key %q: %w", s, err)
 	}
 	return string(key), nil
-}
-
-// RootKeys returns a slice of root keys from args, or an error if any of the
-// keys is invalid.
-func RootKeys(args []string) ([]string, error) {
-	keys := make([]string, len(args))
-	for i, arg := range args {
-		if arg == "" {
-			return nil, errors.New("empty root key")
-		} else if strings.HasPrefix(arg, "@") {
-			key, err := ParseKey(arg[1:])
-			if err != nil {
-				return nil, err
-			}
-			keys[i] = key
-		} else {
-			keys[i] = RootKey(arg)
-		}
-	}
-	return keys, nil
-}
-
-// RootKey converts s into a root key.
-func RootKey(s string) string {
-	if strings.HasPrefix(s, "root:") {
-		return s
-	}
-	return "root:" + s
 }
 
 // ExpandString calls os.ExpandEnv to expand environment variables in *s.

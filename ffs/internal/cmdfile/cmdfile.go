@@ -32,7 +32,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
-const fileCmdUsage = `root:<root-key>[/path] ...
+const fileCmdUsage = `@<root-key>[/path] ...
 <file-key>[/path] ...`
 
 var Command = &command.C{
@@ -42,7 +42,7 @@ var Command = &command.C{
 File objects are addressed by storage keys. The storage key for
 a file may be specified in the following formats:
 
-  root:<root-name>              : the file key from a root pointer
+  @<root-name>                 : the file key from a root pointer
   74686973206973206d79206b6579  : hexadecimal encoded
   dGhpcyBpcyBteSBrZXk=          : base64 encoded
 `,
@@ -64,7 +64,7 @@ a file may be specified in the following formats:
 		},
 		{
 			Name: "set",
-			Usage: `root:<root-key>/<path> <target-key>
+			Usage: `@<root-key>/<path> <target-key>
 <origin-key>/<path> <file-key>`,
 			Help: `Set the specified path beneath the origin to the given target
 
@@ -76,7 +76,7 @@ If the origin is from a root, the root is updated with the modified origin.
 		},
 		{
 			Name: "remove",
-			Usage: `root:<root-key>/<path> ...
+			Usage: `@<root-key>/<path> ...
 <origin-key>/<path> ...`,
 			Help: `Remove the specified path from beneath the origin
 
@@ -235,17 +235,17 @@ func (o *openInfo) flushRoot(ctx context.Context, s blob.CAS) (string, error) {
 func openFile(ctx context.Context, s blob.CAS, spec string, path ...string) (*openInfo, error) {
 	var out openInfo
 
-	if strings.HasPrefix(spec, "root:") {
-		rp, err := root.Open(ctx, s, spec)
+	if strings.HasPrefix(spec, "@") {
+		rp, err := root.Open(ctx, config.Roots(s), spec[1:])
 		if err != nil {
 			return nil, err
 		}
-		rf, err := rp.File(ctx)
+		rf, err := rp.File(ctx, s)
 		if err != nil {
 			return nil, err
 		}
 		out.root = rp
-		out.rootKey = spec
+		out.rootKey = spec[1:]
 		out.rootFile = rf
 		out.targetKey = rp.FileKey
 	} else if fk, err := config.ParseKey(spec); err != nil {

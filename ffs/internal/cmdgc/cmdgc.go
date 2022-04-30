@@ -36,11 +36,8 @@ var Command = &command.C{
 	Usage: "<root-key> <root-key>...",
 	Help:  "Garbage-collect blobs not reachable from known roots",
 
-	Run: func(env *command.Env, args []string) error {
-		keys, err := config.RootKeys(args)
-		if err != nil {
-			return err
-		} else if len(keys) == 0 {
+	Run: func(env *command.Env, keys []string) error {
+		if len(keys) == 0 {
 			return errors.New("at least one root key is required")
 		}
 
@@ -60,7 +57,7 @@ var Command = &command.C{
 			// Mark phase: Scan all roots.
 			for i := 0; i < len(keys); i++ {
 				key := keys[i]
-				rp, err := root.Open(cfg.Context, s, key)
+				rp, err := root.Open(cfg.Context, config.Roots(s), key)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
@@ -93,7 +90,7 @@ var Command = &command.C{
 
 				// Otherwise, we need to compute the reachable set.
 				// TODO(creachadair): Maybe cache the results here too.
-				rf, err := rp.File(cfg.Context)
+				rf, err := rp.File(cfg.Context, s)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", rp.FileKey, err)
 				}
