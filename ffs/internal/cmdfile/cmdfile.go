@@ -32,7 +32,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
-const fileCmdUsage = `root:<root-key>[/path] ...
+const fileCmdUsage = `@<root-key>[/path] ...
 <file-key>[/path] ...`
 
 var Command = &command.C{
@@ -64,7 +64,7 @@ a file may be specified in the following formats:
 		},
 		{
 			Name: "set",
-			Usage: `root:<root-key>/<path> <target-key>
+			Usage: `@<root-key>/<path> <target-key>
 <origin-key>/<path> <file-key>`,
 			Help: `Set the specified path beneath the origin to the given target
 
@@ -76,7 +76,7 @@ If the origin is from a root, the root is updated with the modified origin.
 		},
 		{
 			Name: "remove",
-			Usage: `root:<root-key>/<path> ...
+			Usage: `@<root-key>/<path> ...
 <origin-key>/<path> ...`,
 			Help: `Remove the specified path from beneath the origin
 
