@@ -30,6 +30,7 @@ type settings struct {
 
 	// Flag targets
 	Store     string // global
+	Bucket    string // global
 	Debug     bool   // global
 	Replace   bool   // put
 	Raw       bool   // list
@@ -66,6 +67,7 @@ otherwise -store must be set.
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 		cfg := env.Config.(*settings)
 		fs.StringVar(&cfg.Store, "store", os.Getenv("BLOB_STORE"), "Blob store address (required)")
+		fs.StringVar(&cfg.Bucket, "bucket", "", "Prefix to add to all keys")
 		fs.BoolVar(&cfg.Debug, "debug", false, "Enable client debug logging")
 	},
 
