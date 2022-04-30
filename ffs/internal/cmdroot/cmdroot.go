@@ -86,11 +86,8 @@ var Command = &command.C{
 	},
 }
 
-func runShow(env *command.Env, args []string) error {
-	keys, err := config.RootKeys(args)
-	if err != nil {
-		return err
-	} else if len(keys) == 0 {
+func runShow(env *command.Env, keys []string) error {
+	if len(keys) == 0 {
 		return env.Usagef("missing required <root-key>")
 	}
 
@@ -98,7 +95,7 @@ func runShow(env *command.Env, args []string) error {
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		var lastErr error
 		for _, key := range keys {
-			rp, err := root.Open(cfg.Context, s, key)
+			rp, err := root.Open(cfg.Context, config.Roots(s), key)
 			if err != nil {
 				fmt.Fprintf(env, "Error: %v\n", err)
 				lastErr = err
@@ -120,10 +117,7 @@ func runList(env *command.Env, args []string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		return s.List(cfg.Context, "root:", func(key string) error {
-			if !strings.HasPrefix(key, "root:") {
-				return blob.ErrStopListing
-			}
+		return config.Roots(s).List(cfg.Context, "", func(key string) error {
 			fmt.Println(key)
 			return nil
 		})
@@ -139,7 +133,7 @@ func runCreate(env *command.Env, args []string) error {
 	if len(args) == 0 {
 		return env.Usagef("usage is: <name> <description>...")
 	}
-	key := config.RootKey(args[0])
+	key := args[0]
 	desc := strings.Join(args[1:], " ")
 
 	cfg := env.Config.(*config.Settings)
@@ -157,7 +151,7 @@ func runCreate(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		return root.New(s, &root.Options{
+		return root.New(config.Roots(s), &root.Options{
 			Description: desc,
 			FileKey:     fk,
 		}).Save(cfg.Context, key, createFlags.Replace)
@@ -175,7 +169,7 @@ func runCopy(env *command.Env, args []string) error {
 		return err
 	}
 	defer na.Close()
-	key := config.RootKey(na.Args[0])
+	key := na.Args[0]
 	if copyFlags.Link {
 		// Save a content-addressed copy of the original root, and update the
 		// predecessor pointer. The original key is not sufficient, since it may
@@ -239,13 +233,13 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 	if len(args) < 2 {
 		return nil, env.Usagef("incorrect arguments")
 	}
-	key := config.RootKey(args[0])
+	key := args[0]
 	cfg := env.Config.(*config.Settings)
 	bs, err := cfg.OpenStore(cfg.Context)
 	if err != nil {
 		return nil, err
 	}
-	rp, err := root.Open(cfg.Context, bs, key)
+	rp, err := root.Open(cfg.Context, config.Roots(bs), key)
 	if err != nil {
 		blob.CloseStore(cfg.Context, bs)
 		return nil, err
