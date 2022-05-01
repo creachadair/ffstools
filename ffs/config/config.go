@@ -67,7 +67,9 @@ type StoreSpec struct {
 	Address string `json:"address" yaml:"address"`
 }
 
-func (s *Settings) findAddress() (string, bool) {
+// FindAddress reports whether s has a storage server address, and returns it
+// if so. If a tag was selected but not matched, it is returned.
+func (s *Settings) FindAddress() (string, bool) {
 	if s.DefaultStore == "" {
 		return "", false
 	} else if strings.HasPrefix(s.DefaultStore, "@") {
@@ -85,12 +87,12 @@ func (s *Settings) findAddress() (string, bool) {
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStore(ctx context.Context) (blob.CAS, error) {
-	addr, ok := s.findAddress()
+func (s *Settings) OpenStore() (blob.CAS, error) {
+	addr, ok := s.FindAddress()
 	if !ok {
 		return nil, fmt.Errorf("no store service address (%q)", addr)
 	}
-	return OpenStore(ctx, addr)
+	return OpenStore(s.Context, addr)
 }
 
 // OpenStore connects to the store service at addr.  The caller is responsible
@@ -108,7 +110,7 @@ func OpenStore(_ context.Context, addr string) (blob.CAS, error) {
 // WithStore calls f with a store opened from the configuration. The store is
 // closed after f returns. The error returned by f is returned by WithStore.
 func (s *Settings) WithStore(ctx context.Context, f func(blob.CAS) error) error {
-	addr, ok := s.findAddress()
+	addr, ok := s.FindAddress()
 	if !ok {
 		return fmt.Errorf("no store service address (%q)", addr)
 	}

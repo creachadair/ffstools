@@ -235,7 +235,7 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 	}
 	key := args[0]
 	cfg := env.Config.(*config.Settings)
-	bs, err := cfg.OpenStore(cfg.Context)
+	bs, err := cfg.OpenStore()
 	if err != nil {
 		return nil, err
 	}
