@@ -32,18 +32,33 @@ import (
 )
 
 var Command = &command.C{
-	Name:  "gc",
-	Usage: "<root-key> <root-key>...",
-	Help:  "Garbage-collect blobs not reachable from known roots",
+	Name: "gc",
+	Help: `Garbage-collect blobs not reachable from known roots.
 
-	Run: func(env *command.Env, keys []string) error {
-		if len(keys) == 0 {
-			return errors.New("at least one root key is required")
+If no roots are defined, an error is reported without making any changes.
+This avoids accidentally deleting everything in a store without roots.
+`,
+
+	Run: func(env *command.Env, args []string) error {
+		if len(args) != 0 {
+			return env.Usagef("extra arguments after command")
 		}
 
 		cfg := env.Config.(*config.Settings)
 		ctx, cancel := context.WithCancel(cfg.Context)
 		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+			var keys []string
+			if err := config.Roots(s).List(cfg.Context, "", func(key string) error {
+				keys = append(keys, key)
+				return nil
+			}); err != nil {
+				return fmt.Errorf("listing roots: %w", err)
+			}
+
+			if len(keys) == 0 {
+				return errors.New("there are no root keys defined")
+			}
+
 			n, err := s.Len(ctx)
 			if err != nil {
 				return err
