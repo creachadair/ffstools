@@ -50,9 +50,9 @@ func getCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer blob.CloseStore(getContext(env), bs)
-
 	nctx := getContext(env)
+	defer blob.CloseStore(nctx, bs)
+
 	for _, arg := range args {
 		key, err := parseKey(arg)
 		if err != nil {
@@ -76,9 +76,9 @@ func sizeCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer blob.CloseStore(getContext(env), bs)
-
 	nctx := getContext(env)
+	defer blob.CloseStore(nctx, bs)
+
 	for _, arg := range args {
 		key, err := parseKey(arg)
 		if err != nil {
@@ -103,11 +103,8 @@ func delCmd(env *command.Env, args []string) (err error) {
 		return err
 	}
 	nctx := getContext(env)
-	defer func() {
-		if cerr := blob.CloseStore(nctx, bs); err == nil {
-			err = cerr
-		}
-	}()
+	defer blob.CloseStore(nctx, bs)
+
 	missingOK := env.Config.(*settings).MissingOK
 	for _, arg := range args {
 		key, err := parseKey(arg)
@@ -144,9 +141,10 @@ func listCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer blob.CloseStore(getContext(env), bs)
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, bs)
 
-	return bs.List(getContext(env), start, func(key string) error {
+	return bs.List(ctx, start, func(key string) error {
 		if !strings.HasPrefix(key, pfx) {
 			if key > pfx {
 				return blob.ErrStopListing
@@ -169,8 +167,10 @@ func lenCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer blob.CloseStore(getContext(env), bs)
-	n, err := bs.Len(getContext(env))
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, bs)
+
+	n, err := bs.Len(ctx)
 	if err != nil {
 		return err
 	}
@@ -183,16 +183,14 @@ func casPutCmd(env *command.Env, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if cerr := blob.CloseStore(getContext(env), cas); err == nil {
-			err = cerr
-		}
-	}()
-	data, err := readData(getContext(env), "put", args)
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, cas)
+
+	data, err := readData(ctx, "put", args)
 	if err != nil {
 		return err
 	}
-	key, err := cas.CASPut(getContext(env), data)
+	key, err := cas.CASPut(ctx, data)
 	if err != nil {
 		return err
 	}
@@ -205,11 +203,14 @@ func casKeyCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	data, err := readData(getContext(env), "key", args)
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, cas)
+
+	data, err := readData(ctx, "key", args)
 	if err != nil {
 		return err
 	}
-	key, err := cas.CASKey(getContext(env), data)
+	key, err := cas.CASKey(ctx, data)
 	if err != nil {
 		return err
 	}
@@ -253,7 +254,10 @@ func statCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	si, err := s.(rpcstore.CAS).ServerInfo(getContext(env))
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, s)
+
+	si, err := s.(rpcstore.CAS).ServerInfo(ctx)
 	if err != nil {
 		return err
 	}
@@ -279,17 +283,15 @@ func putCmd(env *command.Env, args []string) (err error) {
 	if err != nil {
 		return nil
 	}
-	defer func() {
-		if cerr := blob.CloseStore(getContext(env), bs); err == nil {
-			err = cerr
-		}
-	}()
-	data, err := readData(getContext(env), "put", args[1:])
+	ctx := getContext(env)
+	defer blob.CloseStore(ctx, bs)
+
+	data, err := readData(ctx, "put", args[1:])
 	if err != nil {
 		return err
 	}
 
-	return bs.Put(getContext(env), blob.PutOptions{
+	return bs.Put(ctx, blob.PutOptions{
 		Key:     key,
 		Data:    data,
 		Replace: env.Config.(*settings).Replace,
@@ -309,19 +311,22 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 
 func storeFromEnv(env *command.Env) (blob.CAS, error) {
 	t := env.Config.(*settings)
-	if t.Store == "" {
-		return rpcstore.CAS{}, errors.New("no -store address was specified")
+	addr, ok := t.FFS.FindAddress()
+	if !ok {
+		return nil, fmt.Errorf("no -store address was found (%q)", addr)
 	}
+
 	var ch channel.Channel
 	if isHTTP(t.Store) {
 		ch = jhttp.NewChannel(t.Store, nil)
-	} else if conn, err := net.Dial(jrpc2.Network(t.Store)); err != nil {
-		return rpcstore.CAS{}, fmt.Errorf("dialing: %w", err)
+	} else if conn, err := net.Dial(jrpc2.Network(addr)); err != nil {
+		return nil, fmt.Errorf("dialing: %w", err)
 	} else {
 		ch = channel.Line(conn, conn)
 	}
 	var logger jrpc2.Logger
 	if t.Debug {
+		log.Printf("Connected to storage service at %q", addr)
 		logger = jrpc2.StdLogger(log.New(os.Stderr, "[client] ", log.LstdFlags))
 	}
 	cli := jrpc2.NewClient(ch, &jrpc2.ClientOptions{Logger: logger})

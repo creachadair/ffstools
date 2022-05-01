@@ -19,14 +19,17 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffstools/ffs/config"
 )
 
 type settings struct {
 	Context context.Context
+	FFS     *config.Settings
 
 	// Flag targets
 	Store     string // global
@@ -59,21 +62,32 @@ Rule                                                     Example
 - If the key is all hex digits, decode it as hex         666f6f0a
 - Otherwise, it is treated as base64.                    Zm9vCg==
 
-The BLOB_STORE environment variable is read to choose a default store address;
-otherwise -store must be set.
+If the BLOB_STORE environment variable is set, it is read to set the
+address of the storage server. Otherwise, -store must be set to either
+the address or an @tag from the configuration file.
 
 `,
 
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 		cfg := env.Config.(*settings)
-		fs.StringVar(&cfg.Store, "store", os.Getenv("BLOB_STORE"), "Blob store address (required)")
+		fs.StringVar(&cfg.Store, "store", "", "Blob store address (required)")
 		fs.StringVar(&cfg.Bucket, "bucket", "", "Prefix to add to all keys")
 		fs.BoolVar(&cfg.Debug, "debug", false, "Enable client debug logging")
 	},
 
 	Init: func(env *command.Env) error {
+		fc, err := config.Load(config.Path())
+		if err != nil {
+			return fmt.Errorf("loading FFS config: %w", err)
+		}
 		cfg := env.Config.(*settings)
-		cfg.Store = os.ExpandEnv(cfg.Store)
+		if cfg.Store != "" {
+			fc.DefaultStore = cfg.Store
+		} else if bs := os.Getenv("BLOB_STORE"); bs != "" {
+			fc.DefaultStore = bs
+		}
+		fc.Context = cfg.Context
+		cfg.FFS = fc
 		return nil
 	},
 
