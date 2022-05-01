@@ -209,6 +209,7 @@ func runDelete(env *command.Env, args []string) error {
 			if err := roots.Delete(cfg.Context, key); err != nil {
 				return fmt.Errorf("delete root %q: %w", key, err)
 			}
+			fmt.Println(key)
 		}
 		return nil
 	})
