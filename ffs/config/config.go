@@ -22,7 +22,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -35,6 +34,19 @@ import (
 	"github.com/creachadair/rpcstore"
 	yaml "gopkg.in/yaml.v3"
 )
+
+// DefaultPath is the configuration file path used if not overridden by the
+// FFS_CONFIG environment variable.
+const DefaultPath = "$HOME/.config/ffs/config.yml"
+
+// Path returns the effective configuration file path. If FFS_CONFIG is set,
+// its value is used; otherwise DefaultPath is expanded.
+func Path() string {
+	if cf, ok := os.LookupEnv("FFS_CONFIG"); ok && cf != "" {
+		return cf
+	}
+	return os.ExpandEnv(DefaultPath)
+}
 
 // Settings represents the stored configuration settings for the ffs tool.
 type Settings struct {
@@ -76,7 +88,7 @@ func (s *Settings) findAddress() (string, bool) {
 func (s *Settings) OpenStore(ctx context.Context) (blob.CAS, error) {
 	addr, ok := s.findAddress()
 	if !ok {
-		return nil, errors.New("no store service address")
+		return nil, fmt.Errorf("no store service address (%q)", addr)
 	}
 	return OpenStore(ctx, addr)
 }
@@ -98,7 +110,7 @@ func OpenStore(_ context.Context, addr string) (blob.CAS, error) {
 func (s *Settings) WithStore(ctx context.Context, f func(blob.CAS) error) error {
 	addr, ok := s.findAddress()
 	if !ok {
-		return errors.New("no store service address")
+		return fmt.Errorf("no store service address (%q)", addr)
 	}
 	return WithStore(ctx, addr, f)
 }

@@ -34,7 +34,7 @@ import (
 )
 
 var (
-	configPath = "$HOME/.config/ffs/config.yml"
+	configPath = config.Path()
 	storeAddr  string
 )
 
@@ -46,15 +46,12 @@ help [<command>]`,
 		Help: `A command-line tool to manage FFS file trees.`,
 
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-			if cf, ok := os.LookupEnv("FFS_CONFIG"); ok && cf != "" {
-				configPath = cf
-			}
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
 			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
 		},
 
 		Init: func(env *command.Env) error {
-			cfg, err := config.Load(os.ExpandEnv(configPath))
+			cfg, err := config.Load(configPath)
 			if err != nil {
 				return err
 			}
