@@ -70,6 +70,13 @@ var Command = &command.C{
 			Run: runCopy,
 		},
 		{
+			Name:  "delete",
+			Usage: "<root-key> ...",
+			Help:  "Delete the specified root pointers",
+
+			Run: runDelete,
+		},
+		{
 			Name:  "set-description",
 			Usage: "<name> <description>...",
 			Help:  "Edit the description of the given root",
@@ -188,6 +195,23 @@ func runCopy(env *command.Env, args []string) error {
 		}
 	}
 	return na.Root.Save(na.Context, key, copyFlags.Replace)
+}
+
+func runDelete(env *command.Env, args []string) error {
+	if len(args) == 0 {
+		return env.Usagef("missing root-key arguments")
+	}
+
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		roots := config.Roots(s)
+		for _, key := range args {
+			if err := roots.Delete(cfg.Context, key); err != nil {
+				return fmt.Errorf("delete root %q: %w", key, err)
+			}
+		}
+		return nil
+	})
 }
 
 func runEditDesc(env *command.Env, args []string) error {
