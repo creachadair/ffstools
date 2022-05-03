@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/boltstore v0.0.0-20220429040131-66f457f55860
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220503004911-c9d4af679599
+	github.com/creachadair/ffs v0.0.0-20220503185216-7e9b553a68fd
 	github.com/creachadair/gcsstore v0.0.0-20220502195503-7ce0a6d8d5a7
 	github.com/creachadair/jrpc2 v0.40.0
 	github.com/creachadair/keyfile v0.7.1
@@ -17,7 +17,7 @@ require (
 	github.com/creachadair/pebblestore v0.0.0-20220429040408-e619f61919f9
 	github.com/creachadair/pogrebstore v0.0.0-20220429040428-f6fe98f8cd25
 	github.com/creachadair/rpcstore v0.0.0-20220502195516-9c25e0b5ac77
-	github.com/creachadair/s3store v0.0.0-20220502195528-bf54cdabdcd4
+	github.com/creachadair/s3store v0.0.0-20220503155117-2c41a4e58f38
 	github.com/creachadair/sqlitestore v0.0.0-20220429040521-281f78ec094c
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
@@ -42,10 +42,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220429211633-e6c60c719402 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220503145038-375586630a43 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/codahale/hdrhistogram v0.9.0 // indirect
-	github.com/creachadair/msync v0.0.0-20220503003853-c527c4b21fc5 // indirect
+	github.com/creachadair/msync v0.0.0-20220503185027-96bf55dad0a9 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -75,7 +75,7 @@ require (
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220502124256-b6088ccd6cba // indirect
+	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/api v0.77.0 // indirect
