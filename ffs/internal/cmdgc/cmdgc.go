@@ -17,6 +17,7 @@ package cmdgc
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"strings"
 	"sync/atomic"
@@ -31,13 +32,22 @@ import (
 	"github.com/creachadair/taskgroup"
 )
 
+var gcFlags struct {
+	Force bool
+}
+
 var Command = &command.C{
 	Name: "gc",
 	Help: `Garbage-collect blobs not reachable from known roots.
 
-If no roots are defined, an error is reported without making any changes.
-This avoids accidentally deleting everything in a store without roots.
+If no roots are defined, an error is reported without making any changes
+unless -force is set. This avoids accidentally deleting everything in a
+store without roots.
 `,
+
+	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+		fs.BoolVar(&gcFlags.Force, "force", false, "Force collection on empty root list (DANGER)")
+	},
 
 	Run: func(env *command.Env, args []string) error {
 		if len(args) != 0 {
@@ -55,8 +65,14 @@ This avoids accidentally deleting everything in a store without roots.
 				return fmt.Errorf("listing roots: %w", err)
 			}
 
-			if len(keys) == 0 {
+			if len(keys) == 0 && !gcFlags.Force {
 				return errors.New("there are no root keys defined")
+			} else if len(keys) == 0 {
+				fmt.Fprint(env, `>> WARNING <<
+* No root keys found!
+* Proceeding with collection anyway because -force is set
+
+`)
 			}
 
 			n, err := s.Len(ctx)
