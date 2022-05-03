@@ -66,7 +66,7 @@ func runSync(env *command.Env, args []string) error {
 	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
 		taddr := cfg.ResolveAddress(addr)
 		return config.WithStore(cfg.Context, taddr, func(tgt blob.CAS) error {
-			debug("Target store: %q", addr)
+			debug("Target store: %q", taddr)
 			for _, elt := range keys {
 				var err error
 				if strings.HasPrefix(elt, "@") {
