@@ -67,6 +67,23 @@ type StoreSpec struct {
 	Address string `json:"address" yaml:"address"`
 }
 
+// ResolveAddress resolves the given address against the settings.  If addr is
+// of the form @tag and that tag exists in the settings, the expanded form of
+// the tag is returned; otherwise addr is returned unmodified.
+func (s *Settings) ResolveAddress(addr string) string {
+	if !strings.HasPrefix(addr, "@") {
+		return addr
+	}
+	tag := strings.TrimPrefix(addr, "@")
+	for _, st := range s.Stores {
+		if tag == st.Tag {
+			ExpandString(&st.Address)
+			return st.Address
+		}
+	}
+	return addr
+}
+
 // FindAddress reports whether s has a storage server address, and returns it
 // if so. If a tag was selected but not matched, it is returned.
 func (s *Settings) FindAddress() (string, bool) {

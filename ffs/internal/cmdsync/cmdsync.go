@@ -64,7 +64,8 @@ func runSync(env *command.Env, args []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
-		return config.WithStore(cfg.Context, addr, func(tgt blob.CAS) error {
+		taddr := cfg.ResolveAddress(addr)
+		return config.WithStore(cfg.Context, taddr, func(tgt blob.CAS) error {
 			debug("Target store: %q", addr)
 			for _, elt := range keys {
 				var err error
