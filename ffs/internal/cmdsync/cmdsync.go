@@ -132,6 +132,9 @@ func copyFile(ctx context.Context, src, tgt blob.CAS, fp *file.File) error {
 	if err := fp.Scan(ctx, func(key string, isFile bool) bool {
 		run(func() error {
 			defer atomic.AddInt64(&nb, 1)
+			if isFile {
+				debug("- Copying file %x...", key)
+			}
 			return copyBlob(ctx, src, tgt, key, false)
 		})
 		return true
