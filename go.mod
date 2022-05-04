@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.18
 
 require (
-	github.com/creachadair/atomicfile v0.2.5
+	github.com/creachadair/atomicfile v0.2.6
 	github.com/creachadair/badgerstore v0.1.9
 	github.com/creachadair/bitcaskstore v0.0.0-20220503185438-7e672ca746dc
 	github.com/creachadair/boltstore v0.0.0-20220503185524-0fe59b6f246c
