@@ -20,7 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -33,6 +32,7 @@ import (
 )
 
 var syncFlags struct {
+	Target  string
 	Verbose bool
 }
 
@@ -43,47 +43,49 @@ func debug(msg string, args ...interface{}) {
 }
 
 var Command = &command.C{
-	Name:  "sync",
-	Usage: `<target-store> (<file-key>|@<root-key>) ...`,
+	Name: "sync",
+	Usage: `<file-key>[/path/...] ...
+@<root-key>[/path/...] ...`,
 	Help: `Synchronize file trees between stores.
 
 Transfer all the blobs reachable from the specified file or root
-trees into the given target store.
+paths into the given target store.
 `,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+		fs.StringVar(&syncFlags.Target, "to", "", "Target store (required)")
 		fs.BoolVar(&syncFlags.Verbose, "v", false, "Enable verbose logging")
 	},
 	Run: runSync,
 }
 
 func runSync(env *command.Env, args []string) error {
-	if len(args) < 2 {
-		return env.Usagef("missing target store and source keys")
+	if len(args) == 0 {
+		return env.Usagef("missing source keys")
+	} else if syncFlags.Target == "" {
+		return env.Usagef("missing -to target store")
 	}
-	addr, keys := args[0], args[1:]
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
-		taddr := cfg.ResolveAddress(addr)
+		taddr := cfg.ResolveAddress(syncFlags.Target)
 		return config.WithStore(cfg.Context, taddr, func(tgt blob.CAS) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
 			// Find all the blobs reachable from the specified starting points.
 			worklist := make(scanSet)
-			for _, elt := range keys {
-				var err error
+			for _, elt := range args {
+				of, err := config.OpenPath(cfg.Context, src, elt)
+				if err != nil {
+					return err
+				}
 
-				if strings.HasPrefix(elt, "@") {
-					fmt.Fprintf(env, "Scanning data reachable from root %q\n", elt[1:])
-					err = worklist.root(cfg.Context, src, elt[1:])
-				} else if pk, perr := config.ParseKey(elt); perr != nil {
-					return perr
-				} else if fp, oerr := file.Open(cfg.Context, src, pk); oerr != nil {
-					return oerr
+				if of.Root != nil && of.Base == of.File {
+					fmt.Fprintf(env, "Scanning data reachable from root %q\n", of.RootKey)
+					err = worklist.root(cfg.Context, src, of.RootKey, of.Root)
 				} else {
-					fmt.Fprintf(env, "Scanning data reachable from file %x\n", pk)
-					err = worklist.file(cfg.Context, fp)
+					fmt.Fprintf(env, "Scanning data reachable from file %x\n", of.FileKey)
+					err = worklist.file(cfg.Context, of.File)
 				}
 				if err != nil {
 					return err
@@ -150,16 +152,15 @@ func runSync(env *command.Env, args []string) error {
 
 type scanSet map[string]byte
 
-func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string) error {
-	rp, err := root.Open(ctx, config.Roots(src), rootKey)
-	if err != nil {
-		return err
-	}
+func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
 	s[rootKey] = 'R'
 	s[rp.OwnerKey] = '+'
 	s[rp.IndexKey] = '-'
 	if rp.Predecessor != "" {
-		if err := s.root(ctx, src, rp.Predecessor); err != nil {
+		proot, err := root.Open(ctx, config.Roots(src), rp.Predecessor)
+		if err != nil {
+			return err
+		} else if err := s.root(ctx, src, rp.Predecessor, proot); err != nil {
 			return err
 		}
 	}
