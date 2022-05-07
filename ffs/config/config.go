@@ -25,9 +25,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
@@ -221,4 +225,107 @@ func isAllHex(s string) bool {
 		}
 	}
 	return true
+}
+
+// PathInfo is the result of parsing and opening a path spec.
+type PathInfo struct {
+	Path    string     // the original input path (unparsed)
+	Base    *file.File // the root or starting file of the path
+	File    *file.File // the target file of the path
+	FileKey string     // the storage key of the target file
+	Root    *root.Root // the specified root, or nil if none
+	RootKey string     // the key of root, or ""
+}
+
+// Flush flushes the base file to reflect any changes and returns its updated
+// storage key. If p is based on a root, the root is also updated and saved.
+func (p *PathInfo) Flush(ctx context.Context) (string, error) {
+	key, err := p.Base.Flush(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	// If this path started at a root, write out the updated contents.
+	if p.Root != nil {
+		// If the file has changed, invalidate the index.
+		if p.Root.FileKey != key {
+			p.Root.IndexKey = ""
+		}
+		p.Root.FileKey = key
+		if err := p.Root.Save(ctx, p.RootKey, true); err != nil {
+			return "", err
+		}
+	}
+	return key, nil
+}
+
+// OpenPath parses and opens the specified path in s.
+// The path has either the form "@<root-key>/some/path" or "<file-key>/some/path".
+func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
+	out := &PathInfo{Path: path}
+
+	first, rest := SplitPath(path)
+
+	// Check for a @root key prefix.
+	if strings.HasPrefix(first, "@") {
+		rp, err := root.Open(ctx, Roots(s), first[1:])
+		if err != nil {
+			return nil, err
+		}
+		rf, err := rp.File(ctx, s)
+		if err != nil {
+			return nil, err
+		}
+		out.Root = rp
+		out.RootKey = first[1:]
+		out.Base = rf
+		out.File = rf
+		out.FileKey = rp.FileKey // provisional
+
+	} else if fk, err := ParseKey(first); err != nil {
+		return nil, err
+
+	} else if fp, err := file.Open(ctx, s, fk); err != nil {
+		return nil, err
+
+	} else {
+		out.Base = fp
+		out.File = fp
+		out.FileKey = fk
+	}
+
+	// If the rest of the path is empty, the starting point is the target.
+	if rest == "" {
+		return out, nil
+	}
+
+	// Otherwise, open a path relative to the base.
+	tf, err := fpath.Open(ctx, out.Base, rest)
+	if err != nil {
+		return nil, err
+	}
+	out.File = tf
+	out.FileKey, _ = out.File.Flush(ctx) // safe, it was just opened
+	return out, nil
+}
+
+// SplitPath parses s as a slash-separated path specification.
+// The first segment of s identifies the storage key of a root or file, the
+// rest indicates a sequence of child names starting from that file.
+// The rest may be empty.
+func SplitPath(s string) (first, rest string) {
+	// Check whether the path starts with a base64-encoded storage key.
+	eq := strings.Index(s, "=")
+	if len(s) == eq+1 {
+		return s, ""
+	} else if len(s) > eq+1 && s[eq+1] == '/' {
+		return s[:eq], path.Clean(s[eq:2])
+	}
+
+	// Otherwise, split at the first / and clean the trailing segment.
+	parts := strings.SplitN(s, "/", 2)
+	if len(parts) == 1 {
+		return parts[0], ""
+	}
+	return parts[0], path.Clean(parts[1])
 }

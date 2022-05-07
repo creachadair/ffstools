@@ -15,18 +15,14 @@
 package cmdfile
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
-	"path"
-	"strings"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
-	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -99,15 +95,14 @@ func runShow(env *command.Env, args []string) error {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			parts := splitPath(arg)
-			of, err := openFile(cfg.Context, s, parts[0], parts[1:]...)
+			of, err := config.OpenPath(cfg.Context, s, arg)
 			if err != nil {
 				return err
 			}
 
-			msg := file.Encode(of.targetFile).Value.(*wiretype.Object_Node).Node
+			msg := file.Encode(of.File).Value.(*wiretype.Object_Node).Node
 			fmt.Println(config.ToJSON(map[string]interface{}{
-				"storageKey": []byte(of.targetKey),
+				"storageKey": []byte(of.FileKey),
 				"node":       msg,
 			}))
 		}
@@ -121,12 +116,11 @@ func runRead(env *command.Env, args []string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		parts := splitPath(args[0])
-		of, err := openFile(cfg.Context, s, parts[0], parts[1:]...)
+		of, err := config.OpenPath(cfg.Context, s, args[0])
 		if err != nil {
 			return err
 		}
-		_, err = io.Copy(os.Stdout, of.targetFile.Cursor(cfg.Context))
+		_, err = io.Copy(os.Stdout, of.File.Cursor(cfg.Context))
 		return err
 	})
 }
@@ -135,8 +129,8 @@ func runSet(env *command.Env, args []string) error {
 	if len(args) != 2 {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
 	}
-	originPath := splitPath(args[0])
-	if len(originPath) == 1 {
+	obase, orest := config.SplitPath(args[0])
+	if orest == "" {
 		return env.Usagef("path must not be empty")
 	}
 	targetKey, err := config.ParseKey(args[1])
@@ -150,13 +144,12 @@ func runSet(env *command.Env, args []string) error {
 		if err != nil {
 			return fmt.Errorf("target file: %w", err)
 		}
-		of, err := openFile(cfg.Context, s, originPath[0]) // N.B. No path; see below.
+		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
 		if err != nil {
 			return err
 		}
 
-		path := path.Clean(originPath[1])
-		if _, err := fpath.Set(cfg.Context, of.rootFile, path, &fpath.SetOptions{
+		if _, err := fpath.Set(cfg.Context, of.Base, orest, &fpath.SetOptions{
 			Create: true,
 			SetStat: func(st *file.Stat) {
 				if st.Mode == 0 {
@@ -167,7 +160,7 @@ func runSet(env *command.Env, args []string) error {
 		}); err != nil {
 			return err
 		}
-		key, err := of.flushRoot(cfg.Context, s)
+		key, err := of.Flush(cfg.Context)
 		if err != nil {
 			return err
 		}
@@ -184,20 +177,19 @@ func runRemove(env *command.Env, args []string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		for _, arg := range args {
-			parts := splitPath(arg)
-			if len(parts) == 1 {
-				return fmt.Errorf("missing path %q", parts[0])
+			base, rest := config.SplitPath(arg)
+			if rest == "" {
+				return fmt.Errorf("missing path %q", arg)
 			}
-			of, err := openFile(cfg.Context, s, parts[0]) // N.B. No path; see below
+			of, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
 			if err != nil {
 				return err
 			}
 
-			path := path.Clean(parts[1])
-			if err := fpath.Remove(cfg.Context, of.rootFile, path); err != nil {
+			if err := fpath.Remove(cfg.Context, of.Base, rest); err != nil {
 				return err
 			}
-			key, err := of.flushRoot(cfg.Context, s)
+			key, err := of.Flush(cfg.Context)
 			if err != nil {
 				return err
 			}
@@ -205,78 +197,4 @@ func runRemove(env *command.Env, args []string) error {
 		}
 		return nil
 	})
-}
-
-type openInfo struct {
-	root       *root.Root // set if the spec is a root key
-	rootKey    string     // set if the spec is a root key
-	rootFile   *file.File // the starting file, whether or not there is a root
-	targetFile *file.File // the target file (== rootFile if there is no path)
-	targetKey  string     // the target file storage key
-}
-
-func (o *openInfo) flushRoot(ctx context.Context, s blob.CAS) (string, error) {
-	key, err := o.rootFile.Flush(ctx)
-	if err != nil {
-		return "", err
-	}
-	if o.root != nil {
-		if o.root.FileKey != key {
-			o.root.IndexKey = "" // invalidate the index
-		}
-		o.root.FileKey = key
-		if err := o.root.Save(ctx, o.rootKey, true); err != nil {
-			return "", err
-		}
-	}
-	return key, nil
-}
-
-func openFile(ctx context.Context, s blob.CAS, spec string, path ...string) (*openInfo, error) {
-	var out openInfo
-
-	if strings.HasPrefix(spec, "@") {
-		rp, err := root.Open(ctx, config.Roots(s), spec[1:])
-		if err != nil {
-			return nil, err
-		}
-		rf, err := rp.File(ctx, s)
-		if err != nil {
-			return nil, err
-		}
-		out.root = rp
-		out.rootKey = spec[1:]
-		out.rootFile = rf
-		out.targetKey = rp.FileKey
-	} else if fk, err := config.ParseKey(spec); err != nil {
-		return nil, err
-	} else if fp, err := file.Open(ctx, s, fk); err != nil {
-		return nil, err
-	} else {
-		out.rootFile = fp
-		out.targetKey = fk
-	}
-
-	if len(path) == 0 {
-		out.targetFile = out.rootFile
-		return &out, nil
-	}
-
-	var err error
-	out.targetFile, err = fpath.Open(ctx, out.rootFile, path[0])
-	if err != nil {
-		return nil, err
-	}
-	out.targetKey, _ = out.targetFile.Flush(ctx)
-	return &out, nil
-}
-
-func splitPath(s string) []string {
-	eq := strings.Index(s, "=")
-	if len(s) == eq+1 {
-		return []string{s}
-	} else if len(s) > eq+1 && s[eq+1] == '/' {
-		return []string{s[:eq], s[eq+2:]}
-	}
-	return strings.SplitN(s, "/", 2)
 }
