@@ -163,7 +163,10 @@ store without roots.
 								return nil
 							}
 						}
-						atomic.AddUint32(&numDrop, 1)
+						v := atomic.AddUint32(&numDrop, 1)
+						if v%25 == 0 {
+							fmt.Fprint(env, ",")
+						}
 						return s.Delete(ctx, key)
 					})
 				})
