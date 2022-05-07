@@ -23,14 +23,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
-	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
@@ -47,8 +45,8 @@ var exportFlags struct {
 
 var Command = &command.C{
 	Name: "export",
-	Usage: `@<root-key>[/path]
-<file-key>[/path]`,
+	Usage: `@<root-key>[/path/...]
+<file-key>[/path/...]`,
 	Help: `Export a file tree to the local filesystem.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
@@ -77,14 +75,7 @@ func runExport(env *command.Env, args []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		parts := strings.SplitN(args[0], "/", 2)
-		f, err := openFile(cfg.Context, s, parts[0])
-		if err != nil {
-			return err
-		}
-		if len(parts) == 2 {
-			f, err = fpath.Open(cfg.Context, f, parts[1])
-		}
+		of, err := config.OpenPath(cfg.Context, s, args[0])
 		if err != nil {
 			return err
 		}
@@ -93,7 +84,7 @@ func runExport(env *command.Env, args []string) error {
 		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(32)
 
 		g.Go(func() error {
-			return fpath.Walk(cctx, f, func(e fpath.Entry) error {
+			return fpath.Walk(cctx, of.File, func(e fpath.Entry) error {
 				if err := cctx.Err(); err != nil {
 					return err
 				}
@@ -187,21 +178,6 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 		return fmt.Errorf("reading link target: %w", err)
 	}
 	return os.Symlink(string(target), path)
-}
-
-func openFile(ctx context.Context, s blob.CAS, spec string) (*file.File, error) {
-	if strings.HasPrefix(spec, "@") {
-		rp, err := root.Open(ctx, config.Roots(s), spec[1:])
-		if err != nil {
-			return nil, err
-		}
-		return rp.File(ctx, s)
-	}
-	key, err := config.ParseKey(spec)
-	if err != nil {
-		return nil, err
-	}
-	return file.Open(ctx, s, key)
 }
 
 func logPrintf(msg string, args ...interface{}) {
