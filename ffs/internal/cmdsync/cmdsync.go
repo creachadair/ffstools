@@ -16,6 +16,7 @@ package cmdsync
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -66,43 +67,99 @@ func runSync(env *command.Env, args []string) error {
 	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
 		taddr := cfg.ResolveAddress(addr)
 		return config.WithStore(cfg.Context, taddr, func(tgt blob.CAS) error {
-			debug("Target store: %q", taddr)
+			fmt.Fprintf(env, "Target store: %q\n", taddr)
+
+			// Find all the blobs reachable from the specified starting points.
+			worklist := make(scanSet)
 			for _, elt := range keys {
 				var err error
+
 				if strings.HasPrefix(elt, "@") {
-					debug("Copying root %q...", elt)
-					err = copyRoot(cfg.Context, src, tgt, elt[1:])
+					fmt.Fprintf(env, "Scanning data reachable from root %q\n", elt[1:])
+					err = worklist.root(cfg.Context, src, elt[1:])
 				} else if pk, perr := config.ParseKey(elt); perr != nil {
 					return perr
 				} else if fp, oerr := file.Open(cfg.Context, src, pk); oerr != nil {
 					return oerr
 				} else {
-					debug("Copying file %x...", pk)
-					err = copyFile(cfg.Context, src, tgt, fp)
+					fmt.Fprintf(env, "Scanning data reachable from file %x\n", pk)
+					err = worklist.file(cfg.Context, fp)
 				}
-
 				if err != nil {
 					return err
 				}
 			}
-			return nil
+			fmt.Fprintf(env, "Found %d reachable objects\n", len(worklist))
+			if len(worklist) == 0 {
+				return errors.New("no matching objects")
+			}
+
+			// Remove from the worklist all blobs already stored in the target
+			// that are not scheduled for replacement. Blobs marked as root (R) or
+			// otherwise requiring replacement (+) are retained regardless.
+			if err := tgt.List(cfg.Context, "", func(key string) error {
+				switch worklist[key] {
+				case '-', 'F':
+					delete(worklist, key)
+				}
+				return nil
+			}); err != nil {
+				return err
+			}
+			fmt.Fprintf(env, "Have %d objects to copy\n", len(worklist))
+
+			// Copy all remaining objects.
+			start := time.Now()
+			var nb int64
+
+			ctx, cancel := context.WithCancel(cfg.Context)
+			defer cancel()
+
+			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(128)
+			for key, tag := range worklist {
+				if ctx.Err() != nil {
+					break
+				}
+
+				key, tag := key, tag
+				run(func() error {
+					defer atomic.AddInt64(&nb, 1)
+					switch tag {
+					case 'R':
+						debug("- copying root %q", key)
+						return copyBlob(ctx, config.Roots(src), config.Roots(tgt), key, true)
+					case '+':
+						return copyBlob(ctx, src, tgt, key, true)
+					case 'F':
+						debug("- copying file %x", key)
+						return copyBlob(ctx, src, tgt, key, false)
+					case '-':
+						return copyBlob(ctx, src, tgt, key, false)
+					default:
+						panic("unknown tag " + string(tag))
+					}
+				})
+			}
+			cerr := g.Wait()
+			fmt.Fprintf(env, "Copied %d blobs [%v elapsed]\n",
+				nb, time.Since(start).Truncate(10*time.Millisecond))
+			return cerr
 		})
 	})
 }
 
-func copyRoot(ctx context.Context, src, tgt blob.CAS, key string) error {
-	rp, err := root.Open(ctx, config.Roots(src), key)
+type scanSet map[string]byte
+
+func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string) error {
+	rp, err := root.Open(ctx, config.Roots(src), rootKey)
 	if err != nil {
 		return err
 	}
-	if err := copyBlob(ctx, src, tgt, rp.OwnerKey, true); err != nil {
-		return fmt.Errorf("copying owner: %w", err)
-	}
-	if err := copyBlob(ctx, src, tgt, rp.IndexKey, false); err != nil {
-		return fmt.Errorf("copying index: %w", err)
-	}
+	s[rootKey] = 'R'
+	s[rp.OwnerKey] = '+'
+	s[rp.IndexKey] = '-'
 	if rp.Predecessor != "" {
-		if err := copyRoot(ctx, src, tgt, rp.Predecessor); err != nil {
+		if err := s.root(ctx, src, rp.Predecessor); err != nil {
 			return err
 		}
 	}
@@ -110,40 +167,20 @@ func copyRoot(ctx context.Context, src, tgt blob.CAS, key string) error {
 	if err != nil {
 		return err
 	}
-	if err := copyFile(ctx, src, tgt, fp); err != nil {
-		return fmt.Errorf("copying root file: %w", err)
-	}
-	return root.New(config.Roots(tgt), &root.Options{
-		OwnerKey:    rp.OwnerKey,
-		Description: rp.Description,
-		FileKey:     rp.FileKey,
-		IndexKey:    rp.IndexKey,
-		Predecessor: rp.Predecessor,
-	}).Save(ctx, key, true)
+	return s.file(ctx, fp)
 }
 
-func copyFile(ctx context.Context, src, tgt blob.CAS, fp *file.File) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
-	start := time.Now()
-
-	var nb int64
-	if err := fp.Scan(ctx, func(key string, isFile bool) bool {
-		run(func() error {
-			defer atomic.AddInt64(&nb, 1)
-			if isFile {
-				debug("- Copying file %x...", key)
-			}
-			return copyBlob(ctx, src, tgt, key, false)
-		})
+func (s scanSet) file(ctx context.Context, fp *file.File) error {
+	return fp.Scan(ctx, func(key string, isFile bool) bool {
+		if _, ok := s[key]; ok {
+			return false
+		} else if isFile {
+			s[key] = 'F'
+		} else {
+			s[key] = '-'
+		}
 		return true
-	}); err != nil {
-		return err
-	}
-	cerr := g.Wait()
-	debug("Copied %d blobs [%v elapsed]", nb, time.Since(start).Truncate(10*time.Millisecond))
-	return cerr
+	})
 }
 
 func copyBlob(ctx context.Context, src, tgt blob.CAS, key string, replace bool) error {
