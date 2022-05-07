@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/boltstore v0.0.0-20220503185524-0fe59b6f246c
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220504173048-35625b420eff
+	github.com/creachadair/ffs v0.0.0-20220507163153-078b78958be7
 	github.com/creachadair/gcsstore v0.0.0-20220504173031-fc775bd797bd
 	github.com/creachadair/jrpc2 v0.40.0
 	github.com/creachadair/keyfile v0.7.1
@@ -45,7 +45,8 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20220504020129-738a7f0b822a // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/codahale/hdrhistogram v0.9.0 // indirect
-	github.com/creachadair/msync v0.0.0-20220503185027-96bf55dad0a9 // indirect
+	github.com/creachadair/msync v0.0.1 // indirect
+	github.com/creachadair/scapegoat v0.5.0 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
