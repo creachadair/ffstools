@@ -40,8 +40,8 @@ File objects are addressed by storage keys. The storage key for
 a file may be specified in the following formats:
 
   @<root-name>                 : the file key from a root pointer
-  74686973206973206d79206b6579  : hexadecimal encoded
-  dGhpcyBpcyBteSBrZXk=          : base64 encoded
+  74686973206973206d79206b6579 : hexadecimal encoded
+  dGhpcyBpcyBteSBrZXk=         : base64 encoded
 `,
 
 	Commands: []*command.C{
