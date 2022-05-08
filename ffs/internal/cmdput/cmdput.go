@@ -15,6 +15,7 @@
 package cmdput
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
@@ -107,7 +108,8 @@ func putFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*fil
 			return nil, err
 		}
 		defer in.Close()
-		if err := f.SetData(ctx, in); err != nil {
+		r := bufio.NewReaderSize(in, 1<<20)
+		if err := f.SetData(ctx, r); err != nil {
 			return nil, fmt.Errorf("copying data: %w", err)
 		}
 	} else if fi.Mode()&fs.ModeSymlink != 0 {
