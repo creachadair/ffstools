@@ -19,7 +19,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -140,19 +139,15 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove blobs not indexed.
-			g := taskgroup.New(taskgroup.Trigger(cancel))
+			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
 
 			fmt.Fprintf(env, "Begin sweep over %d blobs...\n", n)
 			start := time.Now()
 			var numKeep, numDrop uint32
-			for i := 0; i < 256; i++ {
-				pfx := string([]byte{byte(i)})
-				g.Go(func() error {
-					defer fmt.Fprintln(env, "*")
-					return s.List(cfg.Context, pfx, func(key string) error {
-						if !strings.HasPrefix(key, pfx) {
-							return blob.ErrStopListing
-						}
+			g.Go(func() error {
+				defer fmt.Fprintln(env, "*")
+				return s.List(cfg.Context, "", func(key string) error {
+					run(func() error {
 						for _, idx := range idxs {
 							if idx.Has(key) {
 								atomic.AddUint32(&numKeep, 1)
@@ -163,13 +158,11 @@ store without roots.
 						if v%50 == 0 {
 							fmt.Fprint(env, ".")
 						}
-						if err := s.Delete(ctx, key); err != nil {
-							return err
-						}
-						return nil
+						return s.Delete(ctx, key)
 					})
+					return nil
 				})
-			}
+			})
 			fmt.Fprintln(env, "All key ranges listed, waiting for cleanup...")
 			if err := g.Wait(); err != nil {
 				return fmt.Errorf("sweeping failed: %w", err)
