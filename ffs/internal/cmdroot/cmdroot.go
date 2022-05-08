@@ -69,6 +69,16 @@ var Command = &command.C{
 			Run: runCopy,
 		},
 		{
+			Name:  "rename",
+			Usage: "<source-name> <target-name>",
+			Help:  "Rename a root pointer (equivalent to copy + remove).",
+
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+				fs.BoolVar(&copyFlags.Replace, "replace", false, "Replace an existing target root name")
+			},
+			Run: runCopy,
+		},
+		{
 			Name:  "delete",
 			Usage: "<root-key> ...",
 			Help:  "Delete the specified root pointers.",
@@ -172,9 +182,16 @@ func runCopy(env *command.Env, args []string) error {
 	na, err := getNameArgs(env, args)
 	if err != nil {
 		return err
+	} else if na.Args[0] == na.Key {
+		return fmt.Errorf("target %q has the same name as the source", na.Args[0])
 	}
 	defer na.Close()
-	return na.Root.Save(na.Context, na.Args[0], copyFlags.Replace)
+	if err := na.Root.Save(na.Context, na.Args[0], copyFlags.Replace); err != nil {
+		return err
+	} else if env.Command.Name == "rename" {
+		return config.Roots(na.Store).Delete(na.Context, na.Key)
+	}
+	return nil
 }
 
 func runDelete(env *command.Env, args []string) error {
