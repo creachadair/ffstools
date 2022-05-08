@@ -94,10 +94,6 @@ store without roots.
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
 				idx.Add(key)
-				// If this root has a predecessor, add it to the root set.
-				if rp.Predecessor != "" {
-					keys = append(keys, rp.Predecessor)
-				}
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
