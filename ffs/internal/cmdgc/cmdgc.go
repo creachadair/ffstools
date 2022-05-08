@@ -149,7 +149,7 @@ store without roots.
 			for i := 0; i < 256; i++ {
 				pfx := string([]byte{byte(i)})
 				g.Go(func() error {
-					defer fmt.Fprint(env, ".")
+					defer fmt.Fprintln(env, "*")
 					return s.List(cfg.Context, pfx, func(key string) error {
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
@@ -161,8 +161,8 @@ store without roots.
 							}
 						}
 						v := atomic.AddUint32(&numDrop, 1)
-						if v%25 == 0 {
-							fmt.Fprint(env, ",")
+						if v%50 == 0 {
+							fmt.Fprint(env, ".")
 						}
 						if err := s.Delete(ctx, key); err != nil {
 							if err != context.Canceled {
@@ -178,7 +178,6 @@ store without roots.
 			if err := g.Wait(); err != nil {
 				return fmt.Errorf("sweeping failed: %w", err)
 			}
-			fmt.Fprintln(env, "*")
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
 				numKeep, numDrop, time.Since(start).Truncate(10*time.Millisecond))
 			return nil
