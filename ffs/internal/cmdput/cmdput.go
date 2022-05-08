@@ -35,7 +35,7 @@ import (
 )
 
 var putFlags struct {
-	Stat    bool
+	NoStat  bool
 	XAttr   bool
 	Verbose bool
 }
@@ -45,11 +45,16 @@ var Command = &command.C{
 	Usage: "<path> ...",
 	Help: `Write file and directory contents to the store.
 
-Add each specified path to the store and print its storage key.
-`,
+Recursively copy each specified path from the local filesystem to the
+store, and print the storage key. By default, file and directory stat
+info are recorded; use -nostat to disable this. Use -xattr to capture
+extended attributes.
+
+Symbolic links are captured, but devices, sockets, FIFO, and other
+special files are skipped.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&putFlags.Stat, "stat", false, "Capture file and directory stat")
+		fs.BoolVar(&putFlags.NoStat, "nostat", false, "Omit file and directory stat")
 		fs.BoolVar(&putFlags.XAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putFlags.Verbose, "v", false, "Enable verbose logging")
 	},
@@ -248,7 +253,7 @@ func addExtAttrs(path string, f *file.File) error {
 }
 
 func fileInfoToStat(fi fs.FileInfo) *file.Stat {
-	if !putFlags.Stat {
+	if putFlags.NoStat {
 		return nil
 	}
 	owner, group := ownerAndGroup(fi)

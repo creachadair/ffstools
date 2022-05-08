@@ -34,7 +34,12 @@ var indexFlags struct {
 var Command = &command.C{
 	Name:  "index",
 	Usage: "<root-key> ...",
-	Help:  "Update root keys with a blob index",
+	Help: `
+Update each of the specified roots to include a blob index.
+
+An index is a Bloom filter of the keys reachable from the root.
+If a root already has an index, it is not changed; use -f to force
+a new index to be computed anyway.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&indexFlags.Force, "f", false, "Force reindexing")

@@ -37,7 +37,7 @@ import (
 )
 
 var exportFlags struct {
-	Stat    bool
+	NoStat  bool
 	XAttr   bool
 	Verbose bool
 	Target  string
@@ -48,10 +48,16 @@ var Command = &command.C{
 	Name: "export",
 	Usage: `@<root-key>[/path/...]
 <file-key>[/path/...]`,
-	Help: `Export a file tree to the local filesystem.`,
+	Help: `
+Export a file tree to the local filesystem.
+
+Recursively export the file indicated by the selected root or file storage
+key to the path indicated by -to. By default, stat information (permissions,
+modification time, etc.) is copied to the output; use -nostat to omit this.
+Use -xattr to export extended attributes, if any are stored.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&exportFlags.Stat, "stat", false, "Update permissions and modification times")
+		fs.BoolVar(&exportFlags.NoStat, "nostat", false, "Do not update permissions or modification times")
 		fs.BoolVar(&exportFlags.XAttr, "xattr", false, "Restore extended attributes")
 		fs.BoolVar(&exportFlags.Verbose, "v", false, "Enable verbose logging")
 		fs.BoolVar(&exportFlags.Update, "update", false, "Update target if it exists")
@@ -137,7 +143,7 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	}
 
 	// Restore permissions and modification times, if requested and available.
-	if exportFlags.Stat && f.Stat().Persistent() && !link {
+	if !exportFlags.NoStat && f.Stat().Persistent() && !link {
 		stat := f.Stat()
 		logPrintf("Restore %q mode %v and modtime %v",
 			path, stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))

@@ -37,20 +37,20 @@ var Command = &command.C{
 		{
 			Name:  "show",
 			Usage: "<root-key>",
-			Help:  "Print the representation of a filesystem root",
+			Help:  "Print the representation of a filesystem root.",
 
 			Run: runShow,
 		},
 		{
 			Name: "list",
-			Help: "List the root keys known in the store",
+			Help: "List the root keys known in the store.",
 
 			Run: runList,
 		},
 		{
 			Name:  "create",
 			Usage: "<name> <description>...",
-			Help:  "Create a new empty root pointer",
+			Help:  "Create a new (empty) root pointer.",
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
@@ -61,7 +61,7 @@ var Command = &command.C{
 		{
 			Name:  "copy",
 			Usage: "<source-name> <target-name>",
-			Help:  "Duplicate a root pointer under a new name",
+			Help:  "Duplicate a root pointer under a new name.",
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&copyFlags.Replace, "replace", false, "Replace an existing target root name")
@@ -71,14 +71,14 @@ var Command = &command.C{
 		{
 			Name:  "delete",
 			Usage: "<root-key> ...",
-			Help:  "Delete the specified root pointers",
+			Help:  "Delete the specified root pointers.",
 
 			Run: runDelete,
 		},
 		{
 			Name:  "set-description",
 			Usage: "<name> <description>...",
-			Help:  "Edit the description of the given root",
+			Help:  "Edit the description of the given root pointer.",
 
 			Run: runEditDesc,
 		},
