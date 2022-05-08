@@ -19,7 +19,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -165,9 +164,6 @@ store without roots.
 							fmt.Fprint(env, ".")
 						}
 						if err := s.Delete(ctx, key); err != nil {
-							if err != context.Canceled {
-								log.Printf("MJF :: del key=%x err=%v", key, err)
-							}
 							return err
 						}
 						return nil
