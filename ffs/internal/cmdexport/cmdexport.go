@@ -15,6 +15,7 @@
 package cmdexport
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
@@ -168,7 +169,8 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 }
 
 func copyFile(ctx context.Context, f *file.File, path string) error {
-	_, err := atomicfile.WriteAll(path, f.Cursor(ctx), 0600)
+	r := bufio.NewReaderSize(f.Cursor(ctx), 1<<20)
+	_, err := atomicfile.WriteAll(path, r, 0600)
 	return err
 }
 

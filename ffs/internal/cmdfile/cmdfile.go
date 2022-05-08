@@ -15,6 +15,7 @@
 package cmdfile
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/fs"
@@ -120,7 +121,8 @@ func runRead(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		_, err = io.Copy(os.Stdout, of.File.Cursor(cfg.Context))
+		r := bufio.NewReaderSize(of.File.Cursor(cfg.Context), 1<<20)
+		_, err = io.Copy(os.Stdout, r)
 		return err
 	})
 }
