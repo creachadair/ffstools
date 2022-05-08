@@ -156,14 +156,6 @@ func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *roo
 	s[rootKey] = 'R'
 	s[rp.OwnerKey] = '+'
 	s[rp.IndexKey] = '-'
-	if rp.Predecessor != "" {
-		proot, err := root.Open(ctx, config.Roots(src), rp.Predecessor)
-		if err != nil {
-			return err
-		} else if err := s.root(ctx, src, rp.Predecessor, proot); err != nil {
-			return err
-		}
-	}
 	fp, err := rp.File(ctx, src)
 	if err != nil {
 		return err
