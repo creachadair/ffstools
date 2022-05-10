@@ -17,7 +17,7 @@ require (
 	github.com/creachadair/pebblestore v0.0.0-20220508080451-1b2721979f26
 	github.com/creachadair/pogrebstore v0.0.0-20220508080455-c4a08b806637
 	github.com/creachadair/rpcstore v0.0.0-20220508080459-3869c350ed90
-	github.com/creachadair/s3store v0.0.0-20220508080519-e566d3a25d4e
+	github.com/creachadair/s3store v0.0.0-20220510153544-7e948393025f
 	github.com/creachadair/sqlitestore v0.0.0-20220508080505-f089811743bd
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
@@ -37,7 +37,7 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.9 // indirect
+	github.com/aws/aws-sdk-go v1.44.10 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect

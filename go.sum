@@ -92,8 +92,8 @@ github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hC
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
-github.com/aws/aws-sdk-go v1.44.9 h1:s3lsEFbc8i7ghQmcEpcdyvoO/WMwyCVa9pUq3Lq//Ok=
-github.com/aws/aws-sdk-go v1.44.9/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
+github.com/aws/aws-sdk-go v1.44.10 h1:ohCdgQpJ9ojzm0fOk7ykrMTgTpHJBk5nnA7X+HzmnOA=
+github.com/aws/aws-sdk-go v1.44.10/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
@@ -179,8 +179,8 @@ github.com/creachadair/pogrebstore v0.0.0-20220508080455-c4a08b806637 h1:+8/OOWl
 github.com/creachadair/pogrebstore v0.0.0-20220508080455-c4a08b806637/go.mod h1:iFpsvynGTTOt8y1Ia/ZprzQQ7YGnKKn9qcYO/7cu/dk=
 github.com/creachadair/rpcstore v0.0.0-20220508080459-3869c350ed90 h1:jnMS0dPkixDjvdVd6ZslWIFz6mgnq1nz5k3v3f3iPww=
 github.com/creachadair/rpcstore v0.0.0-20220508080459-3869c350ed90/go.mod h1:4P6RalJ/+oppYxC6nWvPAwSjDjXltklKjOexZRf8JDw=
-github.com/creachadair/s3store v0.0.0-20220508080519-e566d3a25d4e h1:L1klXDQITPNI4pYfn1ZzRLNeI+A03iz4IMetIQDEV5Y=
-github.com/creachadair/s3store v0.0.0-20220508080519-e566d3a25d4e/go.mod h1:SlVYWrdqUdgzIp8psfD/cF2Wi7TMO5KU5boLGIn4XtE=
+github.com/creachadair/s3store v0.0.0-20220510153544-7e948393025f h1:lTguTUCUX11RQSfx7LzSLcj2KciCWV69zH1A0F5O6R0=
+github.com/creachadair/s3store v0.0.0-20220510153544-7e948393025f/go.mod h1:gUb1pAQWZeDDGAVoZyFTqXjpG+PBi5bpUvD6XK8igRU=
 github.com/creachadair/scapegoat v0.5.0 h1:RrZo+jaWC6PV+EV3cdKfcKBJa/YOfDhnDz8ly+iwj60=
 github.com/creachadair/scapegoat v0.5.0/go.mod h1:c5VzyF0CSF+wRf4dU9R2DeI0gMsHjj7w1lulEtU1678=
 github.com/creachadair/sqlitestore v0.0.0-20220508080505-f089811743bd h1:3RaHy0uqgyo4W+esGs8/7ulj3FxBqbN3XdCFoUAszwg=
