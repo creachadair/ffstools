@@ -111,7 +111,9 @@ func runShow(env *command.Env, keys []string) error {
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		var lastErr error
 		for _, key := range keys {
-			rp, err := root.Open(cfg.Context, config.Roots(s), key)
+			// N.B. Root keys do not need a @ prefix here, but tolerate one to
+			// make it easier to go back and forth with the file command.
+			rp, err := root.Open(cfg.Context, config.Roots(s), strings.TrimPrefix(key, "@"))
 			if err != nil {
 				fmt.Fprintf(env, "Error: %v\n", err)
 				lastErr = err
