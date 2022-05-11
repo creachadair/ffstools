@@ -113,7 +113,8 @@ func runShow(env *command.Env, keys []string) error {
 		for _, key := range keys {
 			// N.B. Root keys do not need a @ prefix here, but tolerate one to
 			// make it easier to go back and forth with the file command.
-			rp, err := root.Open(cfg.Context, config.Roots(s), strings.TrimPrefix(key, "@"))
+			clean := strings.TrimPrefix(key, "@")
+			rp, err := root.Open(cfg.Context, config.Roots(s), clean)
 			if err != nil {
 				fmt.Fprintf(env, "Error: %v\n", err)
 				lastErr = err
@@ -121,7 +122,7 @@ func runShow(env *command.Env, keys []string) error {
 			}
 			msg := root.Encode(rp).Value.(*wiretype.Object_Root).Root
 			fmt.Println(config.ToJSON(map[string]interface{}{
-				"storageKey": config.PrintableKey(key),
+				"storageKey": config.PrintableKey(clean),
 				"root":       msg,
 			}))
 		}
