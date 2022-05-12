@@ -30,6 +30,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdindex"
 	"github.com/creachadair/ffstools/ffs/internal/cmdput"
 	"github.com/creachadair/ffstools/ffs/internal/cmdroot"
+	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
 	"github.com/creachadair/ffstools/ffs/internal/cmdsync"
 )
 
@@ -74,6 +75,7 @@ help [<command>]`,
 			cmdgc.Command,
 			cmdindex.Command,
 			cmdsync.Command,
+			cmdstatus.Command,
 			command.HelpCommand(nil),
 		},
 	}
