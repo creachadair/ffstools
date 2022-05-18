@@ -5,23 +5,23 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.6
 	github.com/creachadair/badgerstore v0.1.11
-	github.com/creachadair/bitcaskstore v0.0.0-20220512150048-936c2166f917
-	github.com/creachadair/boltstore v0.0.0-20220512150135-d2c0543d3058
+	github.com/creachadair/bitcaskstore v0.0.0-20220518222351-21ee1f510996
+	github.com/creachadair/boltstore v0.0.0-20220518222437-17bbd8ce9ec4
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220512173306-55f591a12a79
-	github.com/creachadair/gcsstore v0.0.0-20220511164939-7c4f97699aed
+	github.com/creachadair/ffs v0.0.0-20220518185017-045cb1351640
+	github.com/creachadair/gcsstore v0.0.0-20220518185133-b39426febfc8
 	github.com/creachadair/jrpc2 v0.41.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20220512150251-dc1adf20e686
-	github.com/creachadair/pebblestore v0.0.0-20220512150355-2c50bfd8a603
-	github.com/creachadair/pogrebstore v0.0.0-20220512150401-265053e612b2
-	github.com/creachadair/rpcstore v0.0.0-20220512150405-2bd37d3bb7b7
-	github.com/creachadair/s3store v0.0.0-20220511164908-dea34db73abe
-	github.com/creachadair/sqlitestore v0.0.0-20220512150452-a70adf96896d
+	github.com/creachadair/leveldbstore v0.0.0-20220518225401-a69592fa7342
+	github.com/creachadair/pebblestore v0.0.0-20220518225436-3fa3c9d88e73
+	github.com/creachadair/pogrebstore v0.0.0-20220518225442-183252015548
+	github.com/creachadair/rpcstore v0.0.0-20220518225449-750448fd04eb
+	github.com/creachadair/s3store v0.0.0-20220518225459-2923edaef611
+	github.com/creachadair/sqlitestore v0.0.0-20220518225455-8b08914d7d41
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
-	golang.org/x/crypto v0.0.0-20220511200225-c6db032c6c88
+	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99
@@ -37,12 +37,12 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.12 // indirect
+	github.com/aws/aws-sdk-go v1.44.17 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220506213004-f8897076324b // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220518190142-9bd431430a38 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/codahale/hdrhistogram v0.9.0 // indirect
 	github.com/creachadair/msync v0.0.1 // indirect
@@ -72,15 +72,15 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20220428152302-39d4317da171 // indirect
-	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
+	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf // indirect
+	golang.org/x/net v0.0.0-20220517181318-183a9ca12b87 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29 // indirect
+	golang.org/x/sys v0.0.0-20220517195934-5e4e11fc645e // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
-	google.golang.org/api v0.79.0 // indirect
+	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
+	google.golang.org/api v0.80.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220505152158-f39f71e6c8f3 // indirect
-	google.golang.org/grpc v1.46.0 // indirect
+	google.golang.org/genproto v0.0.0-20220518221133-4f43b3371335 // indirect
+	google.golang.org/grpc v1.46.2 // indirect
 )
