@@ -10,21 +10,21 @@ require (
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220523163451-3b7ffac9e4c3
-	github.com/creachadair/gcsstore v0.0.0-20220518185133-b39426febfc8
+	github.com/creachadair/gcsstore v0.0.0-20220523153529-e07d6d386a4b
 	github.com/creachadair/jrpc2 v0.41.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220518225401-a69592fa7342
 	github.com/creachadair/pebblestore v0.0.0-20220518225436-3fa3c9d88e73
 	github.com/creachadair/pogrebstore v0.0.0-20220518225442-183252015548
 	github.com/creachadair/rpcstore v0.0.0-20220518225449-750448fd04eb
-	github.com/creachadair/s3store v0.0.0-20220518225459-2923edaef611
+	github.com/creachadair/s3store v0.0.0-20220523153511-cf5c321d4e93
 	github.com/creachadair/sqlitestore v0.0.0-20220518225455-8b08914d7d41
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
 	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171
 	google.golang.org/protobuf v1.28.0
-	gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99
+	gopkg.in/yaml.v3 v3.0.0
 )
 
 require (
@@ -37,12 +37,12 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.17 // indirect
+	github.com/aws/aws-sdk-go v1.44.19 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220518190142-9bd431430a38 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220523153352-99f35c8021d1 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/codahale/hdrhistogram v0.9.0 // indirect
 	github.com/creachadair/msync v0.0.1 // indirect
