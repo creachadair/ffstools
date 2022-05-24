@@ -23,10 +23,7 @@ import (
 	"io"
 	"log"
 	"net"
-	"net/http"
-	"net/url"
 	"os"
-	"strings"
 
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
@@ -37,7 +34,6 @@ import (
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/jrpc2/jhttp"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/keyfile"
 	"golang.org/x/crypto/sha3"
@@ -52,7 +48,7 @@ type startConfig struct {
 	ServerOptions *jrpc2.ServerOptions
 }
 
-func startNetServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
+func startServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
 	lst, err := net.Listen(jrpc2.Network(opts.Address))
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)
@@ -78,37 +74,6 @@ func startNetServer(ctx context.Context, opts startConfig) (closer, <-chan error
 			defer os.Remove(opts.Address)
 		}
 	}, errc
-}
-
-func startHTTPServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	u, err := url.Parse(opts.Address)
-	if err != nil {
-		ctrl.Fatalf("Service URL: %v", err)
-	}
-	hs := &http.Server{
-		Addr:    u.Host,
-		Handler: http.DefaultServeMux,
-	}
-	bridge := jhttp.NewBridge(opts.Methods, &jhttp.BridgeOptions{
-		Server: opts.ServerOptions,
-	})
-	http.Handle(u.Path, bridge)
-	go hs.ListenAndServe()
-	log.Printf("Service: %q", u)
-
-	errc := make(chan error, 1)
-	return func() {
-		defer close(errc)
-		bridge.Close()
-		errc <- hs.Shutdown(ctx)
-	}, errc
-}
-
-func startServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	if isHTTP(opts.Address) {
-		return startHTTPServer(ctx, opts)
-	}
-	return startNetServer(ctx, opts)
 }
 
 func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
@@ -163,8 +128,4 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	return blob.NewCAS(bs, func() hash.Hash {
 		return hmac.New(sha3.New256, key)
 	}), buf
-}
-
-func isHTTP(addr string) bool {
-	return strings.HasPrefix(addr, "http:") || strings.HasPrefix(addr, "https:")
 }
