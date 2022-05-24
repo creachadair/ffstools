@@ -52,16 +52,12 @@ import (
 	"sort"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/storage/filestore"
 	"github.com/creachadair/ffstools/blobd/store"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/metrics"
-	"github.com/creachadair/rpcstore"
 )
 
 var (
@@ -145,39 +141,10 @@ func main() {
 			log.Printf("Encryption key: %q", *keyFile)
 		}
 
-		mx := metrics.New()
-		mx.SetLabel("blobd.store", *storeAddr)
-		mx.SetLabel("blobd.pid", os.Getpid())
-		mx.SetLabel("blobd.encrypted", *keyFile != "")
-		if *keyFile != "" {
-			mx.SetLabel("blobd.encrypted.keyfile", *keyFile)
-		}
-		mx.SetLabel("blobd.compressed", *zlibLevel > 0)
-		mx.SetLabel("blobd.cacheSize", *cacheSize)
-		if buf != nil {
-			mx.SetLabel("blobd.buffer.db", *bufferDB)
-			mx.SetLabel("blobd.buffer.len", func() interface{} {
-				n, err := buf.Len(ctx)
-				if err != nil {
-					return "unknown"
-				}
-				return n
-			})
-		}
-
-		var debug jrpc2.Logger
-		if *doDebug {
-			debug = jrpc2.StdLogger(log.New(os.Stderr, "[blobd] ", log.LstdFlags))
-		}
-		closer, errc := startServer(ctx, startConfig{
+		closer, errc := startJSONServer(ctx, startConfig{
 			Address: *listenAddr,
-			Methods: rpcstore.NewService(bs, nil).Methods(),
-
-			ServerOptions: &jrpc2.ServerOptions{
-				Logger:    debug,
-				Metrics:   mx,
-				StartTime: time.Now().In(time.UTC),
-			},
+			Store:   bs,
+			Buffer:  buf,
 		})
 
 		sig := make(chan os.Signal, 2)

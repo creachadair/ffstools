@@ -24,6 +24,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
@@ -34,8 +35,10 @@ import (
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
+	"github.com/creachadair/jrpc2/metrics"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/keyfile"
+	"github.com/creachadair/rpcstore"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
 )
@@ -43,12 +46,37 @@ import (
 type closer = func()
 
 type startConfig struct {
-	Address       string
-	Methods       jrpc2.Assigner
-	ServerOptions *jrpc2.ServerOptions
+	Address string
+	Store   blob.CAS
+	Buffer  blob.Store
 }
 
-func startServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
+func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
+	mx := metrics.New()
+	mx.SetLabel("blobd.store", *storeAddr)
+	mx.SetLabel("blobd.pid", os.Getpid())
+	mx.SetLabel("blobd.encrypted", *keyFile != "")
+	if *keyFile != "" {
+		mx.SetLabel("blobd.encrypted.keyfile", *keyFile)
+	}
+	mx.SetLabel("blobd.compressed", *zlibLevel > 0)
+	mx.SetLabel("blobd.cacheSize", *cacheSize)
+	if opts.Buffer != nil {
+		mx.SetLabel("blobd.buffer.db", *bufferDB)
+		mx.SetLabel("blobd.buffer.len", func() interface{} {
+			n, err := opts.Buffer.Len(ctx)
+			if err != nil {
+				return "unknown"
+			}
+			return n
+		})
+	}
+
+	var debug jrpc2.Logger
+	if *doDebug {
+		debug = jrpc2.StdLogger(log.New(os.Stderr, "[blobd] ", log.LstdFlags))
+	}
+
 	lst, err := net.Listen(jrpc2.Network(opts.Address))
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)
@@ -58,14 +86,21 @@ func startServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
 		os.Chmod(opts.Address, 0600) // best-effort
 	}
 
+	service := rpcstore.NewService(opts.Store, nil).Methods()
+	loopOpts := &server.LoopOptions{
+		ServerOptions: &jrpc2.ServerOptions{
+			Logger:    debug,
+			Metrics:   mx,
+			StartTime: time.Now().In(time.UTC),
+		},
+	}
+
 	log.Printf("Service: %q", opts.Address)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(errc)
 		acc := server.NetAccepter(lst, channel.Line)
-		errc <- server.Loop(ctx, acc, server.Static(opts.Methods), &server.LoopOptions{
-			ServerOptions: opts.ServerOptions,
-		})
+		errc <- server.Loop(ctx, acc, server.Static(service), loopOpts)
 	}()
 
 	return func() {
