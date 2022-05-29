@@ -34,6 +34,7 @@ type settings struct {
 	// Flag targets
 	Store     string // global
 	Bucket    string // global
+	Mode      string // global
 	Debug     bool   // global
 	Replace   bool   // put
 	Raw       bool   // list
@@ -72,6 +73,7 @@ the address or an @tag from the configuration file.
 		cfg := env.Config.(*settings)
 		fs.StringVar(&cfg.Store, "store", "", "Blob store address (required)")
 		fs.StringVar(&cfg.Bucket, "bucket", "", "Prefix to add to all keys")
+		fs.StringVar(&cfg.Mode, "mode", "jrpc2", "Service mode (jrpc2 or chirp")
 		fs.BoolVar(&cfg.Debug, "debug", false, "Enable client debug logging")
 	},
 

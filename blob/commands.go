@@ -28,11 +28,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/creachadair/chirp"
+	cchannel "github.com/creachadair/chirp/channel"
+	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
+	jchannel "github.com/creachadair/jrpc2/channel"
 	"github.com/creachadair/rpcstore"
 )
 
@@ -248,15 +251,22 @@ func copyCmd(env *command.Env, args []string) error {
 }
 
 func statCmd(env *command.Env, args []string) error {
-	env.Config.(*settings).Bucket = ""
+	t := env.Config.(*settings)
+	t.Bucket = ""
 	s, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
+
+	cas, ok := s.(rpcstore.CAS)
+	if !ok {
+		// TODO(creachadair): Do something more useful than this.
+		return errors.New("server does not support the status command")
+	}
 	ctx := getContext(env)
 	defer blob.CloseStore(ctx, s)
 
-	si, err := s.(rpcstore.CAS).ServerInfo(ctx)
+	si, err := cas.ServerInfo(ctx)
 	if err != nil {
 		return err
 	}
@@ -315,19 +325,31 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 		return nil, fmt.Errorf("no -store address was found (%q)", addr)
 	}
 
-	var ch channel.Channel
-	if conn, err := net.Dial(jrpc2.Network(addr)); err != nil {
+	conn, err := net.Dial(jrpc2.Network(addr))
+	if err != nil {
 		return nil, fmt.Errorf("dialing: %w", err)
-	} else {
-		ch = channel.Line(conn, conn)
 	}
-	var logger jrpc2.Logger
-	if t.Debug {
-		log.Printf("Connected to storage service at %q", addr)
-		logger = jrpc2.StdLogger(log.New(os.Stderr, "[client] ", log.LstdFlags))
+
+	var bs blob.CAS
+	switch t.Mode {
+	case "jrpc", "jrpc2":
+		ch := jchannel.Line(conn, conn)
+		var logger jrpc2.Logger
+		if t.Debug {
+			log.Printf("Connected to storage service at %q", addr)
+			logger = jrpc2.StdLogger(log.New(os.Stderr, "[client] ", log.LstdFlags))
+		}
+		cli := jrpc2.NewClient(ch, &jrpc2.ClientOptions{Logger: logger})
+		bs = rpcstore.NewCAS(cli, nil)
+
+	case "chirp":
+		peer := chirp.NewPeer().Start(cchannel.IO(conn, conn))
+		bs = chirpstore.NewCAS(peer, nil)
+
+	default:
+		conn.Close()
+		return nil, fmt.Errorf("unknown service mode %q", t.Mode)
 	}
-	cli := jrpc2.NewClient(ch, &jrpc2.ClientOptions{Logger: logger})
-	bs := rpcstore.NewCAS(cli, nil)
 	if t.Bucket == "" {
 		return bs, nil
 	}
