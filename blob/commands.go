@@ -33,7 +33,6 @@ import (
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/jrpc2/jhttp"
 	"github.com/creachadair/rpcstore"
 )
 
@@ -317,9 +316,7 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 	}
 
 	var ch channel.Channel
-	if isHTTP(t.Store) {
-		ch = jhttp.NewChannel(t.Store, nil)
-	} else if conn, err := net.Dial(jrpc2.Network(addr)); err != nil {
+	if conn, err := net.Dial(jrpc2.Network(addr)); err != nil {
 		return nil, fmt.Errorf("dialing: %w", err)
 	} else {
 		ch = channel.Line(conn, conn)
@@ -363,8 +360,4 @@ func parseKey(s string) (string, error) {
 		return "", fmt.Errorf("invalid key %q: %w", s, err)
 	}
 	return string(key), nil
-}
-
-func isHTTP(addr string) bool {
-	return strings.HasPrefix(addr, "http:") || strings.HasPrefix(addr, "https:")
 }
