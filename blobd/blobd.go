@@ -69,6 +69,7 @@ var (
 	doDebug    = flag.Bool("debug", false, "Enable server debug logging")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
 	doVersion  = flag.Bool("version", false, "Print version information and exit")
+	serveMode  = flag.String("mode", "jrpc2", "Service mode (jrpc2 or chirp)")
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
@@ -88,8 +89,8 @@ func init() {
 		sort.Strings(keys)
 		fmt.Fprintf(os.Stderr, `Usage: %[1]s [options] -store <spec> -listen <addr>
 
-Start a JSON-RPC server that serves content from the blob.Store described by the -store
-spec. The server listens at the specified address, which may be a host:port or the path
+Start a server that serves content from the blob.Store described by the -store spec.
+The server listens at the specified address, which may be a host:port or the path
 of a Unix-domain socket.
 
 A store spec is a storage type and address: type:address
@@ -141,11 +142,22 @@ func main() {
 			log.Printf("Encryption key: %q", *keyFile)
 		}
 
-		closer, errc := startJSONServer(ctx, startConfig{
+		config := startConfig{
 			Address: *listenAddr,
 			Store:   bs,
 			Buffer:  buf,
-		})
+		}
+
+		var closer closer
+		var errc <-chan error
+		switch *serveMode {
+		case "jrpc", "jrpc2":
+			closer, errc = startJSONServer(ctx, config)
+		case "chirp":
+			closer, errc = startChirpServer(ctx, config)
+		default:
+			ctrl.Fatalf("Unknown service -mode %q", *serveMode)
+		}
 
 		sig := make(chan os.Signal, 2)
 		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)

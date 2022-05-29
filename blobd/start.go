@@ -26,6 +26,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/creachadair/chirp"
+	"github.com/creachadair/chirp/peers"
+	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/cachestore"
@@ -49,6 +52,36 @@ type startConfig struct {
 	Address string
 	Store   blob.CAS
 	Buffer  blob.Store
+}
+
+func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
+	lst, err := net.Listen(jrpc2.Network(opts.Address))
+	if err != nil {
+		ctrl.Fatalf("Listen: %v", err)
+	}
+	isUnix := lst.Addr().Network() == "unix"
+	if isUnix {
+		os.Chmod(opts.Address, 0600) // best-effort
+	}
+	log.Printf("[chirp] Service: %q", opts.Address)
+
+	service := chirpstore.NewService(opts.Store, nil)
+	errc := make(chan error, 1)
+	go func() {
+		defer close(errc)
+		errc <- peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
+			p := chirp.NewPeer()
+			service.Register(p)
+			return p
+		})
+	}()
+
+	return func() {
+		lst.Close()
+		if isUnix {
+			defer os.Remove(opts.Address)
+		}
+	}, errc
 }
 
 func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
@@ -95,7 +128,7 @@ func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan erro
 		},
 	}
 
-	log.Printf("Service: %q", opts.Address)
+	log.Printf("[jrpc2] Service: %q", opts.Address)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(errc)

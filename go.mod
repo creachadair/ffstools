@@ -7,6 +7,8 @@ require (
 	github.com/creachadair/badgerstore v0.1.11
 	github.com/creachadair/bitcaskstore v0.0.0-20220524163443-8f59125ef005
 	github.com/creachadair/boltstore v0.0.0-20220524163527-004545fd027a
+	github.com/creachadair/chirp v0.0.0-20220521215347-c962916224e4
+	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220523163451-3b7ffac9e4c3
