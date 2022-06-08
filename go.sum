@@ -165,8 +165,8 @@ github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1 h1:r626P+s8TKp
 github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1/go.mod h1:bAM+qFQb/KwWyCc9MLC4U1jvn3XyakqP5QRkds5T6cY=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.0.0-20220602213156-2ac4d166f206 h1:Yba921VooZdnn/+7J5w42ciR0UBopAc/w7HCEeB5g6U=
-github.com/creachadair/ffs v0.0.0-20220602213156-2ac4d166f206/go.mod h1:y0JS2YNUCk+KZ1gmXXDZ1i0PCMqa3iS4CTkREJlnfRk=
+github.com/creachadair/ffs v0.0.0-20220608152724-a6e04e75a6c2 h1:KGuRxLfN7bkaWmAjludkr8weB5QbU2cNZbkMBF/ubuA=
+github.com/creachadair/ffs v0.0.0-20220608152724-a6e04e75a6c2/go.mod h1:K4VeoMIjceOvgYp0/NMzXB1su2DRgxZ9EIQtm4/9RKY=
 github.com/creachadair/gcsstore v0.0.0-20220608152849-d553914b5e03 h1:oNYeVoVjOvz0QV+4j3drsFdJ0PkxATfNTy8zgsRYsJU=
 github.com/creachadair/gcsstore v0.0.0-20220608152849-d553914b5e03/go.mod h1:6xaNbUg0k1jUb0pZY73Jr2dmI12itYchT/lFJGme7fQ=
 github.com/creachadair/jrpc2 v0.41.0 h1:5ymgzbDfb8YeGT72h4223AWL9u1nAHJkz5K42uD7MBo=
