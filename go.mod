@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.6
 	github.com/creachadair/badgerstore v0.1.12
-	github.com/creachadair/bitcaskstore v0.0.0-20220627204842-d5ae902c677e
+	github.com/creachadair/bitcaskstore v0.0.0-20220703145626-e7f80368621d
 	github.com/creachadair/boltstore v0.0.0-20220627204929-ec3327a70d4c
 	github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
@@ -16,10 +16,10 @@ require (
 	github.com/creachadair/jrpc2 v0.41.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220614130046-38c12ba5fa37
-	github.com/creachadair/pebblestore v0.0.0-20220630174847-330fe138769b
+	github.com/creachadair/pebblestore v0.0.0-20220703145758-0d6e9180cb1d
 	github.com/creachadair/pogrebstore v0.0.0-20220614130159-d5021a871ebf
 	github.com/creachadair/rpcstore v0.0.0-20220614130203-1b1d7b350ad6
-	github.com/creachadair/s3store v0.0.0-20220630161145-0421eae2795f
+	github.com/creachadair/s3store v0.0.0-20220703145843-f66bde6ca7b6
 	github.com/creachadair/sqlitestore v0.0.0-20220614130256-be44102075ce
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.7
@@ -40,12 +40,12 @@ require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.45 // indirect
+	github.com/aws/aws-sdk-go v1.44.47 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220629231933-15565f7b763b // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220701152857-1f4dfe6f2a75 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/msync v0.0.1 // indirect
 	github.com/creachadair/scapegoat v0.5.0 // indirect
@@ -77,10 +77,10 @@ require (
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20220613132600-b0d781184e0d // indirect
-	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
+	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
 	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
+	golang.org/x/sys v0.0.0-20220702020025-31831981b65f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/api v0.86.0 // indirect
