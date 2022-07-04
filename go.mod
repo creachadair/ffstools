@@ -5,14 +5,14 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.6
 	github.com/creachadair/badgerstore v0.1.12
-	github.com/creachadair/bitcaskstore v0.0.0-20220703145626-e7f80368621d
-	github.com/creachadair/boltstore v0.0.0-20220627204929-ec3327a70d4c
+	github.com/creachadair/bitcaskstore v0.0.0-20220704182012-ddd96ef42596
+	github.com/creachadair/boltstore v0.0.0-20220704182101-0e7c2745cfad
 	github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220614125809-6703c63e5305
-	github.com/creachadair/gcsstore v0.0.0-20220630174834-ee9eaef3ee0f
+	github.com/creachadair/gcsstore v0.0.0-20220703145723-d1e13cee45b5
 	github.com/creachadair/jrpc2 v0.41.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220614130046-38c12ba5fa37
@@ -80,7 +80,7 @@ require (
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
 	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220702020025-31831981b65f // indirect
+	golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/api v0.86.0 // indirect

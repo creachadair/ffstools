@@ -157,10 +157,10 @@ github.com/creachadair/atomicfile v0.2.6 h1:FgYxYvGcqREApTY8Nxg8msM6P/KVKK3ob5h9
 github.com/creachadair/atomicfile v0.2.6/go.mod h1:BRq8Une6ckFneYXZQ+kO7p1ZZP3I2fzVzf28JxrIkBc=
 github.com/creachadair/badgerstore v0.1.12 h1:NbbgZ5zkSYysGacpFBp3x4Pi2i+OJwi2J2sz87FX03Q=
 github.com/creachadair/badgerstore v0.1.12/go.mod h1:qhb55szQJ0Ea4wo9UKXV7d3Mrxyf5CyVmVOWXZFrPdI=
-github.com/creachadair/bitcaskstore v0.0.0-20220703145626-e7f80368621d h1:3wN2HXFEQOL2P66rYQEVPvq521l0mg9Fh8hqrCDga0M=
-github.com/creachadair/bitcaskstore v0.0.0-20220703145626-e7f80368621d/go.mod h1:2vpUZLuP5zaKrUIxLe9Zw9x0hCB6AAHhoMskTZuwj40=
-github.com/creachadair/boltstore v0.0.0-20220627204929-ec3327a70d4c h1:VbGBK7GVJcvOVz2bHcjK7rCpdOXBJudf6I3+fn2BQAg=
-github.com/creachadair/boltstore v0.0.0-20220627204929-ec3327a70d4c/go.mod h1:7cP7e1LZxJDv5W6NXpuP0anxwdknJRgor7G8DZbO6Gs=
+github.com/creachadair/bitcaskstore v0.0.0-20220704182012-ddd96ef42596 h1:knqk4++xI1+332tmyNFE99t4GvlCmrWU8g3cbFIdg+A=
+github.com/creachadair/bitcaskstore v0.0.0-20220704182012-ddd96ef42596/go.mod h1:IYRlBBBXKVB9yuYQw33nx8rWaCu273MHotNp8oE+9Rs=
+github.com/creachadair/boltstore v0.0.0-20220704182101-0e7c2745cfad h1:0tjxTovKP/DqQ18KmPP0s/bP/EVJP34f6iNo6+uzHmU=
+github.com/creachadair/boltstore v0.0.0-20220704182101-0e7c2745cfad/go.mod h1:KGkkqKxRwCJopiyYXOyo0Pp2ThkLv0+N3rAu00xHzFc=
 github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363 h1:q8ZgFL7EFg5gUYo7ysetJmnS/xc8irEcsjGvYi9y5y0=
 github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363/go.mod h1:uwOEvnwoziZupZjbQHhwiI6zCYdpUec5bp5z4YzSdRs=
 github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909 h1:g6CN3Q8WQS43zb/RKtS4vSwN0Iih4gm0iLv9ktJ3uck=
@@ -171,8 +171,8 @@ github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
 github.com/creachadair/ffs v0.0.0-20220614125809-6703c63e5305 h1:kFohrEvqUv537mLyu7kmycK/jxOZU/8sAZoLEDxl4lc=
 github.com/creachadair/ffs v0.0.0-20220614125809-6703c63e5305/go.mod h1:pFV9c7T/hzfuiJ/GCpqpMlaIAHGDZYOAkHF2DHfUTgE=
-github.com/creachadair/gcsstore v0.0.0-20220630174834-ee9eaef3ee0f h1:SFbSP8Zh4Tqe79ms9ld+IWpVLNlz+fTkXEwBWHOYS8U=
-github.com/creachadair/gcsstore v0.0.0-20220630174834-ee9eaef3ee0f/go.mod h1:16olNwTjB4hhM3GEXwPaZd6RrXL/gNmKUPifob/ico8=
+github.com/creachadair/gcsstore v0.0.0-20220703145723-d1e13cee45b5 h1:9CZvYp6yTxOr1tjnawcXfF835H1l3SEn8OJMi8z9EUM=
+github.com/creachadair/gcsstore v0.0.0-20220703145723-d1e13cee45b5/go.mod h1:ukZSGQJ23WeUbTXgh5GA/gWGLk51DHV1Z4uPB5/VJ4M=
 github.com/creachadair/jrpc2 v0.41.0 h1:5ymgzbDfb8YeGT72h4223AWL9u1nAHJkz5K42uD7MBo=
 github.com/creachadair/jrpc2 v0.41.0/go.mod h1:SwEPHK3zqbc5j6AVBVdGoc2QYwYDQUBGnQYk0tflx9k=
 github.com/creachadair/keyfile v0.7.1 h1:XN5VztUPSIbUv4xKCZ2lULM+UsYHAkqz1EvgmXCu3YA=
@@ -884,8 +884,8 @@ golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220624220833-87e55d714810/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220702020025-31831981b65f h1:xdsejrW/0Wf2diT5CPp3XmKUNbr7Xvw8kYilQ+6qjRY=
-golang.org/x/sys v0.0.0-20220702020025-31831981b65f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e h1:CsOuNlbOuf0mzxJIefr6Q4uAUetRUwZE4qt7VfzP+xo=
+golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 h1:CBpWXWQpIRjzmkkA+M7q9Fqnwd2mZr3AFqexg8YTfoM=
