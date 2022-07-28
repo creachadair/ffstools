@@ -25,7 +25,7 @@ require (
 	github.com/pkg/xattr v0.4.7
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
