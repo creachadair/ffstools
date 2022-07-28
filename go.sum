@@ -137,8 +137,8 @@ github.com/cockroachdb/errors v1.9.0/go.mod h1:vaNcEYYqbIqB5JhKBhFV9CneUqeuEbB2O
 github.com/cockroachdb/logtags v0.0.0-20190617123548-eb05cc24525f/go.mod h1:i/u985jwjWRlyHXQbwatDASoW0RMlZ/3i9yJHE2xLkI=
 github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f h1:6jduT9Hfc0njg5jJ1DdKCFPdMBrp/mdZfCpa5h+WM74=
 github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f/go.mod h1:Vz9DsVWQQhf3vs21MhPMZpMGSht7O/2vFW2xusFUVOs=
-github.com/cockroachdb/pebble v0.0.0-20220727132928-1729bc93ee8c h1:cNMLQApDhAoE6SOD2Qd/2PXeIZFy54K9DgSNv6eIgD4=
-github.com/cockroachdb/pebble v0.0.0-20220727132928-1729bc93ee8c/go.mod h1:890yq1fUb9b6dGNwssgeUO5vQV9qfXnCPxAJhBQfXw0=
+github.com/cockroachdb/pebble v0.0.0-20220728161336-ce87a66e911e h1:AcnGqtbtTvPCc+oO76Dr0eDjcSSS+Dp9ONxwlCg3Jzc=
+github.com/cockroachdb/pebble v0.0.0-20220728161336-ce87a66e911e/go.mod h1:890yq1fUb9b6dGNwssgeUO5vQV9qfXnCPxAJhBQfXw0=
 github.com/cockroachdb/redact v1.0.8/go.mod h1:BVNblN9mBWFyMyqK1k3AAiSxhvhfK2oOZZ2lK+dpvRg=
 github.com/cockroachdb/redact v1.1.3 h1:AKZds10rFSIj7qADf0g46UixK8NNLwWTNdCIGS5wfSQ=
 github.com/cockroachdb/redact v1.1.3/go.mod h1:BVNblN9mBWFyMyqK1k3AAiSxhvhfK2oOZZ2lK+dpvRg=
@@ -160,8 +160,8 @@ github.com/creachadair/badgerstore v0.1.12 h1:NbbgZ5zkSYysGacpFBp3x4Pi2i+OJwi2J2
 github.com/creachadair/badgerstore v0.1.12/go.mod h1:qhb55szQJ0Ea4wo9UKXV7d3Mrxyf5CyVmVOWXZFrPdI=
 github.com/creachadair/bitcaskstore v0.0.0-20220728161112-9dbd970858f1 h1:j/mPi2AcpRjMcEhbz5iy082T3zrIXm/3VIjHcvBGSLc=
 github.com/creachadair/bitcaskstore v0.0.0-20220728161112-9dbd970858f1/go.mod h1:I0uG90UAxZZWuSySY6F2YpZ77r0TVwoDk7PlANiogRs=
-github.com/creachadair/boltstore v0.0.0-20220723160136-a657f0f3c5cf h1:hZDR7r5Ve3o1ig4r6/okdrA3DcSJkV7UjDR+SAggQmg=
-github.com/creachadair/boltstore v0.0.0-20220723160136-a657f0f3c5cf/go.mod h1:EQp6+74+77UTGyNPUcN/ZWfvillEp5oDt552PEYiJAo=
+github.com/creachadair/boltstore v0.0.0-20220728161200-90e8eb1f837b h1:yl5bhqR7MzpfOe8M2n5BlpJ0qD0Agp9hv7SirBQ1JgU=
+github.com/creachadair/boltstore v0.0.0-20220728161200-90e8eb1f837b/go.mod h1:+GGsC5c0SHYVqOai22e7X1Z64gYtpjMGUaKELshXAe4=
 github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363 h1:q8ZgFL7EFg5gUYo7ysetJmnS/xc8irEcsjGvYi9y5y0=
 github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363/go.mod h1:uwOEvnwoziZupZjbQHhwiI6zCYdpUec5bp5z4YzSdRs=
 github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909 h1:g6CN3Q8WQS43zb/RKtS4vSwN0Iih4gm0iLv9ktJ3uck=
@@ -170,8 +170,8 @@ github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1 h1:r626P+s8TKp
 github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1/go.mod h1:bAM+qFQb/KwWyCc9MLC4U1jvn3XyakqP5QRkds5T6cY=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.0.0-20220723160023-fc9cf11b3928 h1:nt2nukyC3NPAFlAmgeFUjj85ukdpnk0U7BQD79dwc7c=
-github.com/creachadair/ffs v0.0.0-20220723160023-fc9cf11b3928/go.mod h1:FHNncOtruB6oE6nz3Z1y4qPTFSOa0Gl0bpbW5TaVxLs=
+github.com/creachadair/ffs v0.0.0-20220728160340-518bb3931eb1 h1:Cx0V9RMjHG4+0CKLj3E1BS4gXVGELQuhuTib1vmZYUg=
+github.com/creachadair/ffs v0.0.0-20220728160340-518bb3931eb1/go.mod h1:iljaX5OPJazwdKSNK2TEUNo7pDnmC39yw1lW/s6eU7k=
 github.com/creachadair/gcsstore v0.0.0-20220728161240-fed860a1f8fe h1:KxuICskvNEjK8y/MKBOtKC/rOh4WdkdZz6Yr3gsXqnI=
 github.com/creachadair/gcsstore v0.0.0-20220728161240-fed860a1f8fe/go.mod h1:J3SbgY3SnElBs63ItCCbmu/82pPxe+tivib9VCMbxXQ=
 github.com/creachadair/jrpc2 v0.41.0 h1:5ymgzbDfb8YeGT72h4223AWL9u1nAHJkz5K42uD7MBo=
@@ -186,8 +186,8 @@ github.com/creachadair/pebblestore v0.0.0-20220728161416-30569b7b2d69 h1:djTiYRC
 github.com/creachadair/pebblestore v0.0.0-20220728161416-30569b7b2d69/go.mod h1:2vbMa8TTFEWiwuxdqTTBRBI5h+cai6oFLVMr0Rt99w0=
 github.com/creachadair/pogrebstore v0.0.0-20220728161426-0c2805f818db h1:UP8elRidCFglYjtI2MUEBOCVoR5zy7XXk5qIu4nTT3M=
 github.com/creachadair/pogrebstore v0.0.0-20220728161426-0c2805f818db/go.mod h1:sSSr4GjXyVmom4LP24eppV8iadZgTmF1AeAbUvj0tLs=
-github.com/creachadair/rpcstore v0.0.0-20220723160230-a17a24aadbac h1:pMV9WHDbOlEzrG+0ghGDvofx8QX5tE/7tNR8hu4fhQk=
-github.com/creachadair/rpcstore v0.0.0-20220723160230-a17a24aadbac/go.mod h1:mCrXN7n/ZJ+k96kBEGyPtNxJzSWrOf/3VaLwkIgx2o8=
+github.com/creachadair/rpcstore v0.0.0-20220728161431-f064f5fbfe89 h1:yR4GJEz5us6FuUYRWLMxRxNSBvG41HfikEfPattD0NY=
+github.com/creachadair/rpcstore v0.0.0-20220728161431-f064f5fbfe89/go.mod h1:cnbynJFkXR/hApp+0QUFMVdbWs0BhAd4vNHsEOyXADM=
 github.com/creachadair/s3store v0.0.0-20220728161601-fe26cffc631e h1:mIydiAgkJ30Bjc2PEK//r+OKhatTEf6SU7y5d/yduhc=
 github.com/creachadair/s3store v0.0.0-20220728161601-fe26cffc631e/go.mod h1:UGo036KYJBCKFfYhBpczRNBWnpAEphFNiWZLFVAztzs=
 github.com/creachadair/scapegoat v0.5.0 h1:RrZo+jaWC6PV+EV3cdKfcKBJa/YOfDhnDz8ly+iwj60=

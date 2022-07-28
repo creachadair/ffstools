@@ -6,19 +6,19 @@ require (
 	github.com/creachadair/atomicfile v0.2.6
 	github.com/creachadair/badgerstore v0.1.12
 	github.com/creachadair/bitcaskstore v0.0.0-20220728161112-9dbd970858f1
-	github.com/creachadair/boltstore v0.0.0-20220723160136-a657f0f3c5cf
+	github.com/creachadair/boltstore v0.0.0-20220728161200-90e8eb1f837b
 	github.com/creachadair/chirp v0.0.0-20220623214744-c88930bd7363
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
 	github.com/creachadair/command v0.0.0-20220426235536-a748effdf6a1
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20220723160023-fc9cf11b3928
+	github.com/creachadair/ffs v0.0.0-20220728160340-518bb3931eb1
 	github.com/creachadair/gcsstore v0.0.0-20220728161240-fed860a1f8fe
 	github.com/creachadair/jrpc2 v0.41.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220728161342-8c89e8bf664c
 	github.com/creachadair/pebblestore v0.0.0-20220728161416-30569b7b2d69
 	github.com/creachadair/pogrebstore v0.0.0-20220728161426-0c2805f818db
-	github.com/creachadair/rpcstore v0.0.0-20220723160230-a17a24aadbac
+	github.com/creachadair/rpcstore v0.0.0-20220728161431-f064f5fbfe89
 	github.com/creachadair/s3store v0.0.0-20220728161601-fe26cffc631e
 	github.com/creachadair/sqlitestore v0.0.0-20220728161522-09f72bc9d3c6
 	github.com/creachadair/taskgroup v0.3.2
@@ -45,7 +45,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220727132928-1729bc93ee8c // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220728161336-ce87a66e911e // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/msync v0.0.1 // indirect
 	github.com/creachadair/scapegoat v0.5.0 // indirect
