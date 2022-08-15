@@ -12,11 +12,11 @@ require (
 	github.com/creachadair/command v0.0.0-20220803150008-371cf252ccea
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2
-	github.com/creachadair/gcsstore v0.0.0-20220812142153-66e1b4e6b7f0
+	github.com/creachadair/gcsstore v0.0.0-20220815172203-384b3ebea1ae
 	github.com/creachadair/jrpc2 v0.41.1
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220808163153-31e569e38943
-	github.com/creachadair/pebblestore v0.0.0-20220812142234-e97e12487d9b
+	github.com/creachadair/pebblestore v0.0.0-20220815172224-f8a1a7730f4b
 	github.com/creachadair/pogrebstore v0.0.0-20220808163258-95d404a7df31
 	github.com/creachadair/rpcstore v0.0.0-20220810061430-4c4f8e57c31f
 	github.com/creachadair/s3store v0.0.0-20220815165355-3c1cff5c595e

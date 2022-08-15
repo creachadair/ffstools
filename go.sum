@@ -173,8 +173,8 @@ github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
 github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2 h1:/SA4j1dE+Z9Y5otq3A4BYBF87BbIs6iK9G/Q3KYmajo=
 github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2/go.mod h1:oQP2eWfmEYr8EekEMMF3zfuWB/Q3sywjV+EEPVY9qyY=
-github.com/creachadair/gcsstore v0.0.0-20220812142153-66e1b4e6b7f0 h1:cvffrVufMHn7PD/z0iCuK6WsqBWxBhKk1IMDjNZb8Kk=
-github.com/creachadair/gcsstore v0.0.0-20220812142153-66e1b4e6b7f0/go.mod h1:V5cqkLs9J3mQbuYTpV9eEwusczaG2rDpfxjWgd9SUtU=
+github.com/creachadair/gcsstore v0.0.0-20220815172203-384b3ebea1ae h1:1kxa2NwL2E0qKR2I4gmTorS3HTvfvpl7sbO5aCgMleo=
+github.com/creachadair/gcsstore v0.0.0-20220815172203-384b3ebea1ae/go.mod h1:rPVyAPonr1oxgSxewFcLkI364jrc3zkRkthUOkWWhpI=
 github.com/creachadair/jrpc2 v0.41.1 h1:GnSQNk+vt8B/oayJlfOXVRi4hg8DuB9NsppFGe8iVJ0=
 github.com/creachadair/jrpc2 v0.41.1/go.mod h1:k2mGfjsgE2h2Vo12C9NzZguUzzl3gnfGCmLIvg84pVE=
 github.com/creachadair/keyfile v0.7.1 h1:XN5VztUPSIbUv4xKCZ2lULM+UsYHAkqz1EvgmXCu3YA=
@@ -183,8 +183,8 @@ github.com/creachadair/leveldbstore v0.0.0-20220808163153-31e569e38943 h1:yE9auy
 github.com/creachadair/leveldbstore v0.0.0-20220808163153-31e569e38943/go.mod h1:mRZEC8JNU+jcqm9+qkUAlREggPMokLTJJ9a6YBNUG2s=
 github.com/creachadair/msync v0.0.1 h1:VJGRnZiUStZt7xT941dxwi+ZVN2Rg6d8m30f0s9rCjw=
 github.com/creachadair/msync v0.0.1/go.mod h1:6UuXMEnymbJkxDZjKQt3ynrkbwuJYVtrybIK1z93cA0=
-github.com/creachadair/pebblestore v0.0.0-20220812142234-e97e12487d9b h1:5pK2hK0l1yByeSiwCAs8nHbisYaD+lwuS27gy2w1lnk=
-github.com/creachadair/pebblestore v0.0.0-20220812142234-e97e12487d9b/go.mod h1:LQSDcVWqMrUuis73KzeykVVdtHe3krPzqzNGHOUvrhw=
+github.com/creachadair/pebblestore v0.0.0-20220815172224-f8a1a7730f4b h1:twZuhKcKmn42INh58lqeStfN8AjNLxoesqmz2EnKyDE=
+github.com/creachadair/pebblestore v0.0.0-20220815172224-f8a1a7730f4b/go.mod h1:t8IItLmCwV4KEtdjzBkunYbfzzrMicjotQurjMmsXCE=
 github.com/creachadair/pogrebstore v0.0.0-20220808163258-95d404a7df31 h1:NbrrWYvh9WaI0nMY3Ok+eRhAvzJBG9xfzGFTekUc6IE=
 github.com/creachadair/pogrebstore v0.0.0-20220808163258-95d404a7df31/go.mod h1:y9W6RDuf8MRUD23SQ2fx+HqCIxQUcRRj9UaTYBZnSNM=
 github.com/creachadair/rpcstore v0.0.0-20220810061430-4c4f8e57c31f h1:1akDIb4ehoxYyIKMmoFfVsNzqyya8W9btm8Cr3+WEns=
