@@ -5,33 +5,33 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.12
-	github.com/creachadair/bitcaskstore v0.0.0-20220812142042-28d520223c28
-	github.com/creachadair/boltstore v0.0.0-20220812142132-1211d6eb69dd
+	github.com/creachadair/bitcaskstore v0.0.0-20220829152812-8863b4a450c0
+	github.com/creachadair/boltstore v0.0.0-20220829152859-f58e8bc40222
 	github.com/creachadair/chirp v0.0.0-20220803150907-e576f58ed862
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
-	github.com/creachadair/command v0.0.0-20220803150008-371cf252ccea
+	github.com/creachadair/command v0.0.0-20220817162311-7d5308305dc2
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2
-	github.com/creachadair/gcsstore v0.0.0-20220815172203-384b3ebea1ae
+	github.com/creachadair/gcsstore v0.0.0-20220829152914-58205cd48b80
 	github.com/creachadair/jrpc2 v0.41.1
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20220808163153-31e569e38943
-	github.com/creachadair/pebblestore v0.0.0-20220815172224-f8a1a7730f4b
-	github.com/creachadair/pogrebstore v0.0.0-20220808163258-95d404a7df31
-	github.com/creachadair/rpcstore v0.0.0-20220810061430-4c4f8e57c31f
-	github.com/creachadair/s3store v0.0.0-20220815165355-3c1cff5c595e
-	github.com/creachadair/sqlitestore v0.0.0-20220808163355-4229825a79e4
+	github.com/creachadair/leveldbstore v0.0.0-20220817162121-b802d0e5e593
+	github.com/creachadair/pebblestore v0.0.0-20220829153030-c009469425b7
+	github.com/creachadair/pogrebstore v0.0.0-20220817162033-d9720bd93156
+	github.com/creachadair/rpcstore v0.0.0-20220829153040-5f3b79a31d8d
+	github.com/creachadair/s3store v0.0.0-20220829152652-4c483d4581cb
+	github.com/creachadair/sqlitestore v0.0.0-20220817162224-c0a25ec49617
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.8
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
+	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	cloud.google.com/go v0.103.0 // indirect
-	cloud.google.com/go/compute v1.8.0 // indirect
+	cloud.google.com/go v0.104.0 // indirect
+	cloud.google.com/go/compute v1.9.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/storage v1.25.0 // indirect
 	crawshaw.io/sqlite v0.3.3-0.20211227050848-2cdb5c1a86a1 // indirect
@@ -40,12 +40,12 @@ require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.76 // indirect
+	github.com/aws/aws-sdk-go v1.44.86 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20220814225252-0b6ec868ed93 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20220826184203-b38417b0835b // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/msync v0.0.1 // indirect
 	github.com/creachadair/scapegoat v0.5.0 // indirect
@@ -59,7 +59,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/flatbuffers v2.0.6+incompatible // indirect
+	github.com/google/flatbuffers v2.0.7+incompatible // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
@@ -70,20 +70,20 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plar/go-adaptive-radix-tree v1.0.4 // indirect
-	github.com/rogpeppe/go-internal v1.8.1 // indirect
+	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
-	golang.org/x/oauth2 v0.0.0-20220808172628-8227340efae7 // indirect
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
+	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
+	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
+	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
+	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
-	google.golang.org/api v0.92.0 // indirect
+	google.golang.org/api v0.94.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220815135757-37a418bb8959 // indirect
-	google.golang.org/grpc v1.48.0 // indirect
+	google.golang.org/genproto v0.0.0-20220829144015-23454907ede3 // indirect
+	google.golang.org/grpc v1.49.0 // indirect
 )
