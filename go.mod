@@ -12,7 +12,7 @@ require (
 	github.com/creachadair/command v0.0.0-20220916173946-56a74cdd66b6
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20220916164435-e8f4245e84f5
-	github.com/creachadair/gcsstore v0.0.0-20220916163116-03e87e276cf1
+	github.com/creachadair/gcsstore v0.0.0-20220922154527-11b5047df5a3
 	github.com/creachadair/jrpc2 v0.41.2
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20220916163221-2470c8a3a043
