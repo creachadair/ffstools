@@ -5,21 +5,21 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.15
-	github.com/creachadair/bitcaskstore v0.0.0-20221021173011-57952cda97e6
+	github.com/creachadair/bitcaskstore v0.0.0-20221025155420-7b402a7169f3
 	github.com/creachadair/boltstore v0.0.0-20221021173058-a6b8ed4ab024
 	github.com/creachadair/chirp v0.0.0-20220803150907-e576f58ed862
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
 	github.com/creachadair/command v0.0.0-20220916173946-56a74cdd66b6
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20221021172941-afb16f61a95c
-	github.com/creachadair/gcsstore v0.0.0-20221021173113-1301ee597421
+	github.com/creachadair/gcsstore v0.0.0-20221025155431-9eea31736f50
 	github.com/creachadair/jrpc2 v0.41.2
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20221021173213-6f8cfa9c2312
-	github.com/creachadair/pebblestore v0.0.0-20221021173247-6c863b0bfddf
+	github.com/creachadair/pebblestore v0.0.0-20221025155458-2d6cb60c1214
 	github.com/creachadair/pogrebstore v0.0.0-20221021173250-ba3773ed2be5
 	github.com/creachadair/rpcstore v0.0.0-20221021173254-beb86f501e62
-	github.com/creachadair/s3store v0.0.0-20221021173317-ff66a5e81d2e
+	github.com/creachadair/s3store v0.0.0-20221025155527-62c1839ceee0
 	github.com/creachadair/sqlitestore v0.0.0-20221021173302-c0aa3e660995
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
@@ -39,7 +39,7 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.120 // indirect
+	github.com/aws/aws-sdk-go v1.44.122 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -68,7 +68,7 @@ require (
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.2 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plar/go-adaptive-radix-tree v1.0.4 // indirect
@@ -81,7 +81,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20221019170559-20944726eadf // indirect
+	golang.org/x/exp v0.0.0-20221025133541-111beb427cde // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/oauth2 v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
@@ -90,7 +90,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.100.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
+	google.golang.org/genproto v0.0.0-20221025140454-527a21cfbd71 // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
