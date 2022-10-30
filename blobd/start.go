@@ -19,11 +19,13 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
+	"expvar"
 	"hash"
 	"io"
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/creachadair/chirp"
@@ -38,7 +40,6 @@ import (
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/jrpc2/metrics"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/rpcstore"
@@ -84,26 +85,48 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan err
 	}, errc
 }
 
+func expvarString(s string) *expvar.String {
+	v := new(expvar.String)
+	v.Set(s)
+	return v
+}
+
+func expvarInt(z int) *expvar.Int {
+	v := new(expvar.Int)
+	v.Set(int64(z))
+	return v
+}
+
+type expvarBool bool
+
+func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
+
+type expvarFunc func() string
+
+func (f expvarFunc) String() string { return f() }
+
 func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	mx := metrics.New()
-	mx.SetLabel("blobd.store", *storeAddr)
-	mx.SetLabel("blobd.pid", os.Getpid())
-	mx.SetLabel("blobd.encrypted", *keyFile != "")
+	mx := new(expvar.Map)
+	mx.Set("store", expvarString(*storeAddr))
+	mx.Set("pid", expvarInt(os.Getpid()))
+	mx.Set("encrypted", expvarBool(*keyFile != ""))
 	if *keyFile != "" {
-		mx.SetLabel("blobd.encrypted.keyfile", *keyFile)
+		mx.Set("keyfile", expvarString(*keyFile))
 	}
-	mx.SetLabel("blobd.compressed", *zlibLevel > 0)
-	mx.SetLabel("blobd.cacheSize", *cacheSize)
+	mx.Set("compressed", expvarBool(*zlibLevel > 0))
+	mx.Set("cache_size", expvarInt(*cacheSize))
+
 	if opts.Buffer != nil {
-		mx.SetLabel("blobd.buffer.db", *bufferDB)
-		mx.SetLabel("blobd.buffer.len", func() interface{} {
+		mx.Set("buffer_db", expvarString(*bufferDB))
+		mx.Set("buffer_len", expvarFunc(func() string {
 			n, err := opts.Buffer.Len(ctx)
 			if err != nil {
 				return "unknown"
 			}
-			return n
-		})
+			return strconv.FormatInt(n, 10)
+		}))
 	}
+	jrpc2.ServerMetrics().Set("blobd", mx)
 
 	var debug jrpc2.Logger
 	if *doDebug {
@@ -123,7 +146,6 @@ func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan erro
 	loopOpts := &server.LoopOptions{
 		ServerOptions: &jrpc2.ServerOptions{
 			Logger:    debug,
-			Metrics:   mx,
 			StartTime: time.Now().In(time.UTC),
 		},
 	}
