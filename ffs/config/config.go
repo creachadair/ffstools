@@ -260,15 +260,15 @@ func (p *PathInfo) Flush(ctx context.Context) (string, error) {
 }
 
 // OpenPath parses and opens the specified path in s.
-// The path has either the form "@<root-key>/some/path" or "<file-key>/some/path".
+// The path has either the form "<root-key>/some/path" or "@<file-key>/some/path".
 func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 	out := &PathInfo{Path: path}
 
 	first, rest := SplitPath(path)
 
-	// Check for a @root key prefix.
-	if strings.HasPrefix(first, "@") {
-		rp, err := root.Open(ctx, Roots(s), first[1:])
+	// Check for a @file key prefix; otherwise it should be a root.
+	if !strings.HasPrefix(first, "@") {
+		rp, err := root.Open(ctx, Roots(s), first)
 		if err != nil {
 			return nil, err
 		}
@@ -282,7 +282,7 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 		out.File = rf
 		out.FileKey = rp.FileKey // provisional
 
-	} else if fk, err := ParseKey(first); err != nil {
+	} else if fk, err := ParseKey(strings.TrimPrefix(first, "@")); err != nil {
 		return nil, err
 
 	} else if fp, err := file.Open(ctx, s, fk); err != nil {
@@ -314,18 +314,12 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 // rest indicates a sequence of child names starting from that file.
 // The rest may be empty.
 func SplitPath(s string) (first, rest string) {
-	// Check whether the path starts with a base64-encoded storage key.
-	eq := strings.Index(s, "=")
-	if len(s) == eq+1 {
+	if pre, post, ok := strings.Cut(s, "=/"); ok { // <base64>=/more/stuff
+		return pre + "=", path.Clean(post)
+	}
+	if strings.HasSuffix(s, "=") {
 		return s, ""
-	} else if len(s) > eq+1 && s[eq+1] == '/' {
-		return s[:eq], path.Clean(s[eq:2])
 	}
-
-	// Otherwise, split at the first / and clean the trailing segment.
-	parts := strings.SplitN(s, "/", 2)
-	if len(parts) == 1 {
-		return parts[0], ""
-	}
-	return parts[0], path.Clean(parts[1])
+	pre, post, _ := strings.Cut(s, "/")
+	return pre, path.Clean(post)
 }

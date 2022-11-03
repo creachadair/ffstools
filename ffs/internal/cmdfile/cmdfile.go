@@ -29,8 +29,8 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
-const fileCmdUsage = `@<root-key>[/path] ...
-<file-key>[/path] ...`
+const fileCmdUsage = `<root-key>[/path] ...
+@<file-key>[/path] ...`
 
 var Command = &command.C{
 	Name: "file",
@@ -39,9 +39,9 @@ var Command = &command.C{
 File objects are addressed by storage keys. The storage key for
 a file may be specified in the following formats:
 
-  @<root-name>                 : the file key from a root pointer
-  74686973206973206d79206b6579 : hexadecimal encoded
-  dGhpcyBpcyBteSBrZXk=         : base64 encoded
+  <root-name>                   : the file key from a root pointer
+  @74686973206973206d79206b6579 : hexadecimal encoded
+  @dGhpcyBpcyBteSBrZXk=         : base64 encoded
 `,
 
 	Commands: []*command.C{
@@ -61,8 +61,8 @@ a file may be specified in the following formats:
 		},
 		{
 			Name: "set",
-			Usage: `@<root-key>/<path> <target-key>
-<origin-key>/<path> <file-key>`,
+			Usage: `<root-key>/<path> <target-key>
+@<origin-key>/<path> <file-key>`,
 			Help: `Set the specified path beneath the origin to the given target
 
 The storage key of the modified origin is printed to stdout.
@@ -73,8 +73,8 @@ If the origin is from a root, the root is updated with the modified origin.
 		},
 		{
 			Name: "remove",
-			Usage: `@<root-key>/<path> ...
-<origin-key>/<path> ...`,
+			Usage: `<root-key>/<path> ...
+@<origin-key>/<path> ...`,
 			Help: `Remove the specified path from beneath the origin
 
 The storage key of the modified origin is printed to stdout.

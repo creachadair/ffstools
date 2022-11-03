@@ -44,8 +44,8 @@ func debug(msg string, args ...interface{}) {
 
 var Command = &command.C{
 	Name: "sync",
-	Usage: `<file-key>[/path/...] ...
-@<root-key>[/path/...] ...`,
+	Usage: `@<file-key>[/path/...] ...
+<root-key>[/path/...] ...`,
 	Help: `Synchronize file trees between stores.
 
 Transfer all the blobs reachable from the specified file or root
