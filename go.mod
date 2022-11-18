@@ -5,32 +5,32 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.15
-	github.com/creachadair/bitcaskstore v0.0.0-20221108164843-567ada3b0765
-	github.com/creachadair/boltstore v0.0.0-20221108164859-4d73461f441a
+	github.com/creachadair/bitcaskstore v0.0.0-20221118160420-79acd23a75c9
+	github.com/creachadair/boltstore v0.0.0-20221118160436-123331443db5
 	github.com/creachadair/chirp v0.0.0-20220803150907-e576f58ed862
 	github.com/creachadair/chirpstore v0.0.0-20220521221012-42a619404909
 	github.com/creachadair/command v0.0.0-20220916173946-56a74cdd66b6
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20221108164806-f19497ef09aa
-	github.com/creachadair/gcsstore v0.0.0-20221108164927-ae0b59488151
+	github.com/creachadair/ffs v0.0.0-20221118160344-cda956c7a60c
+	github.com/creachadair/gcsstore v0.0.0-20221118160455-2b94710b837e
 	github.com/creachadair/jrpc2 v0.42.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20221108164953-50988c412d47
-	github.com/creachadair/pebblestore v0.0.0-20221108165016-173ce886591b
-	github.com/creachadair/pogrebstore v0.0.0-20221108165023-09f595861efc
-	github.com/creachadair/rpcstore v0.0.0-20221108165027-2d5e671cd1bb
-	github.com/creachadair/s3store v0.0.0-20221108165045-a545e5746abc
-	github.com/creachadair/sqlitestore v0.0.0-20221108165033-bc22dbd47fa3
+	github.com/creachadair/leveldbstore v0.0.0-20221118160517-5747723febcb
+	github.com/creachadair/pebblestore v0.0.0-20221118160615-ca049b0a24e8
+	github.com/creachadair/pogrebstore v0.0.0-20221118160624-b629e6da8faa
+	github.com/creachadair/rpcstore v0.0.0-20221118160629-03afc39950ff
+	github.com/creachadair/s3store v0.0.0-20221118160739-e9fc790c0a46
+	github.com/creachadair/sqlitestore v0.0.0-20221118160713-dcd8fa1a72ed
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
-	golang.org/x/crypto v0.2.0
+	golang.org/x/crypto v0.3.0
 	golang.org/x/term v0.2.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	cloud.google.com/go v0.105.0 // indirect
+	cloud.google.com/go v0.107.0 // indirect
 	cloud.google.com/go/compute v1.12.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.1 // indirect
 	cloud.google.com/go/iam v0.7.0 // indirect
@@ -40,20 +40,20 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.132 // indirect
+	github.com/aws/aws-sdk-go v1.44.140 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20221107201208-868f031742e6 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20221116223310-87eccabb90a3 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
-	github.com/creachadair/msync v0.0.1 // indirect
+	github.com/creachadair/msync v0.0.2 // indirect
 	github.com/creachadair/scapegoat v0.5.1 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.4 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/getsentry/sentry-go v0.14.0 // indirect
+	github.com/getsentry/sentry-go v0.15.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.0.0 // indirect
@@ -82,16 +82,16 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/exp v0.0.0-20221106115401-f9659909a136 // indirect
+	golang.org/x/exp v0.0.0-20221114191408-850992195362 // indirect
 	golang.org/x/net v0.2.0 // indirect
-	golang.org/x/oauth2 v0.1.0 // indirect
+	golang.org/x/oauth2 v0.2.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.102.0 // indirect
+	google.golang.org/api v0.103.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20221107162902-2d387536bcdd // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
