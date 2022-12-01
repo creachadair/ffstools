@@ -16,10 +16,15 @@ package cmdfile
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
+	"path"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -51,6 +56,17 @@ a file may be specified in the following formats:
 			Help:  "Print the representation of a file object",
 
 			Run: runShow,
+		},
+		{
+			Name:  "ls",
+			Usage: fileCmdUsage,
+			Help:  "List file attributes in a style similar to the ls command",
+
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
+				fs.BoolVar(&listFlags.All, "a", false, "Include entries whose names begin with dot (.)")
+			},
+			Run: runList,
 		},
 		{
 			Name:  "read",
@@ -109,6 +125,80 @@ func runShow(env *command.Env, args []string) error {
 		}
 		return nil
 	})
+}
+
+var listFlags struct {
+	DirOnly bool
+	All     bool
+}
+
+func runList(env *command.Env, args []string) error {
+	if len(args) == 0 {
+		return env.Usagef("missing required origin/path")
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		for _, arg := range args {
+			if arg == "" {
+				return env.Usagef("origin may not be empty")
+			}
+			pi, err := config.OpenPath(cfg.Context, s, arg)
+			if err != nil {
+				return err
+			}
+			of := pi.File
+			name := path.Base(pi.Path)
+
+			// Skip dot files unless -a is set.
+			if strings.HasPrefix(name, ".") && !listFlags.All {
+				continue
+			}
+
+			// List contents of directories unless -d is set.
+			if of.Stat().Mode.IsDir() && !listFlags.DirOnly {
+				for _, kid := range of.Child().Names() {
+					cf, err := of.Open(cfg.Context, kid)
+					if err != nil {
+						return fmt.Errorf("open %q: %w", kid, err)
+					}
+					fmt.Println(listFormat(cf, kid))
+				}
+				continue
+			}
+
+			// List an individual file or directory name.
+			fmt.Print(listFormat(of, name))
+			if of.Stat().Mode.Type()&fs.ModeSymlink != 0 {
+				target, err := io.ReadAll(of.Cursor(cfg.Context))
+				if err != nil {
+					return fmt.Errorf("reading symlink: %w", err)
+				}
+				fmt.Print("-> ", string(target))
+			}
+			fmt.Println()
+		}
+		return nil
+	})
+}
+
+func listFormat(f *file.File, name string) string {
+	s := f.Stat()
+	var date string
+	if now := time.Now(); now.Year() != s.ModTime.Year() {
+		date = s.ModTime.Format("Jan _2 2006 ")
+	} else {
+		date = s.ModTime.Format("Jan _2 15:04")
+	}
+	return fmt.Sprintf("%s %3d %-8s %-8s %8d %s %s",
+		s.Mode, 1+f.Child().Len(), nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
+		f.Size(), date, name)
+}
+
+func nameOrID(name string, id int) string {
+	if name != "" {
+		return name
+	}
+	return strconv.Itoa(id)
 }
 
 func runRead(env *command.Env, args []string) error {
