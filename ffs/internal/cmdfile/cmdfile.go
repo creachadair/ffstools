@@ -150,33 +150,44 @@ func runList(env *command.Env, args []string) error {
 			of := pi.File
 			name := path.Base(pi.Path)
 
-			// Skip dot files unless -a is set.
-			if strings.HasPrefix(name, ".") && !listFlags.All {
-				continue
+			// List an individual file or directory name.
+			printOne := func(of *file.File, name string) error {
+				// Skip dot files unless -a is set.
+				if strings.HasPrefix(name, ".") && !listFlags.All {
+					return nil
+				}
+
+				fmt.Print(listFormat(of, name))
+				if of.Stat().Mode.Type()&fs.ModeSymlink != 0 {
+					target, err := io.ReadAll(of.Cursor(cfg.Context))
+					if err != nil {
+						return fmt.Errorf("reading symlink: %w", err)
+					}
+					fmt.Print(" -> ", string(target))
+				}
+				fmt.Println()
+				return nil
 			}
 
 			// List contents of directories unless -d is set.
 			if of.Stat().Mode.IsDir() && !listFlags.DirOnly {
 				for _, kid := range of.Child().Names() {
+					if strings.HasPrefix(kid, ".") && !listFlags.All {
+						continue
+					}
+
 					cf, err := of.Open(cfg.Context, kid)
 					if err != nil {
 						return fmt.Errorf("open %q: %w", kid, err)
+					} else if err := printOne(cf, kid); err != nil {
+						return err
 					}
-					fmt.Println(listFormat(cf, kid))
 				}
 				continue
 			}
-
-			// List an individual file or directory name.
-			fmt.Print(listFormat(of, name))
-			if of.Stat().Mode.Type()&fs.ModeSymlink != 0 {
-				target, err := io.ReadAll(of.Cursor(cfg.Context))
-				if err != nil {
-					return fmt.Errorf("reading symlink: %w", err)
-				}
-				fmt.Print("-> ", string(target))
+			if err := printOne(pi.File, name); err != nil {
+				return err
 			}
-			fmt.Println()
 		}
 		return nil
 	})
