@@ -101,10 +101,6 @@ type expvarBool bool
 
 func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
 
-type expvarFunc func() string
-
-func (f expvarFunc) String() string { return f() }
-
 func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
 	mx := new(expvar.Map)
 	mx.Set("store", expvarString(*storeAddr))
@@ -118,7 +114,7 @@ func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan erro
 
 	if opts.Buffer != nil {
 		mx.Set("buffer_db", expvarString(*bufferDB))
-		mx.Set("buffer_len", expvarFunc(func() string {
+		mx.Set("buffer_len", expvar.Func(func() any {
 			n, err := opts.Buffer.Len(ctx)
 			if err != nil {
 				return "unknown"
