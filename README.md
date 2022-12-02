@@ -1,6 +1,8 @@
 # Command-line tools for FFS
 
-- The [`blobd`](https://github.com/creachadair/ffstools/tree/default/blobd)
+See also https://github.com/creachadair/ffs.
+
+- The [`blobd`](https://github.com/creachadair/ffstools/tree/main/blobd)
   tool defines a JSON-RPC service that implements the FFS blob store interface
   over various underlying key-value storage implementations.
 
@@ -9,7 +11,7 @@
   go install github.com/creachadair/ffstools/blobd@latest
   ```
 
-- The [`blob`](https://github.com/creachadair/ffstools/tree/default/blob) tool
+- The [`blob`](https://github.com/creachadair/ffstools/tree/main/blob) tool
   is a client that communicates with the `blobd` service to manipulate the
   contents of a blob store as opaque data.
 
@@ -18,7 +20,7 @@
   go install github.com/creachadair/ffstools/blob@latest
   ```
 
-- The [`ffs`](https://github.com/creachadair/ffstools/tree/default/ffs) tool
+- The [`ffs`](https://github.com/creachadair/ffstools/tree/main/ffs) tool
   also communicates with the `blobd` service and provides commands to
   manipulate the contents of the store as FFS specific messages.
 
@@ -27,7 +29,7 @@
   go install github.com/creachadair/ffstools/ffs@latest
   ```
 
-- The [`file2json`](https://github.com/creachadair/ffstools/tree/default/file2json)
+- The [`file2json`](https://github.com/creachadair/ffstools/tree/main/file2json)
   tool decodes wire-format node messages and translates them to JSON for easier
   reading by humans.
 
