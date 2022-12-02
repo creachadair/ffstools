@@ -277,7 +277,7 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 			return nil, err
 		}
 		out.Root = rp
-		out.RootKey = first[1:]
+		out.RootKey = first
 		out.Base = rf
 		out.File = rf
 		out.FileKey = rp.FileKey // provisional
