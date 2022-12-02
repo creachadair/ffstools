@@ -135,8 +135,8 @@ github.com/creachadair/atomicfile v0.2.7 h1:LiL/QmAUO7ZDsjSJ6xj3PlsXaYXYKMS8g/Po
 github.com/creachadair/atomicfile v0.2.7/go.mod h1:BRq8Une6ckFneYXZQ+kO7p1ZZP3I2fzVzf28JxrIkBc=
 github.com/creachadair/badgerstore v0.1.15 h1:3wYGZCznTKphYpOUzZVTrPpnA0J/npYL/C0+/DgBkwU=
 github.com/creachadair/badgerstore v0.1.15/go.mod h1:9OOQM2KQyslwoNngJn0FCVENRfRzD/CpV1QhSy4Oous=
-github.com/creachadair/bitcaskstore v0.0.0-20221128170236-aa8a0a85df01 h1:mPASnRLcUbnlSuO4937NfZWf4FBNvRsaHm/lOT40S0Q=
-github.com/creachadair/bitcaskstore v0.0.0-20221128170236-aa8a0a85df01/go.mod h1:uRg16gUKrpUmmgWdvlVS86KJa5a681KpByH+TjGxIPg=
+github.com/creachadair/bitcaskstore v0.0.0-20221202074720-21f995ab7df2 h1:eysErGu/8zWY18nIjytlkchINYACoubDn96I45yn7eg=
+github.com/creachadair/bitcaskstore v0.0.0-20221202074720-21f995ab7df2/go.mod h1:snAB08mqwkjNpOX5WxffEL8VoESNf40roOzpPOFfmTs=
 github.com/creachadair/boltstore v0.0.0-20221202074737-e1d76d4e4a74 h1:kQNAFtd31QRCtC4Y+y0o7A5VR+io8/NFXR+ZUQXHRp4=
 github.com/creachadair/boltstore v0.0.0-20221202074737-e1d76d4e4a74/go.mod h1:hYc/hnxABSlZiQr40qJMetiUzRxylF8LTIrXIX4bWIA=
 github.com/creachadair/chirp v0.0.0-20220803150907-e576f58ed862 h1:xBlaYcrh6OexDk1jSMXiw/lXW0l5nWZSQXD2lXxhiI0=
