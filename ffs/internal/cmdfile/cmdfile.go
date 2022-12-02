@@ -21,6 +21,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/user"
 	"path"
 	"strconv"
 	"strings"
@@ -198,7 +199,13 @@ func nameOrID(name string, id int) string {
 	if name != "" {
 		return name
 	}
-	return strconv.Itoa(id)
+	idstr := strconv.Itoa(id)
+	if u, err := user.LookupId(idstr); err == nil {
+		return u.Username
+	} else if g, err := user.LookupGroupId(idstr); err == nil {
+		return g.Name
+	}
+	return idstr
 }
 
 func runRead(env *command.Env, args []string) error {
