@@ -130,7 +130,7 @@ func putFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*fil
 }
 
 // putDir puts a single file, directory, or symlink into the store.
-// If path names a plain file or symlin, it calls putFile.
+// If path names a plain file or symlink, it calls putFile.
 func putDir(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
 	fi, err := os.Lstat(path)
 	if err != nil {
