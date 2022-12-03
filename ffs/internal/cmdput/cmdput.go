@@ -176,7 +176,7 @@ func putDir(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
 			dirs = append(dirs, &entry{sub: sub, name: elt.Name()})
 		} else if t := elt.Type(); t != 0 && (t&fs.ModeSymlink == 0) {
 			continue // e.g., socket, pipe, device, fifo, etc.
-		} else if fi, err = elt.Info(); err != nil {
+		} else if fi, err := elt.Info(); err != nil {
 			return nil, err
 		} else {
 			files = append(files, &entry{sub: sub, name: elt.Name(), fi: fi})
