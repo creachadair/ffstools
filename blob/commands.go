@@ -258,19 +258,23 @@ func statCmd(env *command.Env, args []string) error {
 		return err
 	}
 
-	cas, ok := s.(rpcstore.CAS)
-	if !ok {
-		// TODO(creachadair): Do something more useful than this.
-		return errors.New("server does not support the status command")
-	}
 	ctx := getContext(env)
 	defer blob.CloseStore(ctx, s)
 
-	si, err := cas.ServerInfo(ctx)
-	if err != nil {
-		return err
+	var msg []byte
+	switch t := s.(type) {
+	case rpcstore.CAS:
+		var si *jrpc2.ServerInfo
+		si, err = t.ServerInfo(ctx)
+		if err != nil {
+			return err
+		}
+		msg, err = json.Marshal(si)
+	case chirpstore.CAS:
+		msg, err = t.Status(ctx)
+	default:
+		return errors.New("server does not support the status command")
 	}
-	msg, err := json.Marshal(si)
 	if err != nil {
 		return err
 	}

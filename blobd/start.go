@@ -67,11 +67,13 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan err
 	log.Printf("[chirp] Service: %q", opts.Address)
 
 	service := chirpstore.NewService(opts.Store, nil)
+	mx := newServerMetrics(ctx, opts)
 	errc := make(chan error, 1)
 	go func() {
 		defer close(errc)
 		errc <- peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
 			p := chirp.NewPeer()
+			p.Metrics().Set("blobd", mx)
 			service.Register(p)
 			return p
 		})
@@ -85,44 +87,8 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan err
 	}, errc
 }
 
-func expvarString(s string) *expvar.String {
-	v := new(expvar.String)
-	v.Set(s)
-	return v
-}
-
-func expvarInt(z int) *expvar.Int {
-	v := new(expvar.Int)
-	v.Set(int64(z))
-	return v
-}
-
-type expvarBool bool
-
-func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
-
 func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	mx := new(expvar.Map)
-	mx.Set("store", expvarString(*storeAddr))
-	mx.Set("pid", expvarInt(os.Getpid()))
-	mx.Set("encrypted", expvarBool(*keyFile != ""))
-	if *keyFile != "" {
-		mx.Set("keyfile", expvarString(*keyFile))
-	}
-	mx.Set("compressed", expvarBool(*zlibLevel > 0))
-	mx.Set("cache_size", expvarInt(*cacheSize))
-
-	if opts.Buffer != nil {
-		mx.Set("buffer_db", expvarString(*bufferDB))
-		mx.Set("buffer_len", expvar.Func(func() any {
-			n, err := opts.Buffer.Len(ctx)
-			if err != nil {
-				return "unknown"
-			}
-			return strconv.FormatInt(n, 10)
-		}))
-	}
-	jrpc2.ServerMetrics().Set("blobd", mx)
+	jrpc2.ServerMetrics().Set("blobd", newServerMetrics(ctx, opts))
 
 	var debug jrpc2.Logger
 	if *doDebug {
@@ -214,4 +180,36 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	return blob.NewCAS(bs, func() hash.Hash {
 		return hmac.New(sha3.New256, key)
 	}), buf
+}
+
+func expvarString(s string) *expvar.String { v := new(expvar.String); v.Set(s); return v }
+
+func expvarInt(z int) *expvar.Int { v := new(expvar.Int); v.Set(int64(z)); return v }
+
+type expvarBool bool
+
+func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
+
+func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
+	mx := new(expvar.Map)
+	mx.Set("store", expvarString(*storeAddr))
+	mx.Set("pid", expvarInt(os.Getpid()))
+	mx.Set("encrypted", expvarBool(*keyFile != ""))
+	if *keyFile != "" {
+		mx.Set("keyfile", expvarString(*keyFile))
+	}
+	mx.Set("compressed", expvarBool(*zlibLevel > 0))
+	mx.Set("cache_size", expvarInt(*cacheSize))
+
+	if opts.Buffer != nil {
+		mx.Set("buffer_db", expvarString(*bufferDB))
+		mx.Set("buffer_len", expvar.Func(func() any {
+			n, err := opts.Buffer.Len(ctx)
+			if err != nil {
+				return "unknown"
+			}
+			return strconv.FormatInt(n, 10)
+		}))
+	}
+	return mx
 }
