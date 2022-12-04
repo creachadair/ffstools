@@ -15,8 +15,11 @@
 package cmdstatus
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 
+	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/prefixed"
@@ -35,11 +38,28 @@ var Command = &command.C{
 
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-			si, err := s.(prefixed.CAS).Base().(rpcstore.CAS).ServerInfo(cfg.Context)
+			var bs blob.Store = s
+			if t, ok := s.(prefixed.CAS); ok {
+				bs = t.Base()
+			}
+			var msg any
+			var err error
+			switch t := bs.(type) {
+			case rpcstore.CAS:
+				msg, err = t.ServerInfo(cfg.Context)
+
+			case chirpstore.CAS:
+				var data []byte
+				data, err = t.Status(cfg.Context)
+				msg = json.RawMessage(data)
+
+			default:
+				return errors.New("server does not support the status command")
+			}
 			if err != nil {
 				return err
 			}
-			fmt.Println(config.ToJSON(si))
+			fmt.Println(config.ToJSON(msg))
 			return nil
 		})
 	},
