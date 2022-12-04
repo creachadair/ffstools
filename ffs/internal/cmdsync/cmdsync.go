@@ -69,7 +69,7 @@ func runSync(env *command.Env, args []string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
 		taddr := cfg.ResolveAddress(syncFlags.Target)
-		return config.WithStore(cfg.Context, taddr, func(tgt blob.CAS) error {
+		return cfg.WithStoreAddress(cfg.Context, taddr, func(tgt blob.CAS) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
 			// Find all the blobs reachable from the specified starting points.
