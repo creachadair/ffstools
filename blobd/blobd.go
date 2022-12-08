@@ -68,7 +68,7 @@ var (
 	doDebug    = flag.Bool("debug", false, "Enable server debug logging")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
 	doVersion  = flag.Bool("version", false, "Print version information and exit")
-	serveMode  = flag.String("mode", "jrpc2", "Service mode (jrpc2 or chirp)")
+	serveMode  = flag.String("mode", "chirp", "Service mode (jrpc2 or chirp)")
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
