@@ -27,7 +27,6 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdexport"
 	"github.com/creachadair/ffstools/ffs/internal/cmdfile"
 	"github.com/creachadair/ffstools/ffs/internal/cmdgc"
-	"github.com/creachadair/ffstools/ffs/internal/cmdindex"
 	"github.com/creachadair/ffstools/ffs/internal/cmdput"
 	"github.com/creachadair/ffstools/ffs/internal/cmdroot"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
@@ -78,7 +77,6 @@ help [<command>]`,
 			cmdput.Command,
 			cmdexport.Command,
 			cmdgc.Command,
-			cmdindex.Command,
 			cmdsync.Command,
 			cmdstatus.Command,
 			command.HelpCommand(nil),
