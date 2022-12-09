@@ -36,7 +36,6 @@ import (
 var (
 	configPath = config.Path()
 	storeAddr  string
-	rpcMode    string
 )
 
 func main() {
@@ -49,7 +48,6 @@ help [<command>]`,
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
 			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
-			fs.StringVar(&rpcMode, "mode", "", "RPC mode: jrpc2 (default) or chirp")
 		},
 
 		Init: func(env *command.Env) error {
@@ -61,9 +59,6 @@ help [<command>]`,
 				cfg.DefaultStore = storeAddr
 			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
 				cfg.DefaultStore = bs
-			}
-			if rpcMode != "" {
-				cfg.RPCMode = rpcMode
 			}
 			cfg.Context = context.Background()
 			config.ExpandString(&cfg.DefaultStore)

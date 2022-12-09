@@ -29,16 +29,13 @@ import (
 	"strings"
 
 	"github.com/creachadair/chirp"
-	chirpchannel "github.com/creachadair/chirp/channel"
+	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/storage/prefixed"
-	"github.com/creachadair/jrpc2"
-	jrpc2channel "github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/rpcstore"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -63,9 +60,6 @@ type Settings struct {
 	// The default address for the blob store service (required).  This must be
 	// either a store tag (@name) or an address.
 	DefaultStore string `json:"defaultStore" yaml:"default-store"`
-
-	// The RPC mode to use, which is "jrpc2" (default) or "chirp".
-	RPCMode string `json:"rpcMode" yaml:"rpc-mode"`
 
 	// Well-known store specifications, addressable by tag.
 	Stores []*StoreSpec `json:"stores" yaml:"stores"`
@@ -125,28 +119,13 @@ func (s *Settings) OpenStore() (blob.CAS, error) {
 // OpenStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
 func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, error) {
-	switch s.RPCMode {
-	case "", "jrpc2":
-		conn, err := net.Dial(jrpc2.Network(addr))
-		if err != nil {
-			return nil, fmt.Errorf("dialing store: %w", err)
-		}
-		ch := jrpc2channel.Line(conn, conn)
-		bs := rpcstore.NewCAS(jrpc2.NewClient(ch, nil), nil)
-		return prefixed.NewCAS(bs).Derive(" "), nil
-
-	case "chirp":
-		conn, err := net.Dial(chirp.SplitAddress(addr))
-		if err != nil {
-			return nil, fmt.Errorf("dialing store: %w", err)
-		}
-		peer := chirp.NewPeer().Start(chirpchannel.IO(conn, conn))
-		bs := chirpstore.NewCAS(peer, nil)
-		return prefixed.NewCAS(bs).Derive(" "), nil
-
-	default:
-		return nil, fmt.Errorf("unknown RPC mode %q", s.RPCMode)
+	conn, err := net.Dial(chirp.SplitAddress(addr))
+	if err != nil {
+		return nil, fmt.Errorf("dialing store: %w", err)
 	}
+	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
+	bs := chirpstore.NewCAS(peer, nil)
+	return prefixed.NewCAS(bs).Derive(" "), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
