@@ -111,13 +111,13 @@ the address or an @tag from the configuration file.
 		},
 		{
 			Name:  "size",
-			Usage: "size <key>...",
+			Usage: "<key>...",
 			Help:  "Print the sizes of stored blobs",
 			Run:   sizeCmd,
 		},
 		{
 			Name:  "delete",
-			Usage: "delete <key>",
+			Usage: "<key>",
 			Help:  "Delete a blob from the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
@@ -162,8 +162,9 @@ the address or an @tag from the configuration file.
 			},
 		},
 		{
-			Name: "copy",
-			Help: "Copy the contents of one blob to another key",
+			Name:  "copy",
+			Usage: "<src> <dst>",
+			Help:  "Copy the contents of one blob to another key",
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 				cfg := env.Config.(*settings)
 				fs.BoolVar(&cfg.Replace, "replace", false, "Replace an existing key")
