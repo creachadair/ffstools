@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"os"
 	"strings"
@@ -34,9 +33,6 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/prefixed"
-	"github.com/creachadair/jrpc2"
-	jchannel "github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/rpcstore"
 )
 
 func getContext(env *command.Env) context.Context {
@@ -263,13 +259,6 @@ func statCmd(env *command.Env, args []string) error {
 
 	var msg []byte
 	switch t := s.(type) {
-	case rpcstore.CAS:
-		var si *jrpc2.ServerInfo
-		si, err = t.ServerInfo(ctx)
-		if err != nil {
-			return err
-		}
-		msg, err = json.Marshal(si)
 	case chirpstore.CAS:
 		msg, err = t.Status(ctx)
 	default:
@@ -329,31 +318,13 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 		return nil, fmt.Errorf("no -store address was found (%q)", addr)
 	}
 
-	conn, err := net.Dial(jrpc2.Network(addr))
+	conn, err := net.Dial(chirp.SplitAddress(addr))
 	if err != nil {
 		return nil, fmt.Errorf("dialing: %w", err)
 	}
 
-	var bs blob.CAS
-	switch t.Mode {
-	case "jrpc", "jrpc2":
-		ch := jchannel.Line(conn, conn)
-		var logger jrpc2.Logger
-		if t.Debug {
-			log.Printf("Connected to storage service at %q", addr)
-			logger = jrpc2.StdLogger(log.New(os.Stderr, "[client] ", log.LstdFlags))
-		}
-		cli := jrpc2.NewClient(ch, &jrpc2.ClientOptions{Logger: logger})
-		bs = rpcstore.NewCAS(cli, nil)
-
-	case "chirp":
-		peer := chirp.NewPeer().Start(cchannel.IO(conn, conn))
-		bs = chirpstore.NewCAS(peer, nil)
-
-	default:
-		conn.Close()
-		return nil, fmt.Errorf("unknown service mode %q", t.Mode)
-	}
+	peer := chirp.NewPeer().Start(cchannel.IO(conn, conn))
+	bs := chirpstore.NewCAS(peer, nil)
 	if t.Bucket == "" {
 		return bs, nil
 	}
