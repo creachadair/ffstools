@@ -75,6 +75,7 @@ help [<command>]`,
 			cmdsync.Command,
 			cmdstatus.Command,
 			command.HelpCommand(nil),
+			command.VersionCommand(),
 		},
 	}
 	command.RunOrFail(root.NewEnv(nil), os.Args[1:])

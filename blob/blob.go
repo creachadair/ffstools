@@ -176,5 +176,6 @@ the address or an @tag from the configuration file.
 			Run:  statCmd,
 		},
 		command.HelpCommand(nil),
+		command.VersionCommand(),
 	},
 }
