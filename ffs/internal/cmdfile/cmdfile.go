@@ -16,6 +16,8 @@ package cmdfile
 
 import (
 	"bufio"
+	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -66,6 +68,7 @@ a file may be specified in the following formats:
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
 				fs.BoolVar(&listFlags.All, "a", false, "Include entries whose names begin with dot (.)")
+				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
 			},
 			Run: runList,
 		},
@@ -131,6 +134,7 @@ func runShow(env *command.Env, args []string) error {
 var listFlags struct {
 	DirOnly bool
 	All     bool
+	JSON    bool
 }
 
 func runList(env *command.Env, args []string) error {
@@ -157,15 +161,15 @@ func runList(env *command.Env, args []string) error {
 					return nil
 				}
 
-				fmt.Print(listFormat(of, name))
-				if of.Stat().Mode.Type()&fs.ModeSymlink != 0 {
-					target, err := io.ReadAll(of.Cursor(cfg.Context))
-					if err != nil {
-						return fmt.Errorf("reading symlink: %w", err)
-					}
-					fmt.Print(" -> ", string(target))
+				target, err := linkTarget(cfg.Context, of)
+				if err != nil {
+					return err
 				}
-				fmt.Println()
+				if listFlags.JSON {
+					fmt.Println(jsonFormat(of, name, target))
+				} else {
+					fmt.Println(listFormat(of, name, target))
+				}
 				return nil
 			}
 
@@ -193,7 +197,7 @@ func runList(env *command.Env, args []string) error {
 	})
 }
 
-func listFormat(f *file.File, name string) string {
+func listFormat(f *file.File, name, target string) string {
 	s := f.Stat()
 	var date string
 	if now := time.Now(); now.Year() != s.ModTime.Year() {
@@ -201,9 +205,48 @@ func listFormat(f *file.File, name string) string {
 	} else {
 		date = s.ModTime.Format("Jan _2 15:04")
 	}
+	if target != "" {
+		name += " => " + target
+	}
 	return fmt.Sprintf("%s %3d %-8s %-8s %8d %s %s",
 		s.Mode, 1+f.Child().Len(), nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
 		f.Size(), date, name)
+}
+
+func jsonFormat(f *file.File, name, target string) string {
+	s := f.Stat()
+	tag := strings.ToLower(s.Mode.Type().String()[:1])
+	data, err := json.Marshal(struct {
+		Name   string    `json:"name"`
+		Type   string    `json:"type"`
+		Mode   int64     `json:"mode"`
+		NLinks int       `json:"nLinks"`
+		Owner  string    `json:"owner"`
+		Group  string    `json:"group"`
+		Size   int64     `json:"size"`
+		MTime  time.Time `json:"modTime"`
+		Target string    `json:"linkTarget,omitempty"`
+	}{
+		Name: name,
+		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
+		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
+		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target,
+	})
+	if err != nil {
+		return "null"
+	}
+	return string(data)
+}
+
+func linkTarget(ctx context.Context, f *file.File) (string, error) {
+	if f.Stat().Mode.Type()&fs.ModeSymlink != 0 {
+		target, err := io.ReadAll(f.Cursor(ctx))
+		if err != nil {
+			return "", fmt.Errorf("reading symlink: %w", err)
+		}
+		return string(target), nil
+	}
+	return "", nil
 }
 
 func nameOrID(name string, id int) string {
