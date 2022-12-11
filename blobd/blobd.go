@@ -68,7 +68,6 @@ var (
 	keyFile    = flag.String("keyfile", "", "Encryption key file")
 	bufferDB   = flag.String("buffer", "", "Write-behind buffer database")
 	cacheSize  = flag.Int("cache", 0, "Memory cache size in MiB (0 means no cache)")
-	doDebug    = flag.Bool("debug", false, "Enable server debug logging")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
 	doVersion  = flag.Bool("version", false, "Print version information and exit")
 
