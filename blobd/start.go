@@ -26,7 +26,6 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/peers"
@@ -39,10 +38,7 @@ import (
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
-	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/keyfile"
-	"github.com/creachadair/rpcstore"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
 )
@@ -77,47 +73,6 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan err
 			service.Register(p)
 			return p
 		})
-	}()
-
-	return func() {
-		lst.Close()
-		if isUnix {
-			defer os.Remove(opts.Address)
-		}
-	}, errc
-}
-
-func startJSONServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	jrpc2.ServerMetrics().Set("blobd", newServerMetrics(ctx, opts))
-
-	var debug jrpc2.Logger
-	if *doDebug {
-		debug = jrpc2.StdLogger(log.New(os.Stderr, "[blobd] ", log.LstdFlags))
-	}
-
-	lst, err := net.Listen(jrpc2.Network(opts.Address))
-	if err != nil {
-		ctrl.Fatalf("Listen: %v", err)
-	}
-	isUnix := lst.Addr().Network() == "unix"
-	if isUnix {
-		os.Chmod(opts.Address, 0600) // best-effort
-	}
-
-	service := rpcstore.NewService(opts.Store, nil).Methods()
-	loopOpts := &server.LoopOptions{
-		ServerOptions: &jrpc2.ServerOptions{
-			Logger:    debug,
-			StartTime: time.Now().In(time.UTC),
-		},
-	}
-
-	log.Printf("[jrpc2] Service: %q", opts.Address)
-	errc := make(chan error, 1)
-	go func() {
-		defer close(errc)
-		acc := server.NetAccepter(lst, channel.Line)
-		errc <- server.Loop(ctx, acc, server.Static(service), loopOpts)
 	}()
 
 	return func() {

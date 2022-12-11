@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Program blobd exports a blob.Store via JSON-RPC.
+// Program blobd exports a blob.Store via the Chirp V0 protocol.
 //
 // By default, building or installing this tool includes a minimal set of
 // storage backends, "file" and "memory". To build with additional storage
@@ -36,6 +36,9 @@
 //	pogreb   | Pogreb     https://godoc.org/github.com/akrylysov/pogreb
 //	s3       | Amazon S3  https://godoc.org/github.com/aws/aws-sdk-go/service/s3
 //	sqlite   | SQLite     https://godoc.org/crawshaw.io/sqlite
+//
+// For information about Chirp v0, see:
+// https://github.com/creachadair/chirp/blob/main/spec.md
 package main
 
 import (
@@ -68,7 +71,6 @@ var (
 	doDebug    = flag.Bool("debug", false, "Enable server debug logging")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
 	doVersion  = flag.Bool("version", false, "Print version information and exit")
-	serveMode  = flag.String("mode", "chirp", "Service mode (jrpc2 or chirp)")
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
@@ -97,7 +99,6 @@ The types understood are: %[2]s
 
 If -listen is a host:port address, a TCP listener is created at that address.
 Otherwise the address must be a path for a Unix-domain socket.
-JSON-RPC data are exchanged with each message on one line, ending with newline.
 
 With -keyfile, the store is opened with AES encryption.
 Use -cache to enable a memory cache over the underlying store.
@@ -147,17 +148,7 @@ func main() {
 			Buffer:  buf,
 		}
 
-		var closer closer
-		var errc <-chan error
-		switch *serveMode {
-		case "jrpc", "jrpc2":
-			closer, errc = startJSONServer(ctx, config)
-		case "chirp":
-			closer, errc = startChirpServer(ctx, config)
-		default:
-			ctrl.Fatalf("Unknown service -mode %q", *serveMode)
-		}
-
+		closer, errc := startChirpServer(ctx, config)
 		sig := make(chan os.Signal, 2)
 		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 		go func() {
