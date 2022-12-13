@@ -24,7 +24,6 @@ import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/rpcstore"
 )
 
 var Command = &command.C{
@@ -45,9 +44,6 @@ var Command = &command.C{
 			var msg any
 			var err error
 			switch t := bs.(type) {
-			case rpcstore.CAS:
-				msg, err = t.ServerInfo(cfg.Context)
-
 			case chirpstore.CAS:
 				var data []byte
 				data, err = t.Status(cfg.Context)

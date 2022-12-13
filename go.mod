@@ -18,7 +18,6 @@ require (
 	github.com/creachadair/leveldbstore v0.0.0-20221211093939-05b6af52bd23
 	github.com/creachadair/pebblestore v0.0.0-20221211094018-3597a7c55aa0
 	github.com/creachadair/pogrebstore v0.0.0-20221211094026-b0ee55b70e37
-	github.com/creachadair/rpcstore v0.0.0-20221212160958-22aeceab1243
 	github.com/creachadair/s3store v0.0.0-20221211094123-1ede2e8447c3
 	github.com/creachadair/sqlitestore v0.0.0-20221211094043-097ce37888dc
 	github.com/creachadair/taskgroup v0.3.2

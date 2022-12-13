@@ -161,8 +161,6 @@ github.com/creachadair/pebblestore v0.0.0-20221211094018-3597a7c55aa0 h1:G5SeAnV
 github.com/creachadair/pebblestore v0.0.0-20221211094018-3597a7c55aa0/go.mod h1:ZkBLkiJzGkznzTmeS6NwT3Vzd6rlnkOUDpLiDDNzVPQ=
 github.com/creachadair/pogrebstore v0.0.0-20221211094026-b0ee55b70e37 h1:xTfQg4KcTpI+l7ZNxXppDx+dG6cepIqhj6imbgXAvDE=
 github.com/creachadair/pogrebstore v0.0.0-20221211094026-b0ee55b70e37/go.mod h1:nOXFs00Ccs9/1YqcoyokN+6PiD01RyrxEJWpw5kDE0g=
-github.com/creachadair/rpcstore v0.0.0-20221212160958-22aeceab1243 h1:sP/x3ctTWgRZiem8hHukwTdpZMC/QzvDLEr/186p4pM=
-github.com/creachadair/rpcstore v0.0.0-20221212160958-22aeceab1243/go.mod h1:jqCb9KJHBFn+tbFb9hYDNxfpAAUwjl7mY7stDoU/olE=
 github.com/creachadair/s3store v0.0.0-20221211094123-1ede2e8447c3 h1:7oAsi5P1jJikdDhHHCp2jeknw/lLsYfo7tblMLplfgI=
 github.com/creachadair/s3store v0.0.0-20221211094123-1ede2e8447c3/go.mod h1:JQfxZe0R+DXxpwOLpsbTDubISkIWnvaywJX0u5oZ2f8=
 github.com/creachadair/scapegoat v0.5.1 h1:mFbSa61YMpLuFc8Qv/r60h1wD1KdJ54enUPSbXYjtNE=
