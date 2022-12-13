@@ -3,7 +3,7 @@
 See also https://github.com/creachadair/ffs.
 
 - The [`blobd`](https://github.com/creachadair/ffstools/tree/main/blobd)
-  tool defines a JSON-RPC service that implements the FFS blob store interface
+  tool defines an RPC service that implements the FFS blob store interface
   over various underlying key-value storage implementations.
 
   ```sh
