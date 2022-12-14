@@ -31,7 +31,7 @@ import (
 
 var Command = &command.C{
 	Name: "root",
-	Help: "Manipulate filesystem root pointers",
+	Help: "Manipulate filesystem root pointers.",
 
 	Commands: []*command.C{
 		{

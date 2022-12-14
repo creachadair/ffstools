@@ -42,7 +42,7 @@ const fileCmdUsage = `<root-key>[/path] ...
 
 var Command = &command.C{
 	Name: "file",
-	Help: `Manipulate file and directory objects
+	Help: `Manipulate file and directory objects.
 
 File objects are addressed by storage keys. The storage key for
 a file may be specified in the following formats:
