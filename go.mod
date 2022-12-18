@@ -5,21 +5,21 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.17
-	github.com/creachadair/bitcaskstore v0.0.0-20221216064334-30c6c54f6fca
-	github.com/creachadair/boltstore v0.0.0-20221216064349-7a4a2511f30a
-	github.com/creachadair/chirp v0.0.0-20221206073639-8ba6bb1ade78
-	github.com/creachadair/chirpstore v0.0.0-20221216064352-91de63fd2d0d
+	github.com/creachadair/bitcaskstore v0.0.0-20221216065055-94fd07f8c4ee
+	github.com/creachadair/boltstore v0.0.0-20221218040043-6c07deb99101
+	github.com/creachadair/chirp v0.0.0-20221218162000-0d92c3a0a5c9
+	github.com/creachadair/chirpstore v0.0.0-20221216065113-ce379810be54
 	github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20221216064310-8f2e7f7d8113
-	github.com/creachadair/gcsstore v0.0.0-20221216064407-734c24ff8290
+	github.com/creachadair/gcsstore v0.0.0-20221216065140-35302eba6dd9
 	github.com/creachadair/jrpc2 v0.43.0
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20221216064426-8e39a91e43a8
-	github.com/creachadair/pebblestore v0.0.0-20221216064452-8a933774f096
-	github.com/creachadair/pogrebstore v0.0.0-20221216064459-cd46da23857a
-	github.com/creachadair/s3store v0.0.0-20221216064523-81422c198420
-	github.com/creachadair/sqlitestore v0.0.0-20221216064510-1da878a03a4c
+	github.com/creachadair/leveldbstore v0.0.0-20221218040150-b522e585dc5f
+	github.com/creachadair/pebblestore v0.0.0-20221216065205-a540bd84e0fd
+	github.com/creachadair/pogrebstore v0.0.0-20221216065209-8d3da7ee461f
+	github.com/creachadair/s3store v0.0.0-20221216065221-c15d8a21a3ab
+	github.com/creachadair/sqlitestore v0.0.0-20221216065216-b265ddeb4276
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
@@ -39,7 +39,7 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.161 // indirect
+	github.com/aws/aws-sdk-go v1.44.162 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -80,7 +80,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/exp v0.0.0-20221215174704-0915cd710c24 // indirect
+	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.3.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
