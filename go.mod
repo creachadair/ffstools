@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/creachadair/atomicfile v0.2.7
-	github.com/creachadair/badgerstore v0.1.16
+	github.com/creachadair/badgerstore v0.1.17
 	github.com/creachadair/bitcaskstore v0.0.0-20221216064334-30c6c54f6fca
 	github.com/creachadair/boltstore v0.0.0-20221216064349-7a4a2511f30a
 	github.com/creachadair/chirp v0.0.0-20221206073639-8ba6bb1ade78
