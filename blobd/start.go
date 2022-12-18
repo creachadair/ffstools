@@ -25,6 +25,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime/debug"
 	"strconv"
 
 	"github.com/creachadair/chirp"
@@ -155,6 +156,15 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	}
 	mx.Set("compressed", expvarBool(*zlibLevel > 0))
 	mx.Set("cache_size", expvarInt(*cacheSize))
+	if bi := getBuildInfo(); bi != nil {
+		v := new(expvar.Map)
+		v.Set("go_version", expvarString(bi.toolchain))
+		v.Set("package", expvarString(bi.path))
+		v.Set("revision", expvarString(bi.revision))
+		v.Set("build_time", expvarString(bi.buildTime))
+		v.Set("modified", expvarBool(bi.modified))
+		mx.Set("build_info", v)
+	}
 
 	if opts.Buffer != nil {
 		mx.Set("buffer_db", expvarString(*bufferDB))
@@ -167,4 +177,44 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 		}))
 	}
 	return mx
+}
+
+type buildInfo struct {
+	toolchain, path string
+	revision        string
+	buildTime       string
+	modified        bool
+}
+
+func first(ss ...string) string {
+	for _, s := range ss {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
+}
+
+func getBuildInfo() *buildInfo {
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return nil
+	}
+	out := &buildInfo{
+		toolchain: first(bi.GoVersion, "[unknown toolchain]"),
+		path:      first(bi.Path, "[unknown path]"),
+		buildTime: "[unknown build time]",
+		revision:  "[unknown revision]",
+	}
+	for _, s := range bi.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			out.revision = s.Value
+		case "vcs.time":
+			out.buildTime = s.Value
+		case "vcs.modified":
+			out.modified = (s.Value != "false")
+		}
+	}
+	return out
 }

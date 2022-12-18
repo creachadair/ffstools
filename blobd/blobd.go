@@ -50,7 +50,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime/debug"
 	"sort"
 	"strings"
 	"syscall"
@@ -163,21 +162,14 @@ func main() {
 }
 
 func printVersion() error {
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
+	bi := getBuildInfo()
+	if bi == nil {
 		return errors.New("no version information is available")
 	}
-	rev := "(unknown)"
-	time := "(unknown)"
-	for _, s := range bi.Settings {
-		switch s.Key {
-		case "vcs.revision":
-			rev = s.Value
-		case "vcs.time":
-			time = s.Value
-		}
+	if bi.modified {
+		bi.revision += " (modified)"
 	}
 	fmt.Printf("%s built by %s at time %s rev %s\n",
-		filepath.Base(os.Args[0]), bi.GoVersion, time, rev)
+		filepath.Base(os.Args[0]), bi.toolchain, bi.buildTime, bi.revision)
 	return nil
 }
