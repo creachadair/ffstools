@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.17
-	github.com/creachadair/bitcaskstore v0.0.0-20221216065055-94fd07f8c4ee
-	github.com/creachadair/boltstore v0.0.0-20221218040043-6c07deb99101
+	github.com/creachadair/bitcaskstore v0.0.0-20221218222249-c767651610a1
+	github.com/creachadair/boltstore v0.0.0-20221219160741-595e95f41e13
 	github.com/creachadair/chirp v0.0.0-20221218162000-0d92c3a0a5c9
-	github.com/creachadair/chirpstore v0.0.0-20221216065113-ce379810be54
+	github.com/creachadair/chirpstore v0.0.0-20221218222253-526f195d57f1
 	github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20221219164233-2998be17922b
@@ -16,9 +16,9 @@ require (
 	github.com/creachadair/jrpc2 v0.43.0
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20221218040150-b522e585dc5f
-	github.com/creachadair/pebblestore v0.0.0-20221216065205-a540bd84e0fd
-	github.com/creachadair/pogrebstore v0.0.0-20221216065209-8d3da7ee461f
-	github.com/creachadair/s3store v0.0.0-20221216065221-c15d8a21a3ab
+	github.com/creachadair/pebblestore v0.0.0-20221218222335-503cd406b2b0
+	github.com/creachadair/pogrebstore v0.0.0-20221219160811-728e0b4ad0d4
+	github.com/creachadair/s3store v0.0.0-20221218222417-f0dad03c170a
 	github.com/creachadair/sqlitestore v0.0.0-20221216065216-b265ddeb4276
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
@@ -39,13 +39,13 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/akrylysov/pogreb v0.10.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.162 // indirect
+	github.com/aws/aws-sdk-go v1.44.163 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20221213170459-33377d59d70e // indirect
+	github.com/cockroachdb/pebble v0.0.0-20221219140626-6ca7956d84c1 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/creachadair/msync v0.0.3 // indirect
 	github.com/creachadair/scapegoat v0.7.0 // indirect
