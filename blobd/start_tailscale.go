@@ -29,6 +29,11 @@ import (
 	"tailscale.com/tsnet"
 )
 
+func parseQueryBool(s string) bool {
+	b, err := strconv.ParseBool(s)
+	return err == nil && b
+}
+
 func parseTailscaleURL(s string) (string, *tsnet.Server, error) {
 	u, err := url.Parse(s)
 	if err != nil || u.Scheme != "ts" {
@@ -38,25 +43,16 @@ func parseTailscaleURL(s string) (string, *tsnet.Server, error) {
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid Tailscale address: %w", err)
 	}
-	srv := &tsnet.Server{
-		Hostname: host,
-		Logf:     func(string, ...any) {},
-	}
 	q := u.Query()
-	if s := q.Get("dir"); s != "" {
-		srv.Dir = s
+	srv := &tsnet.Server{
+		Hostname:  host,
+		Dir:       q.Get("dir"),
+		AuthKey:   q.Get("auth_key"),
+		Ephemeral: parseQueryBool(q.Get("ephemeral")),
+		Logf:      func(string, ...any) {},
 	}
-	if s := q.Get("auth_key"); s != "" {
-		srv.AuthKey = s
-	}
-	if s := q.Get("ephemeral"); s != "" {
-		b, _ := strconv.ParseBool(s)
-		srv.Ephemeral = b
-	}
-	if s := q.Get("verbose"); s != "" {
-		if b, _ := strconv.ParseBool(s); b {
-			srv.Logf = log.Printf
-		}
+	if parseQueryBool(q.Get("verbose")) {
+		srv.Logf = log.Printf
 	}
 
 	return port, srv, nil
