@@ -49,12 +49,13 @@ var Command = &command.C{
 		},
 		{
 			Name:  "create",
-			Usage: "<name> <description>...",
+			Usage: "<name>",
 			Help:  "Create a new (empty) root pointer.",
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
 				fs.StringVar(&createFlags.FileKey, "key", "", "Initial file key")
+				fs.StringVar(&createFlags.Desc, "description", "", "Initial description")
 			},
 			Run: runCreate,
 		},
@@ -162,14 +163,16 @@ func runList(env *command.Env, args []string) error {
 var createFlags struct {
 	Replace bool
 	FileKey string
+	Desc    string
 }
 
 func runCreate(env *command.Env, args []string) error {
 	if len(args) == 0 {
-		return env.Usagef("usage is: <name> <description>...")
+		return env.Usagef("missing <name> argument")
+	} else if len(args) > 1 {
+		return env.Usagef("extra arguments after <name>")
 	}
 	key := args[0]
-	desc := strings.Join(args[1:], " ")
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
@@ -187,7 +190,7 @@ func runCreate(env *command.Env, args []string) error {
 			return err
 		}
 		return root.New(config.Roots(s), &root.Options{
-			Description: desc,
+			Description: createFlags.Desc,
 			FileKey:     fk,
 		}).Save(cfg.Context, key, createFlags.Replace)
 	})
