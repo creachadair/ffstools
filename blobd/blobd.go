@@ -95,8 +95,21 @@ of a Unix-domain socket.
 A store spec is a storage type and address: type:address
 The types understood are: %[2]s
 
-If -listen is a host:port address, a TCP listener is created at that address.
-Otherwise the address must be a path for a Unix-domain socket.
+If -listen is:
+
+ - A host:port address, a TCP listener is created at that address.
+
+ - A ts://host:port?options URL, a TCP listener is created over Tailscale at
+   the specified host and port. The query parameters are:
+
+   dir=path     : the path of the state directory (must exist; overrides default).
+   auth_key=k   : an authorization key (or use the TS_AUTHKEY environment).
+   ephemeral=?  : whether to create an ephemeral (non-persistent) node.
+   verbose=?    : whether to enable verbose logging from Tailscale to stderr.
+
+   See https://godoc.org/tailscale.com/tsnet for more details.
+
+ - Otherwise, the address must be a path for a Unix-domain socket.
 
 With -keyfile, the store is opened with AES encryption.
 Use -cache to enable a memory cache over the underlying store.

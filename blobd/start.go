@@ -23,7 +23,6 @@ import (
 	"hash"
 	"io"
 	"log"
-	"net"
 	"os"
 	"runtime/debug"
 	"strconv"
@@ -38,7 +37,6 @@ import (
 	"github.com/creachadair/ffs/storage/codecs/zlib"
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
-	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/keyfile"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
@@ -53,7 +51,7 @@ type startConfig struct {
 }
 
 func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
-	lst, err := net.Listen(jrpc2.Network(opts.Address))
+	lst, err := opts.listen(ctx)
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)
 	}
