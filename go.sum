@@ -178,8 +178,8 @@ github.com/creachadair/boltstore v0.0.0-20221222183530-a1a99ed50a70 h1:uZeLvUN6m
 github.com/creachadair/boltstore v0.0.0-20221222183530-a1a99ed50a70/go.mod h1:Lu5K5LOsJE9979Lu40EIlRo/S0EP/roktOGldY3SVLk=
 github.com/creachadair/chirp v0.0.0-20221222230837-c9fb93856e95 h1:yVX9s6UfzB56PTGQwV8eU0iFw+bw2DkfSIGTZACOLro=
 github.com/creachadair/chirp v0.0.0-20221222230837-c9fb93856e95/go.mod h1:uwOEvnwoziZupZjbQHhwiI6zCYdpUec5bp5z4YzSdRs=
-github.com/creachadair/chirpstore v0.0.0-20221222052326-07c6fbf03a1d h1:pycmoYna5svcLaAJlGFpPIg00yEJ5CZsXb42rZfN1AQ=
-github.com/creachadair/chirpstore v0.0.0-20221222052326-07c6fbf03a1d/go.mod h1:07uhCX10pxHMRciVA/StrUs9yOSFdtnugsvJXoebiOQ=
+github.com/creachadair/chirpstore v0.0.0-20221222232935-4c915d4ba44a h1:6u9dh63lc9J76Dy3+GGz2LjL2Tr9z2PnvZKEenRgkv8=
+github.com/creachadair/chirpstore v0.0.0-20221222232935-4c915d4ba44a/go.mod h1:07uhCX10pxHMRciVA/StrUs9yOSFdtnugsvJXoebiOQ=
 github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98 h1:DPCKQ5dO4g+qgGvbuUtKuae0fQcrKP4p7fltMo1kX7k=
 github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98/go.mod h1:jN7ZJM5YSVtD3SHmkAdN/cOC1dXiqg2Y9K5Sr5a8Nxw=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
