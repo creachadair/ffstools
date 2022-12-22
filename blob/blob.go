@@ -83,7 +83,7 @@ the address or an @tag from the configuration file.
 		cfg := env.Config.(*settings)
 		if cfg.Store != "" {
 			fc.DefaultStore = cfg.Store
-		} else if bs := os.Getenv("BLOB_STORE"); bs != "" {
+		} else if bs := os.Getenv("BL OB_STORE"); bs != "" {
 			fc.DefaultStore = bs
 		}
 		fc.Context = cfg.Context

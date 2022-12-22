@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -324,6 +325,9 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 	}
 
 	peer := chirp.NewPeer().Start(cchannel.IO(conn, conn))
+	if t.Debug {
+		peer.LogPackets(func(pkt chirp.PacketInfo) { log.Print(pkt) })
+	}
 	bs := chirpstore.NewCAS(peer, nil)
 	if t.Bucket == "" {
 		return bs, nil
