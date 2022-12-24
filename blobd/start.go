@@ -19,6 +19,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
+	"errors"
 	"expvar"
 	"hash"
 	"io"
@@ -99,6 +100,9 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	if err != nil {
 		ctrl.Fatalf("Opening store: %v", err)
 	}
+	if *doReadOnly {
+		bs = roStore{bs}
+	}
 
 	if *bufferDB != "" {
 		buf, err = stores.Open(ctx, *bufferDB)
@@ -148,6 +152,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	mx := new(expvar.Map)
 	mx.Set("store", expvarString(*storeAddr))
 	mx.Set("pid", expvarInt(os.Getpid()))
+	mx.Set("writable", expvarBool(!*doReadOnly))
 	mx.Set("encrypted", expvarBool(*keyFile != ""))
 	if *keyFile != "" {
 		mx.Set("keyfile", expvarString(*keyFile))
@@ -216,3 +221,13 @@ func getBuildInfo() *buildInfo {
 	}
 	return out
 }
+
+type roStore struct {
+	blob.Store
+}
+
+var errReadOnlyStore = errors.New("storage is read-only")
+
+func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
+func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
+func (r roStore) Close(ctx context.Context) error          { return blob.CloseStore(ctx, r.Store) }

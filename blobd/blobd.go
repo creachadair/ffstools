@@ -68,6 +68,7 @@ var (
 	bufferDB   = flag.String("buffer", "", "Write-behind buffer database")
 	cacheSize  = flag.Int("cache", 0, "Memory cache size in MiB (0 means no cache)")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
+	doReadOnly = flag.Bool("read-only", false, "Disallow modification of the store")
 	doVersion  = flag.Bool("version", false, "Print version information and exit")
 
 	// These storage implementations are built in by default.
@@ -140,6 +141,9 @@ func main() {
 			}
 		}()
 		log.Printf("Store address: %q", *storeAddr)
+		if *doReadOnly {
+			log.Print("Store is open in read-only mode")
+		}
 		if *zlibLevel > 0 {
 			log.Printf("Compression enabled: ZLIB level %d", *zlibLevel)
 			if *keyFile != "" {
