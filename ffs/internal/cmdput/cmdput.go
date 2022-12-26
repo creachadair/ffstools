@@ -228,11 +228,12 @@ func putDir(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
 		for _, e := range files {
 			d.Child().Set(e.name, e.kid)
 		}
+	}
+	if len(files) != 0 || len(dirs) != 0 {
 		d.Stat().Edit(func(s *file.Stat) {
 			s.ModTime = fi.ModTime()
 		}).Update()
 	}
-
 	return d, nil
 }
 
