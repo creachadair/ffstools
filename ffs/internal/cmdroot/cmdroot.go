@@ -19,7 +19,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -42,9 +44,15 @@ var Command = &command.C{
 			Run: runShow,
 		},
 		{
-			Name: "list",
-			Help: "List the root keys known in the store.",
+			Name:  "list",
+			Usage: "[name-glob]",
+			Help: `List the root keys known in the store.
+If a glob is provided, only names matching the glob are listed; otherwise all
+known keys are listed.`,
 
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+				fs.BoolVar(&listFlags.Long, "long", false, "Print details for each root")
+			},
 			Run: runList,
 		},
 		{
@@ -128,10 +136,7 @@ func runShow(env *command.Env, keys []string) error {
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		var lastErr error
 		for _, key := range keys {
-			// N.B. Root keys do not need a @ prefix here, but tolerate one to
-			// make it easier to go back and forth with the file command.
-			clean := strings.TrimPrefix(key, "@")
-			rp, err := root.Open(cfg.Context, config.Roots(s), clean)
+			rp, err := root.Open(cfg.Context, config.Roots(s), key)
 			if err != nil {
 				fmt.Fprintf(env, "Error: %v\n", err)
 				lastErr = err
@@ -139,7 +144,7 @@ func runShow(env *command.Env, keys []string) error {
 			}
 			msg := root.Encode(rp).Value.(*wiretype.Object_Root).Root
 			fmt.Println(config.ToJSON(map[string]interface{}{
-				"storageKey": config.PrintableKey(clean),
+				"storageKey": config.PrintableKey(key),
 				"root":       msg,
 			}))
 		}
@@ -147,14 +152,45 @@ func runShow(env *command.Env, keys []string) error {
 	})
 }
 
+var listFlags struct {
+	Long bool
+}
+
 func runList(env *command.Env, args []string) error {
-	if len(args) != 0 {
+	if len(args) > 1 {
 		return env.Usagef("extra arguments after command")
+	} else if len(args) == 0 {
+		args = append(args, "*")
 	}
+	glob := args[0]
+
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
+		defer w.Flush()
+
 		return config.Roots(s).List(cfg.Context, "", func(key string) error {
-			fmt.Println(key)
+			if ok, _ := path.Match(glob, key); !ok {
+				return nil
+			} else if !listFlags.Long {
+				fmt.Println(key)
+				return nil
+			}
+			rp, err := root.Open(cfg.Context, config.Roots(s), key)
+			if err != nil {
+				return err
+			}
+			fmt.Fprint(w, key, "\t")
+			if rp.IndexKey == "" {
+				fmt.Fprint(w, "[-]")
+			} else {
+				fmt.Fprint(w, "[+]")
+			}
+			fmt.Fprint(w, "\t", config.PrintableKey(rp.FileKey))
+			if rp.Description != "" {
+				fmt.Fprint(w, "\t", rp.Description)
+			}
+			fmt.Fprintln(w)
 			return nil
 		})
 	})
