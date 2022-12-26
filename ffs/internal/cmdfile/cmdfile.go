@@ -68,6 +68,7 @@ a file may be specified in the following formats:
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
 				fs.BoolVar(&listFlags.All, "a", false, "Include entries whose names begin with dot (.)")
+				fs.BoolVar(&listFlags.XAttr, "xattr", false, "Include extended attributes")
 				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
 			},
 			Run: runList,
@@ -134,6 +135,7 @@ func runShow(env *command.Env, args []string) error {
 var listFlags struct {
 	DirOnly bool
 	All     bool
+	XAttr   bool
 	JSON    bool
 }
 
@@ -208,29 +210,45 @@ func listFormat(f *file.File, name, target string) string {
 	if target != "" {
 		name += " => " + target
 	}
-	return fmt.Sprintf("%s %3d %-8s %-8s %8d %s %s",
-		s.Mode, 1+f.Child().Len(), nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
-		f.Size(), date, name)
+	xtag, xattrs := " ", ""
+	if listFlags.XAttr {
+		f.XAttr().List(func(key, value string) {
+			xattrs += fmt.Sprintf("\n\t%s\t%d", key, len(value))
+		})
+	}
+	if f.XAttr().Len() != 0 {
+		xtag = "@"
+	}
+	return fmt.Sprintf("%s%s %2d %-8s %-8s %8d %s %s%s",
+		s.Mode, xtag, 1+f.Child().Len(),
+		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
+		f.Size(), date, name, xattrs)
 }
 
 func jsonFormat(f *file.File, name, target string) string {
 	s := f.Stat()
 	tag := strings.ToLower(s.Mode.Type().String()[:1])
+	var xattr map[string][]byte
+	if listFlags.XAttr {
+		xattr = make(map[string][]byte)
+		f.XAttr().List(func(key, value string) { xattr[key] = []byte(value) })
+	}
 	data, err := json.Marshal(struct {
-		Name   string    `json:"name"`
-		Type   string    `json:"type"`
-		Mode   int64     `json:"mode"`
-		NLinks int       `json:"nLinks"`
-		Owner  string    `json:"owner"`
-		Group  string    `json:"group"`
-		Size   int64     `json:"size"`
-		MTime  time.Time `json:"modTime"`
-		Target string    `json:"linkTarget,omitempty"`
+		Name   string            `json:"name"`
+		Type   string            `json:"type"`
+		Mode   int64             `json:"mode"`
+		NLinks int               `json:"nLinks"`
+		Owner  string            `json:"owner"`
+		Group  string            `json:"group"`
+		Size   int64             `json:"size"`
+		MTime  time.Time         `json:"modTime"`
+		Target string            `json:"linkTarget,omitempty"`
+		XAttr  map[string][]byte `json:"xattr,omitempty"`
 	}{
 		Name: name,
 		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
 		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
-		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target,
+		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target, XAttr: xattr,
 	})
 	if err != nil {
 		return "null"
