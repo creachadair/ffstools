@@ -5,20 +5,20 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.17
-	github.com/creachadair/bitcaskstore v0.0.0-20221219212356-23b3532aeffb
-	github.com/creachadair/boltstore v0.0.0-20221222183530-a1a99ed50a70
-	github.com/creachadair/chirp v0.0.0-20221222230837-c9fb93856e95
+	github.com/creachadair/bitcaskstore v0.0.0-20221226203450-747dfb153bf3
+	github.com/creachadair/boltstore v0.0.0-20221226203506-c32a2fcae0d9
+	github.com/creachadair/chirp v0.0.0-20221226210030-07c3e2af6065
 	github.com/creachadair/chirpstore v0.0.0-20221222232935-4c915d4ba44a
 	github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20221226180407-922470a3cb4a
-	github.com/creachadair/gcsstore v0.0.0-20221219212429-edb9c2105414
+	github.com/creachadair/gcsstore v0.0.0-20221226203724-9fb2cbfd238d
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20221219212448-d409ea9cc6ca
-	github.com/creachadair/pebblestore v0.0.0-20221222052403-7e5661c88047
-	github.com/creachadair/pogrebstore v0.0.0-20221219212528-ce1f7a823f31
-	github.com/creachadair/s3store v0.0.0-20221222052430-51a307cb69f3
-	github.com/creachadair/sqlitestore v0.0.0-20221219212539-00a5073eeb86
+	github.com/creachadair/leveldbstore v0.0.0-20221226203750-f28ff201e3c4
+	github.com/creachadair/pebblestore v0.0.0-20221226203820-79e9b5ad4d6c
+	github.com/creachadair/pogrebstore v0.0.0-20221226203827-f5a34a6679d5
+	github.com/creachadair/s3store v0.0.0-20221226203928-5e398cee87f4
+	github.com/creachadair/sqlitestore v0.0.0-20221226203912-6cf144947455
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
@@ -43,7 +43,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.166 // indirect
+	github.com/aws/aws-sdk-go v1.44.167 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.7 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.7 // indirect
