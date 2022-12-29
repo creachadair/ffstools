@@ -82,12 +82,16 @@ a file may be specified in the following formats:
 		},
 		{
 			Name: "set",
-			Usage: `<root-key>/<path> <target-key>
-@<origin-key>/<path> <file-key>`,
+			Usage: `<root-key>/<path> <target>
+@<origin-key>/<path> <target>`,
 			Help: `Set the specified path beneath the origin to the given target
 
 The storage key of the modified origin is printed to stdout.
 If the origin is from a root, the root is updated with the modified origin.
+
+The <target> may be either a root-key/path or a @file-key/path. In both cases
+the path component is optional; if a root-key is given alone its root file is
+used as the target.
 `,
 
 			Run: runSet,
@@ -304,16 +308,12 @@ func runSet(env *command.Env, args []string) error {
 	if orest == "" {
 		return env.Usagef("path must not be empty")
 	}
-	targetKey, err := config.ParseKey(args[1])
-	if err != nil {
-		return fmt.Errorf("target key: %w", err)
-	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		tf, err := file.Open(cfg.Context, s, targetKey)
+		tf, err := config.OpenPath(cfg.Context, s, args[1])
 		if err != nil {
-			return fmt.Errorf("target file: %w", err)
+			return err
 		}
 		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
 		if err != nil {
@@ -327,7 +327,7 @@ func runSet(env *command.Env, args []string) error {
 					st.Mode = fs.ModeDir | 0755
 				}
 			},
-			File: tf,
+			File: tf.File,
 		}); err != nil {
 			return err
 		}
