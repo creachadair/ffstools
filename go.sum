@@ -176,8 +176,8 @@ github.com/creachadair/bitcaskstore v0.0.0-20221226203450-747dfb153bf3 h1:slnx5K
 github.com/creachadair/bitcaskstore v0.0.0-20221226203450-747dfb153bf3/go.mod h1:HHgbtb1+O+rFTP2ZUiJyXppz6oXHTiGOa2C4ed8qWG8=
 github.com/creachadair/boltstore v0.0.0-20221226203506-c32a2fcae0d9 h1:2W3DWHmpqMJZsCcHjiPWnBQip/jDvs79Fy7YnkZQLhc=
 github.com/creachadair/boltstore v0.0.0-20221226203506-c32a2fcae0d9/go.mod h1:KpWhJRz8Y9WB5b55OA7eQAi81pAgM1bvmO55zirpYfc=
-github.com/creachadair/chirp v0.0.0-20221226210030-07c3e2af6065 h1:P4rP29VeTx6vf2s4lSdMOPHB6E8UiTW6Y4NAYw8B+E4=
-github.com/creachadair/chirp v0.0.0-20221226210030-07c3e2af6065/go.mod h1:uwOEvnwoziZupZjbQHhwiI6zCYdpUec5bp5z4YzSdRs=
+github.com/creachadair/chirp v0.0.0-20221229071535-925971117a50 h1:VQ+JU5hPtGROPtEDcSXK/+cZLchyXyrvDo6ZtiuHMNU=
+github.com/creachadair/chirp v0.0.0-20221229071535-925971117a50/go.mod h1:uwOEvnwoziZupZjbQHhwiI6zCYdpUec5bp5z4YzSdRs=
 github.com/creachadair/chirpstore v0.0.0-20221222232935-4c915d4ba44a h1:6u9dh63lc9J76Dy3+GGz2LjL2Tr9z2PnvZKEenRgkv8=
 github.com/creachadair/chirpstore v0.0.0-20221222232935-4c915d4ba44a/go.mod h1:07uhCX10pxHMRciVA/StrUs9yOSFdtnugsvJXoebiOQ=
 github.com/creachadair/command v0.0.0-20221211215630-ed254b1a1f98 h1:DPCKQ5dO4g+qgGvbuUtKuae0fQcrKP4p7fltMo1kX7k=
