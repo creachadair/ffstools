@@ -23,6 +23,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path"
@@ -60,6 +61,9 @@ type Settings struct {
 	// The default address for the blob store service (required).  This must be
 	// either a store tag (@name) or an address.
 	DefaultStore string `json:"defaultStore" yaml:"default-store"`
+
+	// Enable debug logging for the storage service.
+	EnableDebugLogging bool `json:"enableDebugLogging" yaml:"enable-debug-logging"`
 
 	// Well-known store specifications, addressable by tag.
 	Stores []*StoreSpec `json:"stores" yaml:"stores"`
@@ -124,6 +128,10 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, e
 		return nil, fmt.Errorf("dialing store: %w", err)
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
+	if s.EnableDebugLogging {
+		lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
+		peer.LogPackets(func(pkt chirp.PacketInfo) { lg.Print(pkt) })
+	}
 	bs := chirpstore.NewCAS(peer, nil)
 	return prefixed.NewCAS(bs).Derive(" "), nil
 }
