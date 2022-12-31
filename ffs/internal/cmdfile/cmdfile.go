@@ -83,9 +83,8 @@ a file may be specified in the following formats:
 		},
 		{
 			Name: "set",
-			Usage: `<root-key>/<path> <target>
-@<origin-key>/<path> <target>
-put <path>`,
+			Usage: `<root-key>/<path> (<target> | put <path>)
+@<origin-key>/<path> (<target> | put <path>)`,
 			Help: `Set the specified path beneath the origin to the given target
 
 The storage key of the modified origin is printed to stdout.
