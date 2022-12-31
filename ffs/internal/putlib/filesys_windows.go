@@ -1,4 +1,4 @@
-package cmdput
+package putlib
 
 import "io/fs"
 

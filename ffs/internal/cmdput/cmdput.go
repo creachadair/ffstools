@@ -15,30 +15,17 @@
 package cmdput
 
 import (
-	"bufio"
-	"context"
 	"flag"
 	"fmt"
-	"io/fs"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/taskgroup"
-	"github.com/pkg/xattr"
+	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
 
-var putFlags struct {
-	NoStat  bool
-	XAttr   bool
-	Verbose bool
-}
+var putConfig putlib.Config
 
 var Command = &command.C{
 	Name:  "put",
@@ -54,9 +41,9 @@ Symbolic links are captured, but devices, sockets, FIFO, and other
 special files are skipped.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&putFlags.NoStat, "nostat", false, "Omit file and directory stat")
-		fs.BoolVar(&putFlags.XAttr, "xattr", false, "Capture extended attributes")
-		fs.BoolVar(&putFlags.Verbose, "v", false, "Enable verbose logging")
+		fs.BoolVar(&putConfig.NoStat, "nostat", false, "Omit file and directory stat")
+		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
+		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
 	},
 	Run: runPut,
 }
@@ -70,10 +57,10 @@ func runPut(env *command.Env, args []string) error {
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		keys := make([]string, len(args))
 		for i, path := range args {
-			if putFlags.Verbose {
+			if putConfig.Verbose {
 				log.Printf("put %q", path)
 			}
-			f, err := putDir(cfg.Context, s, path)
+			f, err := putConfig.PutPath(cfg.Context, s, path)
 			if err != nil {
 				return err
 			}
@@ -82,7 +69,7 @@ func runPut(env *command.Env, args []string) error {
 				return err
 			}
 			keys[i] = key
-			if putFlags.Verbose {
+			if putConfig.Verbose {
 				log.Printf("finished %q (%x)", path, key)
 			}
 		}
@@ -91,180 +78,4 @@ func runPut(env *command.Env, args []string) error {
 		}
 		return nil
 	})
-}
-
-// putFile puts a single file or symlink into the store.
-// The caller is responsible for closing in after putFile returns.
-func putFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
-	f := file.New(s, &file.NewOptions{
-		Name: fi.Name(),
-		Stat: fileInfoToStat(fi),
-	})
-
-	// Extended attributes (if -xattr is set)
-	if err := addExtAttrs(path, f); err != nil {
-		return nil, err
-	}
-
-	if fi.Mode().IsRegular() {
-		// Copy file contents.
-		in, err := os.Open(path)
-		if err != nil {
-			return nil, err
-		}
-		defer in.Close()
-		r := bufio.NewReaderSize(in, 1<<20)
-		if err := f.SetData(ctx, r); err != nil {
-			return nil, fmt.Errorf("copying data: %w", err)
-		}
-	} else if fi.Mode()&fs.ModeSymlink != 0 {
-		// Write symbolic link target as file content.
-		tgt, err := os.Readlink(path)
-		if err != nil {
-			return nil, err
-		} else if err := f.SetData(ctx, strings.NewReader(tgt)); err != nil {
-			return nil, err
-		}
-	}
-	return f, nil
-}
-
-// putDir puts a single file, directory, or symlink into the store.
-// If path names a plain file or symlink, it calls putFile.
-func putDir(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return nil, err
-	}
-	if !fi.IsDir() {
-		// Non-directory files, symlinks, etc.
-		return putFile(ctx, s, path, fi)
-	}
-	if putFlags.Verbose {
-		log.Printf("enter %q", path)
-	}
-
-	// Directory
-	d := file.New(s, &file.NewOptions{
-		Name: fi.Name(),
-		Stat: fileInfoToStat(fi),
-	})
-
-	// Extended attributes (if -xattr is set)
-	if err := addExtAttrs(path, d); err != nil {
-		return nil, err
-	}
-
-	// Children
-	elts, err := os.ReadDir(path)
-	if err != nil {
-		return nil, err
-	}
-
-	type entry struct {
-		sub  string
-		name string
-		fi   fs.FileInfo
-		kid  *file.File
-	}
-
-	// Partition the contents of the directory into plain files and directories.
-	var files, dirs []*entry
-	for _, elt := range elts {
-		sub := filepath.Join(path, elt.Name())
-		if elt.IsDir() {
-			dirs = append(dirs, &entry{sub: sub, name: elt.Name()})
-		} else if t := elt.Type(); t != 0 && (t&fs.ModeSymlink == 0) {
-			continue // e.g., socket, pipe, device, fifo, etc.
-		} else if fi, err := elt.Info(); err != nil {
-			return nil, err
-		} else {
-			files = append(files, &entry{sub: sub, name: elt.Name(), fi: fi})
-		}
-	}
-
-	// Process subdirectories serially. We do this so that the recurrence does
-	// not explode concurrency.
-	for _, e := range dirs {
-		kid, err := putDir(ctx, s, e.sub)
-		if err != nil {
-			return nil, err
-		}
-		d.Child().Set(e.name, kid)
-	}
-
-	// Process plain files in parallel.
-	if len(files) != 0 {
-		if putFlags.Verbose {
-			log.Printf("in %q: storing %d files", path, len(files))
-		}
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
-		for _, e := range files {
-			e := e
-			start(func() error {
-				if putFlags.Verbose {
-					log.Printf("copying %d bytes from %q", e.fi.Size(), e.name)
-					if e.fi.Size() > 1<<20 {
-						st := time.Now()
-						defer func() {
-							log.Printf("finished %q [%v elapsed]",
-								e.name, time.Since(st).Truncate(time.Millisecond))
-						}()
-					}
-				}
-				kid, err := putFile(ctx, s, e.sub, e.fi)
-				if err != nil {
-					return err
-				}
-				e.kid = kid
-				return nil
-			})
-		}
-		if err := g.Wait(); err != nil {
-			return nil, err
-		}
-		for _, e := range files {
-			d.Child().Set(e.name, e.kid)
-		}
-	}
-	if len(files) != 0 || len(dirs) != 0 {
-		d.Stat().Edit(func(s *file.Stat) {
-			s.ModTime = fi.ModTime()
-		}).Update()
-	}
-	return d, nil
-}
-
-func addExtAttrs(path string, f *file.File) error {
-	if !putFlags.XAttr {
-		return nil
-	}
-	names, err := xattr.LList(path)
-	if err != nil {
-		return fmt.Errorf("listing xattr: %w", err)
-	}
-	xa := f.XAttr()
-	for _, name := range names {
-		data, err := xattr.LGet(path, name)
-		if err != nil {
-			return fmt.Errorf("get xattr %q: %w", name, err)
-		}
-		xa.Set(name, string(data))
-	}
-	return nil
-}
-
-func fileInfoToStat(fi fs.FileInfo) *file.Stat {
-	if putFlags.NoStat {
-		return nil
-	}
-	owner, group := ownerAndGroup(fi)
-	return &file.Stat{
-		Mode:    fi.Mode(),
-		ModTime: fi.ModTime(),
-		OwnerID: owner,
-		GroupID: group,
-	}
 }

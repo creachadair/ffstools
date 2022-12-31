@@ -1,6 +1,6 @@
 //go:build !windows
 
-package cmdput
+package putlib
 
 import (
 	"io/fs"
