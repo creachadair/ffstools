@@ -31,6 +31,8 @@ import (
 	"github.com/pkg/xattr"
 )
 
+var Default = Config{}
+
 type Config struct {
 	Verbose bool // emit diagnostic output
 	XAttr   bool // capture extended attributes

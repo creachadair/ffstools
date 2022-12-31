@@ -29,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
 
 var Command = &command.C{
@@ -103,8 +104,13 @@ known keys are listed.`,
 		},
 		{
 			Name:  "set-file",
-			Usage: "<name> <file-key>",
-			Help:  "Edit the file key of the given root",
+			Usage: "<name> <file-key>\n<name> put <path>",
+			Help: `Edit the file key of the given root.
+
+If a <file-key> is specified, it must already exist in the store.
+
+The "put <path>" form stores the specified path into the store, and uses the
+resulting key (see the "put" subcommand).`,
 
 			Run: runEditFile,
 		},
@@ -287,12 +293,28 @@ func runEditFile(env *command.Env, args []string) error {
 	}
 	defer na.Close()
 
-	key, err := config.ParseKey(na.Args[0])
+	var key string
+	if len(na.Args) == 2 && na.Args[0] == "put" {
+		f, err := putlib.Default.PutPath(na.Context, na.Store, na.Args[1])
+		if err != nil {
+			return err
+		}
+		key, err = f.Flush(na.Context)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%x\n", key)
+	} else if len(na.Args) != 1 {
+		return env.Usagef("incorrect arguments")
+	} else {
+		key, err = config.ParseKey(na.Args[0])
+	}
 	if err != nil {
 		return err
 	} else if _, err := file.Open(na.Context, na.Store, key); err != nil {
 		return err
 	}
+
 	if key != na.Root.FileKey {
 		na.Root.IndexKey = "" // invalidate the index
 	}
