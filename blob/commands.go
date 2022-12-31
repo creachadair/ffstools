@@ -29,7 +29,7 @@ import (
 	"strings"
 
 	"github.com/creachadair/chirp"
-	cchannel "github.com/creachadair/chirp/channel"
+	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -324,7 +324,7 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 		return nil, fmt.Errorf("dialing: %w", err)
 	}
 
-	peer := chirp.NewPeer().Start(cchannel.IO(conn, conn))
+	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if t.Debug {
 		peer.LogPackets(func(pkt chirp.PacketInfo) { log.Print(pkt) })
 	}
