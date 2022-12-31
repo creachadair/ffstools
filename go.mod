@@ -5,20 +5,20 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.17
-	github.com/creachadair/bitcaskstore v0.0.0-20221230182510-207810aa3e2b
-	github.com/creachadair/boltstore v0.0.0-20221230182526-9bd98439e248
-	github.com/creachadair/chirp v0.0.0-20221229071535-925971117a50
-	github.com/creachadair/chirpstore v0.0.0-20221230182825-e45fa47d1475
-	github.com/creachadair/command v0.0.0-20221231001917-01e4a5bfa682
+	github.com/creachadair/bitcaskstore v0.0.0-20221231181332-30838feb3d7e
+	github.com/creachadair/boltstore v0.0.0-20221231181636-b3120459028a
+	github.com/creachadair/chirp v0.0.0-20221231175616-794862048d82
+	github.com/creachadair/chirpstore v0.0.0-20221231181757-ca1c25a42659
+	github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20221230182434-26e606bfa99c
-	github.com/creachadair/gcsstore v0.0.0-20221230182919-c21e095fbcf0
+	github.com/creachadair/ffs v0.0.0-20221231183239-402ca17d0eb1
+	github.com/creachadair/gcsstore v0.0.0-20221231181659-db3fe6877d05
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20221230182947-48616748e2af
-	github.com/creachadair/pebblestore v0.0.0-20221230183028-53d2e247f555
-	github.com/creachadair/pogrebstore v0.0.0-20221230183034-ffd15ca4ebe1
-	github.com/creachadair/s3store v0.0.0-20221230183101-ce94faf0a30f
-	github.com/creachadair/sqlitestore v0.0.0-20221230183046-e4a0bc81a6b9
+	github.com/creachadair/leveldbstore v0.0.0-20221231181752-03918bdc1c3d
+	github.com/creachadair/pebblestore v0.0.0-20221231181720-77aad873c0b9
+	github.com/creachadair/pogrebstore v0.0.0-20221231181612-2c1a83e774cd
+	github.com/creachadair/s3store v0.0.0-20221231181854-c9f0b9e36e4d
+	github.com/creachadair/sqlitestore v0.0.0-20221231181919-98d2441845f3
 	github.com/creachadair/taskgroup v0.3.2
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
@@ -65,7 +65,7 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20221229212011-811a8c0e741b // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
-	github.com/creachadair/mds v0.0.0-20221230081554-c272d6fe9760 // indirect
+	github.com/creachadair/mds v0.0.0-20221231180243-076dd98fccf7 // indirect
 	github.com/creachadair/msync v0.0.3 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
