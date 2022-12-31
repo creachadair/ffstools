@@ -58,13 +58,17 @@ known keys are listed.`,
 		},
 		{
 			Name:  "create",
-			Usage: "<name>",
-			Help:  "Create a new (empty) root pointer.",
+			Usage: "<name>\n<name> <file-key>\n<name> put <path>",
+			Help: `Create a root pointer.
+
+If only a <name> is given, a new empty root pointer is created with that name.
+If a <file-key> is specified, the new root points to that file (which must exist).
+The "put <path>" form stores the specified path into the store, and uses the resulting
+key (see the "put" subcommmand).`,
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
-				fs.StringVar(&createFlags.FileKey, "key", "", "Initial file key")
-				fs.StringVar(&createFlags.Desc, "description", "", "Initial description")
+				fs.StringVar(&createFlags.Desc, "desc", "", "Set the human-readable description")
 			},
 			Run: runCreate,
 		},
@@ -204,37 +208,54 @@ func runList(env *command.Env, args []string) error {
 
 var createFlags struct {
 	Replace bool
-	FileKey string
 	Desc    string
 }
 
 func runCreate(env *command.Env, args []string) error {
 	if len(args) == 0 {
 		return env.Usagef("missing <name> argument")
-	} else if len(args) > 1 {
-		return env.Usagef("extra arguments after <name>")
 	}
-	key := args[0]
+	name, mode := args[0], "empty"
+	if len(args) == 2 {
+		mode = "file-key"
+	} else if len(args) == 3 && args[1] == "put" {
+		mode = "put-path"
+	} else if len(args) != 1 {
+		return env.Usagef("invalid arguments")
+	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 		var fk string
 		var err error
 
-		if createFlags.FileKey == "" {
+		switch mode {
+		case "file-key":
+			fk, err = config.ParseKey(args[1])
+		case "put-path":
+			f, perr := putlib.Default.PutPath(cfg.Context, s, args[2])
+			if perr != nil {
+				return err
+			}
+			fk, err = f.Flush(cfg.Context)
+			if err == nil {
+				fmt.Printf("%x\n", fk)
+			}
+		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
 			}).Flush(cfg.Context)
-		} else {
-			fk, err = config.ParseKey(createFlags.FileKey)
 		}
 		if err != nil {
 			return err
+		} else if _, err := file.Open(cfg.Context, s, fk); err != nil {
+			return err
 		}
+
 		return root.New(config.Roots(s), &root.Options{
 			Description: createFlags.Desc,
 			FileKey:     fk,
-		}).Save(cfg.Context, key, createFlags.Replace)
+		}).Save(cfg.Context, name, createFlags.Replace)
 	})
 }
 
