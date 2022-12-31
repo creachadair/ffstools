@@ -36,6 +36,7 @@ import (
 var (
 	configPath = config.Path()
 	storeAddr  string
+	debugLog   bool
 )
 
 func main() {
@@ -48,6 +49,7 @@ help [<command>]`,
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
 			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
+			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
 		},
 
 		Init: func(env *command.Env) error {
@@ -59,6 +61,9 @@ help [<command>]`,
 				cfg.DefaultStore = storeAddr
 			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
 				cfg.DefaultStore = bs
+			}
+			if debugLog {
+				cfg.EnableDebugLogging = true
 			}
 			cfg.Context = context.Background()
 			config.ExpandString(&cfg.DefaultStore)
