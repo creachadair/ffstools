@@ -163,7 +163,7 @@ func main() {
 			Buffer:  buf,
 		}
 
-		closer, errc := startChirpServer(ctx, config)
+		closer, loop := startChirpServer(ctx, config)
 		sig := make(chan os.Signal, 2)
 		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 		go func() {
@@ -174,7 +174,7 @@ func main() {
 				signal.Reset(syscall.SIGINT, syscall.SIGTERM)
 			}
 		}()
-		return <-errc
+		return loop.Wait()
 	})
 }
 

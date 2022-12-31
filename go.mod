@@ -19,7 +19,7 @@ require (
 	github.com/creachadair/pogrebstore v0.0.0-20221231181612-2c1a83e774cd
 	github.com/creachadair/s3store v0.0.0-20221231181854-c9f0b9e36e4d
 	github.com/creachadair/sqlitestore v0.0.0-20221231181919-98d2441845f3
-	github.com/creachadair/taskgroup v0.3.2
+	github.com/creachadair/taskgroup v0.4.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
 	golang.org/x/term v0.3.0

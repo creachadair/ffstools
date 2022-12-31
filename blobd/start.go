@@ -39,6 +39,7 @@ import (
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/keyfile"
+	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
 )
@@ -51,7 +52,7 @@ type startConfig struct {
 	Buffer  blob.Store
 }
 
-func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan error) {
+func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Solo) {
 	lst, err := opts.listen(ctx)
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)
@@ -64,23 +65,21 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, <-chan err
 
 	service := chirpstore.NewService(opts.Store, nil)
 	mx := newServerMetrics(ctx, opts)
-	errc := make(chan error, 1)
-	go func() {
-		defer close(errc)
-		errc <- peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
+	loop := taskgroup.Single(func() error {
+		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
 			p := chirp.NewPeer()
 			p.Metrics().Set("blobd", mx)
 			service.Register(p)
 			return p
 		})
-	}()
+	})
 
 	return func() {
 		lst.Close()
 		if isUnix {
 			defer os.Remove(opts.Address)
 		}
-	}, errc
+	}, loop
 }
 
 func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
