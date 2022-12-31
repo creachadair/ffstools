@@ -35,6 +35,7 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -83,16 +84,19 @@ a file may be specified in the following formats:
 		{
 			Name: "set",
 			Usage: `<root-key>/<path> <target>
-@<origin-key>/<path> <target>`,
+@<origin-key>/<path> <target>
+put <path>`,
 			Help: `Set the specified path beneath the origin to the given target
 
 The storage key of the modified origin is printed to stdout.
 If the origin is from a root, the root is updated with the modified origin.
 
-The <target> may be either a root-key/path or a @file-key/path. In both cases
-the path component is optional; if a root-key is given alone its root file is
-used as the target.
-`,
+The <target> may be a root-key/path or a @file-key/path. In both cases the path
+component is optional; if a root-key is given alone its root file is used as
+the target.
+
+If the target is "put <path>", the specified path is put into the store, and
+the resulting storage key is used (see the "put" subcommand).`,
 
 			Run: runSet,
 		},
@@ -301,9 +305,14 @@ func runRead(env *command.Env, args []string) error {
 }
 
 func runSet(env *command.Env, args []string) error {
-	if len(args) != 2 {
+	if len(args) == 3 {
+		if args[1] != "put" {
+			return env.Usagef("invalid three-argument usage")
+		}
+	} else if len(args) != 2 {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
 	}
+
 	obase, orest := config.SplitPath(args[0])
 	if orest == "" {
 		return env.Usagef("path must not be empty")
@@ -311,11 +320,32 @@ func runSet(env *command.Env, args []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		tf, err := config.OpenPath(cfg.Context, s, args[1])
+		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
 		if err != nil {
 			return err
 		}
-		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
+
+		var tf *config.PathInfo
+		if len(args) == 2 {
+			// Standard form: file-key/path or root-key/path
+			tf, err = config.OpenPath(cfg.Context, s, args[1])
+		} else {
+			// Put form: put <path>
+			f, perr := putlib.Default.PutPath(cfg.Context, s, args[2])
+			if perr != nil {
+				return perr
+			}
+			fk, perr := f.Flush(cfg.Context)
+			if perr != nil {
+				return perr
+			}
+			fmt.Printf("put: %x\n", fk)
+			tf = &config.PathInfo{
+				Base:    f,
+				File:    f,
+				FileKey: fk,
+			}
+		}
 		if err != nil {
 			return err
 		}

@@ -63,8 +63,8 @@ known keys are listed.`,
 
 If only a <name> is given, a new empty root pointer is created with that name.
 If a <file-key> is specified, the new root points to that file (which must exist).
-The "put <path>" form stores the specified path into the store, and uses the resulting
-key (see the "put" subcommmand).`,
+The "put <path>" form puts the specified path into the store, and uses the resulting
+storage key (see the "put" subcommmand).`,
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
