@@ -1,0 +1,4 @@
+update_mod() {
+    go get -u ./...
+    go get gvisor.dev/gvisor@v0.0.0-20220817001344-846276b3dbc5
+}
