@@ -29,6 +29,18 @@ import (
 	"tailscale.com/tsnet"
 )
 
+const tsAddress = `
+
+ - A ts://host:port?options URL, a TCP listener is created over Tailscale at
+   the specified host and port. The query parameters are:
+
+   dir=path     : the path of the state directory (must exist; overrides default).
+   auth_key=k   : an authorization key (or use the TS_AUTHKEY environment).
+   ephemeral=?  : whether to create an ephemeral (non-persistent) node.
+   verbose=?    : whether to enable verbose logging from Tailscale to stderr.
+
+   See https://godoc.org/tailscale.com/tsnet for more details.`
+
 func parseQueryBool(s string) bool {
 	b, err := strconv.ParseBool(s)
 	return err == nil && b

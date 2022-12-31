@@ -23,6 +23,8 @@ import (
 	"github.com/creachadair/chirp"
 )
 
+const tsAddress = ""
+
 func (s *startConfig) listen(ctx context.Context) (net.Listener, error) {
 	return net.Listen(chirp.SplitAddress(s.Address))
 }
