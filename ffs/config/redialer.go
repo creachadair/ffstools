@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// Dial calls net.Dial with the specified arguments.  If they succeed and ntype
+// is not "unix", the resulting connection is wrapped to redial the address if
+// the connection fails during a read or write (ECONNRESET or ECONNABORTED).
+//
+// If redial succeeds, the failed Read or Write operation is transparently
+// retried; otherwise the original error is propagated to the caller.
 func Dial(ntype, addr string) (net.Conn, error) {
 	c, err := net.Dial(ntype, addr)
 	if err != nil {
