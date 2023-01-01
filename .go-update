@@ -2,3 +2,10 @@ update_mod() {
     go get -u ./...
     go get gvisor.dev/gvisor@v0.0.0-20220817001344-846276b3dbc5
 }
+
+cleanup() {
+    go install github.com/creachadair/ffstools/blob
+    go install github.com/creachadair/ffstools/ffs
+    go install github.com/creachadair/ffstools/file2json
+    go install -tags badger,bolt,gcs,s3 github.com/creachadair/ffstools/blobd
+}
