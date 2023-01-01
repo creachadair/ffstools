@@ -39,6 +39,7 @@ type settings struct {
 	Raw       bool   // list
 	Start     string // list
 	Prefix    string // list
+	MaxKeys   int    // list
 	MissingOK bool   // delete
 }
 
@@ -135,6 +136,7 @@ the address or an @tag from the configuration file.
 				fs.BoolVar(&cfg.Raw, "raw", false, "Print raw keys without hex encoding")
 				fs.StringVar(&cfg.Start, "start", "", "List keys greater than or equal to this")
 				fs.StringVar(&cfg.Prefix, "prefix", "", "List only keys having this prefix")
+				fs.IntVar(&cfg.MaxKeys, "max", 0, "List at most this many keys (0=all)")
 			},
 			Run: listCmd,
 		},

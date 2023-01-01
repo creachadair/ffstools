@@ -143,16 +143,22 @@ func listCmd(env *command.Env, args []string) error {
 	ctx := getContext(env)
 	defer blob.CloseStore(ctx, bs)
 
+	var listed int
 	return bs.List(ctx, start, func(key string) error {
 		if !strings.HasPrefix(key, pfx) {
 			if key > pfx {
 				return blob.ErrStopListing
 			}
 			return nil
-		} else if cfg.Raw {
+		}
+		if cfg.Raw {
 			fmt.Println(key)
 		} else {
 			fmt.Printf("%x\n", key)
+		}
+		listed++
+		if cfg.MaxKeys > 0 && listed == cfg.MaxKeys {
+			return blob.ErrStopListing
 		}
 		return nil
 	})
