@@ -7,11 +7,11 @@ require (
 	github.com/creachadair/badgerstore v0.1.17
 	github.com/creachadair/bitcaskstore v0.0.0-20221231181332-30838feb3d7e
 	github.com/creachadair/boltstore v0.0.0-20221231181636-b3120459028a
-	github.com/creachadair/chirp v0.0.0-20221231175616-794862048d82
-	github.com/creachadair/chirpstore v0.0.0-20221231181757-ca1c25a42659
+	github.com/creachadair/chirp v0.0.0-20230101165424-a0ca5b25ab37
+	github.com/creachadair/chirpstore v0.0.0-20230101165509-f81a32ebda3d
 	github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20221231183239-402ca17d0eb1
+	github.com/creachadair/ffs v0.0.0-20221231232903-d038b58b6302
 	github.com/creachadair/gcsstore v0.0.0-20221231181659-db3fe6877d05
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20221231181752-03918bdc1c3d
@@ -19,7 +19,7 @@ require (
 	github.com/creachadair/pogrebstore v0.0.0-20221231181612-2c1a83e774cd
 	github.com/creachadair/s3store v0.0.0-20221231181854-c9f0b9e36e4d
 	github.com/creachadair/sqlitestore v0.0.0-20221231181919-98d2441845f3
-	github.com/creachadair/taskgroup v0.4.0
+	github.com/creachadair/taskgroup v0.4.1
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
 	golang.org/x/term v0.3.0
