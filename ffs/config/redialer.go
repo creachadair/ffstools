@@ -26,6 +26,7 @@ func Dial(ntype, addr string) (net.Conn, error) {
 }
 
 type redialConn struct {
+	// Must hold mu exclusively to read or write the connection.
 	mu sync.Mutex
 	net.Conn
 
@@ -36,7 +37,22 @@ type redialConn struct {
 	lastSuccess time.Time     // last successful dial
 }
 
-func (r *redialConn) tryRedialLocked() error {
+func (r *redialConn) getConn() net.Conn {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.Conn
+}
+
+func (r *redialConn) tryRedial(old net.Conn) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	// If the connection was successfully replaced since we read the original
+	// value, we can short-circuit here.
+	if r.Conn != old {
+		return nil
+	}
+
 	if time.Since(r.lastSuccess) > r.grace {
 		r.numAttempts = 0
 	} else if r.numAttempts >= r.maxAttempts {
@@ -53,12 +69,11 @@ func (r *redialConn) tryRedialLocked() error {
 }
 
 func (r *redialConn) Read(data []byte) (int, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	for {
-		nr, err := r.Conn.Read(data)
+		conn := r.getConn()
+		nr, err := conn.Read(data)
 		if err != nil {
-			if isRedialableError(err) && r.tryRedialLocked() == nil {
+			if isRedialableError(err) && r.tryRedial(conn) == nil {
 				continue // retry the failed operation
 			}
 		}
@@ -67,12 +82,11 @@ func (r *redialConn) Read(data []byte) (int, error) {
 }
 
 func (r *redialConn) Write(data []byte) (int, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	for {
-		nw, err := r.Conn.Write(data)
+		conn := r.getConn()
+		nw, err := conn.Write(data)
 		if err != nil {
-			if isRedialableError(err) && r.tryRedialLocked() == nil {
+			if isRedialableError(err) && r.tryRedial(conn) == nil {
 				continue // retry the failed operation
 			}
 		}
