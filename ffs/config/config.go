@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
 	"os"
 	"path"
 	"strings"
@@ -123,7 +122,7 @@ func (s *Settings) OpenStore() (blob.CAS, error) {
 // OpenStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
 func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, error) {
-	conn, err := net.Dial(chirp.SplitAddress(addr))
+	conn, err := Dial(chirp.SplitAddress(addr))
 	if err != nil {
 		return nil, fmt.Errorf("dialing store: %w", err)
 	}
