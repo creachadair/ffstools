@@ -27,6 +27,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/creachadair/command"
@@ -152,6 +153,9 @@ func runList(env *command.Env, args []string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
+		defer w.Flush()
+
 		for _, arg := range args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
@@ -177,7 +181,7 @@ func runList(env *command.Env, args []string) error {
 				if listFlags.JSON {
 					fmt.Println(jsonFormat(of, name, target))
 				} else {
-					fmt.Println(listFormat(of, name, target))
+					fmt.Fprint(w, listFormat(of, name, target))
 				}
 				return nil
 			}
@@ -210,23 +214,26 @@ func listFormat(f *file.File, name, target string) string {
 	s := f.Stat()
 	var date string
 	if now := time.Now(); now.Year() != s.ModTime.Year() {
-		date = s.ModTime.Format("Jan _2 2006 ")
+		date = s.ModTime.Format("Jan _2  2006")
 	} else {
 		date = s.ModTime.Format("Jan _2 15:04")
 	}
 	if target != "" {
-		name += " => " + target
+		name += " -> " + target
 	}
 	xtag, xattrs := " ", ""
-	if listFlags.XAttr {
+	hasXAttr := f.XAttr().Len() != 0
+	if listFlags.XAttr && hasXAttr {
+		xattrs = "\f"
 		f.XAttr().List(func(key, value string) {
-			xattrs += fmt.Sprintf("\n\t%s\t%d", key, len(value))
+			xattrs += fmt.Sprintf("\t%s\t%d\n", key, len(value))
 		})
+		xattrs = strings.TrimRight(xattrs, "\n")
 	}
-	if f.XAttr().Len() != 0 {
+	if hasXAttr {
 		xtag = "@"
 	}
-	return fmt.Sprintf("%s%s %2d %-8s %-8s %8d %s %s%s",
+	return fmt.Sprintf("%s%s\t%2d\t%-8s\t%-8s\v%8d\t%s\t%s%s\f",
 		s.Mode, xtag, 1+f.Child().Len(),
 		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
 		f.Size(), date, name, xattrs)
