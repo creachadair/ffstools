@@ -302,6 +302,7 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 		out.File = fp
 		out.FileKey = fk
 	}
+	out.BaseKey, _ = out.Base.Flush(ctx) // safe, it was just opened
 
 	// If the rest of the path is empty, the starting point is the target.
 	if rest == "" {
@@ -315,7 +316,6 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 	}
 	out.File = tf
 	out.FileKey, _ = out.File.Flush(ctx) // safe, it was just opened
-	out.BaseKey, _ = out.Base.Flush(ctx) // same
 	return out, nil
 }
 
