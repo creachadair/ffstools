@@ -235,7 +235,7 @@ func runCreate(env *command.Env, args []string) error {
 		case "put-path":
 			f, perr := putlib.Default.PutPath(cfg.Context, s, args[2])
 			if perr != nil {
-				return err
+				return perr
 			}
 			fk, err = f.Flush(cfg.Context)
 			if err == nil {
@@ -245,6 +245,8 @@ func runCreate(env *command.Env, args []string) error {
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
 			}).Flush(cfg.Context)
+		default:
+			panic("unexpected mode: " + mode)
 		}
 		if err != nil {
 			return err
