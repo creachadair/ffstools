@@ -5,20 +5,20 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.17
-	github.com/creachadair/bitcaskstore v0.0.0-20230102170851-a606309683ad
-	github.com/creachadair/boltstore v0.0.0-20230102170916-7235d8f02e4f
+	github.com/creachadair/bitcaskstore v0.0.0-20230103211142-6fb20736bb19
+	github.com/creachadair/boltstore v0.0.0-20230103211208-0047158f045d
 	github.com/creachadair/chirp v0.0.0-20230102170835-ef9f16b5d54a
-	github.com/creachadair/chirpstore v0.0.0-20230102170841-ea739bfafc3b
+	github.com/creachadair/chirpstore v0.0.0-20230103211129-8d467cd1f5d6
 	github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230102215056-2d93d4797d57
-	github.com/creachadair/gcsstore v0.0.0-20230102170943-c4d485db5391
+	github.com/creachadair/ffs v0.0.0-20230103165302-eb7e3ec6364b
+	github.com/creachadair/gcsstore v0.0.0-20230103211213-5d58521d5c75
 	github.com/creachadair/keyfile v0.7.1
-	github.com/creachadair/leveldbstore v0.0.0-20230102171046-ca42477fb7a6
-	github.com/creachadair/pebblestore v0.0.0-20230102171020-51afdeb06749
-	github.com/creachadair/pogrebstore v0.0.0-20230102170859-28ee42697f05
-	github.com/creachadair/s3store v0.0.0-20230102171051-7e78319ad24c
-	github.com/creachadair/sqlitestore v0.0.0-20230102171109-59de9d6013f0
+	github.com/creachadair/leveldbstore v0.0.0-20230103211305-2a822aeb00b9
+	github.com/creachadair/pebblestore v0.0.0-20230103211243-d88be74983d3
+	github.com/creachadair/pogrebstore v0.0.0-20230103211153-52711c083d96
+	github.com/creachadair/s3store v0.0.0-20230103211349-221221090716
+	github.com/creachadair/sqlitestore v0.0.0-20230103211358-1dfa6dfb0b4f
 	github.com/creachadair/taskgroup v0.4.2
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.4.0
@@ -43,7 +43,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.171 // indirect
+	github.com/aws/aws-sdk-go v1.44.172 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.7 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.7 // indirect
@@ -62,10 +62,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20221229212011-811a8c0e741b // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230103143030-6cd8bb043e5d // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
-	github.com/creachadair/mds v0.0.0-20221231180243-076dd98fccf7 // indirect
+	github.com/creachadair/mds v0.0.0-20230103074920-71bb2f34a3b8 // indirect
 	github.com/creachadair/msync v0.0.3 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
@@ -92,7 +92,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/native v1.1.0 // indirect
 	github.com/jsimonetti/rtnetlink v1.3.0 // indirect
-	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/klauspost/compress v1.15.14 // indirect
 	github.com/kortschak/wol v0.0.0-20200729010619-da482cc4850a // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
