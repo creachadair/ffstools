@@ -238,6 +238,7 @@ func isAllHex(s string) bool {
 type PathInfo struct {
 	Path    string     // the original input path (unparsed)
 	Base    *file.File // the root or starting file of the path
+	BaseKey string     // the storage key of the base file
 	File    *file.File // the target file of the path
 	FileKey string     // the storage key of the target file
 	Root    *root.Root // the specified root, or nil if none
@@ -251,6 +252,7 @@ func (p *PathInfo) Flush(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	p.BaseKey = key
 
 	// If this path started at a root, write out the updated contents.
 	if p.Root != nil {
@@ -313,6 +315,7 @@ func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
 	}
 	out.File = tf
 	out.FileKey, _ = out.File.Flush(ctx) // safe, it was just opened
+	out.BaseKey, _ = out.Base.Flush(ctx) // same
 	return out, nil
 }
 
