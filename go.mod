@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20230103211129-8d467cd1f5d6
 	github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230103165302-eb7e3ec6364b
+	github.com/creachadair/ffs v0.0.0-20230104000224-ca474c4162dc
 	github.com/creachadair/gcsstore v0.0.0-20230103211213-5d58521d5c75
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20230103211305-2a822aeb00b9
