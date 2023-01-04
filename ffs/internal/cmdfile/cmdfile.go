@@ -17,6 +17,7 @@ package cmdfile
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -71,6 +72,7 @@ a file may be specified in the following formats:
 				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
 				fs.BoolVar(&listFlags.All, "a", false, "Include entries whose names begin with dot (.)")
 				fs.BoolVar(&listFlags.XAttr, "xattr", false, "Include extended attributes")
+				fs.BoolVar(&listFlags.Key, "key", false, "Include storage keys")
 				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
 			},
 			Run: runList,
@@ -144,6 +146,7 @@ var listFlags struct {
 	DirOnly bool
 	All     bool
 	XAttr   bool
+	Key     bool
 	JSON    bool
 }
 
@@ -221,20 +224,24 @@ func listFormat(f *file.File, name, target string) string {
 	if target != "" {
 		name += " -> " + target
 	}
-	xtag, xattrs := " ", ""
+	skey, xtag, xattrs := "", " ", ""
 	hasXAttr := f.XAttr().Len() != 0
-	if listFlags.XAttr && hasXAttr {
-		xattrs = "\f"
-		f.XAttr().List(func(key, value string) {
-			xattrs += fmt.Sprintf("\t%s\t%d\n", key, len(value))
-		})
-		xattrs = strings.TrimRight(xattrs, "\n")
-	}
 	if hasXAttr {
 		xtag = "@"
+		if listFlags.XAttr {
+			xattrs = "\f"
+			f.XAttr().List(func(key, value string) {
+				xattrs += fmt.Sprintf("\t%s\t%d\n", key, len(value))
+			})
+			xattrs = strings.TrimRight(xattrs, "\n")
+		}
 	}
-	return fmt.Sprintf("%s%s\t%2d\t%-8s\t%-8s\v%8d\t%s\t%s%s\f",
-		s.Mode, xtag, 1+f.Child().Len(),
+	if listFlags.Key {
+		skey = base64.StdEncoding.EncodeToString([]byte(f.Key())) + "\t"
+	}
+
+	return fmt.Sprintf("%s%s%s\t%3d\t%-8s\t%-8s\v%8d\t%s\t%s%s\f",
+		skey, s.Mode, xtag, 1+f.Child().Len(),
 		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
 		f.Size(), date, name, xattrs)
 }
@@ -257,12 +264,13 @@ func jsonFormat(f *file.File, name, target string) string {
 		Size   int64             `json:"size"`
 		MTime  time.Time         `json:"modTime"`
 		Target string            `json:"linkTarget,omitempty"`
+		Key    []byte            `json:"storageKey,omitempty"`
 		XAttr  map[string][]byte `json:"xattr,omitempty"`
 	}{
 		Name: name,
 		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
 		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
-		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target, XAttr: xattr,
+		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target, Key: []byte(f.Key()), XAttr: xattr,
 	})
 	if err != nil {
 		return "null"
