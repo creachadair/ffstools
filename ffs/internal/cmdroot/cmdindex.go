@@ -56,9 +56,16 @@ func runIndex(env *command.Env, keys []string) error {
 			}
 
 			fmt.Fprintf(env, "Scanning data reachable from %q (%x)...\n", key, rp.FileKey)
+			scanned := make(map[string]bool)
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()
 			if err := fp.Scan(cfg.Context, func(key string, isFile bool) bool {
+				if isFile {
+					if scanned[key] {
+						return false // don't re-index repeats of the same file
+					}
+					scanned[key] = true
+				}
 				idx.Add(key)
 				return true
 			}); err != nil {
