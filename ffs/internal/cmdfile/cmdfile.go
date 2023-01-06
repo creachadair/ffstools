@@ -19,10 +19,12 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"os"
 	"os/user"
 	"path"
@@ -109,10 +111,30 @@ the resulting storage key is used (see the "put" subcommand).`,
 			Help: `Remove the specified path from beneath the origin
 
 The storage key of the modified origin is printed to stdout.
-If the origin is from a root, the root is updated with the modified origin.
+If the origin is from a root, the root is updated with the changes.
 `,
 
 			Run: runRemove,
+		},
+		{
+			Name: "set-stat",
+			Usage: `<root-key>/<path> <stat-spec>
+@<origin-key>/<path> <stat-spec>`,
+			Help: `Modify the stat message of the specified path beneath the origin
+
+The stat spec is a list of fields to update, one or more of:
+
+ mode <perms>   -- set file permissions (e.g., 0755)
+ mtime <time>   -- update file timestamp ("now", @<seconds>, or RFC3339)
+ uid <id>       -- set the owner UID
+ gid <id>       -- set the group GID
+ owner <name>   -- set the owner name ("" to clear)
+ group <name>   -- set the group name ("" to clear)
+ persist <ok>   -- set or unset stat persistence
+
+If the origin is from a root, the root is updated with the changes.`,
+
+			Run: runSetStat,
 		},
 	},
 }
@@ -412,4 +434,129 @@ func runRemove(env *command.Env, args []string) error {
 		}
 		return nil
 	})
+}
+
+func runSetStat(env *command.Env, args []string) error {
+	if len(args) < 3 {
+		return env.Usagef("missing origin and stat spec")
+	}
+	path := args[0]
+	mod, err := parseStatMod(args[1:])
+	if err != nil {
+		return fmt.Errorf("invalid mod spec: %w", err)
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		tf, err := config.OpenPath(cfg.Context, s, path)
+		if err != nil {
+			return err
+		}
+		stat := tf.File.Stat()
+		if mod.perms != nil {
+			stat.Mode = (stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms)
+		}
+		if mod.modTime != nil {
+			stat.ModTime = *mod.modTime
+		}
+		if mod.uid != nil {
+			stat.OwnerID = *mod.uid
+		}
+		if mod.gid != nil {
+			stat.GroupID = *mod.gid
+		}
+		if mod.owner != nil {
+			stat.OwnerName = *mod.owner
+		}
+		if mod.group != nil {
+			stat.GroupName = *mod.group
+		}
+		if mod.persist != nil {
+			stat.Persist(*mod.persist)
+		}
+		stat.Update()
+		key, err := tf.Flush(cfg.Context)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%x\n", key)
+		return nil
+	})
+}
+
+type statMod struct {
+	perms        *int64
+	modTime      *time.Time
+	uid, gid     *int
+	owner, group *string
+	persist      *bool
+}
+
+func parseStatMod(args []string) (*statMod, error) {
+	var mod statMod
+
+	i := 0
+	for i+1 < len(args) {
+		switch args[i] {
+		case "mode":
+			v, err := strconv.ParseInt(args[i+1], 0, 32)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", args[i], err)
+			}
+			mod.perms = &v
+
+		case "mtime":
+			var t time.Time
+			if args[i+1] == "now" {
+				t = time.Now()
+
+			} else if strings.HasPrefix(args[i+1], "@") {
+				v, err := strconv.ParseFloat(args[i+1][1:], 64)
+				if err != nil {
+					return nil, fmt.Errorf("%s: %w", args[i], err)
+				}
+				sec, rem := math.Modf(v)
+				nano := float64(time.Second) * rem
+				t = time.Unix(int64(sec), int64(nano))
+
+			} else if v, err := time.Parse(time.RFC3339Nano, args[i+1]); err == nil {
+				t = v
+
+			} else {
+				return nil, fmt.Errorf("%s: %w", args[i], err)
+			}
+			mod.modTime = &t
+
+		case "uid", "gid":
+			v, err := strconv.Atoi(args[i+1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", args[i], err)
+			} else if args[i] == "uid" {
+				mod.uid = &v
+			} else {
+				mod.gid = &v
+			}
+
+		case "owner":
+			mod.owner = &args[i+1]
+
+		case "group":
+			mod.group = &args[i+1]
+
+		case "persist":
+			v, err := strconv.ParseBool(args[i+1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", args[i], err)
+			}
+			mod.persist = &v
+
+		default:
+			return nil, fmt.Errorf("unknown stat field %q", args[i])
+		}
+
+		i += 2
+	}
+	if i < len(args) {
+		return nil, errors.New("odd-length argument list")
+	}
+	return &mod, nil
 }
