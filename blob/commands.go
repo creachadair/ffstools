@@ -265,7 +265,7 @@ func statCmd(env *command.Env, args []string) error {
 	defer blob.CloseStore(ctx, s)
 
 	var msg []byte
-	switch t := s.(type) {
+	switch t := s.Base().(type) {
 	case chirpstore.CAS:
 		msg, err = t.Status(ctx)
 	default:
@@ -318,16 +318,16 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 	return
 }
 
-func storeFromEnv(env *command.Env) (blob.CAS, error) {
+func storeFromEnv(env *command.Env) (prefixed.CAS, error) {
 	t := env.Config.(*settings)
 	addr, ok := t.FFS.FindAddress()
 	if !ok {
-		return nil, fmt.Errorf("no -store address was found (%q)", addr)
+		return prefixed.CAS{}, fmt.Errorf("no -store address was found (%q)", addr)
 	}
 
 	conn, err := net.Dial(chirp.SplitAddress(addr))
 	if err != nil {
-		return nil, fmt.Errorf("dialing: %w", err)
+		return prefixed.CAS{}, fmt.Errorf("dialing: %w", err)
 	}
 
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
