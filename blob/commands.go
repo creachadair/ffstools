@@ -335,9 +335,6 @@ func storeFromEnv(env *command.Env) (blob.CAS, error) {
 		peer.LogPackets(func(pkt chirp.PacketInfo) { log.Print(pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
-	if t.Bucket == "" {
-		return bs, nil
-	}
 	return prefixed.NewCAS(bs).Derive(t.Bucket), nil
 }
 

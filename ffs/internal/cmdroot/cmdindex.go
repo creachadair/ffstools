@@ -23,6 +23,7 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
+	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -37,7 +38,7 @@ func runIndex(env *command.Env, keys []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		n, err := s.Len(cfg.Context)
+		n, err := s.(prefixed.CAS).Derive("").Len(cfg.Context)
 		if err != nil {
 			return err
 		}
