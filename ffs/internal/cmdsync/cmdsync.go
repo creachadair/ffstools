@@ -164,13 +164,16 @@ func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *roo
 }
 
 func (s scanSet) file(ctx context.Context, fp *file.File) error {
-	return fp.Scan(ctx, func(key string, isFile bool) bool {
+	return fp.Scan(ctx, func(si file.ScanItem) bool {
+		key := si.Key()
 		if _, ok := s[key]; ok {
-			return false
-		} else if isFile {
-			s[key] = 'F'
-		} else {
-			s[key] = '-'
+			return false // skip repeats of the same file
+		}
+		s[key] = 'F'
+
+		// Record all the data blocks.
+		for _, dkey := range si.Data().Keys() {
+			s[dkey] = '-'
 		}
 		return true
 	})

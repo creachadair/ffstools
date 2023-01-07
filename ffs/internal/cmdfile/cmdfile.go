@@ -252,9 +252,10 @@ func listFormat(f *file.File, name, target string) string {
 		xtag = "@"
 		if listFlags.XAttr {
 			xattrs = "\f"
-			f.XAttr().List(func(key, value string) {
-				xattrs += fmt.Sprintf("\t%s\t%d\n", key, len(value))
-			})
+			xa := f.XAttr()
+			for _, key := range xa.Names() {
+				xattrs += fmt.Sprintf("\t%s\t%d\n", key, len(xa.Get(key)))
+			}
 			xattrs = strings.TrimRight(xattrs, "\n")
 		}
 	}
@@ -265,7 +266,7 @@ func listFormat(f *file.File, name, target string) string {
 	return fmt.Sprintf("%s%s%s\t%3d\t%-8s\t%-8s\v%8d\t%s\t%s%s\f",
 		skey, s.Mode, xtag, 1+f.Child().Len(),
 		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
-		f.Size(), date, name, xattrs)
+		f.Data().Size(), date, name, xattrs)
 }
 
 func jsonFormat(f *file.File, name, target string) string {
@@ -274,7 +275,10 @@ func jsonFormat(f *file.File, name, target string) string {
 	var xattr map[string][]byte
 	if listFlags.XAttr {
 		xattr = make(map[string][]byte)
-		f.XAttr().List(func(key, value string) { xattr[key] = []byte(value) })
+		xa := f.XAttr()
+		for _, key := range xa.Names() {
+			xattr[key] = []byte(xa.Get(key))
+		}
 	}
 	data, err := json.Marshal(struct {
 		Name   string            `json:"name"`
@@ -292,7 +296,8 @@ func jsonFormat(f *file.File, name, target string) string {
 		Name: name,
 		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
 		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
-		Size: f.Size(), MTime: s.ModTime.UTC(), Target: target, Key: []byte(f.Key()), XAttr: xattr,
+		Size: f.Data().Size(), MTime: s.ModTime.UTC(),
+		Target: target, Key: []byte(f.Key()), XAttr: xattr,
 	})
 	if err != nil {
 		return "null"

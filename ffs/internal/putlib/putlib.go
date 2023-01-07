@@ -175,9 +175,9 @@ func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.Fil
 		}
 	}
 	if len(files) != 0 || len(dirs) != 0 {
-		d.Stat().Edit(func(s *file.Stat) {
-			s.ModTime = fi.ModTime()
-		}).Update()
+		ds := d.Stat()
+		ds.ModTime = fi.ModTime()
+		ds.Update()
 	}
 	return d, nil
 }

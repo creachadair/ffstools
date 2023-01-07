@@ -160,15 +160,12 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 
 	// Restore extended attributes if requested.
 	if exportFlags.XAttr {
-		var xerr error
-		f.XAttr().List(func(key, value string) {
-			if xerr == nil {
-				logPrintf("Restore %q xattr %q", path, key)
-				xerr = xattr.LSet(path, key, []byte(value))
+		xa := f.XAttr()
+		for _, key := range xa.Names() {
+			logPrintf("Restore %q xattr %q", path, key)
+			if xerr := xattr.LSet(path, key, []byte(xa.Get(key))); xerr != nil {
+				return fmt.Errorf("setting xattrs %q: %w", key, xerr)
 			}
-		})
-		if xerr != nil {
-			return fmt.Errorf("setting xattrs: %w", xerr)
 		}
 	}
 	return nil

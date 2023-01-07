@@ -24,6 +24,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
@@ -127,9 +128,9 @@ store without roots.
 					config.PrintableKey(key), rp.FileKey)
 				start := time.Now()
 				var numKeys int
-				if err := rf.Scan(cfg.Context, func(key string, isFile bool) bool {
+				if err := rf.Scan(cfg.Context, func(si file.ScanItem) bool {
 					numKeys++
-					idx.Add(key)
+					idx.Add(si.Key())
 					return true
 				}); err != nil {
 					return fmt.Errorf("scanning %q: %w", key, err)

@@ -20,6 +20,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
@@ -60,14 +61,16 @@ func runIndex(env *command.Env, keys []string) error {
 			scanned := make(map[string]bool)
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()
-			if err := fp.Scan(cfg.Context, func(key string, isFile bool) bool {
-				if isFile {
-					if scanned[key] {
-						return false // don't re-index repeats of the same file
-					}
-					scanned[key] = true
+			if err := fp.Scan(cfg.Context, func(si file.ScanItem) bool {
+				key := si.Key()
+				if scanned[key] {
+					return false // don't re-index repeats of the same file
 				}
+				scanned[key] = true
 				idx.Add(key)
+				for _, dkey := range si.Data().Keys() {
+					idx.Add(dkey)
+				}
 				return true
 			}); err != nil {
 				return fmt.Errorf("scanning %q: %w", key, err)

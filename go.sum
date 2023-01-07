@@ -183,8 +183,8 @@ github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127 h1:YTx3js9BScW
 github.com/creachadair/command v0.0.0-20221231174841-7e48f3f7b127/go.mod h1:jN7ZJM5YSVtD3SHmkAdN/cOC1dXiqg2Y9K5Sr5a8Nxw=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.0.0-20230107164512-d57fda350dc7 h1:d/oD5AE3p/+kKzxkGDgm5AFxamjeFtmekGLp5nspS9w=
-github.com/creachadair/ffs v0.0.0-20230107164512-d57fda350dc7/go.mod h1:XZoVFVGbeigae0P8r+7QkazaTsA3iDHz8txbJ1e6Ivg=
+github.com/creachadair/ffs v0.0.0-20230107193204-afaed24db28d h1:ywQ7/ZZIgvDxq8QlpzYSxIuQ4T6m2+9yQ9GDcjft0s0=
+github.com/creachadair/ffs v0.0.0-20230107193204-afaed24db28d/go.mod h1:3KHVlX29/u7/fe9mFT0LTJEtwJ4QhO/wb2tBlkvMGVw=
 github.com/creachadair/gcsstore v0.0.0-20230103211213-5d58521d5c75 h1:piFoxdw/yp8NKikF58cqgKulhKrLJME1s4zElnIjvg0=
 github.com/creachadair/gcsstore v0.0.0-20230103211213-5d58521d5c75/go.mod h1:gXVTYOtKYwi26Ug6544XlqxRYoehKsLeJq8Uaiajtxs=
 github.com/creachadair/keyfile v0.7.1 h1:XN5VztUPSIbUv4xKCZ2lULM+UsYHAkqz1EvgmXCu3YA=
@@ -193,8 +193,8 @@ github.com/creachadair/leveldbstore v0.0.0-20230103211305-2a822aeb00b9 h1:IrDWQm
 github.com/creachadair/leveldbstore v0.0.0-20230103211305-2a822aeb00b9/go.mod h1:9kyt03Sl8j5d9BiBLX2hyp8ahW8ZuoRxtjoE2MFFzbw=
 github.com/creachadair/mds v0.0.0-20230103074920-71bb2f34a3b8 h1:maxYEo+xbjJSKJvMk4OOsfhW6SYY5x4CPc/KchyaVho=
 github.com/creachadair/mds v0.0.0-20230103074920-71bb2f34a3b8/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
-github.com/creachadair/msync v0.0.3 h1:dOzBhh3K7SQNafcxyxzbzy4i8M/AZoycx6obvaq3Po4=
-github.com/creachadair/msync v0.0.3/go.mod h1:5+WcF2IjxUVydSOxqTcUWCgK6pZJwX8uxbGF+FuQkZI=
+github.com/creachadair/msync v0.0.4 h1:v4ZCidRtK7GnB8erBrG/VE5K5vNAYAuSsfe+jFU8v34=
+github.com/creachadair/msync v0.0.4/go.mod h1:5+WcF2IjxUVydSOxqTcUWCgK6pZJwX8uxbGF+FuQkZI=
 github.com/creachadair/pebblestore v0.0.0-20230103211243-d88be74983d3 h1:fHPprsPOHtaI6wZV4GmqiFE/dmGVA+3FCQnqLtwZYrU=
 github.com/creachadair/pebblestore v0.0.0-20230103211243-d88be74983d3/go.mod h1:og/4CMcGNBp65biIt+x2kes0sSuAkYSE003ZHURd7R4=
 github.com/creachadair/pogrebstore v0.0.0-20230103211153-52711c083d96 h1:dTJlpnkbzc3aqAYRQSK1SSQaXWBCB7F0wB2C8BZj+dw=
