@@ -15,8 +15,8 @@ require (
 	github.com/creachadair/gcsstore v0.0.0-20230107205005-7797615d50fd
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20230107205150-7eed17b692bd
-	github.com/creachadair/pebblestore v0.0.0-20230107165948-f0bad3888305
-	github.com/creachadair/pogrebstore v0.0.0-20230107165824-a4a6ffd0eba9
+	github.com/creachadair/pebblestore v0.0.0-20230107205407-264690dfc8b2
+	github.com/creachadair/pogrebstore v0.0.0-20230107205427-abc99889a11a
 	github.com/creachadair/s3store v0.0.0-20230107205457-5445d94426c9
 	github.com/creachadair/sqlitestore v0.0.0-20230107205544-3bd4254518e2
 	github.com/creachadair/taskgroup v0.4.2
@@ -62,10 +62,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230106151110-65ff304d3d7a // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230109175509-1aefe7fed7c0 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
-	github.com/creachadair/mds v0.0.0-20230103074920-71bb2f34a3b8 // indirect
+	github.com/creachadair/mds v0.0.0-20230107205202-3c06ef08ea3e // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
@@ -81,7 +81,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.1.2 // indirect
-	github.com/google/flatbuffers/go v0.0.0-20230107203722-b5802b57f2b2 // indirect
+	github.com/google/flatbuffers/go v0.0.0-20230109183250-ca6381bcc84f // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.1 // indirect
@@ -124,7 +124,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab // indirect
-	golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3 // indirect
+	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/oauth2 v0.4.0 // indirect
@@ -139,9 +139,9 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.106.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230106154932-a12b697841d9 // indirect
+	google.golang.org/genproto v0.0.0-20230109162033-3c3c17ce83e6 // indirect
 	google.golang.org/grpc v1.51.0 // indirect
-	gvisor.dev/gvisor v0.0.0-20230106233210-a17ad261d6d0 // indirect
+	gvisor.dev/gvisor v0.0.0-20220817001344-846276b3dbc5 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
