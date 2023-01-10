@@ -15,6 +15,7 @@ require (
 	github.com/creachadair/gcsstore v0.0.0-20230107205005-7797615d50fd
 	github.com/creachadair/keyfile v0.7.1
 	github.com/creachadair/leveldbstore v0.0.0-20230107205150-7eed17b692bd
+	github.com/creachadair/mds v0.0.0-20230110063319-6815373cfa49
 	github.com/creachadair/pebblestore v0.0.0-20230107205407-264690dfc8b2
 	github.com/creachadair/pogrebstore v0.0.0-20230107205427-abc99889a11a
 	github.com/creachadair/s3store v0.0.0-20230107205457-5445d94426c9
@@ -65,7 +66,6 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20230109175509-1aefe7fed7c0 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
-	github.com/creachadair/mds v0.0.0-20230107205202-3c06ef08ea3e // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect

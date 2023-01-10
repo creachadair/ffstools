@@ -26,6 +26,7 @@ import (
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/mds/mapset"
 )
 
 var indexFlags struct {
@@ -58,15 +59,15 @@ func runIndex(env *command.Env, keys []string) error {
 			}
 
 			fmt.Fprintf(env, "Scanning data reachable from %q (%x)...\n", key, rp.FileKey)
-			scanned := make(map[string]bool)
+			scanned := mapset.New[string]()
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()
 			if err := fp.Scan(cfg.Context, func(si file.ScanItem) bool {
 				key := si.Key()
-				if scanned[key] {
+				if scanned.Has(key) {
 					return false // don't re-index repeats of the same file
 				}
-				scanned[key] = true
+				scanned.Add(key)
 				idx.Add(key)
 				for _, dkey := range si.Data().Keys() {
 					idx.Add(dkey)
