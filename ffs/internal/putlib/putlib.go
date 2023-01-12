@@ -27,33 +27,46 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
 )
 
-var Default = Config{}
+var Default = Config{FilterName: ".ffsignore"}
 
 type Config struct {
-	Verbose bool // emit diagnostic output
-	XAttr   bool // capture extended attributes
-	NoStat  bool // do not capture stat metadata
+	Verbose    bool   // emit diagnostic output
+	XAttr      bool   // capture extended attributes
+	NoStat     bool   // do not capture stat metadata
+	FilterName string // name of filter file to read
+}
+
+type state struct {
+	s      blob.CAS
+	path   string
+	fi     fs.FileInfo
+	filter *config.Filter
 }
 
 // PutFile puts a single file or symlink into the store.
 func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
-	f := file.New(s, &file.NewOptions{
-		Name: fi.Name(),
-		Stat: c.fileInfoToStat(fi),
+	return c.putFile(ctx, state{s: s, path: path, fi: fi})
+}
+
+func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
+	f := file.New(st.s, &file.NewOptions{
+		Name: st.fi.Name(),
+		Stat: c.fileInfoToStat(st.fi),
 	})
 
 	// Extended attributes (if -xattr is set)
-	if err := c.addExtAttrs(path, f); err != nil {
+	if err := c.addExtAttrs(st.path, f); err != nil {
 		return nil, err
 	}
 
-	if fi.Mode().IsRegular() {
+	if st.fi.Mode().IsRegular() {
 		// Copy file contents.
-		in, err := os.Open(path)
+		in, err := os.Open(st.path)
 		if err != nil {
 			return nil, err
 		}
@@ -62,9 +75,9 @@ func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.File
 		if err := f.SetData(ctx, r); err != nil {
 			return nil, fmt.Errorf("copying data: %w", err)
 		}
-	} else if fi.Mode()&fs.ModeSymlink != 0 {
+	} else if st.fi.Mode()&fs.ModeSymlink != 0 {
 		// Write symbolic link target as file content.
-		tgt, err := os.Readlink(path)
+		tgt, err := os.Readlink(st.path)
 		if err != nil {
 			return nil, err
 		} else if err := f.SetData(ctx, strings.NewReader(tgt)); err != nil {
@@ -77,31 +90,36 @@ func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.File
 // PutPath puts a single file, directory, or symlink into the store.  If path
 // names a plain file or symlink, it calls PutFile.
 func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
-	fi, err := os.Lstat(path)
+	return c.putPath(ctx, state{s: s, path: path})
+}
+
+func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
+	fi, err := os.Lstat(st.path)
 	if err != nil {
 		return nil, err
 	}
 	if !fi.IsDir() {
 		// Non-directory files, symlinks, etc.
-		return c.PutFile(ctx, s, path, fi)
+		st.fi = fi
+		return c.putFile(ctx, st)
 	}
 	if c.Verbose {
-		log.Printf("enter %q", path)
+		log.Printf("enter %q", st.path)
 	}
 
 	// Directory
-	d := file.New(s, &file.NewOptions{
+	d := file.New(st.s, &file.NewOptions{
 		Name: fi.Name(),
 		Stat: c.fileInfoToStat(fi),
 	})
 
 	// Extended attributes (if -xattr is set)
-	if err := c.addExtAttrs(path, d); err != nil {
+	if err := c.addExtAttrs(st.path, d); err != nil {
 		return nil, err
 	}
 
 	// Children
-	elts, err := os.ReadDir(path)
+	elts, err := os.ReadDir(st.path)
 	if err != nil {
 		return nil, err
 	}
@@ -113,11 +131,32 @@ func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.Fil
 		kid  *file.File
 	}
 
+	// Precheck for filter rules.
+	filt := st.filter
+	for _, elt := range elts {
+		if elt.Name() == c.FilterName {
+			sub := filepath.Join(st.path, elt.Name())
+			nf, err := filt.Load(sub)
+			if err != nil {
+				return nil, fmt.Errorf("loading filter: %w", err)
+			} else if c.Verbose {
+				log.Printf("Loaded filter rules from %q", sub)
+			}
+			filt = nf
+			break
+		}
+	}
+
 	// Partition the contents of the directory into plain files and directories.
 	var files, dirs []*entry
 	for _, elt := range elts {
-		sub := filepath.Join(path, elt.Name())
-		if elt.IsDir() {
+		sub := filepath.Join(st.path, elt.Name())
+		if filt.Match(sub) {
+			if c.Verbose {
+				log.Printf("Skip (filtered): %q", sub)
+			}
+			continue
+		} else if elt.IsDir() {
 			dirs = append(dirs, &entry{sub: sub, name: elt.Name()})
 		} else if t := elt.Type(); t != 0 && (t&fs.ModeSymlink == 0) {
 			continue // e.g., socket, pipe, device, fifo, etc.
@@ -131,7 +170,10 @@ func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.Fil
 	// Process subdirectories serially. We do this so that the recurrence does
 	// not explode concurrency.
 	for _, e := range dirs {
-		kid, err := c.PutPath(ctx, s, e.sub)
+		cp := st
+		cp.path, cp.filter = e.sub, filt
+
+		kid, err := c.putPath(ctx, cp)
 		if err != nil {
 			return nil, err
 		}
@@ -141,7 +183,7 @@ func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.Fil
 	// Process plain files in parallel.
 	if len(files) != 0 {
 		if c.Verbose {
-			log.Printf("in %q: storing %d files", path, len(files))
+			log.Printf("in %q: storing %d files", st.path, len(files))
 		}
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -152,14 +194,16 @@ func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.Fil
 				if c.Verbose {
 					log.Printf("copying %d bytes from %q", e.fi.Size(), e.name)
 					if e.fi.Size() > 1<<20 {
-						st := time.Now()
+						begin := time.Now()
 						defer func() {
 							log.Printf("finished %q [%v elapsed]",
-								e.name, time.Since(st).Truncate(time.Millisecond))
+								e.name, time.Since(begin).Truncate(time.Millisecond))
 						}()
 					}
 				}
-				kid, err := c.PutFile(ctx, s, e.sub, e.fi)
+				kid, err := c.putFile(ctx, state{
+					s: st.s, path: e.sub, fi: e.fi, filter: filt,
+				})
 				if err != nil {
 					return err
 				}

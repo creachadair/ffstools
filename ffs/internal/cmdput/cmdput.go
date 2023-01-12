@@ -44,6 +44,7 @@ special files are skipped.`,
 		fs.BoolVar(&putConfig.NoStat, "nostat", false, "Omit file and directory stat")
 		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
+		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
 	},
 	Run: runPut,
 }
