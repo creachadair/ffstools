@@ -72,7 +72,6 @@ a file may be specified in the following formats:
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
-				fs.BoolVar(&listFlags.All, "a", false, "Include entries whose names begin with dot (.)")
 				fs.BoolVar(&listFlags.XAttr, "xattr", false, "Include extended attributes")
 				fs.BoolVar(&listFlags.Key, "key", false, "Include storage keys")
 				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
@@ -166,7 +165,6 @@ func runShow(env *command.Env, args []string) error {
 
 var listFlags struct {
 	DirOnly bool
-	All     bool
 	XAttr   bool
 	Key     bool
 	JSON    bool
@@ -192,47 +190,38 @@ func runList(env *command.Env, args []string) error {
 			of := pi.File
 			name := path.Base(pi.Path)
 
-			// List an individual file or directory name.
-			printOne := func(of *file.File, name string) error {
-				// Skip dot files unless -a is set.
-				if strings.HasPrefix(name, ".") && !listFlags.All {
-					return nil
-				}
-
-				target, err := linkTarget(cfg.Context, of)
-				if err != nil {
-					return err
-				}
-				if listFlags.JSON {
-					fmt.Println(jsonFormat(of, name, target))
-				} else {
-					fmt.Fprint(w, listFormat(of, name, target))
-				}
-				return nil
-			}
-
 			// List contents of directories unless -d is set.
 			if of.Stat().Mode.IsDir() && !listFlags.DirOnly {
 				for _, kid := range of.Child().Names() {
-					if strings.HasPrefix(kid, ".") && !listFlags.All {
-						continue
-					}
-
 					cf, err := of.Open(cfg.Context, kid)
 					if err != nil {
 						return fmt.Errorf("open %q: %w", kid, err)
-					} else if err := printOne(cf, kid); err != nil {
+					} else if err := printOne(cfg.Context, w, cf, kid); err != nil {
 						return err
 					}
 				}
 				continue
 			}
-			if err := printOne(pi.File, name); err != nil {
+			if err := printOne(cfg.Context, w, pi.File, name); err != nil {
 				return err
 			}
 		}
 		return nil
 	})
+}
+
+// List an individual file or directory name.
+func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) error {
+	target, err := linkTarget(ctx, of)
+	if err != nil {
+		return err
+	}
+	if listFlags.JSON {
+		fmt.Println(jsonFormat(of, name, target))
+	} else {
+		fmt.Fprint(tw, listFormat(of, name, target))
+	}
+	return nil
 }
 
 func listFormat(f *file.File, name, target string) string {
