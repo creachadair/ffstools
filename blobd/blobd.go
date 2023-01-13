@@ -64,7 +64,8 @@ import (
 var (
 	listenAddr = flag.String("listen", "", "Service address (required)")
 	storeAddr  = flag.String("store", "", "Store address (required)")
-	keyFile    = flag.String("keyfile", "", "Encryption key file")
+	keyFile    = flag.String("keyfile", "", "Encryption key file (if empty, do not encrypt)")
+	doSignKeys = flag.Bool("sign-keys", false, "Sign content addresses (ignored without -keyfile)")
 	bufferDB   = flag.String("buffer", "", "Write-behind buffer database")
 	cacheSize  = flag.Int("cache", 0, "Memory cache size in MiB (0 means no cache)")
 	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")

@@ -113,6 +113,9 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 		bs = encoded.New(bs, zlib.NewCodec(zlib.Level(*zlibLevel)))
 	}
 	if *keyFile == "" {
+		if *doSignKeys {
+			log.Print("WARNING: Ignoring -hash-keys because -keyfile is unset")
+		}
 		return blob.NewCAS(bs, sha3.New256), buf
 	}
 
@@ -133,10 +136,12 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	if err != nil {
 		ctrl.Fatalf("Creating GCM instance: %v", err)
 	}
+	hcons := sha3.New256
+	if *doSignKeys {
+		hcons = func() hash.Hash { return hmac.New(sha3.New256, key) }
+	}
 	bs = encoded.New(bs, encrypted.New(gcm, nil))
-	return blob.NewCAS(bs, func() hash.Hash {
-		return hmac.New(sha3.New256, key)
-	}), buf
+	return blob.NewCAS(bs, hcons), buf
 }
 
 func expvarString(s string) *expvar.String { v := new(expvar.String); v.Set(s); return v }
