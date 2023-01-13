@@ -11,12 +11,26 @@ import (
 	"strings"
 )
 
-// Filter is a collection of path filters.
+// Filter is a collection of path filters used to control what parts of a file
+// tree get copied by "put" operations. Each line of a filter file specifies a
+// glob matching a filename. By default, all files are included, and any file
+// matching a rule is filtered out.
+//
+// Each directory is checked for a filter file, which governs paths under that
+// directory. If a rule is prefixed with "!", a match of that rule inverts the
+// sense of the parent directory for that path, including it if it was filtered
+// and vice versa.
 type Filter struct {
 	Base string
-	Rule []*regexp.Regexp
+	Rule []Rule
 
 	up *Filter
+}
+
+// A Rule is a single filter rule.
+type Rule struct {
+	*regexp.Regexp      // the compiled glob expression
+	Negate         bool // whether this rule negates a parent match
 }
 
 // Load loads a list of path filters from a file.
@@ -33,7 +47,8 @@ func (f *Filter) Load(name string) (*Filter, error) {
 			return f, nil
 		}
 	}
-	data, err := os.ReadFile(path)
+
+	data, err := os.ReadFile(name)
 	if errors.Is(err, fs.ErrNotExist) {
 		return f, nil
 	} else if err != nil {
@@ -48,7 +63,7 @@ func (f *Filter) Load(name string) (*Filter, error) {
 	return sub, nil
 }
 
-// Match reports whether
+// Match reports whether path should be excluded.
 func (f *Filter) Match(path string) bool {
 	if f == nil {
 		return false
@@ -56,6 +71,10 @@ func (f *Filter) Match(path string) bool {
 	adj, _ := filepath.Rel(f.Base, path)
 	for _, elt := range f.Rule {
 		if elt.MatchString(adj) {
+			// If this is a negative match, it reverses the previous judgement.
+			if elt.Negate {
+				return !f.up.Match(path)
+			}
 			return true
 		}
 	}
@@ -69,11 +88,15 @@ func parseFilter(base string, data []byte) (*Filter, error) {
 		if len(trim) == 0 || trim[0] == '#' {
 			continue
 		}
-		re, err := regexp.Compile(makePattern(string(trim)))
+		negate, pat := trimPrefix(string(trim), "!")
+		re, err := regexp.Compile(makePattern(pat))
 		if err != nil {
 			return nil, fmt.Errorf("line %d: invalid pattern: %w", i+1, err)
 		}
-		f.Rule = append(f.Rule, re)
+		f.Rule = append(f.Rule, Rule{
+			Regexp: re,
+			Negate: negate,
+		})
 	}
 	return f, nil
 }
@@ -86,4 +109,11 @@ func makePattern(raw string) string {
 		`\?`, `\?`, `?`, `[^/]`,
 	)
 	return `^` + r.Replace(strings.TrimSuffix(raw, "/")) + `$`
+}
+
+func trimPrefix(s, pfx string) (bool, string) {
+	if strings.HasPrefix(s, pfx) {
+		return true, strings.TrimPrefix(s, pfx)
+	}
+	return false, s
 }
