@@ -117,14 +117,14 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	mode := f.Stat().Mode
 	var link bool
 	if mode.IsDir() {
-		logPrintf("Create directory %q", path)
+		logPrintf("create directory %q", path)
 		if err := os.Mkdir(path, 0700); err != nil {
 			if !exportFlags.Update || !os.IsExist(err) {
 				return err
 			}
 		}
 	} else if mode.Type()&fs.ModeSymlink != 0 {
-		logPrintf("Create symlink %q", path)
+		logPrintf("write symlink %q", path)
 		if err := linkFile(ctx, f, path); err != nil {
 			return err
 		}
@@ -136,17 +136,18 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 				return fmt.Errorf("file %q exists", path)
 			}
 		}
-		logPrintf("Export %q", path)
-		if err := copyFile(ctx, f, path); err != nil {
+		nw, err := copyFile(ctx, f, path)
+		if err != nil {
 			return err
 		}
+		logPrintf("write file %q (%d bytes)", path, nw)
 	}
 
 	// Restore permissions and modification times, if requested and available.
 	if !exportFlags.NoStat && f.Stat().Persistent() && !link {
 		stat := f.Stat()
-		logPrintf("Restore %q mode %v and modtime %v",
-			path, stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
+		logPrintf("- set mode %v, mtime %v",
+			stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
 
 		if err := os.Chmod(path, stat.Mode); err != nil {
 			return fmt.Errorf("setting permissions: %w", err)
@@ -162,8 +163,9 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	if exportFlags.XAttr {
 		xa := f.XAttr()
 		for _, key := range xa.Names() {
-			logPrintf("Restore %q xattr %q", path, key)
-			if xerr := xattr.LSet(path, key, []byte(xa.Get(key))); xerr != nil {
+			val := xa.Get(key)
+			logPrintf("- set xattr %q (%d bytes)", key, len(val))
+			if xerr := xattr.LSet(path, key, []byte(val)); xerr != nil {
 				return fmt.Errorf("setting xattrs %q: %w", key, xerr)
 			}
 		}
@@ -171,10 +173,9 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	return nil
 }
 
-func copyFile(ctx context.Context, f *file.File, path string) error {
+func copyFile(ctx context.Context, f *file.File, path string) (int64, error) {
 	r := bufio.NewReaderSize(f.Cursor(ctx), 1<<20)
-	_, err := atomicfile.WriteAll(path, r, 0600)
-	return err
+	return atomicfile.WriteAll(path, r, 0600)
 }
 
 func linkFile(ctx context.Context, f *file.File, path string) error {
