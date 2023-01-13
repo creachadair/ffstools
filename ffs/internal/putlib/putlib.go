@@ -140,7 +140,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 			if err != nil {
 				return nil, fmt.Errorf("loading filter: %w", err)
 			} else if c.Verbose {
-				log.Printf("Loaded filter rules from %q", sub)
+				log.Printf("load filter rules from %q", sub)
 			}
 			filt = nf
 			break
@@ -153,7 +153,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		sub := filepath.Join(st.path, elt.Name())
 		if filt.Match(sub) {
 			if c.Verbose {
-				log.Printf("Skip (filtered): %q", sub)
+				log.Printf("skip (filtered): %q", sub)
 			}
 			continue
 		} else if elt.IsDir() {
