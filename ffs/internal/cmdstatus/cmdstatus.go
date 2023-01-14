@@ -22,7 +22,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/storage/prefixed"
+	"github.com/creachadair/ffs/storage/suffixed"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -38,7 +38,7 @@ var Command = &command.C{
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
 			var bs blob.Store = s
-			if t, ok := s.(prefixed.CAS); ok {
+			if t, ok := s.(suffixed.CAS); ok {
 				bs = t.Base()
 			}
 			var msg any

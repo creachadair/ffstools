@@ -33,7 +33,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/storage/prefixed"
+	"github.com/creachadair/ffs/storage/suffixed"
 )
 
 func getContext(env *command.Env) context.Context {
@@ -318,16 +318,16 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 	return
 }
 
-func storeFromEnv(env *command.Env) (prefixed.CAS, error) {
+func storeFromEnv(env *command.Env) (suffixed.CAS, error) {
 	t := env.Config.(*settings)
 	addr, ok := t.FFS.FindAddress()
 	if !ok {
-		return prefixed.CAS{}, fmt.Errorf("no -store address was found (%q)", addr)
+		return suffixed.CAS{}, fmt.Errorf("no -store address was found (%q)", addr)
 	}
 
 	conn, err := net.Dial(chirp.SplitAddress(addr))
 	if err != nil {
-		return prefixed.CAS{}, fmt.Errorf("dialing: %w", err)
+		return suffixed.CAS{}, fmt.Errorf("dialing: %w", err)
 	}
 
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
@@ -335,7 +335,7 @@ func storeFromEnv(env *command.Env) (prefixed.CAS, error) {
 		peer.LogPackets(func(pkt chirp.PacketInfo) { log.Print(pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
-	return prefixed.NewCAS(bs).Derive(t.Bucket), nil
+	return suffixed.NewCAS(bs).Derive(t.Bucket), nil
 }
 
 func isAllHex(s string) bool {

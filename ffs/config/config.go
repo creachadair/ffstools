@@ -35,7 +35,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/fpath"
-	"github.com/creachadair/ffs/storage/prefixed"
+	"github.com/creachadair/ffs/storage/suffixed"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -135,7 +135,7 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, e
 		peer.LogPackets(func(pkt chirp.PacketInfo) { lg.Print(pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
-	return prefixed.NewCAS(bs).Derive(" "), nil
+	return suffixed.NewCAS(bs).Derive(" "), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
@@ -160,7 +160,7 @@ func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(blo
 }
 
 // Roots derives a view of roots from bs.
-func Roots(bs blob.CAS) prefixed.CAS { return prefixed.NewCAS(bs).Derive("@") }
+func Roots(bs blob.CAS) suffixed.CAS { return suffixed.NewCAS(bs).Derive("@") }
 
 // ParseKey parses the string encoding of a key.  By default, s must be hex
 // encoded. If s begins with "@", it is taken literally. If s begins with "+"
