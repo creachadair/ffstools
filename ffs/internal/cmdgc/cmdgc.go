@@ -29,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -125,17 +126,24 @@ store without roots.
 
 				fmt.Fprintf(env, "Scanning data reachable from %q (%x)...\n",
 					config.PrintableKey(key), rp.FileKey)
+				scanned := mapset.New[string]()
 				start := time.Now()
-				var numKeys int
 				if err := rf.Scan(cfg.Context, func(si file.ScanItem) bool {
-					numKeys++
-					idx.Add(si.Key())
+					key := si.Key()
+					if scanned.Has(key) {
+						return false // don't re-index repeats of the same file
+					}
+					scanned.Add(key)
+					idx.Add(key)
+					for _, dkey := range si.Data().Keys() {
+						idx.Add(dkey)
+					}
 					return true
 				}); err != nil {
 					return fmt.Errorf("scanning %q: %w", key, err)
 				}
 				fmt.Fprintf(env, "Finished scanning %d blobs [%v elapsed]\n",
-					numKeys, time.Since(start).Truncate(10*time.Millisecond))
+					idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 			}
 			idxs = append(idxs, idx)
 
