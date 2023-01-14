@@ -159,7 +159,7 @@ store without roots.
 						fmt.Fprint(env, ".")
 					}
 					run(func() error {
-						if err := s.Delete(ctx, key); err != nil {
+						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 							log.Printf("WARNING: delete key %x: %v", key, err)
 						}
 						return nil
