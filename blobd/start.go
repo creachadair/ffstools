@@ -160,6 +160,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	mx.Set("encrypted", expvarBool(*keyFile != ""))
 	if *keyFile != "" {
 		mx.Set("keyfile", expvarString(*keyFile))
+		mx.Set("signKeys", expvarBool(*doSignKeys))
 	}
 	mx.Set("compressed", expvarBool(*zlibLevel > 0))
 	mx.Set("cache_size", expvarInt(*cacheSize))
