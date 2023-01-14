@@ -81,17 +81,17 @@ var (
 		"file":   filestore.Opener,
 		"memory": memstore.Opener,
 	}
-	storeNames []string
 )
 
-func init() {
+func main() {
+	// List the available storage drivers. Note we have to do this after main
+	// starts to ensure all the initializers are done with registration.
+	var storeNames []string
 	for key := range stores {
 		storeNames = append(storeNames, key)
 	}
 	sort.Strings(storeNames)
-}
 
-func main() {
 	root := &command.C{
 		Name:  filepath.Base(os.Args[0]),
 		Usage: `[options] -store <spec> -listen <addr> -mount <path> -root <spec>`,
