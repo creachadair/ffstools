@@ -185,10 +185,14 @@ func blobd(_ *command.Env, args []string) error {
 		Buffer:  buf,
 	}
 
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	closer, loop := startChirpServer(ctx, config)
 	sig := make(chan os.Signal, 2)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
+		defer cancel()
 		s, ok := <-sig
 		if ok {
 			log.Printf("Received signal: %v, closing listener", s)
