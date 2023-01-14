@@ -66,6 +66,9 @@ type Settings struct {
 
 	// Well-known store specifications, addressable by tag.
 	Stores []*StoreSpec `json:"stores" yaml:"stores"`
+
+	// A cancel function for the supplied context.
+	Cancel context.CancelFunc
 }
 
 // A StoreSpec associates a tag (handle) with a storage address.

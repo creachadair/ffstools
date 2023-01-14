@@ -18,6 +18,7 @@ import (
 	"context"
 	"flag"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/creachadair/command"
@@ -65,7 +66,7 @@ help [<command>]`,
 			if debugLog {
 				cfg.EnableDebugLogging = true
 			}
-			cfg.Context = context.Background()
+			cfg.Context, cfg.Cancel = signal.NotifyContext(context.Background(), os.Interrupt)
 			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
 			return nil
