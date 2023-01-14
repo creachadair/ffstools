@@ -239,7 +239,7 @@ func runCreate(env *command.Env, args []string) error {
 			}
 			fk, err = f.Flush(cfg.Context)
 			if err == nil {
-				fmt.Printf("%x\n", fk)
+				fmt.Printf("put: %x\n", fk)
 			}
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
@@ -326,7 +326,7 @@ func runEditFile(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%x\n", key)
+		fmt.Printf("put: %x\n", key)
 	} else if len(na.Args) != 1 {
 		return env.Usagef("incorrect arguments")
 	} else {

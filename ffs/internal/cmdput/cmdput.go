@@ -75,7 +75,7 @@ func runPut(env *command.Env, args []string) error {
 			}
 		}
 		for _, key := range keys {
-			fmt.Printf("%x\n", key)
+			fmt.Printf("put: %x\n", key)
 		}
 		return nil
 	})

@@ -395,7 +395,7 @@ func runSet(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%x\n", key)
+		fmt.Printf("set: %x\n", key)
 		return nil
 	})
 }
@@ -424,7 +424,7 @@ func runRemove(env *command.Env, args []string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%x\n", key)
+			fmt.Printf("remove: %x\n", key)
 		}
 		return nil
 	})
@@ -472,7 +472,7 @@ func runSetStat(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%x\n", key)
+		fmt.Printf("set-stat: %x\n", key)
 		return nil
 	})
 }
