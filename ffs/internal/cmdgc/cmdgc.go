@@ -19,6 +19,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/creachadair/command"
@@ -157,7 +158,12 @@ store without roots.
 					if numDrop%50 == 0 {
 						fmt.Fprint(env, ".")
 					}
-					run(func() error { return s.Delete(ctx, key) })
+					run(func() error {
+						if err := s.Delete(ctx, key); err != nil {
+							log.Printf("WARNING: delete key %x: %v", key, err)
+						}
+						return nil
+					})
 					return nil
 				})
 			})
