@@ -19,7 +19,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
@@ -145,23 +144,21 @@ store without roots.
 
 			fmt.Fprintf(env, "Begin sweep over %d blobs...\n", n)
 			start := time.Now()
-			var numKeep, numDrop uint32
+			var numKeep, numDrop int
 			g.Go(func() error {
 				defer fmt.Fprintln(env, "*")
 				return s.List(cfg.Context, "", func(key string) error {
-					run(func() error {
-						for _, idx := range idxs {
-							if idx.Has(key) {
-								atomic.AddUint32(&numKeep, 1)
-								return nil
-							}
+					for _, idx := range idxs {
+						if idx.Has(key) {
+							numKeep++
+							return nil
 						}
-						v := atomic.AddUint32(&numDrop, 1)
-						if v%50 == 0 {
-							fmt.Fprint(env, ".")
-						}
-						return s.Delete(ctx, key)
-					})
+					}
+					numDrop++
+					if numDrop%50 == 0 {
+						fmt.Fprint(env, ".")
+					}
+					run(func() error { return s.Delete(ctx, key) })
 					return nil
 				})
 			})
