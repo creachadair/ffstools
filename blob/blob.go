@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/creachadair/command"
@@ -29,6 +30,7 @@ import (
 
 type settings struct {
 	Context context.Context
+	Cancel  context.CancelFunc
 	FFS     *config.Settings
 
 	// Flag targets
@@ -44,8 +46,10 @@ type settings struct {
 }
 
 func main() {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	command.RunOrFail(tool.NewEnv(&settings{
-		Context: context.Background(),
+		Context: ctx,
+		Cancel:  cancel,
 	}), os.Args[1:])
 }
 
