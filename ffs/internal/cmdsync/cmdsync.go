@@ -130,8 +130,6 @@ func runSync(env *command.Env, args []string) error {
 					case 'R':
 						debug("- copying root %q", key)
 						return copyBlob(ctx, config.Roots(src), config.Roots(tgt), key, true)
-					case '+':
-						return copyBlob(ctx, src, tgt, key, true)
 					case 'F':
 						debug("- copying file %x", key)
 						return copyBlob(ctx, src, tgt, key, false)
@@ -154,7 +152,6 @@ type scanSet map[string]byte
 
 func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
 	s[rootKey] = 'R'
-	s[rp.OwnerKey] = '+'
 	s[rp.IndexKey] = '-'
 	fp, err := rp.File(ctx, src)
 	if err != nil {
