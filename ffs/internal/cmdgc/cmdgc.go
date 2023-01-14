@@ -27,7 +27,6 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
-	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 )
@@ -75,7 +74,7 @@ store without roots.
 `)
 			}
 
-			n, err := s.(prefixed.CAS).Derive("").Len(ctx)
+			n, err := s.Len(ctx)
 			if err != nil {
 				return err
 			} else if n == 0 {
