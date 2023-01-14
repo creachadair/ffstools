@@ -90,36 +90,36 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 		if buf != nil {
 			cas = wbstore.New(ctx, cas, buf)
 		}
-		if *cacheSize > 0 {
-			cas = cachestore.NewCAS(cas, *cacheSize<<20)
+		if cacheSize > 0 {
+			cas = cachestore.NewCAS(cas, cacheSize<<20)
 		}
 	}()
 
-	bs, err := stores.Open(ctx, *storeAddr)
+	bs, err := stores.Open(ctx, storeAddr)
 	if err != nil {
 		ctrl.Fatalf("Opening store: %v", err)
 	}
-	if *doReadOnly {
+	if doReadOnly {
 		bs = roStore{bs}
 	}
 
-	if *bufferDB != "" {
-		buf, err = stores.Open(ctx, *bufferDB)
+	if bufferDB != "" {
+		buf, err = stores.Open(ctx, bufferDB)
 		if err != nil {
 			ctrl.Fatalf("Opening buffer store: %v", err)
 		}
 	}
-	if *zlibLevel > 0 {
-		bs = encoded.New(bs, zlib.NewCodec(zlib.Level(*zlibLevel)))
+	if zlibLevel > 0 {
+		bs = encoded.New(bs, zlib.NewCodec(zlib.Level(zlibLevel)))
 	}
-	if *keyFile == "" {
-		if *doSignKeys {
+	if keyFile == "" {
+		if doSignKeys {
 			log.Print("WARNING: Ignoring -hash-keys because -keyfile is unset")
 		}
 		return blob.NewCAS(bs, sha3.New256), buf
 	}
 
-	key, err := keyfile.LoadKey(*keyFile, func() (string, error) {
+	key, err := keyfile.LoadKey(keyFile, func() (string, error) {
 		io.WriteString(os.Stdout, "Passphrase: ")
 		bits, err := term.ReadPassword(0)
 		return string(bits), err
@@ -137,7 +137,7 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 		ctrl.Fatalf("Creating GCM instance: %v", err)
 	}
 	hcons := sha3.New256
-	if *doSignKeys {
+	if doSignKeys {
 		hcons = func() hash.Hash { return hmac.New(sha3.New256, key) }
 	}
 	bs = encoded.New(bs, encrypted.New(gcm, nil))
@@ -154,16 +154,16 @@ func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
 
 func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	mx := new(expvar.Map)
-	mx.Set("store", expvarString(*storeAddr))
+	mx.Set("store", expvarString(storeAddr))
 	mx.Set("pid", expvarInt(os.Getpid()))
-	mx.Set("writable", expvarBool(!*doReadOnly))
-	mx.Set("encrypted", expvarBool(*keyFile != ""))
-	if *keyFile != "" {
-		mx.Set("keyfile", expvarString(*keyFile))
-		mx.Set("signKeys", expvarBool(*doSignKeys))
+	mx.Set("writable", expvarBool(!doReadOnly))
+	mx.Set("encrypted", expvarBool(keyFile != ""))
+	if keyFile != "" {
+		mx.Set("keyfile", expvarString(keyFile))
+		mx.Set("signKeys", expvarBool(doSignKeys))
 	}
-	mx.Set("compressed", expvarBool(*zlibLevel > 0))
-	mx.Set("cache_size", expvarInt(*cacheSize))
+	mx.Set("compressed", expvarBool(zlibLevel > 0))
+	mx.Set("cache_size", expvarInt(cacheSize))
 	if bi := getBuildInfo(); bi != nil {
 		v := new(expvar.Map)
 		v.Set("go_version", expvarString(bi.toolchain))
@@ -175,7 +175,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	}
 
 	if opts.Buffer != nil {
-		mx.Set("buffer_db", expvarString(*bufferDB))
+		mx.Set("buffer_db", expvarString(bufferDB))
 		mx.Set("buffer_len", expvar.Func(func() any {
 			n, err := opts.Buffer.Len(ctx)
 			if err != nil {

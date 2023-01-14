@@ -54,6 +54,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/creachadair/command"
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
@@ -62,15 +63,16 @@ import (
 )
 
 var (
-	listenAddr = flag.String("listen", "", "Service address (required)")
-	storeAddr  = flag.String("store", "", "Store address (required)")
-	keyFile    = flag.String("keyfile", "", "Encryption key file (if empty, do not encrypt)")
-	doSignKeys = flag.Bool("sign-keys", false, "Sign content addresses (ignored without -keyfile)")
-	bufferDB   = flag.String("buffer", "", "Write-behind buffer database")
-	cacheSize  = flag.Int("cache", 0, "Memory cache size in MiB (0 means no cache)")
-	zlibLevel  = flag.Int("zlib", 0, "Enable ZLIB compression (0 means no compression)")
-	doReadOnly = flag.Bool("read-only", false, "Disallow modification of the store")
-	doVersion  = flag.Bool("version", false, "Print version information and exit")
+	// Flags (see root.SetFlags below).
+	listenAddr string
+	storeAddr  string
+	keyFile    string
+	doSignKeys bool
+	bufferDB   string
+	cacheSize  int
+	zlibLevel  int
+	doReadOnly bool
+	doVersion  bool
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
@@ -79,23 +81,27 @@ var (
 		"file":   filestore.Opener,
 		"memory": memstore.Opener,
 	}
+	storeNames []string
 )
 
 func init() {
-	flag.Usage = func() {
-		var keys []string
-		for key := range stores {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
-		fmt.Fprintf(os.Stderr, `Usage: %[1]s [options] -store <spec> -listen <addr>
+	for key := range stores {
+		storeNames = append(storeNames, key)
+	}
+	sort.Strings(storeNames)
+}
 
+func main() {
+	root := &command.C{
+		Name:  filepath.Base(os.Args[0]),
+		Usage: `[options] -store <spec> -listen <addr> -mount <path> -root <spec>`,
+		Help: fmt.Sprintf(`
 Start a server that serves content from the blob.Store described by the -store spec.
 The server listens at the specified address, which may be a host:port or the path
 of a Unix-domain socket.
 
 A store spec is a storage type and address: type:address
-The types understood are: %[2]s
+The types understood are: %[1]s
 
 If -listen is:
 
@@ -104,68 +110,25 @@ If -listen is:
  - Otherwise, the address must be a path for a Unix-domain socket.
 
 With -keyfile, the store is opened with AES encryption.
-Use -cache to enable a memory cache over the underlying store.
+Use -cache to enable a memory cache over the underlying store.`, strings.Join(storeNames, ", ")),
 
-Options:
-`, filepath.Base(os.Args[0]), strings.Join(keys, ", "))
-		flag.PrintDefaults()
+		SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+			fs.StringVar(&listenAddr, "listen", "", "Service address (required)")
+			fs.StringVar(&storeAddr, "store", "", "Store address (required)")
+			fs.StringVar(&keyFile, "keyfile", "", "Encryption key file (if empty, do not encrypt)")
+			fs.BoolVar(&doSignKeys, "sign-keys", false, "Sign content addresses (ignored without -keyfile)")
+			fs.StringVar(&bufferDB, "buffer", "", "Write-behind buffer database")
+			fs.IntVar(&cacheSize, "cache", 0, "Memory cache size in MiB (0 means no cache)")
+			fs.IntVar(&zlibLevel, "zlib", 0, "Enable ZLIB compression (0 means no compression)")
+			fs.BoolVar(&doReadOnly, "read-only", false, "Disallow modification of the store")
+			fs.BoolVar(&doVersion, "version", false, "Print version information and exit")
+		},
+
+		Run: blobd,
 	}
-}
-
-func main() {
-	flag.Parse()
 	ctrl.Run(func() error {
-		switch {
-		case *doVersion:
-			return printVersion()
-		case *listenAddr == "":
-			ctrl.Exitf(1, "You must provide a non-empty -listen address")
-		case *storeAddr == "":
-			ctrl.Exitf(1, "You must provide a non-empty -store address")
-		}
-
-		ctx := context.Background()
-		bs, buf := mustOpenStore(ctx)
-		defer func() {
-			if err := blob.CloseStore(ctx, bs); err != nil {
-				log.Printf("Warning: closing store: %v", err)
-			}
-		}()
-		log.Printf("Store address: %q", *storeAddr)
-		if *doReadOnly {
-			log.Print("Store is open in read-only mode")
-		}
-		if *zlibLevel > 0 {
-			log.Printf("Compression enabled: ZLIB level %d", *zlibLevel)
-			if *keyFile != "" {
-				log.Printf(">> WARNING: Compression and encryption are both enabled")
-			}
-		}
-		if *cacheSize > 0 {
-			log.Printf("Memory cache size: %d MiB", *cacheSize)
-		}
-		if *keyFile != "" {
-			log.Printf("Encryption key: %q", *keyFile)
-		}
-
-		config := startConfig{
-			Address: *listenAddr,
-			Store:   bs,
-			Buffer:  buf,
-		}
-
-		closer, loop := startChirpServer(ctx, config)
-		sig := make(chan os.Signal, 2)
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-		go func() {
-			s, ok := <-sig
-			if ok {
-				log.Printf("Received signal: %v, closing listener", s)
-				closer()
-				signal.Reset(syscall.SIGINT, syscall.SIGTERM)
-			}
-		}()
-		return loop.Wait()
+		command.RunOrFail(root.NewEnv(nil), os.Args[1:])
+		return nil
 	})
 }
 
@@ -180,4 +143,58 @@ func printVersion() error {
 	fmt.Printf("%s built by %s at time %s rev %s\n",
 		filepath.Base(os.Args[0]), bi.toolchain, bi.buildTime, bi.revision)
 	return nil
+}
+
+func blobd(_ *command.Env, args []string) error {
+	switch {
+	case doVersion:
+		return printVersion()
+	case listenAddr == "":
+		ctrl.Exitf(1, "You must provide a non-empty -listen address")
+	case storeAddr == "":
+		ctrl.Exitf(1, "You must provide a non-empty -store address")
+	}
+
+	ctx := context.Background()
+	bs, buf := mustOpenStore(ctx)
+	defer func() {
+		if err := blob.CloseStore(ctx, bs); err != nil {
+			log.Printf("Warning: closing store: %v", err)
+		}
+	}()
+	log.Printf("Store address: %q", storeAddr)
+	if doReadOnly {
+		log.Print("Store is open in read-only mode")
+	}
+	if zlibLevel > 0 {
+		log.Printf("Compression enabled: ZLIB level %d", zlibLevel)
+		if keyFile != "" {
+			log.Printf(">> WARNING: Compression and encryption are both enabled")
+		}
+	}
+	if cacheSize > 0 {
+		log.Printf("Memory cache size: %d MiB", cacheSize)
+	}
+	if keyFile != "" {
+		log.Printf("Encryption key: %q", keyFile)
+	}
+
+	config := startConfig{
+		Address: listenAddr,
+		Store:   bs,
+		Buffer:  buf,
+	}
+
+	closer, loop := startChirpServer(ctx, config)
+	sig := make(chan os.Signal, 2)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		s, ok := <-sig
+		if ok {
+			log.Printf("Received signal: %v, closing listener", s)
+			closer()
+			signal.Reset(syscall.SIGINT, syscall.SIGTERM)
+		}
+	}()
+	return loop.Wait()
 }
