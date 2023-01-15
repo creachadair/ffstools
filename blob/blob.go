@@ -76,7 +76,7 @@ the address or an @tag from the configuration file.
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 		cfg := env.Config.(*settings)
 		fs.StringVar(&cfg.Store, "store", "", "Blob store address (required)")
-		fs.StringVar(&cfg.Bucket, "bucket", "", "Prefix to add to all keys")
+		fs.StringVar(&cfg.Bucket, "bucket", "", "Filter keys to this bucket label")
 		fs.BoolVar(&cfg.Debug, "debug", false, "Enable client debug logging")
 	},
 
