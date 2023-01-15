@@ -22,7 +22,6 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/storage/suffixed"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -37,25 +36,16 @@ var Command = &command.C{
 
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-			var bs blob.Store = s
-			if t, ok := s.(suffixed.CAS); ok {
-				bs = t.Base()
+			bs := s.(config.CAS).Base()
+			cs, ok := bs.(chirpstore.CAS)
+			if !ok {
+				return errors.New("store does not support the status command")
 			}
-			var msg any
-			var err error
-			switch t := bs.(type) {
-			case chirpstore.CAS:
-				var data []byte
-				data, err = t.Status(cfg.Context)
-				msg = json.RawMessage(data)
-
-			default:
-				return errors.New("server does not support the status command")
-			}
+			data, err := cs.Status(cfg.Context)
 			if err != nil {
 				return err
 			}
-			fmt.Println(config.ToJSON(msg))
+			fmt.Println(config.ToJSON(json.RawMessage(data)))
 			return nil
 		})
 	},
