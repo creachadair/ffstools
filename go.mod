@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/creachadair/atomicfile v0.2.7
-	github.com/creachadair/badgerstore v0.1.18
+	github.com/creachadair/badgerstore v0.1.19
 	github.com/creachadair/bitcaskstore v0.0.0-20230107203601-0d2d06d8b1c3
 	github.com/creachadair/boltstore v0.0.0-20230107203628-477d2eef020c
 	github.com/creachadair/chirp v0.0.0-20230110190239-f3dae41ee379
@@ -81,7 +81,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.1.2 // indirect
-	github.com/google/flatbuffers/go v0.0.0-20230110184317-b17d59b18c5a // indirect
+	github.com/google/flatbuffers/go v0.0.0-20230110200425-62e4d2e5b215 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.1 // indirect
