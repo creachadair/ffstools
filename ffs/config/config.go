@@ -35,6 +35,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/fpath"
+	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffs/storage/suffixed"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -135,7 +136,7 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, e
 		peer.LogPackets(func(pkt chirp.PacketInfo) { lg.Print(pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
-	return suffixed.NewCAS(bs).Derive(" "), nil
+	return newCAS(bs), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
@@ -160,7 +161,12 @@ func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(blo
 }
 
 // Roots derives a view of roots from bs.
-func Roots(bs blob.CAS) suffixed.CAS { return suffixed.NewCAS(bs).Derive("@") }
+func Roots(bs blob.CAS) blob.CAS {
+	if c, ok := bs.(CAS); ok {
+		return c.Roots()
+	}
+	return newCAS(bs).Roots()
+}
 
 // ParseKey parses the string encoding of a key.  By default, s must be hex
 // encoded. If s begins with "@", it is taken literally. If s begins with "+"
@@ -335,4 +341,23 @@ func SplitPath(s string) (first, rest string) {
 	}
 	pre, post, _ := strings.Cut(s, "/")
 	return pre, path.Clean(post)
+}
+
+// CAS is a wrapper around a blob.CAS that adds methods to expose the root and
+// data buckets.
+type CAS struct {
+	suffixed.CAS
+}
+
+func newCAS(bs blob.CAS) CAS { return CAS{CAS: suffixed.NewCAS(bs).Derive(dataBucketSuffix)} }
+
+const (
+	dataBucketSuffix = "."
+	rootBucketSuffix = "@"
+	rootKeyTag       = "\x00"
+)
+
+// Roots returns the root view of c.
+func (c CAS) Roots() blob.CAS {
+	return prefixed.NewCAS(c.CAS.Derive(rootBucketSuffix)).Derive(rootKeyTag)
 }
