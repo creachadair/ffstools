@@ -359,5 +359,6 @@ const (
 
 // Roots returns the root view of c.
 func (c CAS) Roots() blob.CAS {
-	return prefixed.NewCAS(c.CAS.Derive(rootBucketSuffix)).Derive(rootKeyTag)
+	rs := prefixed.NewCAS(c.CAS.Derive("")).Derive(rootKeyTag)
+	return suffixed.NewCAS(rs).Derive(rootBucketSuffix)
 }
