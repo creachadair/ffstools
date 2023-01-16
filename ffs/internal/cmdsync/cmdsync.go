@@ -67,9 +67,9 @@ func runSync(env *command.Env, args []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(src blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(src config.CAS) error {
 		taddr := cfg.ResolveAddress(syncFlags.Target)
-		return cfg.WithStoreAddress(cfg.Context, taddr, func(tgt blob.CAS) error {
+		return cfg.WithStoreAddress(cfg.Context, taddr, func(tgt config.CAS) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
 			// Find all the blobs reachable from the specified starting points.
@@ -129,7 +129,7 @@ func runSync(env *command.Env, args []string) error {
 					switch tag {
 					case 'R':
 						debug("- copying root %q", key)
-						return copyBlob(ctx, config.Roots(src), config.Roots(tgt), key, true)
+						return copyBlob(ctx, src.Roots(), tgt.Roots(), key, true)
 					case 'F':
 						debug("- copying file %x", key)
 						return copyBlob(ctx, src, tgt, key, false)

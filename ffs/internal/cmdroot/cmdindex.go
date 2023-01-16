@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
@@ -38,13 +37,13 @@ func runIndex(env *command.Env, keys []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-		n, err := s.(config.CAS).Base().Len(cfg.Context)
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+		n, err := s.Base().Len(cfg.Context)
 		if err != nil {
 			return err
 		}
 		for _, key := range keys {
-			rp, err := root.Open(cfg.Context, config.Roots(s), key)
+			rp, err := root.Open(cfg.Context, s.Roots(), key)
 			if err != nil {
 				return err
 			}

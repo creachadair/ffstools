@@ -21,7 +21,6 @@ import (
 
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -35,9 +34,8 @@ var Command = &command.C{
 		}
 
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
-			bs := s.(config.CAS).Base()
-			cs, ok := bs.(chirpstore.CAS)
+		return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+			cs, ok := s.Base().(chirpstore.CAS)
 			if !ok {
 				return errors.New("store does not support the status command")
 			}

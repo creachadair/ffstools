@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
@@ -57,9 +56,9 @@ store without roots.
 
 		cfg := env.Config.(*config.Settings)
 		ctx, cancel := context.WithCancel(cfg.Context)
-		return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+		return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 			var keys []string
-			if err := config.Roots(s).List(cfg.Context, "", func(key string) error {
+			if err := s.Roots().List(cfg.Context, "", func(key string) error {
 				keys = append(keys, key)
 				return nil
 			}); err != nil {
@@ -89,7 +88,7 @@ store without roots.
 			// Mark phase: Scan all roots.
 			for i := 0; i < len(keys); i++ {
 				key := keys[i]
-				rp, err := root.Open(cfg.Context, config.Roots(s), key)
+				rp, err := root.Open(cfg.Context, s.Roots(), key)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}

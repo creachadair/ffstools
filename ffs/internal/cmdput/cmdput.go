@@ -20,7 +20,6 @@ import (
 	"log"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
@@ -55,7 +54,7 @@ func runPut(env *command.Env, args []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		keys := make([]string, len(args))
 		for i, path := range args {
 			if putConfig.Verbose {

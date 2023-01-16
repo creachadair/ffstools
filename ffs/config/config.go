@@ -115,20 +115,20 @@ func (s *Settings) FindAddress() (string, bool) {
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStore() (blob.CAS, error) {
+func (s *Settings) OpenStore() (CAS, error) {
 	addr, ok := s.FindAddress()
 	if !ok {
-		return nil, fmt.Errorf("no store service address (%q)", addr)
+		return CAS{}, fmt.Errorf("no store service address (%q)", addr)
 	}
 	return s.OpenStoreAddress(s.Context, addr)
 }
 
 // OpenStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, error) {
+func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (CAS, error) {
 	conn, err := Dial(chirp.SplitAddress(addr))
 	if err != nil {
-		return nil, fmt.Errorf("dialing store: %w", err)
+		return CAS{}, fmt.Errorf("dialing store: %w", err)
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
@@ -141,7 +141,7 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (blob.CAS, e
 
 // WithStore calls f with a store opened from the configuration. The store is
 // closed after f returns. The error returned by f is returned by WithStore.
-func (s *Settings) WithStore(ctx context.Context, f func(blob.CAS) error) error {
+func (s *Settings) WithStore(ctx context.Context, f func(CAS) error) error {
 	addr, ok := s.FindAddress()
 	if !ok {
 		return fmt.Errorf("no store service address (%q)", addr)
@@ -151,21 +151,13 @@ func (s *Settings) WithStore(ctx context.Context, f func(blob.CAS) error) error 
 
 // WithStoreAddress calls f with a store opened at addr. The store is closed
 // after f returns. The error returned by f is returned by WithStore.
-func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(blob.CAS) error) error {
+func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(CAS) error) error {
 	bs, err := s.OpenStoreAddress(ctx, addr)
 	if err != nil {
 		return err
 	}
 	defer blob.CloseStore(ctx, bs)
 	return f(bs)
-}
-
-// Roots derives a view of roots from bs.
-func Roots(bs blob.CAS) blob.CAS {
-	if c, ok := bs.(CAS); ok {
-		return c.Roots()
-	}
-	return newCAS(bs).Roots()
 }
 
 // ParseKey parses the string encoding of a key.  By default, s must be hex
@@ -279,14 +271,14 @@ func (p *PathInfo) Flush(ctx context.Context) (string, error) {
 
 // OpenPath parses and opens the specified path in s.
 // The path has either the form "<root-key>/some/path" or "@<file-key>/some/path".
-func OpenPath(ctx context.Context, s blob.CAS, path string) (*PathInfo, error) {
+func OpenPath(ctx context.Context, s CAS, path string) (*PathInfo, error) {
 	out := &PathInfo{Path: path}
 
 	first, rest := SplitPath(path)
 
 	// Check for a @file key prefix; otherwise it should be a root.
 	if !strings.HasPrefix(first, "@") {
-		rp, err := root.Open(ctx, Roots(s), first)
+		rp, err := root.Open(ctx, s.Roots(), first)
 		if err != nil {
 			return nil, err
 		}

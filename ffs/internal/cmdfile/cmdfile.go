@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
@@ -143,7 +142,7 @@ func runShow(env *command.Env, args []string) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		for _, arg := range args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
@@ -175,7 +174,7 @@ func runList(env *command.Env, args []string) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -323,7 +322,7 @@ func runRead(env *command.Env, args []string) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		of, err := config.OpenPath(cfg.Context, s, args[0])
 		if err != nil {
 			return err
@@ -349,7 +348,7 @@ func runSet(env *command.Env, args []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
 		if err != nil {
 			return err
@@ -406,7 +405,7 @@ func runRemove(env *command.Env, args []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		for _, arg := range args {
 			base, rest := config.SplitPath(arg)
 			if rest == "" {
@@ -440,7 +439,7 @@ func runSetStat(env *command.Env, args []string) error {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		tf, err := config.OpenPath(cfg.Context, s, path)
 		if err != nil {
 			return err

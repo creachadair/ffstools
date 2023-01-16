@@ -28,7 +28,6 @@ import (
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -81,7 +80,7 @@ func runExport(env *command.Env, args []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s blob.CAS) error {
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		of, err := config.OpenPath(cfg.Context, s, args[0])
 		if err != nil {
 			return err
