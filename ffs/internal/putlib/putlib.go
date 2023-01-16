@@ -103,9 +103,6 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		st.fi = fi
 		return c.putFile(ctx, st)
 	}
-	if c.Verbose {
-		log.Printf("dir: %s", st.path)
-	}
 
 	// Directory
 	d := file.New(st.s, &file.NewOptions{
@@ -166,6 +163,9 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 			files = append(files, &entry{sub: sub, name: elt.Name(), fi: fi})
 		}
 	}
+	if c.Verbose {
+		log.Printf("dir: %s (%d files, %d dirs)", st.path, len(files), len(dirs))
+	}
 
 	// Process subdirectories serially. We do this so that the recurrence does
 	// not explode concurrency.
@@ -182,9 +182,6 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 
 	// Process plain files in parallel.
 	if len(files) != 0 {
-		if c.Verbose {
-			log.Printf("+ in %s: copy %d files", st.path, len(files))
-		}
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
