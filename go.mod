@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20230114213900-b3edb6d7b979
 	github.com/creachadair/gcsstore v0.0.0-20230114181748-18371a30c927
-	github.com/creachadair/keyfile v0.7.1
+	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230114181913-48a82f0bc2d5
 	github.com/creachadair/mds v0.0.0-20230112232013-549c3f4fe455
 	github.com/creachadair/pebblestore v0.0.0-20230114181846-981205ec34b5
