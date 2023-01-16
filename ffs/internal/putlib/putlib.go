@@ -104,7 +104,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		return c.putFile(ctx, st)
 	}
 	if c.Verbose {
-		log.Printf("enter %q", st.path)
+		log.Printf("dir: %s", st.path)
 	}
 
 	// Directory
@@ -140,7 +140,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 			if err != nil {
 				return nil, fmt.Errorf("loading filter: %w", err)
 			} else if c.Verbose {
-				log.Printf("load filter rules from %q", sub)
+				log.Printf("load filter rules: %s", sub)
 			}
 			filt = nf
 			break
@@ -153,7 +153,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		sub := filepath.Join(st.path, elt.Name())
 		if filt.Match(sub) {
 			if c.Verbose {
-				log.Printf("skip (filtered): %q", sub)
+				log.Printf("skip (filtered): %s", sub)
 			}
 			continue
 		} else if elt.IsDir() {
@@ -183,7 +183,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	// Process plain files in parallel.
 	if len(files) != 0 {
 		if c.Verbose {
-			log.Printf("in %q: storing %d files", st.path, len(files))
+			log.Printf("+ in %s: copy %d files", st.path, len(files))
 		}
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -192,11 +192,11 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 			e := e
 			start(func() error {
 				if c.Verbose {
-					log.Printf("copying %d bytes from %q", e.fi.Size(), e.name)
+					log.Printf("file: %s (%d bytes)", e.name, e.fi.Size())
 					if e.fi.Size() > 1<<20 {
 						begin := time.Now()
 						defer func() {
-							log.Printf("finished %q [%v elapsed]",
+							log.Printf("file done: %s [%v elapsed]",
 								e.name, time.Since(begin).Truncate(time.Millisecond))
 						}()
 					}

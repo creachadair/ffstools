@@ -59,7 +59,7 @@ func runPut(env *command.Env, args []string) error {
 		keys := make([]string, len(args))
 		for i, path := range args {
 			if putConfig.Verbose {
-				log.Printf("put %q", path)
+				log.Printf("begin put: %s", path)
 			}
 			f, err := putConfig.PutPath(cfg.Context, s, path)
 			if err != nil {
@@ -71,7 +71,7 @@ func runPut(env *command.Env, args []string) error {
 			}
 			keys[i] = key
 			if putConfig.Verbose {
-				log.Printf("finished %q (%x)", path, key)
+				log.Printf("done put: %s (%x)", path, key)
 			}
 		}
 		for _, key := range keys {
