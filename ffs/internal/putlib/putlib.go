@@ -17,6 +17,7 @@ package putlib
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log"
@@ -27,6 +28,7 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
@@ -253,4 +255,32 @@ func (c Config) fileInfoToStat(fi fs.FileInfo) *file.Stat {
 		OwnerID: owner,
 		GroupID: group,
 	}
+}
+
+// SetPath sets the specified root-key/path or file-key/path to the given
+// target file. It returns the storage key of the resulting updated object.
+func SetPath(ctx context.Context, s config.CAS, path string, tf *file.File) (string, error) {
+	obase, orest := config.SplitPath(path)
+	if orest == "" {
+		return "", errors.New("path must not be empty")
+	}
+
+	of, err := config.OpenPath(ctx, s, obase) // N.B. No path; see below
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := fpath.Set(ctx, of.Base, orest, &fpath.SetOptions{
+		Create: true,
+		SetStat: func(st *file.Stat) {
+			if st.Mode == 0 {
+				st.Mode = fs.ModeDir | 0755
+			}
+		},
+		File: tf,
+	}); err != nil {
+		return "", err
+	}
+
+	return of.Flush(ctx)
 }

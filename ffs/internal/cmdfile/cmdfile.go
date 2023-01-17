@@ -342,19 +342,14 @@ func runSet(env *command.Env, args []string) error {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
 	}
 
-	obase, orest := config.SplitPath(args[0])
-	if orest == "" {
+	if _, orest := config.SplitPath(args[0]); orest == "" {
 		return env.Usagef("path must not be empty")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		of, err := config.OpenPath(cfg.Context, s, obase) // N.B. No path; see below
-		if err != nil {
-			return err
-		}
-
 		var tf *config.PathInfo
+		var err error
 		if len(args) == 2 {
 			// Standard form: file-key/path or root-key/path
 			tf, err = config.OpenPath(cfg.Context, s, args[1])
@@ -379,18 +374,7 @@ func runSet(env *command.Env, args []string) error {
 			return err
 		}
 
-		if _, err := fpath.Set(cfg.Context, of.Base, orest, &fpath.SetOptions{
-			Create: true,
-			SetStat: func(st *file.Stat) {
-				if st.Mode == 0 {
-					st.Mode = fs.ModeDir | 0755
-				}
-			},
-			File: tf.File,
-		}); err != nil {
-			return err
-		}
-		key, err := of.Flush(cfg.Context)
+		key, err := putlib.SetPath(cfg.Context, s, args[0], tf.File)
 		if err != nil {
 			return err
 		}
