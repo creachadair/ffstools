@@ -20,11 +20,16 @@ import (
 	"log"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
 
 var putConfig putlib.Config
+
+var putFlags struct {
+	Target string
+}
 
 var Command = &command.C{
 	Name:  "put",
@@ -37,13 +42,18 @@ info are recorded; use -nostat to disable this. Use -xattr to capture
 extended attributes.
 
 Symbolic links are captured, but devices, sockets, FIFO, and other
-special files are skipped.`,
+special files are skipped.
+
+With "-into", the resulting file is stored under the specified path of
+the form <root-key>/<path> or @<file-key>/<path>. In this form, only one
+input path is allowed.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&putConfig.NoStat, "nostat", false, "Omit file and directory stat")
 		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
 		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
+		fs.StringVar(&putFlags.Target, "into", "", "Store the resulting object under this root/path or file/path")
 	},
 	Run: runPut,
 }
@@ -51,6 +61,8 @@ special files are skipped.`,
 func runPut(env *command.Env, args []string) error {
 	if len(args) == 0 {
 		return env.Usagef("missing required path")
+	} else if putFlags.Target != "" && len(args) > 1 {
+		return env.Usagef("only one path is allowed when -target is set")
 	}
 
 	cfg := env.Config.(*config.Settings)
@@ -75,6 +87,18 @@ func runPut(env *command.Env, args []string) error {
 		}
 		for _, key := range keys {
 			fmt.Printf("put: %x\n", key)
+		}
+
+		if putFlags.Target != "" {
+			tf, err := file.Open(cfg.Context, s, keys[0])
+			if err != nil {
+				return err
+			}
+			key, err := putlib.SetPath(cfg.Context, s, putFlags.Target, tf)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("set: %x\n", key)
 		}
 		return nil
 	})
