@@ -52,7 +52,7 @@ type startConfig struct {
 	Buffer  blob.Store
 }
 
-func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Solo) {
+func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Single) {
 	lst, err := opts.listen(ctx)
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)
@@ -65,7 +65,7 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 
 	service := chirpstore.NewService(opts.Store, nil)
 	mx := newServerMetrics(ctx, opts)
-	loop := taskgroup.Single(func() error {
+	loop := taskgroup.Go(func() error {
 		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
 			p := chirp.NewPeer()
 			p.Metrics().Set("blobd", mx)

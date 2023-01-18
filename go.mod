@@ -20,7 +20,7 @@ require (
 	github.com/creachadair/pogrebstore v0.0.0-20230114181639-e442abb0a279
 	github.com/creachadair/s3store v0.0.0-20230114181927-02d2678388dd
 	github.com/creachadair/sqlitestore v0.0.0-20230114182018-1fe4c15f8e76
-	github.com/creachadair/taskgroup v0.4.2
+	github.com/creachadair/taskgroup v0.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.5.0
 	golang.org/x/term v0.4.0
@@ -145,3 +145,9 @@ require (
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
+
+replace github.com/creachadair/taskgroup => ../taskgroup
+
+replace github.com/creachadair/ffs => ../ffs
+
+replace github.com/creachadair/chirp => ../chirp
