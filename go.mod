@@ -5,21 +5,21 @@ go 1.18
 require (
 	github.com/creachadair/atomicfile v0.2.7
 	github.com/creachadair/badgerstore v0.1.19
-	github.com/creachadair/bitcaskstore v0.0.0-20230114181632-dfd93ed2e6cb
-	github.com/creachadair/boltstore v0.0.0-20230114181654-1304e43592c6
-	github.com/creachadair/chirp v0.0.0-20230112043905-a124b1c2fada
-	github.com/creachadair/chirpstore v0.0.0-20230110190400-0f5b2b89374b
-	github.com/creachadair/command v0.0.0-20230107203805-cdc04e5fa940
+	github.com/creachadair/bitcaskstore v0.0.0-20230116214855-7e49cecdca9d
+	github.com/creachadair/boltstore v0.0.0-20230116214908-87b016521f46
+	github.com/creachadair/chirp v0.0.0-20230118190903-9da33e026e61
+	github.com/creachadair/chirpstore v0.0.0-20230115224117-156fdb462086
+	github.com/creachadair/command v0.0.0-20230116214947-f5a018644005
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230117220548-85b20c5abc53
-	github.com/creachadair/gcsstore v0.0.0-20230114181748-18371a30c927
+	github.com/creachadair/ffs v0.0.0-20230118190926-885e90b0e805
+	github.com/creachadair/gcsstore v0.0.0-20230118200403-7dfe4609ab0a
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20230114181913-48a82f0bc2d5
-	github.com/creachadair/mds v0.0.0-20230112232013-549c3f4fe455
-	github.com/creachadair/pebblestore v0.0.0-20230114181846-981205ec34b5
-	github.com/creachadair/pogrebstore v0.0.0-20230114181639-e442abb0a279
-	github.com/creachadair/s3store v0.0.0-20230114181927-02d2678388dd
-	github.com/creachadair/sqlitestore v0.0.0-20230114182018-1fe4c15f8e76
+	github.com/creachadair/leveldbstore v0.0.0-20230116215139-4b6c14e0cae7
+	github.com/creachadair/mds v0.0.0-20230115232940-050e69c560e9
+	github.com/creachadair/pebblestore v0.0.0-20230116215221-fc4b3dfcb08a
+	github.com/creachadair/pogrebstore v0.0.0-20230116215237-a28d2e3530b4
+	github.com/creachadair/s3store v0.0.0-20230116215304-a780bebdad6a
+	github.com/creachadair/sqlitestore v0.0.0-20230116215332-b9c41d78e5b7
 	github.com/creachadair/taskgroup v0.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.5.0
@@ -44,7 +44,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.180 // indirect
+	github.com/aws/aws-sdk-go v1.44.182 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.8 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.8 // indirect
@@ -62,8 +62,8 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
-	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230113195140-25d2b70d1aeb // indirect
+	github.com/cockroachdb/logtags v0.0.0-20230118171846-1c69660c5e76 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230118173120-15945a2be184 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
@@ -123,8 +123,8 @@ require (
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
-	go4.org/netipx v0.0.0-20230113150534-b98ae1862cde // indirect
-	golang.org/x/exp v0.0.0-20230113213754-f9f960f08ad4 // indirect
+	go4.org/netipx v0.0.0-20230118030647-987e16ee2705 // indirect
+	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/oauth2 v0.4.0 // indirect
@@ -139,15 +139,9 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.107.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230113154510-dbe35b8444a5 // indirect
+	google.golang.org/genproto v0.0.0-20230117162540-28d6b9783ac4 // indirect
 	google.golang.org/grpc v1.52.0 // indirect
 	gvisor.dev/gvisor v0.0.0-20220817001344-846276b3dbc5 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
-
-replace github.com/creachadair/taskgroup => ../taskgroup
-
-replace github.com/creachadair/ffs => ../ffs
-
-replace github.com/creachadair/chirp => ../chirp
