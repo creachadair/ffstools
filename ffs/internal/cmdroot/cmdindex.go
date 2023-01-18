@@ -74,7 +74,7 @@ func runIndex(env *command.Env, keys []string) error {
 			}); err != nil {
 				return fmt.Errorf("scanning %q: %w", key, err)
 			}
-			fmt.Fprintf(env, "Finished scanning %d blobs [%v elapsed]\n",
+			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 				idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 
 			rp.IndexKey, err = wiretype.Save(cfg.Context, s, &wiretype.Object{

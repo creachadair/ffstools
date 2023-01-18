@@ -48,7 +48,7 @@ var Command = &command.C{
 <root-key>[/path/...] ...`,
 	Help: `Synchronize file trees between stores.
 
-Transfer all the blobs reachable from the specified file or root
+Transfer all the objects reachable from the specified file or root
 paths into the given target store.
 `,
 
@@ -72,7 +72,7 @@ func runSync(env *command.Env, args []string) error {
 		return cfg.WithStoreAddress(cfg.Context, taddr, func(tgt config.CAS) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
-			// Find all the blobs reachable from the specified starting points.
+			// Find all the objects reachable from the specified starting points.
 			worklist := make(scanSet)
 			for _, elt := range args {
 				of, err := config.OpenPath(cfg.Context, src, elt)
@@ -96,9 +96,9 @@ func runSync(env *command.Env, args []string) error {
 				return errors.New("no matching objects")
 			}
 
-			// Remove from the worklist all blobs already stored in the target
-			// that are not scheduled for replacement. Blobs marked as root (R) or
-			// otherwise requiring replacement (+) are retained regardless.
+			// Remove from the worklist all objects already stored in the target
+			// that are not scheduled for replacement. Objects marked as root (R)
+			// or otherwise requiring replacement (+) are retained regardless.
 			if err := tgt.List(cfg.Context, "", func(key string) error {
 				switch worklist[key] {
 				case '-', 'F':
@@ -141,7 +141,7 @@ func runSync(env *command.Env, args []string) error {
 				})
 			}
 			cerr := g.Wait()
-			fmt.Fprintf(env, "Copied %d blobs [%v elapsed]\n",
+			fmt.Fprintf(env, "Copied %d objects [%v elapsed]\n",
 				nb, time.Since(start).Truncate(10*time.Millisecond))
 			return cerr
 		})

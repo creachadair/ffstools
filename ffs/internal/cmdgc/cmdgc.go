@@ -38,7 +38,7 @@ var gcFlags struct {
 
 var Command = &command.C{
 	Name: "gc",
-	Help: `Garbage-collect blobs not reachable from known roots.
+	Help: `Garbage-collect objects not reachable from known roots.
 
 If no roots are defined, an error is reported without making any changes
 unless -force is set. This avoids accidentally deleting everything in a
@@ -83,7 +83,7 @@ store without roots.
 			}
 			var idxs []*index.Index
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
-			fmt.Fprintf(env, "Begin GC of %d blobs, roots=%+q\n", n, keys)
+			fmt.Fprintf(env, "Begin GC of %d objects, roots=%+q\n", n, keys)
 
 			// Mark phase: Scan all roots.
 			for i := 0; i < len(keys); i++ {
@@ -141,15 +141,15 @@ store without roots.
 				}); err != nil {
 					return fmt.Errorf("scanning %q: %w", key, err)
 				}
-				fmt.Fprintf(env, "Finished scanning %d blobs [%v elapsed]\n",
+				fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 					idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 			}
 			idxs = append(idxs, idx)
 
-			// Sweep phase: Remove blobs not indexed.
+			// Sweep phase: Remove objects not indexed.
 			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
 
-			fmt.Fprintf(env, "Begin sweep over %d blobs...\n", n)
+			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
 			var numKeep, numDrop int
 			g.Go(func() error {
