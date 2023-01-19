@@ -346,7 +346,7 @@ func newCAS(bs blob.CAS) CAS { return CAS{CAS: suffixed.NewCAS(bs).Derive(dataBu
 const (
 	dataBucketSuffix = "."
 	rootBucketSuffix = "@"
-	rootKeyTag       = "\x00"
+	rootKeyTag       = "\x00\x00"
 )
 
 // Roots returns the root view of c.
