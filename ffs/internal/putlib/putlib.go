@@ -261,7 +261,7 @@ func (c Config) fileInfoToStat(fi fs.FileInfo) *file.Stat {
 // target file. It returns the storage key of the resulting updated object.
 func SetPath(ctx context.Context, s config.CAS, path string, tf *file.File) (string, error) {
 	obase, orest := config.SplitPath(path)
-	if orest == "" {
+	if orest == "" || orest == "." {
 		return "", errors.New("path must not be empty")
 	}
 

@@ -342,8 +342,8 @@ func runSet(env *command.Env, args []string) error {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
 	}
 
-	if _, orest := config.SplitPath(args[0]); orest == "" {
-		return env.Usagef("path must not be empty")
+	if _, orest := config.SplitPath(args[0]); orest == "" || orest == "." {
+		return errors.New("path must not be empty")
 	}
 
 	cfg := env.Config.(*config.Settings)
