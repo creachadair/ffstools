@@ -53,6 +53,7 @@ import (
 	"sort"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ctrl"
@@ -158,7 +159,12 @@ func blobd(_ *command.Env, args []string) error {
 	ctx := context.Background()
 	bs, buf := mustOpenStore(ctx)
 	defer func() {
-		if err := blob.CloseStore(ctx, bs); err != nil {
+		// N.B. Invoke close with a fresh context, since the parent is likely to
+		// have been already canceleld during shutdown. Set a timeout in case the
+		// close gets stuck, however.
+		cctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := blob.CloseStore(cctx, bs); err != nil {
 			log.Printf("Warning: closing store: %v", err)
 		}
 	}()
