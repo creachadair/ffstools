@@ -359,7 +359,7 @@ func runRemove(env *command.Env, args []string) error {
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		for _, arg := range args {
 			base, rest := config.SplitPath(arg)
-			if rest == "" {
+			if rest == "" || rest == "." {
 				return fmt.Errorf("missing path %q", arg)
 			}
 			of, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
