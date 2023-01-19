@@ -95,10 +95,7 @@ If the origin is from a root, the root is updated with the modified origin.
 
 The <target> may be a root-key/path or a @file-key/path. In both cases the path
 component is optional; if a root-key is given alone its root file is used as
-the target.
-
-If the target is "put <path>", the specified path is put into the store, and
-the resulting storage key is used (see the "put" subcommand).`,
+the target.`,
 
 			Run: runSet,
 		},
@@ -334,46 +331,16 @@ func runRead(env *command.Env, args []string) error {
 }
 
 func runSet(env *command.Env, args []string) error {
-	if len(args) == 3 {
-		if args[1] != "put" {
-			return env.Usagef("invalid three-argument usage")
-		}
-	} else if len(args) != 2 {
+	if len(args) != 2 {
 		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
-	}
-
-	if _, orest := config.SplitPath(args[0]); orest == "" || orest == "." {
-		return errors.New("path must not be empty")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		var tf *config.PathInfo
-		var err error
-		if len(args) == 2 {
-			// Standard form: file-key/path or root-key/path
-			tf, err = config.OpenPath(cfg.Context, s, args[1])
-		} else {
-			// Put form: put <path>
-			f, perr := putlib.Default.PutPath(cfg.Context, s, args[2])
-			if perr != nil {
-				return perr
-			}
-			fk, perr := f.Flush(cfg.Context)
-			if perr != nil {
-				return perr
-			}
-			fmt.Printf("put: %x\n", fk)
-			tf = &config.PathInfo{
-				Base:    f,
-				File:    f,
-				FileKey: fk,
-			}
-		}
+		tf, err := config.OpenPath(cfg.Context, s, args[1])
 		if err != nil {
 			return err
 		}
-
 		key, err := putlib.SetPath(cfg.Context, s, args[0], tf.File)
 		if err != nil {
 			return err

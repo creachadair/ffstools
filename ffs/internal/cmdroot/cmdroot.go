@@ -29,7 +29,6 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/ffs/internal/putlib"
 )
 
 var Command = &command.C{
@@ -58,13 +57,11 @@ known keys are listed.`,
 		},
 		{
 			Name:  "create",
-			Usage: "<name>\n<name> <file-key>\n<name> put <path>",
+			Usage: "<name>\n<name> <file-key>",
 			Help: `Create a root pointer.
 
 If only a <name> is given, a new empty root pointer is created with that name.
-If a <file-key> is specified, the new root points to that file (which must exist).
-The "put <path>" form puts the specified path into the store, and uses the resulting
-storage key (see the "put" subcommmand).`,
+If a <file-key> is specified, the new root points to that file (which must exist).`,
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
@@ -108,13 +105,10 @@ storage key (see the "put" subcommmand).`,
 		},
 		{
 			Name:  "set-file",
-			Usage: "<name> <file-key>\n<name> put <path>",
+			Usage: "<name> <file-key>",
 			Help: `Edit the file key of the given root.
 
-If a <file-key> is specified, it must already exist in the store.
-
-The "put <path>" form stores the specified path into the store, and uses the
-resulting key (see the "put" subcommand).`,
+If a <file-key> is specified, it must already exist in the store.`,
 
 			Run: runEditFile,
 		},
@@ -218,8 +212,6 @@ func runCreate(env *command.Env, args []string) error {
 	name, mode := args[0], "empty"
 	if len(args) == 2 {
 		mode = "file-key"
-	} else if len(args) == 3 && args[1] == "put" {
-		mode = "put-path"
 	} else if len(args) != 1 {
 		return env.Usagef("invalid arguments")
 	}
@@ -232,15 +224,6 @@ func runCreate(env *command.Env, args []string) error {
 		switch mode {
 		case "file-key":
 			fk, err = config.ParseKey(args[1])
-		case "put-path":
-			f, perr := putlib.Default.PutPath(cfg.Context, s, args[2])
-			if perr != nil {
-				return perr
-			}
-			fk, err = f.Flush(cfg.Context)
-			if err == nil {
-				fmt.Printf("put: %x\n", fk)
-			}
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
@@ -317,17 +300,7 @@ func runEditFile(env *command.Env, args []string) error {
 	defer na.Close()
 
 	var key string
-	if len(na.Args) == 2 && na.Args[0] == "put" {
-		f, err := putlib.Default.PutPath(na.Context, na.Store, na.Args[1])
-		if err != nil {
-			return err
-		}
-		key, err = f.Flush(na.Context)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("put: %x\n", key)
-	} else if len(na.Args) != 1 {
+	if len(na.Args) != 1 {
 		return env.Usagef("incorrect arguments")
 	} else {
 		key, err = config.ParseKey(na.Args[0])
