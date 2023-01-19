@@ -248,7 +248,7 @@ func listFormat(f *file.File, name, target string) string {
 		skey = base64.StdEncoding.EncodeToString([]byte(f.Key())) + "\t"
 	}
 
-	return fmt.Sprintf("%s%s%s\t%3d\t%-8s\t%-8s\v%8d\t%s\t%s%s\f",
+	return fmt.Sprintf("%s%s%s\t%3d\t%s\t%s\v%9d\t%s\t%s%s\f",
 		skey, s.Mode, xtag, 1+f.Child().Len(),
 		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
 		f.Data().Size(), date, name, xattrs)
