@@ -19,7 +19,7 @@ require (
 	github.com/creachadair/pebblestore v0.0.0-20230116215221-fc4b3dfcb08a
 	github.com/creachadair/pogrebstore v0.0.0-20230116215237-a28d2e3530b4
 	github.com/creachadair/s3store v0.0.0-20230116215304-a780bebdad6a
-	github.com/creachadair/sqlitestore v0.0.0-20230116215332-b9c41d78e5b7
+	github.com/creachadair/sqlitestore v0.0.0-20230119013314-dd5efec6f652
 	github.com/creachadair/taskgroup v0.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.5.0
