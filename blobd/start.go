@@ -235,4 +235,3 @@ var errReadOnlyStore = errors.New("storage is read-only")
 
 func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
 func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
-func (r roStore) Close(ctx context.Context) error          { return blob.CloseStore(ctx, r.Store) }

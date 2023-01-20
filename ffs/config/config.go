@@ -156,7 +156,7 @@ func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(CAS
 	if err != nil {
 		return err
 	}
-	defer blob.CloseStore(ctx, bs)
+	defer bs.Close(ctx)
 	return f(bs)
 }
 

@@ -57,7 +57,6 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ctrl"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/storage/filestore"
 	"github.com/creachadair/ffstools/blobd/store"
@@ -164,7 +163,7 @@ func blobd(_ *command.Env, args []string) error {
 		// close gets stuck, however.
 		cctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		if err := blob.CloseStore(cctx, bs); err != nil {
+		if err := bs.Close(cctx); err != nil {
 			log.Printf("Warning: closing store: %v", err)
 		}
 	}()

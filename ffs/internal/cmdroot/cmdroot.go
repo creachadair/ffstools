@@ -24,7 +24,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
@@ -339,7 +338,7 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 	}
 	rp, err := root.Open(cfg.Context, bs.Roots(), key)
 	if err != nil {
-		blob.CloseStore(cfg.Context, bs)
+		bs.Close(cfg.Context)
 		return nil, err
 	}
 	return &rootArgs{
@@ -348,6 +347,6 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 		Args:    args[1:],
 		Root:    rp,
 		Store:   bs,
-		Close:   func() { blob.CloseStore(cfg.Context, bs) },
+		Close:   func() { bs.Close(cfg.Context) },
 	}, nil
 }

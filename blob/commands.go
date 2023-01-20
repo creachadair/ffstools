@@ -50,7 +50,7 @@ func getCmd(env *command.Env, args []string) error {
 		return err
 	}
 	nctx := getContext(env)
-	defer blob.CloseStore(nctx, bs)
+	defer bs.Close(nctx)
 
 	for _, arg := range args {
 		key, err := parseKey(arg)
@@ -76,7 +76,7 @@ func sizeCmd(env *command.Env, args []string) error {
 		return err
 	}
 	nctx := getContext(env)
-	defer blob.CloseStore(nctx, bs)
+	defer bs.Close(nctx)
 
 	for _, arg := range args {
 		key, err := parseKey(arg)
@@ -102,7 +102,7 @@ func delCmd(env *command.Env, args []string) (err error) {
 		return err
 	}
 	nctx := getContext(env)
-	defer blob.CloseStore(nctx, bs)
+	defer bs.Close(nctx)
 
 	missingOK := env.Config.(*settings).MissingOK
 	for _, arg := range args {
@@ -141,7 +141,7 @@ func listCmd(env *command.Env, args []string) error {
 		return err
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, bs)
+	defer bs.Close(ctx)
 
 	var listed int
 	return bs.List(ctx, start, func(key string) error {
@@ -173,7 +173,7 @@ func lenCmd(env *command.Env, args []string) error {
 		return err
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, bs)
+	defer bs.Close(ctx)
 
 	n, err := bs.Len(ctx)
 	if err != nil {
@@ -189,7 +189,7 @@ func casPutCmd(env *command.Env, args []string) (err error) {
 		return err
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, cas)
+	defer cas.Close(ctx)
 
 	data, err := readData(ctx, "put", args)
 	if err != nil {
@@ -209,7 +209,7 @@ func casKeyCmd(env *command.Env, args []string) error {
 		return err
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, cas)
+	defer cas.Close(ctx)
 
 	data, err := readData(ctx, "key", args)
 	if err != nil {
@@ -232,7 +232,7 @@ func copyCmd(env *command.Env, args []string) error {
 		return err
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, bs)
+	defer bs.Close(ctx)
 
 	srcKey, err := parseKey(args[0])
 	if err != nil {
@@ -262,7 +262,7 @@ func statCmd(env *command.Env, args []string) error {
 	}
 
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, s)
+	defer s.Close(ctx)
 
 	var msg []byte
 	switch t := s.Base().(type) {
@@ -293,7 +293,7 @@ func putCmd(env *command.Env, args []string) (err error) {
 		return nil
 	}
 	ctx := getContext(env)
-	defer blob.CloseStore(ctx, bs)
+	defer bs.Close(ctx)
 
 	data, err := readData(ctx, "put", args[1:])
 	if err != nil {
