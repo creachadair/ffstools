@@ -33,6 +33,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffs/storage/suffixed"
 )
 
@@ -133,9 +134,6 @@ func listCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	if pfx != "" && start == "" {
-		start = pfx
-	}
 	bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
@@ -143,14 +141,15 @@ func listCmd(env *command.Env, args []string) error {
 	ctx := getContext(env)
 	defer bs.Close(ctx)
 
+	// If there is a prefix, apply it first since that will permit the
+	// underlying scan to terminate sooner.
+	if pfx != "" {
+		p := prefixed.NewCAS(bs.Base()).Derive(pfx)
+		bs = suffixed.NewCAS(p).Derive(cfg.Bucket)
+	}
+
 	var listed int
 	return bs.List(ctx, start, func(key string) error {
-		if !strings.HasPrefix(key, pfx) {
-			if key > pfx {
-				return blob.ErrStopListing
-			}
-			return nil
-		}
 		if cfg.Raw {
 			fmt.Println(key)
 		} else {
