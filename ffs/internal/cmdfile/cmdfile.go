@@ -273,6 +273,7 @@ func jsonFormat(f *file.File, name, target string) string {
 		Owner  string            `json:"owner"`
 		Group  string            `json:"group"`
 		Size   int64             `json:"size"`
+		Blocks int               `json:"blocks,omitempty"`
 		MTime  time.Time         `json:"modTime"`
 		Target string            `json:"linkTarget,omitempty"`
 		Key    []byte            `json:"storageKey,omitempty"`
@@ -281,7 +282,7 @@ func jsonFormat(f *file.File, name, target string) string {
 		Name: name,
 		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
 		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
-		Size: f.Data().Size(), MTime: s.ModTime.UTC(),
+		Size: f.Data().Size(), Blocks: f.Data().Len(), MTime: s.ModTime.UTC(),
 		Target: target, Key: []byte(f.Key()), XAttr: xattr,
 	})
 	if err != nil {
