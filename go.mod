@@ -14,12 +14,12 @@ require (
 	github.com/creachadair/ffs v0.0.0-20230120050709-78d85727da59
 	github.com/creachadair/gcsstore v0.0.0-20230120031730-807c9d45fa5c
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20230119221925-bb5a1cd2a1fb
-	github.com/creachadair/mds v0.0.0-20230115232940-050e69c560e9
+	github.com/creachadair/leveldbstore v0.0.0-20230120031831-84bf42f01d96
+	github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1
 	github.com/creachadair/pebblestore v0.0.0-20230120032041-4fd04ce4e67e
 	github.com/creachadair/pogrebstore v0.0.0-20230120032139-623211774cd7
 	github.com/creachadair/s3store v0.0.0-20230120034141-5792d292269c
-	github.com/creachadair/sqlitestore v0.0.0-20230119222006-3f59b86906b6
+	github.com/creachadair/sqlitestore v0.0.0-20230120032241-fa59a8afc00f
 	github.com/creachadair/taskgroup v0.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.5.0
@@ -44,7 +44,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.183 // indirect
+	github.com/aws/aws-sdk-go v1.44.184 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.8 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.8 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230119222307-19fce0ea19fe // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230120151441-7953ed0f0058 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
