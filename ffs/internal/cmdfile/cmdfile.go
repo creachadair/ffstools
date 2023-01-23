@@ -449,12 +449,14 @@ func runShowKeys(env *command.Env, args []string) error {
 			return err
 		}
 		if rf.RootKey != "" {
-			fmt.Println(rf.RootKey)
+			fmt.Printf("%s: %x\n", rf.RootKey, rf.Base.Key())
+		} else {
+			fmt.Printf("%x\n", rf.Base.Key())
 		}
-		fmt.Printf("%x\n", rf.Base.Key())
+		parts := strings.Split(rest, "/")
 		pf, err := fpath.OpenPath(cfg.Context, rf.Base, rest)
-		for _, f := range pf {
-			fmt.Printf("%x\n", f.Key())
+		for i, f := range pf {
+			fmt.Printf("%s: %x\n", parts[i], f.Key())
 		}
 		return err
 	})
