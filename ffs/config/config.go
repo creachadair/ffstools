@@ -34,7 +34,9 @@ import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
+	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffs/storage/suffixed"
 	yaml "gopkg.in/yaml.v3"
@@ -353,4 +355,18 @@ const (
 func (c CAS) Roots() blob.CAS {
 	rs := prefixed.NewCAS(c.CAS.Derive("")).Derive(rootKeyTag)
 	return suffixed.NewCAS(rs).Derive(rootBucketSuffix)
+}
+
+// LoadIndex loads the contents of an index blob.
+func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {
+	var obj wiretype.Object
+	if err := wiretype.Load(ctx, s, key, &obj); err != nil {
+		return nil, fmt.Errorf("loading index: %w", err)
+	}
+	ridx := obj.GetIndex()
+	if ridx == nil {
+		return nil, fmt.Errorf("no index in %x", key)
+	}
+
+	return index.Decode(ridx)
 }

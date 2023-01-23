@@ -25,7 +25,6 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
-	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/mds/mapset"
@@ -96,18 +95,9 @@ store without roots.
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
-					var obj wiretype.Object
-					if err := wiretype.Load(cfg.Context, s, rp.IndexKey, &obj); err != nil {
-						return fmt.Errorf("loading index: %w", err)
-					}
-					ridx := obj.GetIndex()
-					if ridx == nil {
-						return fmt.Errorf("no index in %x", rp.IndexKey)
-					}
-
-					rpi, err := index.Decode(ridx)
+					rpi, err := config.LoadIndex(cfg.Context, s, rp.IndexKey)
 					if err != nil {
-						return fmt.Errorf("decoding index for %q: %w", key, err)
+						return err
 					}
 					idxs = append(idxs, rpi)
 					idx.Add(rp.IndexKey)
