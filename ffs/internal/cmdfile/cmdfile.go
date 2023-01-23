@@ -131,6 +131,14 @@ If the origin is from a root, the root is updated with the changes.`,
 
 			Run: runSetStat,
 		},
+		{
+			Name: "show-keys",
+			Usage: `<root-key>/<path>
+@<origin-key>/<path>`,
+			Help: "Show the sequence of storage keys traversed by the specified path",
+
+			Run: runShowKeys,
+		},
 	},
 }
 
@@ -425,6 +433,30 @@ func runSetStat(env *command.Env, args []string) error {
 		}
 		fmt.Printf("set-stat: %x\n", key)
 		return nil
+	})
+}
+
+func runShowKeys(env *command.Env, args []string) error {
+	if len(args) != 1 {
+		return env.Usagef("missing origin/path")
+	}
+
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+		base, rest := config.SplitPath(args[0])
+		rf, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
+		if err != nil {
+			return err
+		}
+		if rf.RootKey != "" {
+			fmt.Println(rf.RootKey)
+		}
+		fmt.Printf("%x\n", rf.Base.Key())
+		pf, err := fpath.OpenPath(cfg.Context, rf.Base, rest)
+		for _, f := range pf {
+			fmt.Printf("%x\n", f.Key())
+		}
+		return err
 	})
 }
 
