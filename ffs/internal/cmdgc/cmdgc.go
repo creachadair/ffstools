@@ -164,7 +164,6 @@ store without roots.
 					return nil
 				})
 			})
-			fmt.Fprintln(env, "All key ranges listed, waiting for cleanup...")
 			if err := g.Wait(); err != nil {
 				return fmt.Errorf("sweeping failed: %w", err)
 			}
