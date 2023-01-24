@@ -27,6 +27,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strconv"
+	"time"
 
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/peers"
@@ -154,6 +155,7 @@ func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
 
 func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	mx := new(expvar.Map)
+	mx.Set("started", expvarString(time.Now().UTC().Format(time.RFC3339)))
 	mx.Set("store", expvarString(storeAddr))
 	mx.Set("pid", expvarInt(os.Getpid()))
 	mx.Set("writable", expvarBool(!doReadOnly))
