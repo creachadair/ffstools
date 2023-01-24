@@ -448,15 +448,17 @@ func runShowKeys(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
+		tw := tabwriter.NewWriter(os.Stderr, 4, 4, 1, ' ', 0)
+		defer tw.Flush()
 		if rf.RootKey != "" {
-			fmt.Printf("%s: %x\n", rf.RootKey, rf.Base.Key())
+			fmt.Fprintf(tw, "%s\t%x\n", rf.RootKey, rf.Base.Key())
 		} else {
 			fmt.Printf("%x\n", rf.Base.Key())
 		}
 		parts := strings.Split(rest, "/")
 		pf, err := fpath.OpenPath(cfg.Context, rf.Base, rest)
 		for i, f := range pf {
-			fmt.Printf("%s: %x\n", parts[i], f.Key())
+			fmt.Fprintf(tw, "%s\t%x\n", parts[i], f.Key())
 		}
 		return err
 	})
