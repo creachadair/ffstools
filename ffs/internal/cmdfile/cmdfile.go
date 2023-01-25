@@ -65,7 +65,7 @@ a file may be specified in the following formats:
 			Run: runShow,
 		},
 		{
-			Name:  "ls",
+			Name:  "list",
 			Usage: fileCmdUsage,
 			Help:  "List file attributes in a style similar to the ls command",
 
