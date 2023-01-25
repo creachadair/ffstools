@@ -25,8 +25,9 @@ func Dial(ntype, addr string) (net.Conn, error) {
 		Conn:        c,
 		net:         ntype,
 		addr:        addr,
-		maxAttempts: 3,
+		maxAttempts: 4,
 		grace:       30 * time.Second,
+		pause:       50 * time.Millisecond,
 		lastSuccess: time.Now(),
 	}, nil
 }
@@ -40,6 +41,7 @@ type redialConn struct {
 	maxAttempts int           // total attempts allowed per successful connection
 	numAttempts int           // attempts since latest grace interval
 	grace       time.Duration // interval beyond which attempts are reset
+	pause       time.Duration // interval between redial attempts
 	lastSuccess time.Time     // last successful dial
 }
 
@@ -63,6 +65,9 @@ func (r *redialConn) tryRedial(old net.Conn) error {
 		r.numAttempts = 0
 	} else if r.numAttempts >= r.maxAttempts {
 		return fmt.Errorf("maximum %d redials exhausted", r.maxAttempts)
+	}
+	if r.numAttempts > 0 {
+		time.Sleep(time.Duration(r.numAttempts) * r.pause)
 	}
 	r.numAttempts++
 	c, err := net.Dial(r.net, r.addr)
