@@ -16,6 +16,7 @@ package cmdroot
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -26,7 +27,6 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
-	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -36,21 +36,16 @@ var Command = &command.C{
 
 	Commands: []*command.C{
 		{
-			Name:  "show",
-			Usage: "<root-key>",
-			Help:  "Print the representation of a filesystem root.",
-
-			Run: runShow,
-		},
-		{
 			Name:  "list",
 			Usage: "[name-glob]",
 			Help: `List the root keys known in the store.
+
 If a glob is provided, only names matching the glob are listed; otherwise all
 known keys are listed.`,
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&listFlags.Long, "long", false, "Print details for each root")
+				fs.BoolVar(&listFlags.JSON, "json", false, "Format output as JSON")
 			},
 			Run: runList,
 		},
@@ -130,33 +125,9 @@ computed anyway.`,
 	},
 }
 
-func runShow(env *command.Env, keys []string) error {
-	if len(keys) == 0 {
-		return env.Usagef("missing required <root-key>")
-	}
-
-	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		var lastErr error
-		for _, key := range keys {
-			rp, err := root.Open(cfg.Context, s.Roots(), key)
-			if err != nil {
-				fmt.Fprintf(env, "Error: %v\n", err)
-				lastErr = err
-				continue
-			}
-			msg := root.Encode(rp).Value.(*wiretype.Object_Root).Root
-			fmt.Println(config.ToJSON(map[string]interface{}{
-				"storageKey": config.PrintableKey(key),
-				"root":       msg,
-			}))
-		}
-		return lastErr
-	})
-}
-
 var listFlags struct {
 	Long bool
+	JSON bool
 }
 
 func runList(env *command.Env, args []string) error {
@@ -175,25 +146,36 @@ func runList(env *command.Env, args []string) error {
 		return s.Roots().List(cfg.Context, "", func(key string) error {
 			if ok, _ := path.Match(glob, key); !ok {
 				return nil
-			} else if !listFlags.Long {
+			} else if !listFlags.Long && !listFlags.JSON {
 				fmt.Println(key)
 				return nil
 			}
+
 			rp, err := root.Open(cfg.Context, s.Roots(), key)
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(w, key, "\t")
-			if rp.IndexKey == "" {
-				fmt.Fprint(w, "[-]")
+			if listFlags.Long {
+				fmt.Fprint(w, key, "\t")
+				if rp.IndexKey == "" {
+					fmt.Fprint(w, "[-]")
+				} else {
+					fmt.Fprint(w, "[+]")
+				}
+				fmt.Fprint(w, "\t", config.PrintableKey(rp.FileKey))
+				if rp.Description != "" {
+					fmt.Fprint(w, "\t", rp.Description)
+				}
+				fmt.Fprintln(w)
 			} else {
-				fmt.Fprint(w, "[+]")
+				data, _ := json.Marshal(struct {
+					S string `json:"storageKey"`
+					D string `json:"description,omitempty"`
+					F []byte `json:"fileKey,omitempty"`
+					X []byte `json:"indexKey,omitempty"`
+				}{key, rp.Description, []byte(rp.FileKey), []byte(rp.IndexKey)})
+				fmt.Println(string(data))
 			}
-			fmt.Fprint(w, "\t", config.PrintableKey(rp.FileKey))
-			if rp.Description != "" {
-				fmt.Fprint(w, "\t", rp.Description)
-			}
-			fmt.Fprintln(w)
 			return nil
 		})
 	})
