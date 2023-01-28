@@ -71,6 +71,7 @@ a file may be specified in the following formats:
 
 			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
+				fs.BoolVar(&listFlags.Long, "long", false, "Print detail for each file entry")
 				fs.BoolVar(&listFlags.XAttr, "xattr", false, "Include extended attributes")
 				fs.BoolVar(&listFlags.Key, "key", false, "Include storage keys")
 				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
@@ -169,6 +170,7 @@ func runShow(env *command.Env, args []string) error {
 
 var listFlags struct {
 	DirOnly bool
+	Long    bool
 	XAttr   bool
 	Key     bool
 	JSON    bool
@@ -216,6 +218,13 @@ func runList(env *command.Env, args []string) error {
 
 // List an individual file or directory name.
 func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) error {
+	if !listFlags.Long && !listFlags.JSON {
+		if listFlags.Key {
+			fmt.Print(base64.StdEncoding.EncodeToString([]byte(of.Key())) + "\t")
+		}
+		fmt.Println(name)
+		return nil
+	}
 	target, err := linkTarget(ctx, of)
 	if err != nil {
 		return err
