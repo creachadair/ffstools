@@ -80,13 +80,15 @@ func runSync(env *command.Env, args []string) error {
 					return err
 				}
 
+				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
-					fmt.Fprintf(env, "Scanning data reachable from root %q\n", of.RootKey)
+					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
 					err = worklist.root(cfg.Context, src, of.RootKey, of.Root)
 				} else {
-					fmt.Fprintf(env, "Scanning data reachable from file %x\n", of.FileKey)
+					fmt.Fprintf(env, "Scanning data reachable from file %x", of.FileKey)
 					err = worklist.file(cfg.Context, of.File)
 				}
+				fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
 				if err != nil {
 					return err
 				}
