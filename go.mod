@@ -16,7 +16,7 @@ require (
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230131154210-fb44928a9588
 	github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1
-	github.com/creachadair/pebblestore v0.0.0-20230131154151-1063ae64d781
+	github.com/creachadair/pebblestore v0.0.0-20230202054018-41f855d9516e
 	github.com/creachadair/pogrebstore v0.0.0-20230131154049-455f83d4475e
 	github.com/creachadair/s3store v0.0.0-20230131154249-335ed061e305
 	github.com/creachadair/sqlitestore v0.0.0-20230131154256-88465a1b7ddd

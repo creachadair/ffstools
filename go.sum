@@ -188,8 +188,8 @@ github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1 h1:h7jEOsXCvbU//K4
 github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
 github.com/creachadair/msync v0.0.4 h1:v4ZCidRtK7GnB8erBrG/VE5K5vNAYAuSsfe+jFU8v34=
 github.com/creachadair/msync v0.0.4/go.mod h1:5+WcF2IjxUVydSOxqTcUWCgK6pZJwX8uxbGF+FuQkZI=
-github.com/creachadair/pebblestore v0.0.0-20230131154151-1063ae64d781 h1:bVxnGWtkgO+cy0OsMNC4WcvtfQMsEwUC/1avbOhmUo0=
-github.com/creachadair/pebblestore v0.0.0-20230131154151-1063ae64d781/go.mod h1:slYTbrXyZ8aPbKsBAPNeGf8+WV+iE9YGjSsF1aV4eaQ=
+github.com/creachadair/pebblestore v0.0.0-20230202054018-41f855d9516e h1:3YeUqQv1metUjf3YamDwoQfUmd/X7caz3R6TcOBLsGA=
+github.com/creachadair/pebblestore v0.0.0-20230202054018-41f855d9516e/go.mod h1:slYTbrXyZ8aPbKsBAPNeGf8+WV+iE9YGjSsF1aV4eaQ=
 github.com/creachadair/pogrebstore v0.0.0-20230131154049-455f83d4475e h1:pAU2octYFZskeeYgC/j+D6FB1kD1n5245viH3YGjFlc=
 github.com/creachadair/pogrebstore v0.0.0-20230131154049-455f83d4475e/go.mod h1:FdMQMbJhUsPKK0te39NqU6pi15TJtsSdYfXxUD+AwFM=
 github.com/creachadair/s3store v0.0.0-20230131154249-335ed061e305 h1:g/YgMs1TRGv+3fAMNF5bjDf2KUEwwyGyHqZ+QzyWLm8=
