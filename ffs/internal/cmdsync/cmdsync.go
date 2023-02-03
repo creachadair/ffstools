@@ -27,6 +27,7 @@ import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 )
@@ -74,6 +75,7 @@ func runSync(env *command.Env, args []string) error {
 
 			// Find all the objects reachable from the specified starting points.
 			worklist := make(scanSet)
+			var indices []*index.Index
 			for _, elt := range args {
 				of, err := config.OpenPath(cfg.Context, src, elt)
 				if err != nil {
@@ -82,6 +84,16 @@ func runSync(env *command.Env, args []string) error {
 
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
+					if of.Root.IndexKey != "" {
+						idx, err := config.LoadIndex(cfg.Context, src, of.Root.IndexKey)
+						if err != nil {
+							return err
+						}
+						worklist.bareRoot(of.RootKey, of.Root)
+						indices = append(indices, idx)
+						fmt.Fprintf(env, "Loaded cached index for %q (%d keys)\n", elt, idx.Len())
+						continue
+					}
 					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
 					err = worklist.root(cfg.Context, src, of.RootKey, of.Root)
 				} else {
@@ -93,6 +105,25 @@ func runSync(env *command.Env, args []string) error {
 					return err
 				}
 			}
+
+			// If we loaded cached indices, fill the worklist with matching keys.
+			if len(indices) != 0 {
+				var numAdded int
+				if err := src.List(cfg.Context, "", func(key string) error {
+					for _, idx := range indices {
+						if idx.Has(key) {
+							worklist.addKey(key)
+							numAdded++
+							break
+						}
+					}
+					return nil
+				}); err != nil {
+					return err
+				}
+				fmt.Fprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
+			}
+
 			fmt.Fprintf(env, "Found %d reachable objects\n", len(worklist))
 			if len(worklist) == 0 {
 				return errors.New("no matching objects")
@@ -152,9 +183,15 @@ func runSync(env *command.Env, args []string) error {
 
 type scanSet map[string]byte
 
-func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
+func (s scanSet) addKey(key string) { s[key] = '-' }
+
+func (s scanSet) bareRoot(rootKey string, rp *root.Root) {
 	s[rootKey] = 'R'
 	s[rp.IndexKey] = '-'
+}
+
+func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
+	s.bareRoot(rootKey, rp)
 	fp, err := rp.File(ctx, src)
 	if err != nil {
 		return err
