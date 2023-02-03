@@ -35,6 +35,7 @@ import (
 var syncFlags struct {
 	Target  string
 	Verbose bool
+	NoIndex bool
 }
 
 func debug(msg string, args ...interface{}) {
@@ -56,6 +57,7 @@ paths into the given target store.
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 		fs.StringVar(&syncFlags.Target, "to", "", "Target store (required)")
 		fs.BoolVar(&syncFlags.Verbose, "v", false, "Enable verbose logging")
+		fs.BoolVar(&syncFlags.NoIndex, "no-index", false, "Do not use cached indices")
 	},
 	Run: runSync,
 }
@@ -84,7 +86,7 @@ func runSync(env *command.Env, args []string) error {
 
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
-					if of.Root.IndexKey != "" {
+					if of.Root.IndexKey != "" && !syncFlags.NoIndex {
 						idx, err := config.LoadIndex(cfg.Context, src, of.Root.IndexKey)
 						if err != nil {
 							return err
