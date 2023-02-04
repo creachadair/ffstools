@@ -42,6 +42,7 @@
 package main
 
 import (
+	"archive/zip"
 	"context"
 	"errors"
 	"flag"
@@ -57,8 +58,10 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ctrl"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/storage/filestore"
+	"github.com/creachadair/ffs/storage/zipstore"
 	"github.com/creachadair/ffstools/blobd/store"
 )
 
@@ -78,7 +81,16 @@ var (
 	// To include other stores, build with -tags set to their names.
 	// The known implementations are in the store_*.go files.
 	stores = store.Registry{
-		"file":   filestore.Opener,
+		"file": func(ctx context.Context, addr string) (blob.Store, error) {
+			if strings.HasSuffix(addr, ".zip") {
+				zf, err := zip.OpenReader(addr)
+				if err != nil {
+					return nil, err
+				}
+				return zipstore.New(zf, nil), nil
+			}
+			return filestore.Opener(ctx, addr)
+		},
 		"memory": memstore.Opener,
 	}
 )
