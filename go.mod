@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20230201023056-fa6aa5f86b2a
 	github.com/creachadair/command v0.0.0-20230116214947-f5a018644005
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230129190020-edf9315ecc3b
+	github.com/creachadair/ffs v0.0.0-20230204022207-569f8f4cdd9e
 	github.com/creachadair/gcsstore v0.0.0-20230131154120-27496f79c3bb
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230131154210-fb44928a9588
@@ -44,26 +44,26 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.192 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.17.3 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.18.11 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.11 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.21 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.27 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.21 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.28 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.21 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.35.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.12.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.2 // indirect
+	github.com/aws/aws-sdk-go v1.44.194 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.17.4 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.18.12 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.12 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.28 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.29 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.22 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.35.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.3 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230202003038-9fc4a2088c62 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230203182935-f2e58dc4a0e1 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
@@ -124,7 +124,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f // indirect
-	golang.org/x/exp v0.0.0-20230131160201-f062dba9d201 // indirect
+	golang.org/x/exp v0.0.0-20230203172020-98cc5a0785f9 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/oauth2 v0.4.0 // indirect
@@ -139,7 +139,7 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.109.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619 // indirect
+	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
 	google.golang.org/grpc v1.52.3 // indirect
 	gvisor.dev/gvisor v0.0.0-20220817001344-846276b3dbc5 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
