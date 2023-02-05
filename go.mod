@@ -5,21 +5,21 @@ go 1.19
 require (
 	github.com/creachadair/atomicfile v0.2.8
 	github.com/creachadair/badgerstore v0.2.0
-	github.com/creachadair/bitcaskstore v0.0.0-20230131154041-7a089b745d9a
-	github.com/creachadair/boltstore v0.0.0-20230131154104-abcaea860d6c
-	github.com/creachadair/chirp v0.0.0-20230118205743-51c55d6664b2
-	github.com/creachadair/chirpstore v0.0.0-20230201023056-fa6aa5f86b2a
-	github.com/creachadair/command v0.0.0-20230116214947-f5a018644005
+	github.com/creachadair/bitcaskstore v0.0.0-20230205180830-1aba57edc671
+	github.com/creachadair/boltstore v0.0.0-20230205180906-c1521bb76664
+	github.com/creachadair/chirp v0.0.0-20230205180931-7dde045fc821
+	github.com/creachadair/chirpstore v0.0.0-20230205180945-c9ff2a9fb20e
+	github.com/creachadair/command v0.0.0-20230205181012-a3a7f6690378
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230204022207-569f8f4cdd9e
-	github.com/creachadair/gcsstore v0.0.0-20230131154120-27496f79c3bb
+	github.com/creachadair/ffs v0.0.0-20230205181227-d55aafbb6c81
+	github.com/creachadair/gcsstore v0.0.0-20230205181318-bf08ebb58383
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20230131154210-fb44928a9588
+	github.com/creachadair/leveldbstore v0.0.0-20230205181450-3d947dfcda35
 	github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1
-	github.com/creachadair/pebblestore v0.0.0-20230202054018-41f855d9516e
-	github.com/creachadair/pogrebstore v0.0.0-20230131154049-455f83d4475e
-	github.com/creachadair/s3store v0.0.0-20230131154249-335ed061e305
-	github.com/creachadair/sqlitestore v0.0.0-20230131154256-88465a1b7ddd
+	github.com/creachadair/pebblestore v0.0.0-20230205181602-599ec1a850d4
+	github.com/creachadair/pogrebstore v0.0.0-20230205181623-c8d7b7ea28e6
+	github.com/creachadair/s3store v0.0.0-20230205181655-32c2384cf7ed
+	github.com/creachadair/sqlitestore v0.0.0-20230205181716-15c2e5644090
 	github.com/creachadair/taskgroup v0.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.5.0
