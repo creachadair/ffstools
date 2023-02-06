@@ -32,6 +32,7 @@
 //	gcs      | GCS        https://godoc.org/cloud.google.com/go/storage
 //	leveldb  | LevelDB    https://godoc.org/github.com/syndtr/goleveldb/leveldb
 //	memory   | In-memory  https://godoc.org/github.com/creachadair/ffs/blob/memstore
+//	nuts     | NutsDB     https://godoc.org/github.com/xujiajun/nutsdb
 //	pebble   | PebbleDB   https://godoc.org/github.com/cockroachdb/pebble
 //	pogreb   | Pogreb     https://godoc.org/github.com/akrylysov/pogreb
 //	s3       | Amazon S3  https://godoc.org/github.com/aws/aws-sdk-go/service/s3
