@@ -16,6 +16,7 @@ require (
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230205181450-3d947dfcda35
 	github.com/creachadair/mds v0.0.0-20230121043849-c7d6542927f1
+	github.com/creachadair/nutstore v0.0.0-20230206001321-30572add6f37
 	github.com/creachadair/pebblestore v0.0.0-20230205181602-599ec1a850d4
 	github.com/creachadair/pogrebstore v0.0.0-20230205181623-c8d7b7ea28e6
 	github.com/creachadair/s3store v0.0.0-20230205181655-32c2384cf7ed
@@ -59,6 +60,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.3 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.1 // indirect
@@ -120,6 +122,9 @@ require (
 	github.com/vishvananda/netlink v1.2.1-beta.2 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	github.com/xujiajun/mmap-go v1.0.1 // indirect
+	github.com/xujiajun/nutsdb v0.11.1 // indirect
+	github.com/xujiajun/utils v0.0.0-20220904132955-5f7c5b914235 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
