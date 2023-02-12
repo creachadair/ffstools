@@ -11,11 +11,11 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20230209192223-2eadf3b0c30c
 	github.com/creachadair/command v0.0.0-20230205181012-a3a7f6690378
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230210191730-74d62b358e4a
+	github.com/creachadair/ffs v0.0.0-20230212230301-365cf6fd96f9
 	github.com/creachadair/gcsstore v0.0.0-20230209192042-875413bb775e
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230209192119-4ce81c2033f5
-	github.com/creachadair/mds v0.0.0-20230210193006-ec4a88b5921b
+	github.com/creachadair/mds v0.0.0-20230211201837-5ec6beec55ce
 	github.com/creachadair/nutstore v0.0.0-20230206001321-30572add6f37
 	github.com/creachadair/pebblestore v0.0.0-20230209192055-427449db57bf
 	github.com/creachadair/pogrebstore v0.0.0-20230209192015-648cc7165103
@@ -130,7 +130,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f // indirect
-	golang.org/x/exp v0.0.0-20230210204819-062eb4c674ab // indirect
+	golang.org/x/exp v0.0.0-20230212135524-a684f29349b6 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
@@ -141,7 +141,6 @@ require (
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
-	golang.zx2c4.com/wireguard v0.0.0-20230209153558-1e2c3e5a3c14 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.109.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
