@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
@@ -141,21 +142,21 @@ store without roots.
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
-			var numKeep, numDrop int
+			var numKeep, numDrop atomic.Int64
 			g.Go(func() error {
 				defer fmt.Fprintln(env, "*")
 				return s.List(cfg.Context, "", func(key string) error {
-					for _, idx := range idxs {
-						if idx.Has(key) {
-							numKeep++
-							return nil
-						}
-					}
-					numDrop++
-					if numDrop%50 == 0 {
-						fmt.Fprint(env, ".")
-					}
 					run(func() error {
+						for _, idx := range idxs {
+							if idx.Has(key) {
+								numKeep.Add(1)
+								return nil
+							}
+						}
+						if numDrop.Add(1)%50 == 0 {
+							fmt.Fprint(env, ".")
+						}
+
 						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 							log.Printf("WARNING: delete key %x: %v", key, err)
 						}
@@ -168,7 +169,7 @@ store without roots.
 				return fmt.Errorf("sweeping failed: %w", err)
 			}
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
-				numKeep, numDrop, time.Since(start).Truncate(10*time.Millisecond))
+				numKeep.Load(), numDrop.Load(), time.Since(start).Truncate(10*time.Millisecond))
 			return nil
 		})
 	},
