@@ -84,11 +84,11 @@ func sizeCmd(env *command.Env, args []string) error {
 		if err != nil {
 			return err
 		}
-		size, err := bs.Size(nctx, key)
+		data, err := bs.Get(nctx, key)
 		if err != nil {
 			return err
 		}
-		fmt.Println(hex.EncodeToString([]byte(key)), size)
+		fmt.Println(hex.EncodeToString([]byte(key)), len(data))
 	}
 	return nil
 }
