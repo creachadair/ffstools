@@ -20,10 +20,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
@@ -138,15 +140,18 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
-			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
+			g := taskgroup.New(taskgroup.Trigger(cancel))
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
-			g.Go(func() error {
-				defer fmt.Fprintln(env, "*")
-				return s.List(cfg.Context, "", func(key string) error {
-					run(func() error {
+			for i := 0; i < 256; i++ {
+				pfx := string([]byte{byte(i)})
+				g.Go(func() error {
+					return s.List(cfg.Context, pfx, func(key string) error {
+						if !strings.HasPrefix(key, pfx) {
+							return blob.ErrStopListing
+						}
 						for _, idx := range idxs {
 							if idx.Has(key) {
 								numKeep.Add(1)
@@ -156,18 +161,17 @@ store without roots.
 						if numDrop.Add(1)%50 == 0 {
 							fmt.Fprint(env, ".")
 						}
-
 						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 							log.Printf("WARNING: delete key %x: %v", key, err)
 						}
 						return nil
 					})
-					return nil
 				})
-			})
+			}
 			if err := g.Wait(); err != nil {
 				return fmt.Errorf("sweeping failed: %w", err)
 			}
+			fmt.Fprintln(env, "*")
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
 				numKeep.Load(), numDrop.Load(), time.Since(start).Truncate(10*time.Millisecond))
 			return nil
