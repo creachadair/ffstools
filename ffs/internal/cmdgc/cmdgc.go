@@ -140,7 +140,7 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
-			g := taskgroup.New(taskgroup.Trigger(cancel))
+			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(128)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
@@ -152,18 +152,21 @@ store without roots.
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
 						}
-						for _, idx := range idxs {
-							if idx.Has(key) {
-								numKeep.Add(1)
-								return nil
+						run(func() error {
+							for _, idx := range idxs {
+								if idx.Has(key) {
+									numKeep.Add(1)
+									return nil
+								}
 							}
-						}
-						if numDrop.Add(1)%50 == 0 {
-							fmt.Fprint(env, ".")
-						}
-						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
-							log.Printf("WARNING: delete key %x: %v", key, err)
-						}
+							if numDrop.Add(1)%50 == 0 {
+								fmt.Fprint(env, ".")
+							}
+							if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
+								log.Printf("WARNING: delete key %x: %v", key, err)
+							}
+							return nil
+						})
 						return nil
 					})
 				})
