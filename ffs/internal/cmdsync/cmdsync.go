@@ -152,7 +152,7 @@ func runSync(env *command.Env, args []string) error {
 			ctx, cancel := context.WithCancel(cfg.Context)
 			defer cancel()
 
-			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(128)
+			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
 			for key, tag := range worklist {
 				if ctx.Err() != nil {
 					break
