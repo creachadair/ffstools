@@ -172,7 +172,7 @@ func blobd(_ *command.Env, args []string) error {
 	bs, buf := mustOpenStore(ctx)
 	defer func() {
 		// N.B. Invoke close with a fresh context, since the parent is likely to
-		// have been already canceleld during shutdown. Set a timeout in case the
+		// have been already canceled during shutdown. Set a timeout in case the
 		// close gets stuck, however.
 		cctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
