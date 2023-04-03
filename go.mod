@@ -5,29 +5,29 @@ go 1.19
 require (
 	github.com/creachadair/atomicfile v0.2.8
 	github.com/creachadair/badgerstore v0.2.1
-	github.com/creachadair/bitcaskstore v0.0.0-20230324145429-406185c42890
-	github.com/creachadair/boltstore v0.0.0-20230324145452-6abf48a95421
-	github.com/creachadair/chirp v0.0.0-20230321183114-d6aede0dc743
-	github.com/creachadair/chirpstore v0.0.0-20230324145615-752184defc15
+	github.com/creachadair/bitcaskstore v0.0.0-20230330235235-1156b4d1b62a
+	github.com/creachadair/boltstore v0.0.0-20230330235300-ec490df8147a
+	github.com/creachadair/chirp v0.0.0-20230328043846-db5a8b978c9b
+	github.com/creachadair/chirpstore v0.0.0-20230330235621-716d8907583a
 	github.com/creachadair/command v0.0.0-20230321183317-e4e984c4ab3c
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230321183314-02aaf775b436
-	github.com/creachadair/gcsstore v0.0.0-20230324145507-06242caadb76
+	github.com/creachadair/ffs v0.0.0-20230327222140-2f4162e209d7
+	github.com/creachadair/gcsstore v0.0.0-20230330235329-74856f004d9d
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20230324145544-4cc5eee7f1fc
+	github.com/creachadair/leveldbstore v0.0.0-20230330235517-a1ff893b9c48
 	github.com/creachadair/mds v0.0.1
 	github.com/creachadair/nutstore v0.0.0-20230321183140-ba1ac3bc6f37
-	github.com/creachadair/pebblestore v0.0.0-20230324145524-bf86551631ef
-	github.com/creachadair/pogrebstore v0.0.0-20230324145437-3f31238bf55d
-	github.com/creachadair/s3store v0.0.0-20230324145602-c70919623a87
-	github.com/creachadair/sqlitestore v0.0.0-20230324145607-a4b9ae992b24
+	github.com/creachadair/pebblestore v0.0.0-20230330235452-558c3c100acd
+	github.com/creachadair/pogrebstore v0.0.0-20230330235244-d16aa832ab32
+	github.com/creachadair/s3store v0.0.0-20230330235531-e41095f6033a
+	github.com/creachadair/sqlitestore v0.0.0-20230330235613-62f2d38e3fa1
 	github.com/creachadair/taskgroup v0.5.1
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.7.0
 	golang.org/x/term v0.6.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
-	tailscale.com v1.38.2
+	tailscale.com v1.38.3
 )
 
 require (
@@ -45,7 +45,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.230 // indirect
+	github.com/aws/aws-sdk-go v1.44.234 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.7 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.19 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.18 // indirect
@@ -65,7 +65,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230327211300-5d60d312f3ba // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230401172815-5fd583650456 // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
@@ -73,7 +73,7 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
-	github.com/getsentry/sentry-go v0.19.0 // indirect
+	github.com/getsentry/sentry-go v0.20.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
@@ -145,7 +145,7 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.114.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230327215041-6ac7f18bb9d5 // indirect
+	google.golang.org/genproto v0.0.0-20230331144136-dcfb400f0633 // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	gvisor.dev/gvisor v0.0.0-20221203005347-703fd9b7fbc0 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
