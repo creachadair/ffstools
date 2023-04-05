@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -35,7 +36,8 @@ import (
 )
 
 var gcFlags struct {
-	Force bool
+	Force   bool
+	Partial float64
 }
 
 var Command = &command.C{
@@ -49,11 +51,14 @@ store without roots.
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&gcFlags.Force, "force", false, "Force collection on empty root list (DANGER)")
+		fs.Float64Var(&gcFlags.Partial, "partial", 1, "Fraction of unreachable objects to remove")
 	},
 
 	Run: func(env *command.Env, args []string) error {
 		if len(args) != 0 {
 			return env.Usagef("extra arguments after command")
+		} else if gcFlags.Partial <= 0 || gcFlags.Partial > 1 {
+			return errors.New("sweep fraction must be in 0..1")
 		}
 
 		cfg := env.Config.(*config.Settings)
@@ -143,6 +148,12 @@ store without roots.
 			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
+			sample := func() bool { return true }
+			if gcFlags.Partial < 1 {
+				rng := rand.New(rand.NewSource(20230405090527))
+				sample = func() bool { return rng.Float64() <= gcFlags.Partial }
+				fmt.Fprintf(env, "- partial sweep with fraction %.2g\n", gcFlags.Partial)
+			}
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
 			for i := 0; i < 256; i++ {
@@ -159,7 +170,9 @@ store without roots.
 									return nil
 								}
 							}
-							if numDrop.Add(1)%50 == 0 {
+							if !sample() {
+								return nil
+							} else if numDrop.Add(1)%50 == 0 {
 								fmt.Fprint(env, ".")
 							}
 							if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
