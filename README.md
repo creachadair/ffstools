@@ -11,15 +11,6 @@ See also https://github.com/creachadair/ffs.
   go install github.com/creachadair/ffstools/blobd@latest
   ```
 
-- The [`blob`](https://github.com/creachadair/ffstools/tree/main/blob) tool
-  is a client that communicates with the `blobd` service to manipulate the
-  contents of a blob store as opaque data.
-
-  ```sh
-  # To install:
-  go install github.com/creachadair/ffstools/blob@latest
-  ```
-
 - The [`ffs`](https://github.com/creachadair/ffstools/tree/main/ffs) tool
   also communicates with the `blobd` service and provides commands to
   manipulate the contents of the store as FFS specific messages.
@@ -28,6 +19,8 @@ See also https://github.com/creachadair/ffs.
   # To install:
   go install github.com/creachadair/ffstools/ffs@latest
   ```
+
+  The `ffs blob` subcommand replaced the separate `blob` tool in #30.
 
 - The [`file2json`](https://github.com/creachadair/ffstools/tree/main/file2json)
   tool decodes wire-format node messages and translates them to JSON for easier

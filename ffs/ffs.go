@@ -25,6 +25,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 
 	// Subcommands.
+	"github.com/creachadair/ffstools/ffs/internal/cmdblob"
 	"github.com/creachadair/ffstools/ffs/internal/cmdexport"
 	"github.com/creachadair/ffstools/ffs/internal/cmdfile"
 	"github.com/creachadair/ffstools/ffs/internal/cmdgc"
@@ -73,6 +74,7 @@ help [<command>]`,
 		},
 
 		Commands: []*command.C{
+			cmdblob.Command,
 			cmdroot.Command,
 			cmdfile.Command,
 			cmdput.Command,

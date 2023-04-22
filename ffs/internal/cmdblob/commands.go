@@ -12,49 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmdblob
 
 import (
-	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"log"
-	"net"
 	"os"
-	"strings"
 
-	"github.com/creachadair/chirp"
-	"github.com/creachadair/chirp/channel"
-	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffs/storage/suffixed"
+	"github.com/creachadair/ffstools/ffs/config"
 )
-
-func getContext(env *command.Env) context.Context {
-	return env.Config.(*settings).Context
-}
 
 func getCmd(env *command.Env, args []string) error {
 	if len(args) == 0 {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: get <key>...")
 	}
-	bs, err := storeFromEnv(env)
+	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	nctx := getContext(env)
 	defer bs.Close(nctx)
 
 	for _, arg := range args {
-		key, err := parseKey(arg)
+		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
 		}
@@ -72,15 +59,14 @@ func sizeCmd(env *command.Env, args []string) error {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: size <key>...")
 	}
-	bs, err := storeFromEnv(env)
+	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	nctx := getContext(env)
 	defer bs.Close(nctx)
 
 	for _, arg := range args {
-		key, err := parseKey(arg)
+		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
 		}
@@ -98,16 +84,15 @@ func delCmd(env *command.Env, args []string) (err error) {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: delete <key>...")
 	}
-	bs, err := storeFromEnv(env)
+	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	nctx := getContext(env)
 	defer bs.Close(nctx)
 
-	missingOK := env.Config.(*settings).MissingOK
+	missingOK := blobFlags.MissingOK
 	for _, arg := range args {
-		key, err := parseKey(arg)
+		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
 		}
@@ -125,38 +110,38 @@ func listCmd(env *command.Env, args []string) error {
 	if len(args) != 0 {
 		return errors.New("usage is: list")
 	}
-	cfg := env.Config.(*settings)
-	start, err := parseKey(cfg.Start)
+	start, err := config.ParseKey(blobFlags.Start)
 	if err != nil {
 		return err
 	}
-	pfx, err := parseKey(cfg.Prefix)
+	pfx, err := config.ParseKey(blobFlags.Prefix)
 	if err != nil {
 		return err
 	}
-	bs, err := storeFromEnv(env)
+	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	ctx := getContext(env)
 	defer bs.Close(ctx)
 
 	// If there is a prefix, apply it first since that will permit the
 	// underlying scan to terminate sooner.
 	if pfx != "" {
 		p := prefixed.NewCAS(bs.Base()).Derive(pfx)
-		bs = suffixed.NewCAS(p).Derive(cfg.Bucket)
+		bs.CAS = suffixed.NewCAS(p).Derive(blobFlags.Bucket)
+	} else if blobFlags.Bucket != "" {
+		bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
 	}
 
 	var listed int
 	return bs.List(ctx, start, func(key string) error {
-		if cfg.Raw {
+		if blobFlags.Raw {
 			fmt.Println(key)
 		} else {
 			fmt.Printf("%x\n", key)
 		}
 		listed++
-		if cfg.MaxKeys > 0 && listed == cfg.MaxKeys {
+		if blobFlags.MaxKeys > 0 && listed == blobFlags.MaxKeys {
 			return blob.ErrStopListing
 		}
 		return nil
@@ -167,11 +152,10 @@ func lenCmd(env *command.Env, args []string) error {
 	if len(args) != 0 {
 		return errors.New("usage is: len")
 	}
-	bs, err := storeFromEnv(env)
+	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	ctx := getContext(env)
 	defer bs.Close(ctx)
 
 	n, err := bs.Len(ctx)
@@ -183,11 +167,10 @@ func lenCmd(env *command.Env, args []string) error {
 }
 
 func casPutCmd(env *command.Env, args []string) (err error) {
-	cas, err := storeFromEnv(env)
+	ctx, cas, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	ctx := getContext(env)
 	defer cas.Close(ctx)
 
 	data, err := readData(ctx, "put", args)
@@ -203,11 +186,10 @@ func casPutCmd(env *command.Env, args []string) (err error) {
 }
 
 func casKeyCmd(env *command.Env, args []string) error {
-	cas, err := storeFromEnv(env)
+	ctx, cas, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	ctx := getContext(env)
 	defer cas.Close(ctx)
 
 	data, err := readData(ctx, "key", args)
@@ -226,18 +208,17 @@ func copyCmd(env *command.Env, args []string) error {
 	if len(args) != 2 {
 		return errors.New("usage is: copy <src> <dst>")
 	}
-	bs, err := storeFromEnv(env)
+	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
-	ctx := getContext(env)
 	defer bs.Close(ctx)
 
-	srcKey, err := parseKey(args[0])
+	srcKey, err := config.ParseKey(args[0])
 	if err != nil {
 		return err
 	}
-	dstKey, err := parseKey(args[1])
+	dstKey, err := config.ParseKey(args[1])
 	if err != nil {
 		return err
 	}
@@ -248,50 +229,22 @@ func copyCmd(env *command.Env, args []string) error {
 	return bs.Put(ctx, blob.PutOptions{
 		Key:     dstKey,
 		Data:    src,
-		Replace: env.Config.(*settings).Replace,
+		Replace: blobFlags.Replace,
 	})
-}
-
-func statCmd(env *command.Env, args []string) error {
-	t := env.Config.(*settings)
-	t.Bucket = ""
-	s, err := storeFromEnv(env)
-	if err != nil {
-		return err
-	}
-
-	ctx := getContext(env)
-	defer s.Close(ctx)
-
-	var msg []byte
-	switch t := s.Base().(type) {
-	case chirpstore.CAS:
-		msg, err = t.Status(ctx)
-	default:
-		return errors.New("server does not support the status command")
-	}
-	if err != nil {
-		return err
-	}
-	var buf bytes.Buffer
-	json.Indent(&buf, msg, "", "  ")
-	fmt.Println(buf.String())
-	return nil
 }
 
 func putCmd(env *command.Env, args []string) (err error) {
 	if len(args) == 0 || len(args) > 2 {
 		return errors.New("usage is: put <key> [<path>]")
 	}
-	key, err := parseKey(args[0])
+	key, err := config.ParseKey(args[0])
 	if err != nil {
 		return err
 	}
-	bs, err := storeFromEnv(env)
+	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return nil
 	}
-	ctx := getContext(env)
 	defer bs.Close(ctx)
 
 	data, err := readData(ctx, "put", args[1:])
@@ -302,7 +255,7 @@ func putCmd(env *command.Env, args []string) (err error) {
 	return bs.Put(ctx, blob.PutOptions{
 		Key:     key,
 		Data:    data,
-		Replace: env.Config.(*settings).Replace,
+		Replace: blobFlags.Replace,
 	})
 }
 
@@ -317,50 +270,8 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 	return
 }
 
-func storeFromEnv(env *command.Env) (suffixed.CAS, error) {
-	t := env.Config.(*settings)
-	addr, ok := t.FFS.FindAddress()
-	if !ok {
-		return suffixed.CAS{}, fmt.Errorf("no -store address was found (%q)", addr)
-	}
-
-	conn, err := net.Dial(chirp.SplitAddress(addr))
-	if err != nil {
-		return suffixed.CAS{}, fmt.Errorf("dialing: %w", err)
-	}
-
-	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
-	if t.Debug {
-		peer.LogPackets(func(pkt chirp.PacketInfo) { log.Print(pkt) })
-	}
-	bs := chirpstore.NewCAS(peer, nil)
-	return suffixed.NewCAS(bs).Derive(t.Bucket), nil
-}
-
-func isAllHex(s string) bool {
-	for _, c := range s {
-		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F') {
-			return false
-		}
-	}
-	return true
-}
-
-func parseKey(s string) (string, error) {
-	if strings.HasPrefix(s, "@") {
-		return s[1:], nil
-	}
-	var key []byte
-	var err error
-	if isAllHex(s) {
-		key, err = hex.DecodeString(s)
-	} else if strings.HasSuffix(s, "=") {
-		key, err = base64.StdEncoding.DecodeString(s)
-	} else {
-		key, err = base64.RawStdEncoding.DecodeString(s) // tolerate missing padding
-	}
-	if err != nil {
-		return "", fmt.Errorf("invalid key %q: %w", s, err)
-	}
-	return string(key), nil
+func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
+	t := env.Config.(*config.Settings)
+	bs, err := t.OpenStore()
+	return t.Context, bs, err
 }
