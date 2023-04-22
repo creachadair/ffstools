@@ -177,7 +177,7 @@ func casPutCmd(env *command.Env, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	key, err := cas.CASPut(ctx, data)
+	key, err := cas.CASPut(ctx, blob.CASPutOptions{Data: data})
 	if err != nil {
 		return err
 	}
@@ -196,7 +196,7 @@ func casKeyCmd(env *command.Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	key, err := cas.CASKey(ctx, data)
+	key, err := cas.CASKey(ctx, blob.CASPutOptions{Data: data})
 	if err != nil {
 		return err
 	}

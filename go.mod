@@ -8,10 +8,10 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20230413071257-9b647eecd2d1
 	github.com/creachadair/boltstore v0.0.0-20230413071313-41f6824f417f
 	github.com/creachadair/chirp v0.0.0-20230328043846-db5a8b978c9b
-	github.com/creachadair/chirpstore v0.0.0-20230411162306-e0d0bf6a1eb3
+	github.com/creachadair/chirpstore v0.0.0-20230422214319-b6099503373a
 	github.com/creachadair/command v0.0.0-20230321183317-e4e984c4ab3c
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.0-20230410142923-abd30b2c23c4
+	github.com/creachadair/ffs v0.0.0-20230422212610-c0c8aaed6b8c
 	github.com/creachadair/gcsstore v0.0.0-20230413071331-8d279c8b9a54
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230411162221-e6c491d0eb93
