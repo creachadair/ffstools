@@ -200,8 +200,8 @@ github.com/creachadair/pogrebstore v0.0.0-20230422215342-44fb76da9b7c h1:B7u76E1
 github.com/creachadair/pogrebstore v0.0.0-20230422215342-44fb76da9b7c/go.mod h1:dsvgaDXl3unQEeI247mLac3lMN0RGj2vfE8uBPp+1uY=
 github.com/creachadair/s3store v0.0.0-20230422220013-f0eaec5b4fb4 h1:w/OO6GSBnCdl6WgRYI3mtvDXg1jwsKG7gr13ULm3Qyo=
 github.com/creachadair/s3store v0.0.0-20230422220013-f0eaec5b4fb4/go.mod h1:ogQz/ykhcrBc4N6IQMVqqYSCb8OB48NJiLw90OBDZR4=
-github.com/creachadair/sqlitestore v0.0.0-20230422224438-f5dd8afb05b1 h1:6Q2ULsX8FPUtv+ae9LLGdExDKcoC9BuXxAmhCq4iHBA=
-github.com/creachadair/sqlitestore v0.0.0-20230422224438-f5dd8afb05b1/go.mod h1:D6sCt1QHEviWGTSpc9Ub4RfFxN+YQGsTz9Xui6qjxTA=
+github.com/creachadair/sqlitestore v0.0.0-20230422232757-4f59f953f2b9 h1:qTuYGyzCC53WJkpWctp7Jn2DuXTKMNJtvV+dB9eXz6g=
+github.com/creachadair/sqlitestore v0.0.0-20230422232757-4f59f953f2b9/go.mod h1:D6sCt1QHEviWGTSpc9Ub4RfFxN+YQGsTz9Xui6qjxTA=
 github.com/creachadair/taskgroup v0.5.1 h1:O9UWnfoqX+K6jFwN5lYDN/h0prhc1zVhk8/SCmKmffc=
 github.com/creachadair/taskgroup v0.5.1/go.mod h1:e1kO+tKiCfDiDiwHei/dXgz3i9kQ8b5inEUVsrGmFfw=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
