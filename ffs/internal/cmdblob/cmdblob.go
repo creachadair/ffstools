@@ -12,31 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Program blob provides basic support for reading and writing implementations
-// of the blob.Store interface.
-package main
+// Package cmdblob provides basic support for reading and writing
+// implementations of the blob.Store interface.
+package cmdblob
 
 import (
-	"context"
 	"flag"
-	"fmt"
-	"os"
-	"os/signal"
-	"path/filepath"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffstools/ffs/config"
 )
 
-type settings struct {
-	Context context.Context
-	Cancel  context.CancelFunc
-	FFS     *config.Settings
-
+var blobFlags struct {
 	// Flag targets
-	Store     string // global
 	Bucket    string // global
-	Debug     bool   // global
 	Replace   bool   // put
 	Raw       bool   // list
 	Start     string // list
@@ -45,18 +33,8 @@ type settings struct {
 	MissingOK bool   // delete
 }
 
-func main() {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	command.RunOrFail(tool.NewEnv(&settings{
-		Context: ctx,
-		Cancel:  cancel,
-	}), os.Args[1:])
-}
-
-var tool = &command.C{
-	Name: filepath.Base(os.Args[0]),
-	Usage: `[options] command [args...]
-help [command]`,
+var Command = &command.C{
+	Name: "blob",
 	Help: `Manipulate the contents of a blob store.
 
 Since blob keys are usually binary, key arguments are assumed to be encoded.
@@ -70,30 +48,10 @@ Rule                                                     Example
 If the BLOB_STORE environment variable is set, it is read to set the
 address of the storage server. Otherwise, -store must be set to either
 the address or an @tag from the configuration file.
-
 `,
 
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-		cfg := env.Config.(*settings)
-		fs.StringVar(&cfg.Store, "store", "", "Blob store address (required)")
-		fs.StringVar(&cfg.Bucket, "bucket", "", "Filter keys to this bucket label")
-		fs.BoolVar(&cfg.Debug, "debug", false, "Enable client debug logging")
-	},
-
-	Init: func(env *command.Env) error {
-		fc, err := config.Load(config.Path())
-		if err != nil {
-			return fmt.Errorf("loading FFS config: %w", err)
-		}
-		cfg := env.Config.(*settings)
-		if cfg.Store != "" {
-			fc.DefaultStore = cfg.Store
-		} else if bs := os.Getenv("BL OB_STORE"); bs != "" {
-			fc.DefaultStore = bs
-		}
-		fc.Context = cfg.Context
-		cfg.FFS = fc
-		return nil
+		fs.StringVar(&blobFlags.Bucket, "bucket", "", "Filter keys to this bucket label")
 	},
 
 	Commands: []*command.C{
@@ -109,8 +67,7 @@ the address or an @tag from the configuration file.
 			Help:  "Write a blob to the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				cfg := env.Config.(*settings)
-				fs.BoolVar(&cfg.Replace, "replace", false, "Replace an existing key")
+				fs.BoolVar(&blobFlags.Replace, "replace", false, "Replace an existing key")
 			},
 			Run: putCmd,
 		},
@@ -126,8 +83,7 @@ the address or an @tag from the configuration file.
 			Help:  "Delete a blob from the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				cfg := env.Config.(*settings)
-				fs.BoolVar(&cfg.MissingOK, "missing-ok", false, "Do not report an error for missing keys")
+				fs.BoolVar(&blobFlags.MissingOK, "missing-ok", false, "Do not report an error for missing keys")
 			},
 			Run: delCmd,
 		},
@@ -136,11 +92,10 @@ the address or an @tag from the configuration file.
 			Help: "List keys in the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				cfg := env.Config.(*settings)
-				fs.BoolVar(&cfg.Raw, "raw", false, "Print raw keys without hex encoding")
-				fs.StringVar(&cfg.Start, "start", "", "List keys greater than or equal to this")
-				fs.StringVar(&cfg.Prefix, "prefix", "", "List only keys having this prefix")
-				fs.IntVar(&cfg.MaxKeys, "max", 0, "List at most this many keys (0=all)")
+				fs.BoolVar(&blobFlags.Raw, "raw", false, "Print raw keys without hex encoding")
+				fs.StringVar(&blobFlags.Start, "start", "", "List keys greater than or equal to this")
+				fs.StringVar(&blobFlags.Prefix, "prefix", "", "List only keys having this prefix")
+				fs.IntVar(&blobFlags.MaxKeys, "max", 0, "List at most this many keys (0=all)")
 			},
 			Run: listCmd,
 		},
@@ -150,39 +105,24 @@ the address or an @tag from the configuration file.
 			Run:  lenCmd,
 		},
 		{
-			Name: "cas",
-			Help: "Manipulate a content-addressable blob store",
-
-			Commands: []*command.C{
-				{
-					Name: "key",
-					Help: "Compute the key for a blob without writing it",
-					Run:  casKeyCmd,
-				},
-				{
-					Name:  "put",
-					Usage: "put",
-					Help:  "Write a content-addressed blob to the store from stdin.",
-					Run:   casPutCmd,
-				},
-			},
+			Name: "cas-key",
+			Help: "Compute the key for a blob without writing it",
+			Run:  casKeyCmd,
+		},
+		{
+			Name:  "cas-put",
+			Usage: "cas-put",
+			Help:  "Write a content-addressed blob to the store from stdin",
+			Run:   casPutCmd,
 		},
 		{
 			Name:  "copy",
 			Usage: "<src> <dst>",
 			Help:  "Copy the contents of one blob to another key",
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				cfg := env.Config.(*settings)
-				fs.BoolVar(&cfg.Replace, "replace", false, "Replace an existing key")
+				fs.BoolVar(&blobFlags.Replace, "replace", false, "Replace an existing key")
 			},
 			Run: copyCmd,
 		},
-		{
-			Name: "status",
-			Help: "Print blob server status",
-			Run:  statCmd,
-		},
-		command.HelpCommand(nil),
-		command.VersionCommand(),
 	},
 }
