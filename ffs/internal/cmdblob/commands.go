@@ -273,5 +273,9 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
 	t := env.Config.(*config.Settings)
 	bs, err := t.OpenStore()
+
+	// Becuase the blob commands operate on the raw store, take off the default
+	// data bucket suffix (commands that want it can put it back on).
+	bs.CAS = bs.CAS.Derive("")
 	return t.Context, bs, err
 }
