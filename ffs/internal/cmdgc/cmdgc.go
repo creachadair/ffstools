@@ -145,7 +145,7 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
-			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(256)
+			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			sample := func() bool { return true }

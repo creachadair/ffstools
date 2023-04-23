@@ -87,7 +87,7 @@ func runExport(env *command.Env, args []string) error {
 		}
 		cctx, cancel := context.WithCancel(cfg.Context)
 		defer cancel()
-		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(32)
+		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
 
 		g.Go(func() error {
 			return fpath.Walk(cctx, of.File, func(e fpath.Entry) error {
