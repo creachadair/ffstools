@@ -20,18 +20,21 @@ import (
 	"flag"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/flax"
 )
 
 var blobFlags struct {
 	// Flag targets
-	Bucket    string // global
-	Replace   bool   // put
-	Raw       bool   // list
-	Start     string // list
-	Prefix    string // list
-	MaxKeys   int    // list
-	MissingOK bool   // delete
+	Bucket    string `flag:"bucket,Filter keys to this bucket label"`            // global
+	Replace   bool   `flag:"replace,Replace an existing key"`                    // put
+	Raw       bool   `flag:"raw,Print raw keys without hex encoding"`            // list
+	Start     string `flag:"start,List keys greater than or equal to this"`      // list
+	Prefix    string `flag:"prefix,List only keys having this prefix"`           // list
+	MaxKeys   int    `flag:"max,List at most this many keys (0=all)"`            // list
+	MissingOK bool   `flag:"missing-ok,Do not report an error for missing keys"` // delete
 }
+
+var bf = flax.MustCheck(&blobFlags)
 
 var Command = &command.C{
 	Name: "blob",
@@ -50,9 +53,7 @@ address of the storage server. Otherwise, -store must be set to either
 the address or an @tag from the configuration file.
 `,
 
-	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-		fs.StringVar(&blobFlags.Bucket, "bucket", "", "Filter keys to this bucket label")
-	},
+	SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("bucket").Bind(fs) },
 
 	Commands: []*command.C{
 		{
@@ -66,10 +67,8 @@ the address or an @tag from the configuration file.
 			Usage: "put <key> [<path>]",
 			Help:  "Write a blob to the store",
 
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&blobFlags.Replace, "replace", false, "Replace an existing key")
-			},
-			Run: putCmd,
+			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
+			Run:      putCmd,
 		},
 		{
 			Name:  "size",
@@ -82,20 +81,18 @@ the address or an @tag from the configuration file.
 			Usage: "<key>",
 			Help:  "Delete a blob from the store",
 
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&blobFlags.MissingOK, "missing-ok", false, "Do not report an error for missing keys")
-			},
-			Run: delCmd,
+			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("missing-ok").Bind(fs) },
+			Run:      delCmd,
 		},
 		{
 			Name: "list",
 			Help: "List keys in the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&blobFlags.Raw, "raw", false, "Print raw keys without hex encoding")
-				fs.StringVar(&blobFlags.Start, "start", "", "List keys greater than or equal to this")
-				fs.StringVar(&blobFlags.Prefix, "prefix", "", "List only keys having this prefix")
-				fs.IntVar(&blobFlags.MaxKeys, "max", 0, "List at most this many keys (0=all)")
+				bf.Flag("raw").Bind(fs)
+				bf.Flag("start").Bind(fs)
+				bf.Flag("prefix").Bind(fs)
+				bf.Flag("max").Bind(fs)
 			},
 			Run: listCmd,
 		},
@@ -116,13 +113,11 @@ the address or an @tag from the configuration file.
 			Run:   casPutCmd,
 		},
 		{
-			Name:  "copy",
-			Usage: "<src> <dst>",
-			Help:  "Copy the contents of one blob to another key",
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&blobFlags.Replace, "replace", false, "Replace an existing key")
-			},
-			Run: copyCmd,
+			Name:     "copy",
+			Usage:    "<src> <dst>",
+			Help:     "Copy the contents of one blob to another key",
+			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
+			Run:      copyCmd,
 		},
 	},
 }
