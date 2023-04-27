@@ -28,6 +28,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 )
 
 var Command = &command.C{
@@ -43,11 +44,8 @@ var Command = &command.C{
 If a glob is provided, only names matching the glob are listed; otherwise all
 known keys are listed.`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&listFlags.Long, "long", false, "Print details for each root")
-				fs.BoolVar(&listFlags.JSON, "json", false, "Format output as JSON")
-			},
-			Run: runList,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
+			Run:      runList,
 		},
 		{
 			Name:  "create",
@@ -57,31 +55,24 @@ known keys are listed.`,
 If only a <name> is given, a new empty root pointer is created with that name.
 If a <file-key> is specified, the new root points to that file (which must exist).`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&createFlags.Replace, "replace", false, "Replace an existing root name")
-				fs.StringVar(&createFlags.Desc, "desc", "", "Set the human-readable description")
-			},
-			Run: runCreate,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &createFlags) },
+			Run:      runCreate,
 		},
 		{
 			Name:  "copy",
 			Usage: "<source-name> <target-name>",
 			Help:  "Duplicate a root pointer under a new name.",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&copyFlags.Replace, "replace", false, "Replace an existing target root name")
-			},
-			Run: runCopy,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &copyFlags) },
+			Run:      runCopy,
 		},
 		{
 			Name:  "rename",
 			Usage: "<source-name> <target-name>",
 			Help:  "Rename a root pointer (equivalent to copy + remove).",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&copyFlags.Replace, "replace", false, "Replace an existing target root name")
-			},
-			Run: runCopy,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &copyFlags) },
+			Run:      runCopy,
 		},
 		{
 			Name:  "delete",
@@ -116,18 +107,15 @@ An index is a Bloom filter of the keys reachable from the root.  If a root
 already has an index, it is not changed; use -f to force a new index to be
 computed anyway.`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&indexFlags.Force, "f", false, "Force reindexing")
-			},
-
-			Run: runIndex,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &indexFlags) },
+			Run:      runIndex,
 		},
 	},
 }
 
 var listFlags struct {
-	Long bool
-	JSON bool
+	Long bool `flag:"long,Print details for each root"`
+	JSON bool `flag:"json,Format output as JSON"`
 }
 
 func runList(env *command.Env, args []string) error {
@@ -182,8 +170,8 @@ func runList(env *command.Env, args []string) error {
 }
 
 var createFlags struct {
-	Replace bool
-	Desc    string
+	Replace bool   `flag:"replace,Replace an existing root name"`
+	Desc    string `flag:"desc,Set the human-readable description"`
 }
 
 func runCreate(env *command.Env, args []string) error {
@@ -226,7 +214,7 @@ func runCreate(env *command.Env, args []string) error {
 }
 
 var copyFlags struct {
-	Replace bool
+	Replace bool `flag:"replace,Replace an existing target root name"`
 }
 
 func runCopy(env *command.Env, args []string) error {

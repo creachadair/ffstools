@@ -12,6 +12,7 @@ require (
 	github.com/creachadair/command v0.0.0-20230321183317-e4e984c4ab3c
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.0.0-20230422230946-ae5c147c555f
+	github.com/creachadair/flax v0.0.0-20230427040449-fbd9a0cd4d5c
 	github.com/creachadair/gcsstore v0.0.0-20230422215045-89354baed04a
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20230422215120-662b256cd596

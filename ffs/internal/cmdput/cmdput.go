@@ -23,12 +23,13 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/putlib"
+	"github.com/creachadair/flax"
 )
 
 var putConfig putlib.Config
 
 var putFlags struct {
-	Target string
+	Target string `flag:"into,Store the resulting object under this root/path or file/path"`
 }
 
 var Command = &command.C{
@@ -53,7 +54,7 @@ input path is allowed.`,
 		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
 		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
-		fs.StringVar(&putFlags.Target, "into", "", "Store the resulting object under this root/path or file/path")
+		flax.MustBind(fs, &putFlags)
 	},
 	Run: runPut,
 }

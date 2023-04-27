@@ -31,13 +31,14 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
 )
 
 var gcFlags struct {
-	Force   bool
-	Partial float64
+	Force   bool    `flag:"force,Force collection on empty root list (DANGER)"`
+	Partial float64 `flag:"partial,default=1,Fraction of unreachable objects to remove"`
 }
 
 var Command = &command.C{
@@ -49,10 +50,7 @@ unless -force is set. This avoids accidentally deleting everything in a
 store without roots.
 `,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&gcFlags.Force, "force", false, "Force collection on empty root list (DANGER)")
-		fs.Float64Var(&gcFlags.Partial, "partial", 1, "Fraction of unreachable objects to remove")
-	},
+	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &gcFlags) },
 
 	Run: func(env *command.Env, args []string) error {
 		if len(args) != 0 {

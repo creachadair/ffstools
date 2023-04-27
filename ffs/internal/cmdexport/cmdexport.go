@@ -31,16 +31,17 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
 )
 
 var exportFlags struct {
-	NoStat  bool
-	XAttr   bool
-	Verbose bool
-	Target  string
-	Update  bool
+	NoStat  bool   `flag:"nostat,Do not update permissions or modification times"`
+	XAttr   bool   `flag:"xattr,Restore extended attributes"`
+	Verbose bool   `flag:"v,Enable verbose logging"`
+	Target  string `flag:"update,Update target path if it exists"`
+	Update  bool   `flag:"to,Export to this path (required)"`
 }
 
 var Command = &command.C{
@@ -55,14 +56,8 @@ key to the path indicated by -to. By default, stat information (permissions,
 modification time, etc.) is copied to the output; use -nostat to omit this.
 Use -xattr to export extended attributes, if any are stored.`,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&exportFlags.NoStat, "nostat", false, "Do not update permissions or modification times")
-		fs.BoolVar(&exportFlags.XAttr, "xattr", false, "Restore extended attributes")
-		fs.BoolVar(&exportFlags.Verbose, "v", false, "Enable verbose logging")
-		fs.BoolVar(&exportFlags.Update, "update", false, "Update target if it exists")
-		fs.StringVar(&exportFlags.Target, "to", "", "Export to this path (required)")
-	},
-	Run: runExport,
+	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &exportFlags) },
+	Run:      runExport,
 }
 
 func runExport(env *command.Env, args []string) error {

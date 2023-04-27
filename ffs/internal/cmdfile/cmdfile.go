@@ -39,6 +39,7 @@ import (
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/putlib"
+	"github.com/creachadair/flax"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -69,14 +70,8 @@ a file may be specified in the following formats:
 			Usage: fileCmdUsage,
 			Help:  "List file attributes in a style similar to the ls command",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&listFlags.DirOnly, "d", false, "List directories as plain files")
-				fs.BoolVar(&listFlags.Long, "long", false, "Print detail for each file entry")
-				fs.BoolVar(&listFlags.XAttr, "xattr", false, "Include extended attributes")
-				fs.BoolVar(&listFlags.Key, "key", false, "Include storage keys")
-				fs.BoolVar(&listFlags.JSON, "json", false, "Emit output in JSON format")
-			},
-			Run: runList,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
+			Run:      runList,
 		},
 		{
 			Name:  "read",
@@ -169,11 +164,11 @@ func runShow(env *command.Env, args []string) error {
 }
 
 var listFlags struct {
-	DirOnly bool
-	Long    bool
-	XAttr   bool
-	Key     bool
-	JSON    bool
+	DirOnly bool `flag:"d,List directories as plain files"`
+	Long    bool `flag:"long,Print detail for each file entry"`
+	XAttr   bool `flag:"xattr,Include extended attributes"`
+	Key     bool `flag:"key,Include storage keys"`
+	JSON    bool `flag:"json,Emit output in JSON format"`
 }
 
 func runList(env *command.Env, args []string) error {

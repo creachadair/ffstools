@@ -28,7 +28,7 @@ import (
 )
 
 var indexFlags struct {
-	Force bool
+	Force bool `flag:"f,Force reindexing"`
 }
 
 func runIndex(env *command.Env, keys []string) error {

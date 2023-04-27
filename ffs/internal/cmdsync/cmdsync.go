@@ -29,13 +29,14 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 	"github.com/creachadair/taskgroup"
 )
 
 var syncFlags struct {
-	Target  string
-	Verbose bool
-	NoIndex bool
+	Target  string `flag:"to,Target store (required)"`
+	Verbose bool   `flag:"v,Enable verbose logging"`
+	NoIndex bool   `flag:"no-index,Do not use cached indices"`
 }
 
 func debug(msg string, args ...interface{}) {
@@ -54,12 +55,8 @@ Transfer all the objects reachable from the specified file or root
 paths into the given target store.
 `,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.StringVar(&syncFlags.Target, "to", "", "Target store (required)")
-		fs.BoolVar(&syncFlags.Verbose, "v", false, "Enable verbose logging")
-		fs.BoolVar(&syncFlags.NoIndex, "no-index", false, "Do not use cached indices")
-	},
-	Run: runSync,
+	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &syncFlags) },
+	Run:      runSync,
 }
 
 func runSync(env *command.Env, args []string) error {
