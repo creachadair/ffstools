@@ -24,14 +24,16 @@ import (
 )
 
 var blobFlags struct {
-	// Flag targets
 	Bucket    string `flag:"bucket,Filter keys to this bucket label"`            // global
 	Replace   bool   `flag:"replace,Replace an existing key"`                    // put
-	Raw       bool   `flag:"raw,Print raw keys without hex encoding"`            // list
-	Start     string `flag:"start,List keys greater than or equal to this"`      // list
-	Prefix    string `flag:"prefix,List only keys having this prefix"`           // list
-	MaxKeys   int    `flag:"max,List at most this many keys (0=all)"`            // list
 	MissingOK bool   `flag:"missing-ok,Do not report an error for missing keys"` // delete
+}
+
+var listFlags struct {
+	Raw     bool   `flag:"raw,Print raw keys without hex encoding"`
+	Start   string `flag:"start,List keys greater than or equal to this"`
+	Prefix  string `flag:"prefix,List only keys having this prefix"`
+	MaxKeys int    `flag:"max,List at most this many keys (0=all)"`
 }
 
 var bf = flax.MustCheck(&blobFlags)
@@ -88,13 +90,8 @@ the address or an @tag from the configuration file.
 			Name: "list",
 			Help: "List keys in the store",
 
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				bf.Flag("raw").Bind(fs)
-				bf.Flag("start").Bind(fs)
-				bf.Flag("prefix").Bind(fs)
-				bf.Flag("max").Bind(fs)
-			},
-			Run: listCmd,
+			SetFlags: func(env *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
+			Run:      listCmd,
 		},
 		{
 			Name: "len",

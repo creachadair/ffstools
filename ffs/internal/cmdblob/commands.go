@@ -110,11 +110,11 @@ func listCmd(env *command.Env, args []string) error {
 	if len(args) != 0 {
 		return errors.New("usage is: list")
 	}
-	start, err := config.ParseKey(blobFlags.Start)
+	start, err := config.ParseKey(listFlags.Start)
 	if err != nil {
 		return err
 	}
-	pfx, err := config.ParseKey(blobFlags.Prefix)
+	pfx, err := config.ParseKey(listFlags.Prefix)
 	if err != nil {
 		return err
 	}
@@ -135,13 +135,13 @@ func listCmd(env *command.Env, args []string) error {
 
 	var listed int
 	return bs.List(ctx, start, func(key string) error {
-		if blobFlags.Raw {
+		if listFlags.Raw {
 			fmt.Println(key)
 		} else {
 			fmt.Printf("%x\n", key)
 		}
 		listed++
-		if blobFlags.MaxKeys > 0 && listed == blobFlags.MaxKeys {
+		if listFlags.MaxKeys > 0 && listed == listFlags.MaxKeys {
 			return blob.ErrStopListing
 		}
 		return nil
