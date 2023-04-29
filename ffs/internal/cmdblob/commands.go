@@ -129,8 +129,6 @@ func listCmd(env *command.Env, args []string) error {
 	if pfx != "" {
 		p := prefixed.NewCAS(bs.Base()).Derive(pfx)
 		bs.CAS = suffixed.NewCAS(p).Derive(blobFlags.Bucket)
-	} else if blobFlags.Bucket != "" {
-		bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
 	}
 
 	var listed int
@@ -274,8 +272,8 @@ func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
 	t := env.Config.(*config.Settings)
 	bs, err := t.OpenStore()
 
-	// Becuase the blob commands operate on the raw store, take off the default
-	// data bucket suffix (commands that want it can put it back on).
-	bs.CAS = bs.CAS.Derive("")
+	// Becausethe blob commands operate on the raw store, take off the default
+	// data bucket suffix and apply the one from the -bucket flag.
+	bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
 	return t.Context, bs, err
 }
