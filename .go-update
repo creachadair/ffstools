@@ -6,5 +6,5 @@ update_mod() {
 cleanup() {
     go install github.com/creachadair/ffstools/ffs
     go install github.com/creachadair/ffstools/file2json
-    go install -tags gcs,pebble,s3 github.com/creachadair/ffstools/blobd
+    go install -tags badger,gcs,pebble,s3 github.com/creachadair/ffstools/blobd
 }
