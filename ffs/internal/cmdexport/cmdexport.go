@@ -40,8 +40,8 @@ var exportFlags struct {
 	NoStat  bool   `flag:"nostat,Do not update permissions or modification times"`
 	XAttr   bool   `flag:"xattr,Restore extended attributes"`
 	Verbose bool   `flag:"v,Enable verbose logging"`
-	Target  string `flag:"update,Update target path if it exists"`
-	Update  bool   `flag:"to,Export to this path (required)"`
+	Target  string `flag:"to,Export to this path (required)"`
+	Update  bool   `flag:"update,Update target path if it exists"`
 }
 
 var Command = &command.C{
