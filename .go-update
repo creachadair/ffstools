@@ -1,6 +1,6 @@
 update_mod() {
     go get -t -u ./...
-    go get gvisor.dev/gvisor@v0.0.0-20221203005347-703fd9b7fbc0
+    # go get gvisor.dev/gvisor@v0.0.0-20221203005347-703fd9b7fbc0
 }
 
 cleanup() {
