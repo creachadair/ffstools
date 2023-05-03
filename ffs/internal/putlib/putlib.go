@@ -286,7 +286,7 @@ func SetPath(ctx context.Context, s config.CAS, path string, tf *file.File) (str
 			return "", err
 		}
 		if key != of.Root.FileKey {
-			of.Root.FileKey = "" // invalidate the index, the key changed
+			of.Root.IndexKey = "" // invalidate the index, the key changed
 		}
 		of.Root.FileKey = key
 		return key, of.Root.Save(ctx, of.RootKey, true) // replace
