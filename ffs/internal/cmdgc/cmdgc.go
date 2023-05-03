@@ -20,7 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -37,8 +36,8 @@ import (
 )
 
 var gcFlags struct {
-	Force   bool    `flag:"force,Force collection on empty root list (DANGER)"`
-	Partial float64 `flag:"partial,default=1,Fraction of unreachable objects to remove"`
+	Force bool          `flag:"force,Force collection on empty root list (DANGER)"`
+	Limit time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
 }
 
 var Command = &command.C{
@@ -55,12 +54,9 @@ store without roots.
 	Run: func(env *command.Env, args []string) error {
 		if len(args) != 0 {
 			return env.Usagef("extra arguments after command")
-		} else if gcFlags.Partial <= 0 || gcFlags.Partial > 1 {
-			return errors.New("sweep fraction must be in 0..1")
 		}
 
 		cfg := env.Config.(*config.Settings)
-		ctx, cancel := context.WithCancel(cfg.Context)
 		return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 			var keys []string
 			if err := s.Roots().List(cfg.Context, "", func(key string) error {
@@ -80,7 +76,7 @@ store without roots.
 `)
 			}
 
-			n, err := s.Len(ctx)
+			n, err := s.Len(cfg.Context)
 			if err != nil {
 				return err
 			} else if n == 0 {
@@ -143,47 +139,48 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
+			ctx, cancel := context.WithCancel(cfg.Context)
+			if gcFlags.Limit > 0 {
+				cancel()
+				ctx, cancel = context.WithTimeout(cfg.Context, gcFlags.Limit)
+				fmt.Fprintf(env, "- sweep limit %v\n", gcFlags.Limit)
+			}
 			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
-			sample := func() bool { return true }
-			if gcFlags.Partial < 1 {
-				rng := rand.New(rand.NewSource(20230405090527))
-				sample = func() bool { return rng.Float64() <= gcFlags.Partial }
-				fmt.Fprintf(env, "- partial sweep with fraction %.2g\n", gcFlags.Partial)
-			}
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
 			for i := 0; i < 256; i++ {
 				pfx := string([]byte{byte(i)})
 				g.Go(func() error {
-					return s.List(cfg.Context, pfx, func(key string) error {
+					return s.List(ctx, pfx, func(key string) error {
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
 						}
-						run(func() error {
+						run(taskgroup.NoError(func() {
 							for _, idx := range idxs {
 								if idx.Has(key) {
 									numKeep.Add(1)
-									return nil
+									return
 								}
 							}
-							if !sample() {
-								return nil
-							} else if numDrop.Add(1)%50 == 0 {
+							if numDrop.Add(1)%50 == 0 {
 								fmt.Fprint(env, ".")
 							}
 							if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 								log.Printf("WARNING: delete key %x: %v", key, err)
 							}
-							return nil
-						})
+						}))
 						return nil
 					})
 				})
 			}
 			if err := g.Wait(); err != nil {
-				return fmt.Errorf("sweeping failed: %w", err)
+				if gcFlags.Limit > 0 && errors.Is(err, context.Canceled) {
+					fmt.Fprintln(env, "(sweep ended by timeout)")
+				} else {
+					return fmt.Errorf("sweeping failed: %w", err)
+				}
 			}
 			fmt.Fprintln(env, "*")
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
