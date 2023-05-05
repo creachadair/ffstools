@@ -138,13 +138,13 @@ If the origin is from a root, the root is updated with the changes.`,
 	},
 }
 
-func runShow(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runShow(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		for _, arg := range args {
+		for _, arg := range env.Args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
@@ -171,8 +171,8 @@ var listFlags struct {
 	JSON    bool `flag:"json,Emit output in JSON format"`
 }
 
-func runList(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runList(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
@@ -180,7 +180,7 @@ func runList(env *command.Env, args []string) error {
 		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
 		defer w.Flush()
 
-		for _, arg := range args {
+		for _, arg := range env.Args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
@@ -327,13 +327,13 @@ func nameOrID(name string, id int) string {
 	return idstr
 }
 
-func runRead(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runRead(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		of, err := config.OpenPath(cfg.Context, s, args[0])
+		of, err := config.OpenPath(cfg.Context, s, env.Args[0])
 		if err != nil {
 			return err
 		}
@@ -343,18 +343,18 @@ func runRead(env *command.Env, args []string) error {
 	})
 }
 
-func runSet(env *command.Env, args []string) error {
-	if len(args) != 2 {
-		return env.Usagef("got %d arguments, wanted origin/path, target", len(args))
+func runSet(env *command.Env) error {
+	if len(env.Args) != 2 {
+		return env.Usagef("got %d arguments, wanted origin/path, target", len(env.Args))
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		tf, err := config.OpenPath(cfg.Context, s, args[1])
+		tf, err := config.OpenPath(cfg.Context, s, env.Args[1])
 		if err != nil {
 			return err
 		}
-		key, err := putlib.SetPath(cfg.Context, s, args[0], tf.File)
+		key, err := putlib.SetPath(cfg.Context, s, env.Args[0], tf.File)
 		if err != nil {
 			return err
 		}
@@ -363,14 +363,14 @@ func runSet(env *command.Env, args []string) error {
 	})
 }
 
-func runRemove(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runRemove(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing origin/path")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		for _, arg := range args {
+		for _, arg := range env.Args {
 			base, rest := config.SplitPath(arg)
 			if rest == "" || rest == "." {
 				return fmt.Errorf("missing path %q", arg)
@@ -393,12 +393,12 @@ func runRemove(env *command.Env, args []string) error {
 	})
 }
 
-func runSetStat(env *command.Env, args []string) error {
-	if len(args) < 3 {
+func runSetStat(env *command.Env) error {
+	if len(env.Args) < 3 {
 		return env.Usagef("missing origin and stat spec")
 	}
-	path := args[0]
-	mod, err := parseStatMod(args[1:])
+	path := env.Args[0]
+	mod, err := parseStatMod(env.Args[1:])
 	if err != nil {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
@@ -440,14 +440,14 @@ func runSetStat(env *command.Env, args []string) error {
 	})
 }
 
-func runShowKeys(env *command.Env, args []string) error {
-	if len(args) != 1 {
+func runShowKeys(env *command.Env) error {
+	if len(env.Args) != 1 {
 		return env.Usagef("missing origin/path")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		base, rest := config.SplitPath(args[0])
+		base, rest := config.SplitPath(env.Args[0])
 		rf, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
 		if err != nil {
 			return err

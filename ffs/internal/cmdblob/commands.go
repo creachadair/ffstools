@@ -29,8 +29,8 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
-func getCmd(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func getCmd(env *command.Env) error {
+	if len(env.Args) == 0 {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: get <key>...")
 	}
@@ -40,7 +40,7 @@ func getCmd(env *command.Env, args []string) error {
 	}
 	defer bs.Close(nctx)
 
-	for _, arg := range args {
+	for _, arg := range env.Args {
 		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
@@ -54,8 +54,8 @@ func getCmd(env *command.Env, args []string) error {
 	return nil
 }
 
-func sizeCmd(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func sizeCmd(env *command.Env) error {
+	if len(env.Args) == 0 {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: size <key>...")
 	}
@@ -65,7 +65,7 @@ func sizeCmd(env *command.Env, args []string) error {
 	}
 	defer bs.Close(nctx)
 
-	for _, arg := range args {
+	for _, arg := range env.Args {
 		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
@@ -79,8 +79,8 @@ func sizeCmd(env *command.Env, args []string) error {
 	return nil
 }
 
-func delCmd(env *command.Env, args []string) (err error) {
-	if len(args) == 0 {
+func delCmd(env *command.Env) (err error) {
+	if len(env.Args) == 0 {
 		//lint:ignore ST1005 The punctuation signifies repetition to the user.
 		return errors.New("usage is: delete <key>...")
 	}
@@ -91,7 +91,7 @@ func delCmd(env *command.Env, args []string) (err error) {
 	defer bs.Close(nctx)
 
 	missingOK := blobFlags.MissingOK
-	for _, arg := range args {
+	for _, arg := range env.Args {
 		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
@@ -106,8 +106,8 @@ func delCmd(env *command.Env, args []string) (err error) {
 	return nil
 }
 
-func listCmd(env *command.Env, args []string) error {
-	if len(args) != 0 {
+func listCmd(env *command.Env) error {
+	if len(env.Args) != 0 {
 		return errors.New("usage is: list")
 	}
 	start, err := config.ParseKey(listFlags.Start)
@@ -146,8 +146,8 @@ func listCmd(env *command.Env, args []string) error {
 	})
 }
 
-func lenCmd(env *command.Env, args []string) error {
-	if len(args) != 0 {
+func lenCmd(env *command.Env) error {
+	if len(env.Args) != 0 {
 		return errors.New("usage is: len")
 	}
 	ctx, bs, err := storeFromEnv(env)
@@ -164,14 +164,14 @@ func lenCmd(env *command.Env, args []string) error {
 	return nil
 }
 
-func casPutCmd(env *command.Env, args []string) (err error) {
+func casPutCmd(env *command.Env) (err error) {
 	ctx, cas, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
 	defer cas.Close(ctx)
 
-	data, err := readData(ctx, "put", args)
+	data, err := readData(ctx, "put", env.Args)
 	if err != nil {
 		return err
 	}
@@ -183,14 +183,14 @@ func casPutCmd(env *command.Env, args []string) (err error) {
 	return nil
 }
 
-func casKeyCmd(env *command.Env, args []string) error {
+func casKeyCmd(env *command.Env) error {
 	ctx, cas, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
 	defer cas.Close(ctx)
 
-	data, err := readData(ctx, "key", args)
+	data, err := readData(ctx, "key", env.Args)
 	if err != nil {
 		return err
 	}
@@ -202,8 +202,8 @@ func casKeyCmd(env *command.Env, args []string) error {
 	return nil
 }
 
-func copyCmd(env *command.Env, args []string) error {
-	if len(args) != 2 {
+func copyCmd(env *command.Env) error {
+	if len(env.Args) != 2 {
 		return errors.New("usage is: copy <src> <dst>")
 	}
 	ctx, bs, err := storeFromEnv(env)
@@ -212,11 +212,11 @@ func copyCmd(env *command.Env, args []string) error {
 	}
 	defer bs.Close(ctx)
 
-	srcKey, err := config.ParseKey(args[0])
+	srcKey, err := config.ParseKey(env.Args[0])
 	if err != nil {
 		return err
 	}
-	dstKey, err := config.ParseKey(args[1])
+	dstKey, err := config.ParseKey(env.Args[1])
 	if err != nil {
 		return err
 	}
@@ -231,11 +231,11 @@ func copyCmd(env *command.Env, args []string) error {
 	})
 }
 
-func putCmd(env *command.Env, args []string) (err error) {
-	if len(args) == 0 || len(args) > 2 {
+func putCmd(env *command.Env) (err error) {
+	if len(env.Args) == 0 || len(env.Args) > 2 {
 		return errors.New("usage is: put <key> [<path>]")
 	}
-	key, err := config.ParseKey(args[0])
+	key, err := config.ParseKey(env.Args[0])
 	if err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func putCmd(env *command.Env, args []string) (err error) {
 	}
 	defer bs.Close(ctx)
 
-	data, err := readData(ctx, "put", args[1:])
+	data, err := readData(ctx, "put", env.Args[1:])
 	if err != nil {
 		return err
 	}

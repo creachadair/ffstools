@@ -31,8 +31,8 @@ var indexFlags struct {
 	Force bool `flag:"f,Force reindexing"`
 }
 
-func runIndex(env *command.Env, keys []string) error {
-	if len(keys) == 0 {
+func runIndex(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing required <root-key>")
 	}
 
@@ -42,7 +42,7 @@ func runIndex(env *command.Env, keys []string) error {
 		if err != nil {
 			return err
 		}
-		for _, key := range keys {
+		for _, key := range env.Args {
 			rp, err := root.Open(cfg.Context, s.Roots(), key)
 			if err != nil {
 				return err

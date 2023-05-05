@@ -118,13 +118,13 @@ var listFlags struct {
 	JSON bool `flag:"json,Format output as JSON"`
 }
 
-func runList(env *command.Env, args []string) error {
-	if len(args) > 1 {
+func runList(env *command.Env) error {
+	if len(env.Args) > 1 {
 		return env.Usagef("extra arguments after command")
-	} else if len(args) == 0 {
-		args = append(args, "*")
+	} else if len(env.Args) == 0 {
+		env.Args = append(env.Args, "*")
 	}
-	glob := args[0]
+	glob := env.Args[0]
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
@@ -174,14 +174,14 @@ var createFlags struct {
 	Desc    string `flag:"desc,Set the human-readable description"`
 }
 
-func runCreate(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runCreate(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing <name> argument")
 	}
-	name, mode := args[0], "empty"
-	if len(args) == 2 {
+	name, mode := env.Args[0], "empty"
+	if len(env.Args) == 2 {
 		mode = "file-key"
-	} else if len(args) != 1 {
+	} else if len(env.Args) != 1 {
 		return env.Usagef("invalid arguments")
 	}
 
@@ -192,7 +192,7 @@ func runCreate(env *command.Env, args []string) error {
 
 		switch mode {
 		case "file-key":
-			fk, err = config.ParseKey(args[1])
+			fk, err = config.ParseKey(env.Args[1])
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
@@ -217,8 +217,8 @@ var copyFlags struct {
 	Replace bool `flag:"replace,Replace an existing target root name"`
 }
 
-func runCopy(env *command.Env, args []string) error {
-	na, err := getNameArgs(env, args)
+func runCopy(env *command.Env) error {
+	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
 	} else if na.Args[0] == na.Key {
@@ -233,15 +233,15 @@ func runCopy(env *command.Env, args []string) error {
 	return nil
 }
 
-func runDelete(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runDelete(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing root-key arguments")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
 		roots := s.Roots()
-		for _, key := range args {
+		for _, key := range env.Args {
 			if err := roots.Delete(cfg.Context, key); err != nil {
 				return fmt.Errorf("delete root %q: %w", key, err)
 			}
@@ -251,8 +251,8 @@ func runDelete(env *command.Env, args []string) error {
 	})
 }
 
-func runEditDesc(env *command.Env, args []string) error {
-	na, err := getNameArgs(env, args)
+func runEditDesc(env *command.Env) error {
+	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
 	}
@@ -261,8 +261,8 @@ func runEditDesc(env *command.Env, args []string) error {
 	return na.Root.Save(na.Context, na.Key, true)
 }
 
-func runEditFile(env *command.Env, args []string) error {
-	na, err := getNameArgs(env, args)
+func runEditFile(env *command.Env) error {
+	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
 	}

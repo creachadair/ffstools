@@ -59,8 +59,8 @@ paths into the given target store.
 	Run:      runSync,
 }
 
-func runSync(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runSync(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing source keys")
 	} else if syncFlags.Target == "" {
 		return env.Usagef("missing -to target store")
@@ -75,7 +75,7 @@ func runSync(env *command.Env, args []string) error {
 			// Find all the objects reachable from the specified starting points.
 			worklist := make(scanSet)
 			var indices []*index.Index
-			for _, elt := range args {
+			for _, elt := range env.Args {
 				of, err := config.OpenPath(cfg.Context, src, elt)
 				if err != nil {
 					return err

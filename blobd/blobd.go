@@ -157,7 +157,7 @@ func printVersion() error {
 	return nil
 }
 
-func blobd(_ *command.Env, args []string) error {
+func blobd(env *command.Env) error {
 	switch {
 	case doVersion:
 		return printVersion()
