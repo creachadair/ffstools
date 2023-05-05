@@ -28,8 +28,8 @@ var Command = &command.C{
 	Name: "status",
 	Help: "Print the status of the storage server.",
 
-	Run: func(env *command.Env, args []string) error {
-		if len(args) != 0 {
+	Run: func(env *command.Env) error {
+		if len(env.Args) != 0 {
 			return env.Usagef("extra arguments after command")
 		}
 

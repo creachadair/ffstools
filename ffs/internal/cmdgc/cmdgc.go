@@ -51,8 +51,8 @@ store without roots.
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &gcFlags) },
 
-	Run: func(env *command.Env, args []string) error {
-		if len(args) != 0 {
+	Run: func(env *command.Env) error {
+		if len(env.Args) != 0 {
 			return env.Usagef("extra arguments after command")
 		}
 

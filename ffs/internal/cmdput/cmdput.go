@@ -59,17 +59,17 @@ input path is allowed.`,
 	Run: runPut,
 }
 
-func runPut(env *command.Env, args []string) error {
-	if len(args) == 0 {
+func runPut(env *command.Env) error {
+	if len(env.Args) == 0 {
 		return env.Usagef("missing required path")
-	} else if putFlags.Target != "" && len(args) > 1 {
+	} else if putFlags.Target != "" && len(env.Args) > 1 {
 		return env.Usagef("only one path is allowed when -target is set")
 	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		keys := make([]string, len(args))
-		for i, path := range args {
+		keys := make([]string, len(env.Args))
+		for i, path := range env.Args {
 			if putConfig.Verbose {
 				log.Printf("begin put: %s", path)
 			}

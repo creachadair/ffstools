@@ -60,11 +60,11 @@ Use -xattr to export extended attributes, if any are stored.`,
 	Run:      runExport,
 }
 
-func runExport(env *command.Env, args []string) error {
-	if len(args) == 0 || args[0] == "" {
+func runExport(env *command.Env) error {
+	if len(env.Args) == 0 || env.Args[0] == "" {
 		return env.Usagef("missing required object path")
-	} else if len(args) > 1 {
-		return env.Usagef("extra arguments: %q", args[1:])
+	} else if len(env.Args) > 1 {
+		return env.Usagef("extra arguments: %q", env.Args[1:])
 	} else if exportFlags.Target == "" {
 		return env.Usagef("missing required -to path")
 	}
@@ -76,7 +76,7 @@ func runExport(env *command.Env, args []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		of, err := config.OpenPath(cfg.Context, s, args[0])
+		of, err := config.OpenPath(cfg.Context, s, env.Args[0])
 		if err != nil {
 			return err
 		}
