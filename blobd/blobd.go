@@ -36,6 +36,7 @@
 //	pebble   | PebbleDB   https://godoc.org/github.com/cockroachdb/pebble
 //	pogreb   | Pogreb     https://godoc.org/github.com/akrylysov/pogreb
 //	s3       | Amazon S3  https://godoc.org/github.com/aws/aws-sdk-go/service/s3
+//	sqlite   | SQLite     https://godoc.org/crawshaw.io/sqlite
 //
 // For information about Chirp v0, see:
 // https://github.com/creachadair/chirp/blob/main/spec.md

@@ -21,6 +21,7 @@ require (
 	github.com/creachadair/pebblestore v0.0.0-20230426145131-0e19339b6e59
 	github.com/creachadair/pogrebstore v0.0.0-20230423155247-6ad39866d8a6
 	github.com/creachadair/s3store v0.0.0-20230426145145-50e2f4e81afe
+	github.com/creachadair/sqlitestore v0.0.0-20230505201035-795851925db5
 	github.com/creachadair/taskgroup v0.5.1
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.8.0
@@ -94,6 +95,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/native v1.1.1-0.20230202152459-5c7d0dd6ab86 // indirect
 	github.com/jsimonetti/rtnetlink v1.3.2 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/kortschak/wol v0.0.0-20200729010619-da482cc4850a // indirect
 	github.com/kr/pretty v0.3.1 // indirect
@@ -112,6 +114,7 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
@@ -150,5 +153,15 @@ require (
 	google.golang.org/grpc v1.54.0 // indirect
 	gvisor.dev/gvisor v0.0.0-20230328175328-162ed5ef888d // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
+	lukechampine.com/uint128 v1.3.0 // indirect
+	modernc.org/cc/v3 v3.40.0 // indirect
+	modernc.org/ccgo/v3 v3.16.13 // indirect
+	modernc.org/libc v1.22.5 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.5.0 // indirect
+	modernc.org/opt v0.1.3 // indirect
+	modernc.org/sqlite v1.22.1 // indirect
+	modernc.org/strutil v1.1.3 // indirect
+	modernc.org/token v1.1.0 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
