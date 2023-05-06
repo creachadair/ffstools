@@ -40,6 +40,8 @@ var gcFlags struct {
 	Limit time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
 }
 
+var errSweepLimit = errors.New("sweep limit reached")
+
 var Command = &command.C{
 	Name: "gc",
 	Help: `Garbage-collect objects not reachable from known roots.
@@ -139,13 +141,13 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
-			ctx, cancel := context.WithCancel(cfg.Context)
+			ctx, cancel := context.WithCancelCause(cfg.Context)
+			defer cancel(nil)
 			if gcFlags.Limit > 0 {
-				cancel()
-				ctx, cancel = context.WithTimeout(cfg.Context, gcFlags.Limit)
 				fmt.Fprintf(env, "- sweep limit %v\n", gcFlags.Limit)
+				time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
 			}
-			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
+			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(64)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
@@ -175,14 +177,15 @@ store without roots.
 					})
 				})
 			}
-			if err := g.Wait(); err != nil {
-				if gcFlags.Limit > 0 && errors.Is(err, context.Canceled) {
-					fmt.Fprintln(env, "(sweep ended by timeout)")
+			serr := g.Wait()
+			fmt.Fprintln(env, "*")
+			if serr != nil {
+				if errors.Is(context.Cause(ctx), errSweepLimit) {
+					fmt.Fprintln(env, "(sweep limit reached)")
 				} else {
-					return fmt.Errorf("sweeping failed: %w", err)
+					return fmt.Errorf("sweeping failed: %w", serr)
 				}
 			}
-			fmt.Fprintln(env, "*")
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
 				numKeep.Load(), numDrop.Load(), time.Since(start).Truncate(10*time.Millisecond))
 			return nil
