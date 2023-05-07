@@ -18,7 +18,7 @@ import (
 //
 // Each directory is checked for a filter file, which governs paths under that
 // directory. If a rule is prefixed with "!", a match of that rule inverts the
-// sense of the parent directory for that path, including it if it was filtered
+// sense of the parent directory for that path, including if it was filtered
 // and vice versa.
 type Filter struct {
 	Base string
