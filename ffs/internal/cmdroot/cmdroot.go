@@ -172,6 +172,7 @@ func runList(env *command.Env) error {
 var createFlags struct {
 	Replace bool   `flag:"replace,Replace an existing root name"`
 	Desc    string `flag:"desc,Set the human-readable description"`
+	Ref     bool   `flag:"ref,Treat the target as a root/path or file/path"`
 }
 
 func runCreate(env *command.Env) error {
@@ -180,7 +181,11 @@ func runCreate(env *command.Env) error {
 	}
 	name, mode := env.Args[0], "empty"
 	if len(env.Args) == 2 {
-		mode = "file-key"
+		if createFlags.Ref {
+			mode = "ref"
+		} else {
+			mode = "file-key"
+		}
 	} else if len(env.Args) != 1 {
 		return env.Usagef("invalid arguments")
 	}
@@ -193,6 +198,12 @@ func runCreate(env *command.Env) error {
 		switch mode {
 		case "file-key":
 			fk, err = config.ParseKey(env.Args[1])
+		case "ref":
+			tf, terr := config.OpenPath(cfg.Context, s, env.Args[1])
+			if terr != nil {
+				return err
+			}
+			fk = tf.File.Key()
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
