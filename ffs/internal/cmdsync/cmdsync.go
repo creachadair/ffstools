@@ -39,7 +39,7 @@ var syncFlags struct {
 	NoIndex bool   `flag:"no-index,Do not use cached indices"`
 }
 
-func debug(msg string, args ...interface{}) {
+func debug(msg string, args ...any) {
 	if syncFlags.Verbose {
 		log.Printf(msg, args...)
 	}

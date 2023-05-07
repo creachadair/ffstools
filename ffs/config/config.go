@@ -206,7 +206,7 @@ func Load(path string) (*Settings, error) {
 
 // PrintableKey converts key into a value that will marshal into JSON as a
 // sensible human-readable string.
-func PrintableKey(key string) interface{} {
+func PrintableKey(key string) any {
 	for i := 0; i < len(key); i++ {
 		if key[i] < ' ' || key[i] > '~' {
 			return base64.StdEncoding.EncodeToString([]byte(key))
@@ -216,7 +216,7 @@ func PrintableKey(key string) interface{} {
 }
 
 // ToJSON converts a value to indented JSON.
-func ToJSON(msg interface{}) string {
+func ToJSON(msg any) string {
 	bits, err := json.Marshal(msg)
 	if err != nil {
 		return "null"

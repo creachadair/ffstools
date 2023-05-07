@@ -154,7 +154,7 @@ func runShow(env *command.Env) error {
 			}
 
 			msg := file.Encode(of.File).Value.(*wiretype.Object_Node).Node
-			fmt.Println(config.ToJSON(map[string]interface{}{
+			fmt.Println(config.ToJSON(map[string]any{
 				"storageKey": []byte(of.FileKey),
 				"node":       msg,
 			}))

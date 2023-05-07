@@ -180,7 +180,7 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 	return os.Symlink(string(target), path)
 }
 
-func logPrintf(msg string, args ...interface{}) {
+func logPrintf(msg string, args ...any) {
 	if exportFlags.Verbose {
 		log.Printf(msg, args...)
 	}
