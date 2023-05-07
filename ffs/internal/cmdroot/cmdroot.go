@@ -49,7 +49,7 @@ known keys are listed.`,
 		},
 		{
 			Name:  "create",
-			Usage: "<name>\n<name> <file-key>",
+			Usage: "<name>\n<name> <file-key>\n-ref <name> <root>/<path>",
 			Help: `Create a root pointer.
 
 If only a <name> is given, a new empty root pointer is created with that name.
