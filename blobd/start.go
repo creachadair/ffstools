@@ -53,7 +53,7 @@ type startConfig struct {
 	Buffer  blob.Store
 }
 
-func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Single) {
+func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Single[error]) {
 	lst, err := opts.listen(ctx)
 	if err != nil {
 		ctrl.Fatalf("Listen: %v", err)

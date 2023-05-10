@@ -63,7 +63,8 @@ a file may be specified in the following formats:
 			Usage: fileCmdUsage,
 			Help:  "Print the representation of a file object",
 
-			Run: runShow,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &showFlags) },
+			Run:      runShow,
 		},
 		{
 			Name:  "list",
@@ -138,6 +139,10 @@ If the origin is from a root, the root is updated with the changes.`,
 	},
 }
 
+var showFlags struct {
+	Raw bool `flag:"raw,Write the file record in binary format"`
+}
+
 func runShow(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required origin/path")
@@ -154,10 +159,15 @@ func runShow(env *command.Env) error {
 			}
 
 			msg := file.Encode(of.File).Value.(*wiretype.Object_Node).Node
-			fmt.Println(config.ToJSON(map[string]any{
-				"storageKey": []byte(of.FileKey),
-				"node":       msg,
-			}))
+			if showFlags.Raw {
+				bits, _ := wiretype.ToBinary(msg)
+				os.Stdout.Write(bits)
+			} else {
+				fmt.Println(config.ToJSON(map[string]any{
+					"storageKey": []byte(of.FileKey),
+					"node":       msg,
+				}))
+			}
 		}
 		return nil
 	})
