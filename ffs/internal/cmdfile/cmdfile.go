@@ -158,14 +158,14 @@ func runShow(env *command.Env) error {
 				return err
 			}
 
-			msg := file.Encode(of.File).Value.(*wiretype.Object_Node).Node
+			msg := file.Encode(of.File)
 			if showFlags.Raw {
 				bits, _ := wiretype.ToBinary(msg)
 				os.Stdout.Write(bits)
 			} else {
 				fmt.Println(config.ToJSON(map[string]any{
 					"storageKey": []byte(of.FileKey),
-					"node":       msg,
+					"node":       msg.Value.(*wiretype.Object_Node).Node,
 				}))
 			}
 		}
