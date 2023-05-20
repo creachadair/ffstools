@@ -121,6 +121,10 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	}
 
 	key, err := keyfile.LoadKey(keyFile, func() (string, error) {
+		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
+		if ok {
+			return pp, nil
+		}
 		io.WriteString(os.Stdout, "Passphrase: ")
 		bits, err := term.ReadPassword(0)
 		return string(bits), err

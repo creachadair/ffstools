@@ -123,6 +123,9 @@ If -listen is:
  - Otherwise, the address must be a path for a Unix-domain socket.
 
 With -keyfile, the store is opened with AES encryption.
+If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
+passphrase for the keyfile; otherwise %[1]s prompts at the terminal.
+
 Use -cache to enable a memory cache over the underlying store.`, strings.Join(storeNames, ", ")),
 
 		SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
