@@ -124,7 +124,7 @@ If -listen is:
 
 With -keyfile, the store is opened with AES encryption.
 If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
-passphrase for the keyfile; otherwise %[1]s prompts at the terminal.
+passphrase for the keyfile; otherwise blobd prompts at the terminal.
 
 Use -cache to enable a memory cache over the underlying store.`, strings.Join(storeNames, ", ")),
 
