@@ -127,11 +127,11 @@ func runList(env *command.Env) error {
 	glob := env.Args[0]
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
-		return s.Roots().List(cfg.Context, "", func(key string) error {
+		return s.Roots().List(env.Context(), "", func(key string) error {
 			if ok, _ := path.Match(glob, key); !ok {
 				return nil
 			} else if !listFlags.Long && !listFlags.JSON {
@@ -139,7 +139,7 @@ func runList(env *command.Env) error {
 				return nil
 			}
 
-			rp, err := root.Open(cfg.Context, s.Roots(), key)
+			rp, err := root.Open(env.Context(), s.Roots(), key)
 			if err != nil {
 				return err
 			}
@@ -191,7 +191,7 @@ func runCreate(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		var fk string
 		var err error
 
@@ -199,7 +199,7 @@ func runCreate(env *command.Env) error {
 		case "file-key":
 			fk, err = config.ParseKey(env.Args[1])
 		case "ref":
-			tf, terr := config.OpenPath(cfg.Context, s, env.Args[1])
+			tf, terr := config.OpenPath(env.Context(), s, env.Args[1])
 			if terr != nil {
 				return err
 			}
@@ -207,20 +207,20 @@ func runCreate(env *command.Env) error {
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat: &file.Stat{Mode: os.ModeDir | 0755},
-			}).Flush(cfg.Context)
+			}).Flush(env.Context())
 		default:
 			panic("unexpected mode: " + mode)
 		}
 		if err != nil {
 			return err
-		} else if _, err := file.Open(cfg.Context, s, fk); err != nil {
+		} else if _, err := file.Open(env.Context(), s, fk); err != nil {
 			return err
 		}
 
 		return root.New(s.Roots(), &root.Options{
 			Description: createFlags.Desc,
 			FileKey:     fk,
-		}).Save(cfg.Context, name, createFlags.Replace)
+		}).Save(env.Context(), name, createFlags.Replace)
 	})
 }
 
@@ -250,10 +250,10 @@ func runDelete(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		roots := s.Roots()
 		for _, key := range env.Args {
-			if err := roots.Delete(cfg.Context, key); err != nil {
+			if err := roots.Delete(env.Context(), key); err != nil {
 				return fmt.Errorf("delete root %q: %w", key, err)
 			}
 			fmt.Println(key)
@@ -313,21 +313,21 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 	}
 	key := args[0]
 	cfg := env.Config.(*config.Settings)
-	bs, err := cfg.OpenStore()
+	bs, err := cfg.OpenStore(env.Context())
 	if err != nil {
 		return nil, err
 	}
-	rp, err := root.Open(cfg.Context, bs.Roots(), key)
+	rp, err := root.Open(env.Context(), bs.Roots(), key)
 	if err != nil {
-		bs.Close(cfg.Context)
+		bs.Close(env.Context())
 		return nil, err
 	}
 	return &rootArgs{
-		Context: cfg.Context,
+		Context: env.Context(),
 		Key:     key,
 		Args:    args[1:],
 		Root:    rp,
 		Store:   bs,
-		Close:   func() { bs.Close(cfg.Context) },
+		Close:   func() { bs.Close(env.Context()) },
 	}, nil
 }

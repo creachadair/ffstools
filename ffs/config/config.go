@@ -57,9 +57,6 @@ func Path() string {
 
 // Settings represents the stored configuration settings for the ffs tool.
 type Settings struct {
-	// Context value governing the execution of the tool.
-	Context context.Context `json:"-" yaml:"-"`
-
 	// The default address for the blob store service (required).  This must be
 	// either a store tag (@name) or an address.
 	DefaultStore string `json:"defaultStore" yaml:"default-store"`
@@ -69,9 +66,6 @@ type Settings struct {
 
 	// Well-known store specifications, addressable by tag.
 	Stores []*StoreSpec `json:"stores" yaml:"stores"`
-
-	// A cancel function for the supplied context.
-	Cancel context.CancelFunc
 }
 
 // A StoreSpec associates a tag (handle) with a storage address.
@@ -117,12 +111,12 @@ func (s *Settings) FindAddress() (string, bool) {
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStore() (CAS, error) {
+func (s *Settings) OpenStore(ctx context.Context) (CAS, error) {
 	addr, ok := s.FindAddress()
 	if !ok {
 		return CAS{}, fmt.Errorf("no store service address (%q)", addr)
 	}
-	return s.OpenStoreAddress(s.Context, addr)
+	return s.OpenStoreAddress(ctx, addr)
 }
 
 // OpenStoreAddress connects to the store service at addr.  The caller is

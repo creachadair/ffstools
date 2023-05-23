@@ -37,13 +37,13 @@ func runIndex(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		n, err := s.Base().Len(cfg.Context)
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		n, err := s.Base().Len(env.Context())
 		if err != nil {
 			return err
 		}
 		for _, key := range env.Args {
-			rp, err := root.Open(cfg.Context, s.Roots(), key)
+			rp, err := root.Open(env.Context(), s.Roots(), key)
 			if err != nil {
 				return err
 			}
@@ -51,7 +51,7 @@ func runIndex(env *command.Env) error {
 				fmt.Fprintf(env, "Root %q is already indexed\n", key)
 				continue
 			}
-			fp, err := rp.File(cfg.Context, s)
+			fp, err := rp.File(env.Context(), s)
 			if err != nil {
 				return err
 			}
@@ -60,7 +60,7 @@ func runIndex(env *command.Env) error {
 			scanned := mapset.New[string]()
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()
-			if err := fp.Scan(cfg.Context, func(si file.ScanItem) bool {
+			if err := fp.Scan(env.Context(), func(si file.ScanItem) bool {
 				key := si.Key()
 				if scanned.Has(key) {
 					return false // don't re-index repeats of the same file
@@ -77,13 +77,13 @@ func runIndex(env *command.Env) error {
 			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 				idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 
-			rp.IndexKey, err = wiretype.Save(cfg.Context, s, &wiretype.Object{
+			rp.IndexKey, err = wiretype.Save(env.Context(), s, &wiretype.Object{
 				Value: &wiretype.Object_Index{Index: index.Encode(idx)},
 			})
 			if err != nil {
 				return fmt.Errorf("saving index: %w", err)
 			}
-			if err := rp.Save(cfg.Context, key, true); err != nil {
+			if err := rp.Save(env.Context(), key, true); err != nil {
 				return err
 			}
 		}

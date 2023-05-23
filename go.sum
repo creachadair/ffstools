@@ -177,8 +177,8 @@ github.com/creachadair/chirp v0.0.0-20230502164725-17729557af30 h1:REalrQBR/xl4z
 github.com/creachadair/chirp v0.0.0-20230502164725-17729557af30/go.mod h1:9QINizAnw8QS4WpSYNA1x9+7uOu95SLF21Y0/TZNneI=
 github.com/creachadair/chirpstore v0.0.0-20230512190759-854cfe3f81eb h1:bJ0Oyl8vBmlqKsgmY4CWzMZHIVj5Ybu2/cdIpGKk9d4=
 github.com/creachadair/chirpstore v0.0.0-20230512190759-854cfe3f81eb/go.mod h1:LDeKhBJBcM8Fi+UdtI8m1FYLfSvz8beY7CPILhy+P74=
-github.com/creachadair/command v0.0.1 h1:CDubnkYhkeGv7knO4i2elvnqX2ddyQLjVEQvBpb4Sfk=
-github.com/creachadair/command v0.0.1/go.mod h1:E4rDY2agq/HFjdmeTqf3kP8ubiq7DZHC4dTjQA2LcB8=
+github.com/creachadair/command v0.0.2 h1:b9NmTWO4d7diPJp2KJIFDAUZzzQXkOl5CIYXZ5tgLEg=
+github.com/creachadair/command v0.0.2/go.mod h1:E4rDY2agq/HFjdmeTqf3kP8ubiq7DZHC4dTjQA2LcB8=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
 github.com/creachadair/ffs v0.0.2 h1:j9awEG+5qIWeI3+bCnXlbQ2d/w8QFLCZr/rSqtTN6aE=

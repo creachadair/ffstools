@@ -67,16 +67,16 @@ func runSync(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(src config.CAS) error {
+	return cfg.WithStore(env.Context(), func(src config.CAS) error {
 		taddr := cfg.ResolveAddress(syncFlags.Target)
-		return cfg.WithStoreAddress(cfg.Context, taddr, func(tgt config.CAS) error {
+		return cfg.WithStoreAddress(env.Context(), taddr, func(tgt config.CAS) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
 			// Find all the objects reachable from the specified starting points.
 			worklist := make(scanSet)
 			var indices []*index.Index
 			for _, elt := range env.Args {
-				of, err := config.OpenPath(cfg.Context, src, elt)
+				of, err := config.OpenPath(env.Context(), src, elt)
 				if err != nil {
 					return err
 				}
@@ -84,7 +84,7 @@ func runSync(env *command.Env) error {
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
 					if of.Root.IndexKey != "" && !syncFlags.NoIndex {
-						idx, err := config.LoadIndex(cfg.Context, src, of.Root.IndexKey)
+						idx, err := config.LoadIndex(env.Context(), src, of.Root.IndexKey)
 						if err != nil {
 							return err
 						}
@@ -94,10 +94,10 @@ func runSync(env *command.Env) error {
 						continue
 					}
 					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
-					err = worklist.root(cfg.Context, src, of.RootKey, of.Root)
+					err = worklist.root(env.Context(), src, of.RootKey, of.Root)
 				} else {
 					fmt.Fprintf(env, "Scanning data reachable from file %x", of.FileKey)
-					err = worklist.file(cfg.Context, of.File)
+					err = worklist.file(env.Context(), of.File)
 				}
 				fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
 				if err != nil {
@@ -108,7 +108,7 @@ func runSync(env *command.Env) error {
 			// If we loaded cached indices, fill the worklist with matching keys.
 			if len(indices) != 0 {
 				var numAdded int
-				if err := src.List(cfg.Context, "", func(key string) error {
+				if err := src.List(env.Context(), "", func(key string) error {
 					for _, idx := range indices {
 						if idx.Has(key) {
 							worklist.addKey(key)
@@ -131,7 +131,7 @@ func runSync(env *command.Env) error {
 			// Remove from the worklist all objects already stored in the target
 			// that are not scheduled for replacement. Objects marked as root (R)
 			// or otherwise requiring replacement (+) are retained regardless.
-			if err := tgt.List(cfg.Context, "", func(key string) error {
+			if err := tgt.List(env.Context(), "", func(key string) error {
 				switch worklist[key] {
 				case '-', 'F':
 					delete(worklist, key)
@@ -146,7 +146,7 @@ func runSync(env *command.Env) error {
 			start := time.Now()
 			var nb int64
 
-			ctx, cancel := context.WithCancel(cfg.Context)
+			ctx, cancel := context.WithCancel(env.Context())
 			defer cancel()
 
 			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)

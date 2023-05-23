@@ -148,12 +148,12 @@ func runShow(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		for _, arg := range env.Args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			of, err := config.OpenPath(cfg.Context, s, arg)
+			of, err := config.OpenPath(env.Context(), s, arg)
 			if err != nil {
 				return err
 			}
@@ -186,7 +186,7 @@ func runList(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -194,7 +194,7 @@ func runList(env *command.Env) error {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			pi, err := config.OpenPath(cfg.Context, s, arg)
+			pi, err := config.OpenPath(env.Context(), s, arg)
 			if err != nil {
 				return err
 			}
@@ -204,16 +204,16 @@ func runList(env *command.Env) error {
 			// List contents of directories unless -d is set.
 			if of.Stat().Mode.IsDir() && !listFlags.DirOnly {
 				for _, kid := range of.Child().Names() {
-					cf, err := of.Open(cfg.Context, kid)
+					cf, err := of.Open(env.Context(), kid)
 					if err != nil {
 						return fmt.Errorf("open %q: %w", kid, err)
-					} else if err := printOne(cfg.Context, w, cf, kid); err != nil {
+					} else if err := printOne(env.Context(), w, cf, kid); err != nil {
 						return err
 					}
 				}
 				continue
 			}
-			if err := printOne(cfg.Context, w, pi.File, name); err != nil {
+			if err := printOne(env.Context(), w, pi.File, name); err != nil {
 				return err
 			}
 		}
@@ -342,12 +342,12 @@ func runRead(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		of, err := config.OpenPath(cfg.Context, s, env.Args[0])
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		of, err := config.OpenPath(env.Context(), s, env.Args[0])
 		if err != nil {
 			return err
 		}
-		r := bufio.NewReaderSize(of.File.Cursor(cfg.Context), 1<<20)
+		r := bufio.NewReaderSize(of.File.Cursor(env.Context()), 1<<20)
 		_, err = io.Copy(os.Stdout, r)
 		return err
 	})
@@ -359,12 +359,12 @@ func runSet(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		tf, err := config.OpenPath(cfg.Context, s, env.Args[1])
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		tf, err := config.OpenPath(env.Context(), s, env.Args[1])
 		if err != nil {
 			return err
 		}
-		key, err := putlib.SetPath(cfg.Context, s, env.Args[0], tf.File)
+		key, err := putlib.SetPath(env.Context(), s, env.Args[0], tf.File)
 		if err != nil {
 			return err
 		}
@@ -379,21 +379,21 @@ func runRemove(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		for _, arg := range env.Args {
 			base, rest := config.SplitPath(arg)
 			if rest == "" || rest == "." {
 				return fmt.Errorf("missing path %q", arg)
 			}
-			of, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
+			of, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
 			if err != nil {
 				return err
 			}
 
-			if err := fpath.Remove(cfg.Context, of.Base, rest); err != nil {
+			if err := fpath.Remove(env.Context(), of.Base, rest); err != nil {
 				return err
 			}
-			key, err := of.Flush(cfg.Context)
+			key, err := of.Flush(env.Context())
 			if err != nil {
 				return err
 			}
@@ -413,8 +413,8 @@ func runSetStat(env *command.Env) error {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		tf, err := config.OpenPath(cfg.Context, s, path)
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		tf, err := config.OpenPath(env.Context(), s, path)
 		if err != nil {
 			return err
 		}
@@ -441,7 +441,7 @@ func runSetStat(env *command.Env) error {
 			stat.Persist(*mod.persist)
 		}
 		stat.Update()
-		key, err := tf.Flush(cfg.Context)
+		key, err := tf.Flush(env.Context())
 		if err != nil {
 			return err
 		}
@@ -456,9 +456,9 @@ func runShowKeys(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		base, rest := config.SplitPath(env.Args[0])
-		rf, err := config.OpenPath(cfg.Context, s, base) // N.B. No path; see below
+		rf, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
 		if err != nil {
 			return err
 		}
@@ -470,7 +470,7 @@ func runShowKeys(env *command.Env) error {
 			fmt.Printf("%x\n", rf.Base.Key())
 		}
 		parts := strings.Split(rest, "/")
-		pf, err := fpath.OpenPath(cfg.Context, rf.Base, rest)
+		pf, err := fpath.OpenPath(env.Context(), rf.Base, rest)
 		for i, f := range pf {
 			fmt.Fprintf(tw, "%s\t%x\n", parts[i], f.Key())
 		}

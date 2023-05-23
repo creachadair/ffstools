@@ -59,9 +59,9 @@ store without roots.
 		}
 
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.CAS) error {
 			var keys []string
-			if err := s.Roots().List(cfg.Context, "", func(key string) error {
+			if err := s.Roots().List(env.Context(), "", func(key string) error {
 				keys = append(keys, key)
 				return nil
 			}); err != nil {
@@ -78,7 +78,7 @@ store without roots.
 `)
 			}
 
-			n, err := s.Len(cfg.Context)
+			n, err := s.Len(env.Context())
 			if err != nil {
 				return err
 			} else if n == 0 {
@@ -91,7 +91,7 @@ store without roots.
 			// Mark phase: Scan all roots.
 			for i := 0; i < len(keys); i++ {
 				key := keys[i]
-				rp, err := root.Open(cfg.Context, s.Roots(), key)
+				rp, err := root.Open(env.Context(), s.Roots(), key)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
@@ -99,7 +99,7 @@ store without roots.
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
-					rpi, err := config.LoadIndex(cfg.Context, s, rp.IndexKey)
+					rpi, err := config.LoadIndex(env.Context(), s, rp.IndexKey)
 					if err != nil {
 						return err
 					}
@@ -111,7 +111,7 @@ store without roots.
 
 				// Otherwise, we need to compute the reachable set.
 				// TODO(creachadair): Maybe cache the results here too.
-				rf, err := rp.File(cfg.Context, s)
+				rf, err := rp.File(env.Context(), s)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", rp.FileKey, err)
 				}
@@ -121,7 +121,7 @@ store without roots.
 					config.PrintableKey(key), rp.FileKey)
 				scanned := mapset.New[string]()
 				start := time.Now()
-				if err := rf.Scan(cfg.Context, func(si file.ScanItem) bool {
+				if err := rf.Scan(env.Context(), func(si file.ScanItem) bool {
 					key := si.Key()
 					if scanned.Has(key) {
 						return false // don't re-index repeats of the same file
@@ -141,7 +141,7 @@ store without roots.
 			idxs = append(idxs, idx)
 
 			// Sweep phase: Remove objects not indexed.
-			ctx, cancel := context.WithCancelCause(cfg.Context)
+			ctx, cancel := context.WithCancelCause(env.Context())
 			defer cancel(nil)
 			if gcFlags.Limit > 0 {
 				fmt.Fprintf(env, "- sweep limit %v\n", gcFlags.Limit)

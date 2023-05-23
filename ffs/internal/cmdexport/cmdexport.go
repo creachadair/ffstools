@@ -75,12 +75,12 @@ func runExport(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
-		of, err := config.OpenPath(cfg.Context, s, env.Args[0])
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		of, err := config.OpenPath(env.Context(), s, env.Args[0])
 		if err != nil {
 			return err
 		}
-		cctx, cancel := context.WithCancel(cfg.Context)
+		cctx, cancel := context.WithCancel(env.Context())
 		defer cancel()
 		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
 

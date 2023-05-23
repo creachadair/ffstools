@@ -34,12 +34,12 @@ var Command = &command.C{
 		}
 
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.CAS) error {
 			cs, ok := s.Base().(chirpstore.CAS)
 			if !ok {
 				return errors.New("store does not support the status command")
 			}
-			data, err := cs.Status(cfg.Context)
+			data, err := cs.Status(env.Context())
 			if err != nil {
 				return err
 			}

@@ -270,10 +270,10 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 
 func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
 	t := env.Config.(*config.Settings)
-	bs, err := t.OpenStore()
+	bs, err := t.OpenStore(env.Context())
 
 	// Becausethe blob commands operate on the raw store, take off the default
 	// data bucket suffix and apply the one from the -bucket flag.
 	bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
-	return t.Context, bs, err
+	return env.Context(), bs, err
 }

@@ -67,7 +67,6 @@ help [<command>]`,
 			if debugLog {
 				cfg.EnableDebugLogging = true
 			}
-			cfg.Context, cfg.Cancel = signal.NotifyContext(context.Background(), os.Interrupt)
 			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
 			return nil
@@ -86,5 +85,7 @@ help [<command>]`,
 			command.VersionCommand(),
 		},
 	}
-	command.RunOrFail(root.NewEnv(nil), os.Args[1:])
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	command.RunOrFail(root.NewEnv(nil).SetContext(ctx), os.Args[1:])
 }

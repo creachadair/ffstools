@@ -67,17 +67,17 @@ func runPut(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(cfg.Context, func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		keys := make([]string, len(env.Args))
 		for i, path := range env.Args {
 			if putConfig.Verbose {
 				log.Printf("begin put: %s", path)
 			}
-			f, err := putConfig.PutPath(cfg.Context, s, path)
+			f, err := putConfig.PutPath(env.Context(), s, path)
 			if err != nil {
 				return err
 			}
-			key, err := f.Flush(cfg.Context)
+			key, err := f.Flush(env.Context())
 			if err != nil {
 				return err
 			}
@@ -91,11 +91,11 @@ func runPut(env *command.Env) error {
 		}
 
 		if putFlags.Target != "" {
-			tf, err := file.Open(cfg.Context, s, keys[0])
+			tf, err := file.Open(env.Context(), s, keys[0])
 			if err != nil {
 				return err
 			}
-			key, err := putlib.SetPath(cfg.Context, s, putFlags.Target, tf)
+			key, err := putlib.SetPath(env.Context(), s, putFlags.Target, tf)
 			if err != nil {
 				return err
 			}
