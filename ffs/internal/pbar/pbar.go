@@ -39,10 +39,10 @@ func New(w io.Writer, max int64) *Bar {
 	go func() {
 		defer b.pulse.Stop()
 		for range b.pulse.C {
+			b.repaint()
 			if ctx.Err() != nil {
 				return
 			}
-			b.repaint()
 		}
 	}()
 	return b
