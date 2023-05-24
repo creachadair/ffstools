@@ -154,7 +154,6 @@ store without roots.
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
 			pb := pbar.New(env, n).Start()
-			defer pb.Stop()
 			for i := 0; i < 256; i++ {
 				pfx := string([]byte{byte(i)})
 				g.Go(func() error {
@@ -180,6 +179,7 @@ store without roots.
 				})
 			}
 			serr := g.Wait()
+			pb.Stop()
 			fmt.Fprintln(env, "*")
 			if serr != nil {
 				if errors.Is(context.Cause(ctx), errSweepLimit) {

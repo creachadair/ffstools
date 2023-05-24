@@ -18,6 +18,7 @@ type Bar struct {
 	w      io.Writer
 	cancel context.CancelFunc
 	pulse  *time.Ticker
+	done   chan struct{}
 
 	μ        sync.Mutex
 	cur, max int64
@@ -33,11 +34,13 @@ func New(w io.Writer, max int64) *Bar {
 		w:      w,
 		cancel: cancel,
 		pulse:  time.NewTicker(time.Second),
+		done:   make(chan struct{}),
 		max:    max,
 	}
 	b.pulse.Stop()
 	go func() {
 		defer b.pulse.Stop()
+		defer close(b.done)
 		for range b.pulse.C {
 			b.repaint()
 			if ctx.Err() != nil {
@@ -52,7 +55,7 @@ func New(w io.Writer, max int64) *Bar {
 func (b *Bar) Start() *Bar { b.pulse.Reset(time.Second); return b }
 
 // Stop stops rendering the status line for b.
-func (b *Bar) Stop() { b.cancel() }
+func (b *Bar) Stop() { b.cancel(); <-b.done }
 
 // Set sets the current value of the bar to v. If v exceeds the current
 // maximum, the bar length is extended.
