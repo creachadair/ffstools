@@ -180,7 +180,7 @@ store without roots.
 			}
 			serr := g.Wait()
 			pb.Stop()
-			fmt.Fprintln(env, "*")
+			fmt.Fprintln(env, " *")
 			if serr != nil {
 				if errors.Is(context.Cause(ctx), errSweepLimit) {
 					fmt.Fprintln(env, "(sweep limit reached)")
