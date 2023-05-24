@@ -30,6 +30,7 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/ffs/internal/pbar"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
@@ -152,6 +153,8 @@ store without roots.
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
+			pb := pbar.New(env, n).Start()
+			defer pb.Stop()
 			for i := 0; i < 256; i++ {
 				pfx := string([]byte{byte(i)})
 				g.Go(func() error {
@@ -159,6 +162,7 @@ store without roots.
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
 						}
+						pb.Add(1)
 						run(taskgroup.NoError(func() {
 							for _, idx := range idxs {
 								if idx.Has(key) {
@@ -166,9 +170,7 @@ store without roots.
 									return
 								}
 							}
-							if numDrop.Add(1)%50 == 0 {
-								fmt.Fprint(env, ".")
-							}
+							pb.SetMeta(numDrop.Add(1))
 							if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 								log.Printf("WARNING: delete key %x: %v", key, err)
 							}
