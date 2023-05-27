@@ -41,9 +41,12 @@ func New(w io.Writer, max int64) *Bar {
 	go func() {
 		defer b.pulse.Stop()
 		defer close(b.done)
-		for range b.pulse.C {
-			b.repaint()
-			if ctx.Err() != nil {
+		for {
+			select {
+			case <-b.pulse.C:
+				b.repaint()
+			case <-ctx.Done():
+				b.repaint()
 				return
 			}
 		}
