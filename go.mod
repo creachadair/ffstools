@@ -45,7 +45,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
-	github.com/aws/aws-sdk-go v1.44.270 // indirect
+	github.com/aws/aws-sdk-go v1.44.271 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.18.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.25 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.24 // indirect
@@ -65,7 +65,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.9.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
-	github.com/cockroachdb/pebble v0.0.0-20230525220056-bb4fc9527b3b // indirect
+	github.com/cockroachdb/pebble v0.0.0-20230527012508-ac69476c46ff // indirect
 	github.com/cockroachdb/redact v1.1.4 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
@@ -149,9 +149,9 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.124.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230526015343-6ee61e4f9d5f // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20230526015343-6ee61e4f9d5f // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526015343-6ee61e4f9d5f // indirect
+	google.golang.org/genproto v0.0.0-20230526203410-71b5a4ffd15e // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20230526203410-71b5a4ffd15e // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526203410-71b5a4ffd15e // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	gvisor.dev/gvisor v0.0.0-20230504175454-7b0a1988a28f // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
