@@ -107,7 +107,7 @@ func main() {
 
 	root := &command.C{
 		Name:  filepath.Base(os.Args[0]),
-		Usage: `[options] -store <spec> -listen <addr> -mount <path> -root <spec>`,
+		Usage: `[options] -store <spec> -listen <addr>`,
 		Help: fmt.Sprintf(`
 Start a server that serves content from the blob.Store described by the -store spec.
 The server listens at the specified address, which may be a host:port or the path
