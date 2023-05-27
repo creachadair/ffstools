@@ -102,8 +102,12 @@ func (b *Bar) repaint() {
 	var buf bytes.Buffer
 	buf.WriteString("\r[")
 	fr := float64(cur) / float64(max)
-	nc := int(fr * 50)
+	nc, lip := int(fr*50), int(fr*100)%2 == 1
 	buf.WriteString(strings.Repeat("=", nc))
+	if lip {
+		buf.WriteByte('-')
+		nc++
+	}
 	buf.WriteString(strings.Repeat(" ", 50-nc))
 	fmt.Fprintf(&buf, "] %.1f%%", 100*fr)
 	if meta != 0 {
