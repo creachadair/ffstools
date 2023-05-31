@@ -134,9 +134,9 @@ func listCmd(env *command.Env) error {
 	var listed int
 	return bs.List(ctx, start, func(key string) error {
 		if listFlags.Raw {
-			fmt.Println(key)
+			fmt.Println(pfx + key)
 		} else {
-			fmt.Printf("%x\n", key)
+			fmt.Printf("%x\n", pfx+key)
 		}
 		listed++
 		if listFlags.MaxKeys > 0 && listed == listFlags.MaxKeys {
