@@ -156,24 +156,22 @@ store without roots.
 			pb := pbar.New(env, n).Start()
 			for i := 0; i < 256; i++ {
 				pfx := string([]byte{byte(i)})
-				g.Go(func() error {
+				run(func() error {
 					return s.List(ctx, pfx, func(key string) error {
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
 						}
 						pb.Add(1)
-						run(taskgroup.NoError(func() {
-							for _, idx := range idxs {
-								if idx.Has(key) {
-									numKeep.Add(1)
-									return
-								}
+						for _, idx := range idxs {
+							if idx.Has(key) {
+								numKeep.Add(1)
+								return nil
 							}
-							pb.SetMeta(numDrop.Add(1))
-							if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
-								log.Printf("WARNING: delete key %x: %v", key, err)
-							}
-						}))
+						}
+						pb.SetMeta(numDrop.Add(1))
+						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
+							log.Printf("WARNING: delete key %x: %v", key, err)
+						}
 						return nil
 					})
 				})
