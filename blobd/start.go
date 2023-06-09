@@ -27,6 +27,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/creachadair/chirp"
@@ -134,7 +135,7 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 		ctrl.Fatalf("Loading encryption key: %v", err)
 	}
 	var aead cipher.AEAD
-	switch aeadStyle {
+	switch strings.ToLower(aeadStyle) {
 	case "aes", "gcm", "aes256-gcm":
 		c, err := aes.NewCipher(key)
 		if err != nil {
