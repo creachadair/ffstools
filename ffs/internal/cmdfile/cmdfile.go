@@ -129,12 +129,13 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run: runSetStat,
 		},
 		{
-			Name: "show-keys",
+			Name: "resolve",
 			Usage: `<root-key>/<path>
 @<origin-key>/<path>`,
-			Help: "Show the sequence of storage keys traversed by the specified path",
+			Help: "Show the storage key targeted by the specified path.",
 
-			Run: runShowKeys,
+			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &resolveFlags) },
+			Run:      runResolve,
 		},
 	},
 }
@@ -450,29 +451,41 @@ func runSetStat(env *command.Env) error {
 	})
 }
 
-func runShowKeys(env *command.Env) error {
+var resolveFlags struct {
+	Path bool `flag:"path,Show each key traversed by the path"`
+}
+
+func runResolve(env *command.Env) error {
 	if len(env.Args) != 1 {
 		return env.Usagef("missing origin/path")
 	}
 
 	cfg := env.Config.(*config.Settings)
+	if !resolveFlags.Path {
+		return cfg.WithStore(env.Context(), func(s config.CAS) error {
+			rf, err := config.OpenPath(env.Context(), s, env.Args[0])
+			if err != nil {
+				return err
+			}
+			fmt.Printf("%x\n", rf.File.Key())
+			return nil
+		})
+	}
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
 		base, rest := config.SplitPath(env.Args[0])
 		rf, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
 		if err != nil {
 			return err
 		}
-		tw := tabwriter.NewWriter(os.Stderr, 4, 4, 1, ' ', 0)
-		defer tw.Flush()
 		if rf.RootKey != "" {
-			fmt.Fprintf(tw, "%s\t%x\n", rf.RootKey, rf.Base.Key())
+			fmt.Printf("%x %s\n", rf.Base.Key(), rf.RootKey)
 		} else {
 			fmt.Printf("%x\n", rf.Base.Key())
 		}
 		parts := strings.Split(rest, "/")
 		pf, err := fpath.OpenPath(env.Context(), rf.Base, rest)
 		for i, f := range pf {
-			fmt.Fprintf(tw, "%s\t%x\n", parts[i], f.Key())
+			fmt.Printf("%x %s\n", f.Key(), parts[i])
 		}
 		return err
 	})
