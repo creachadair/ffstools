@@ -41,6 +41,7 @@ import (
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
+	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
 )
@@ -132,20 +133,31 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	if err != nil {
 		ctrl.Fatalf("Loading encryption key: %v", err)
 	}
+	var aead cipher.AEAD
+	switch aeadStyle {
+	case "aes", "gcm", "aes256-gcm":
+		c, err := aes.NewCipher(key)
+		if err != nil {
+			ctrl.Fatalf("Creating cipher: %v", err)
+		}
+		aead, err = cipher.NewGCM(c)
+		if err != nil {
+			ctrl.Fatalf("Creating GCM instance: %v", err)
+		}
+	case "chacha", "chacha20-poly1305":
+		aead, err = chacha20poly1305.NewX(key)
+		if err != nil {
+			ctrl.Fatalf("Creating chacha20-poly1305 instance: %v", err)
+		}
+	default:
+		ctrl.Fatalf("Unknown encryption algorithm %q", aeadStyle)
+	}
 
-	c, err := aes.NewCipher(key)
-	if err != nil {
-		ctrl.Fatalf("Creating cipher: %v", err)
-	}
-	gcm, err := cipher.NewGCM(c)
-	if err != nil {
-		ctrl.Fatalf("Creating GCM instance: %v", err)
-	}
 	hcons := sha3.New256
 	if doSignKeys {
 		hcons = func() hash.Hash { return hmac.New(sha3.New256, key) }
 	}
-	bs = encoded.New(bs, encrypted.New(gcm, nil))
+	bs = encoded.New(bs, encrypted.New(aead, nil))
 	return blob.NewCAS(bs, hcons), buf
 }
 
