@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -154,8 +155,8 @@ store without roots.
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
 			pb := pbar.New(env, n).Start()
-			for i := 0; i < 256; i++ {
-				pfx := string([]byte{byte(i)})
+			for _, p := range shuffledSeeds() {
+				pfx := string([]byte{p})
 				run(func() error {
 					return s.List(ctx, pfx, func(key string) error {
 						if !strings.HasPrefix(key, pfx) {
@@ -191,4 +192,15 @@ store without roots.
 			return nil
 		})
 	},
+}
+
+func shuffledSeeds() []byte {
+	m := make([]byte, 256)
+	for i := range m {
+		m[i] = byte(i)
+	}
+	rand.Shuffle(256, func(i, j int) {
+		m[i], m[j] = m[j], m[i]
+	})
+	return m
 }
