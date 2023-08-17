@@ -107,7 +107,7 @@ store without roots.
 					}
 					idxs = append(idxs, rpi)
 					idx.Add(rp.IndexKey)
-					fmt.Fprintf(env, "Loaded cached index for %q (%x)\n", key, rp.IndexKey)
+					fmt.Fprintf(env, "Loaded cached index for %q (%s)\n", key, config.FormatKey(rp.IndexKey))
 					continue
 				}
 
@@ -119,8 +119,8 @@ store without roots.
 				}
 				idx.Add(rp.FileKey)
 
-				fmt.Fprintf(env, "Scanning data reachable from %q (%x)...\n",
-					config.PrintableKey(key), rp.FileKey)
+				fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n",
+					config.PrintableKey(key), config.FormatKey(rp.FileKey))
 				scanned := mapset.New[string]()
 				start := time.Now()
 				if err := rf.Scan(env.Context(), func(si file.ScanItem) bool {
@@ -171,7 +171,7 @@ store without roots.
 						}
 						pb.SetMeta(numDrop.Add(1))
 						if err := s.Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
-							log.Printf("WARNING: delete key %x: %v", key, err)
+							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
 						}
 						return nil
 					})

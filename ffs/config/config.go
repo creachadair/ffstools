@@ -209,6 +209,11 @@ func PrintableKey(key string) any {
 	return key
 }
 
+// FormatKey converts key into a base64 value.
+func FormatKey(key string) string {
+	return base64.StdEncoding.EncodeToString([]byte(key))
+}
+
 // ToJSON converts a value to indented JSON.
 func ToJSON(msg any) string {
 	bits, err := json.Marshal(msg)
@@ -359,7 +364,7 @@ func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error
 	}
 	ridx := obj.GetIndex()
 	if ridx == nil {
-		return nil, fmt.Errorf("no index in %x", key)
+		return nil, fmt.Errorf("no index in %s", FormatKey(key))
 	}
 
 	return index.Decode(ridx)

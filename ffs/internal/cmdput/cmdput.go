@@ -83,11 +83,11 @@ func runPut(env *command.Env) error {
 			}
 			keys[i] = key
 			if putConfig.Verbose {
-				log.Printf("done put: %s (%x)", path, key)
+				log.Printf("done put: %s (%s)", path, config.FormatKey(key))
 			}
 		}
 		for _, key := range keys {
-			fmt.Printf("put: %x\n", key)
+			fmt.Printf("put: %s\n", config.FormatKey(key))
 		}
 
 		if putFlags.Target != "" {
@@ -99,7 +99,7 @@ func runPut(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("set: %x\n", key)
+			fmt.Printf("set: %s\n", config.FormatKey(key))
 		}
 		return nil
 	})

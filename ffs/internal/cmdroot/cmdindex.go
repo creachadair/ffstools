@@ -56,7 +56,7 @@ func runIndex(env *command.Env) error {
 				return err
 			}
 
-			fmt.Fprintf(env, "Scanning data reachable from %q (%x)...\n", key, rp.FileKey)
+			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, config.FormatKey(rp.FileKey))
 			scanned := mapset.New[string]()
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()

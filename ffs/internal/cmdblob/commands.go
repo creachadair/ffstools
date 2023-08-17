@@ -136,7 +136,7 @@ func listCmd(env *command.Env) error {
 		if listFlags.Raw {
 			fmt.Println(pfx + key)
 		} else {
-			fmt.Printf("%x\n", pfx+key)
+			fmt.Printf("%s\n", config.FormatKey(pfx+key))
 		}
 		listed++
 		if listFlags.MaxKeys > 0 && listed == listFlags.MaxKeys {
@@ -179,7 +179,7 @@ func casPutCmd(env *command.Env) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%x\n", key)
+	fmt.Printf("%s\n", config.FormatKey(key))
 	return nil
 }
 
@@ -198,7 +198,7 @@ func casKeyCmd(env *command.Env) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%x\n", key)
+	fmt.Printf("%s\n", config.FormatKey(key))
 	return nil
 }
 

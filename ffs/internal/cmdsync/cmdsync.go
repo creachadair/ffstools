@@ -96,7 +96,7 @@ func runSync(env *command.Env) error {
 					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
 					err = worklist.root(env.Context(), src, of.RootKey, of.Root)
 				} else {
-					fmt.Fprintf(env, "Scanning data reachable from file %x", of.FileKey)
+					fmt.Fprintf(env, "Scanning data reachable from file %s", config.FormatKey(of.FileKey))
 					err = worklist.file(env.Context(), of.File)
 				}
 				fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
@@ -163,7 +163,7 @@ func runSync(env *command.Env) error {
 						debug("- copying root %q", key)
 						return copyBlob(ctx, src.Roots(), tgt.Roots(), key, true)
 					case 'F':
-						debug("- copying file %x", key)
+						debug("- copying file %s", config.FormatKey(key))
 						return copyBlob(ctx, src, tgt, key, false)
 					case '-':
 						return copyBlob(ctx, src, tgt, key, false)

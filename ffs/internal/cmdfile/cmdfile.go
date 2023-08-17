@@ -369,7 +369,7 @@ func runSet(env *command.Env) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("set: %x\n", key)
+		fmt.Printf("set: %s\n", config.FormatKey(key))
 		return nil
 	})
 }
@@ -398,7 +398,7 @@ func runRemove(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("remove: %x\n", key)
+			fmt.Printf("remove: %s\n", config.FormatKey(key))
 		}
 		return nil
 	})
@@ -446,7 +446,7 @@ func runSetStat(env *command.Env) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("set-stat: %x\n", key)
+		fmt.Printf("set-stat: %s\n", config.FormatKey(key))
 		return nil
 	})
 }
@@ -467,7 +467,7 @@ func runResolve(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%x\n", rf.File.Key())
+			fmt.Printf("%s\n", config.FormatKey(rf.File.Key()))
 			return nil
 		})
 	}
@@ -478,14 +478,14 @@ func runResolve(env *command.Env) error {
 			return err
 		}
 		if rf.RootKey != "" {
-			fmt.Printf("%x %s\n", rf.Base.Key(), rf.RootKey)
+			fmt.Printf("%s %s\n", config.FormatKey(rf.Base.Key()), rf.RootKey)
 		} else {
-			fmt.Printf("%x\n", rf.Base.Key())
+			fmt.Printf("%s\n", config.FormatKey(rf.Base.Key()))
 		}
 		parts := strings.Split(rest, "/")
 		pf, err := fpath.OpenPath(env.Context(), rf.Base, rest)
 		for i, f := range pf {
-			fmt.Printf("%x %s\n", f.Key(), parts[i])
+			fmt.Printf("%s %s\n", config.FormatKey(f.Key()), parts[i])
 		}
 		return err
 	})
