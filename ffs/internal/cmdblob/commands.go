@@ -17,7 +17,6 @@ package cmdblob
 import (
 	"context"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -31,8 +30,7 @@ import (
 
 func getCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
-		//lint:ignore ST1005 The punctuation signifies repetition to the user.
-		return errors.New("usage is: get <key>...")
+		return env.Usagef("missing required <key>")
 	}
 	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
@@ -56,8 +54,7 @@ func getCmd(env *command.Env) error {
 
 func sizeCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
-		//lint:ignore ST1005 The punctuation signifies repetition to the user.
-		return errors.New("usage is: size <key>...")
+		return env.Usagef("missing required <key>")
 	}
 	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
@@ -81,8 +78,7 @@ func sizeCmd(env *command.Env) error {
 
 func delCmd(env *command.Env) (err error) {
 	if len(env.Args) == 0 {
-		//lint:ignore ST1005 The punctuation signifies repetition to the user.
-		return errors.New("usage is: delete <key>...")
+		return env.Usagef("missing required <key>")
 	}
 	nctx, bs, err := storeFromEnv(env)
 	if err != nil {
@@ -107,9 +103,6 @@ func delCmd(env *command.Env) (err error) {
 }
 
 func listCmd(env *command.Env) error {
-	if len(env.Args) != 0 {
-		return errors.New("usage is: list")
-	}
 	start, err := config.ParseKey(listFlags.Start)
 	if err != nil {
 		return err
@@ -147,9 +140,6 @@ func listCmd(env *command.Env) error {
 }
 
 func lenCmd(env *command.Env) error {
-	if len(env.Args) != 0 {
-		return errors.New("usage is: len")
-	}
 	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
@@ -202,21 +192,18 @@ func casKeyCmd(env *command.Env) error {
 	return nil
 }
 
-func copyCmd(env *command.Env) error {
-	if len(env.Args) != 2 {
-		return errors.New("usage is: copy <src> <dst>")
-	}
+func copyCmd(env *command.Env, srcArg, dstArg string) error {
 	ctx, bs, err := storeFromEnv(env)
 	if err != nil {
 		return err
 	}
 	defer bs.Close(ctx)
 
-	srcKey, err := config.ParseKey(env.Args[0])
+	srcKey, err := config.ParseKey(srcArg)
 	if err != nil {
 		return err
 	}
-	dstKey, err := config.ParseKey(env.Args[1])
+	dstKey, err := config.ParseKey(dstArg)
 	if err != nil {
 		return err
 	}
@@ -231,11 +218,11 @@ func copyCmd(env *command.Env) error {
 	})
 }
 
-func putCmd(env *command.Env) (err error) {
-	if len(env.Args) == 0 || len(env.Args) > 2 {
-		return errors.New("usage is: put <key> [<path>]")
+func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
+	if len(rest) > 1 {
+		return env.Usagef("extra arguments after path: %q", rest[1:])
 	}
-	key, err := config.ParseKey(env.Args[0])
+	key, err := config.ParseKey(keyArg)
 	if err != nil {
 		return err
 	}
@@ -245,7 +232,7 @@ func putCmd(env *command.Env) (err error) {
 	}
 	defer bs.Close(ctx)
 
-	data, err := readData(ctx, "put", env.Args[1:])
+	data, err := readData(ctx, "put", rest)
 	if err != nil {
 		return err
 	}
@@ -272,7 +259,7 @@ func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
 	t := env.Config.(*config.Settings)
 	bs, err := t.OpenStore(env.Context())
 
-	// Becausethe blob commands operate on the raw store, take off the default
+	// Because the blob commands operate on the raw store, take off the default
 	// data bucket suffix and apply the one from the -bucket flag.
 	bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
 	return env.Context(), bs, err

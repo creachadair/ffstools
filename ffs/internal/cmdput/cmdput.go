@@ -56,13 +56,11 @@ input path is allowed.`,
 		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
 		flax.MustBind(fs, &putFlags)
 	},
-	Run: runPut,
+	Run: command.Adapt(runPut),
 }
 
-func runPut(env *command.Env) error {
-	if len(env.Args) == 0 {
-		return env.Usagef("missing required path")
-	} else if putFlags.Target != "" && len(env.Args) > 1 {
+func runPut(env *command.Env, srcPath string, rest []string) error {
+	if putFlags.Target != "" && len(rest) != 0 {
 		return env.Usagef("only one path is allowed when -target is set")
 	}
 

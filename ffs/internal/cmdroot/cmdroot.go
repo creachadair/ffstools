@@ -17,7 +17,6 @@ package cmdroot
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -44,7 +43,7 @@ var Command = &command.C{
 If a glob is provided, only names matching the glob are listed; otherwise all
 known keys are listed.`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
+			SetFlags: command.Flags(flax.MustBind, &listFlags),
 			Run:      runList,
 		},
 		{
@@ -55,15 +54,15 @@ known keys are listed.`,
 If only a <name> is given, a new empty root pointer is created with that name.
 If a <file-key> is specified, the new root points to that file (which must exist).`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &createFlags) },
-			Run:      runCreate,
+			SetFlags: command.Flags(flax.MustBind, &createFlags),
+			Run:      command.Adapt(runCreate),
 		},
 		{
 			Name:  "copy",
 			Usage: "<source-name> <target-name>",
 			Help:  "Duplicate a root pointer under a new name.",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &copyFlags) },
+			SetFlags: command.Flags(flax.MustBind, &copyFlags),
 			Run:      runCopy,
 		},
 		{
@@ -71,7 +70,7 @@ If a <file-key> is specified, the new root points to that file (which must exist
 			Usage: "<source-name> <target-name>",
 			Help:  "Rename a root pointer (equivalent to copy + remove).",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &copyFlags) },
+			SetFlags: command.Flags(flax.MustBind, &copyFlags),
 			Run:      runCopy,
 		},
 		{
@@ -107,7 +106,7 @@ An index is a Bloom filter of the keys reachable from the root.  If a root
 already has an index, it is not changed; use -f to force a new index to be
 computed anyway.`,
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &indexFlags) },
+			SetFlags: command.Flags(flax.MustBind, &indexFlags),
 			Run:      runIndex,
 		},
 	},
@@ -175,18 +174,15 @@ var createFlags struct {
 	Ref     bool   `flag:"ref,Treat the target as a root/path or file/path"`
 }
 
-func runCreate(env *command.Env) error {
-	if len(env.Args) == 0 {
-		return env.Usagef("missing <name> argument")
-	}
-	name, mode := env.Args[0], "empty"
-	if len(env.Args) == 2 {
+func runCreate(env *command.Env, name string, rest ...string) error {
+	mode := "empty"
+	if len(rest) == 1 {
 		if createFlags.Ref {
 			mode = "ref"
 		} else {
 			mode = "file-key"
 		}
-	} else if len(env.Args) != 1 {
+	} else if len(rest) != 0 {
 		return env.Usagef("invalid arguments")
 	}
 

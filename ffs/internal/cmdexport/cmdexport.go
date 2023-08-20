@@ -17,7 +17,6 @@ package cmdexport
 import (
 	"bufio"
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -56,16 +55,12 @@ key to the path indicated by -to. By default, stat information (permissions,
 modification time, etc.) is copied to the output; use -nostat to omit this.
 Use -xattr to export extended attributes, if any are stored.`,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &exportFlags) },
-	Run:      runExport,
+	SetFlags: command.Flags(flax.MustBind, &exportFlags),
+	Run:      command.Adapt(runExport),
 }
 
-func runExport(env *command.Env) error {
-	if len(env.Args) == 0 || env.Args[0] == "" {
-		return env.Usagef("missing required object path")
-	} else if len(env.Args) > 1 {
-		return env.Usagef("extra arguments: %q", env.Args[1:])
-	} else if exportFlags.Target == "" {
+func runExport(env *command.Env, originPath string) error {
+	if exportFlags.Target == "" {
 		return env.Usagef("missing required -to path")
 	}
 
@@ -76,7 +71,7 @@ func runExport(env *command.Env) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
-		of, err := config.OpenPath(env.Context(), s, env.Args[0])
+		of, err := config.OpenPath(env.Context(), s, originPath)
 		if err != nil {
 			return err
 		}

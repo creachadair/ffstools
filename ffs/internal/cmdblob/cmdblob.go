@@ -70,7 +70,7 @@ the address or an @tag from the configuration file.
 			Help:  "Write a blob to the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
-			Run:      putCmd,
+			Run:      command.Adapt(putCmd),
 		},
 		{
 			Name:  "size",
@@ -90,31 +90,31 @@ the address or an @tag from the configuration file.
 			Name: "list",
 			Help: "List keys in the store",
 
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
-			Run:      listCmd,
+			SetFlags: command.Flags(flax.MustBind, &listFlags),
+			Run:      command.Adapt(listCmd),
 		},
 		{
 			Name: "len",
 			Help: "Print the number of stored keys",
-			Run:  lenCmd,
+			Run:  command.Adapt(lenCmd),
 		},
 		{
 			Name: "cas-key",
 			Help: "Compute the key for a blob without writing it",
-			Run:  casKeyCmd,
+			Run:  command.Adapt(casKeyCmd),
 		},
 		{
 			Name:  "cas-put",
 			Usage: "cas-put",
 			Help:  "Write a content-addressed blob to the store from stdin",
-			Run:   casPutCmd,
+			Run:   command.Adapt(casPutCmd),
 		},
 		{
 			Name:     "copy",
 			Usage:    "<src> <dst>",
 			Help:     "Copy the contents of one blob to another key",
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
-			Run:      copyCmd,
+			Run:      command.Adapt(copyCmd),
 		},
 	},
 }

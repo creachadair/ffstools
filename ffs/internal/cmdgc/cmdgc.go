@@ -17,7 +17,6 @@ package cmdgc
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -53,13 +52,9 @@ unless -force is set. This avoids accidentally deleting everything in a
 store without roots.
 `,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &gcFlags) },
+	SetFlags: command.Flags(flax.MustBind, &gcFlags),
 
-	Run: func(env *command.Env) error {
-		if len(env.Args) != 0 {
-			return env.Usagef("extra arguments after command")
-		}
-
+	Run: command.Adapt(func(env *command.Env) error {
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(env.Context(), func(s config.CAS) error {
 			var keys []string
@@ -191,7 +186,7 @@ store without roots.
 				numKeep.Load(), numDrop.Load(), time.Since(start).Truncate(10*time.Millisecond))
 			return nil
 		})
-	},
+	}),
 }
 
 func shuffledSeeds() []byte {

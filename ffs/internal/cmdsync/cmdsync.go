@@ -17,7 +17,6 @@ package cmdsync
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"sync/atomic"
@@ -55,14 +54,12 @@ Transfer all the objects reachable from the specified file or root
 paths into the given target store.
 `,
 
-	SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &syncFlags) },
-	Run:      runSync,
+	SetFlags: command.Flags(flax.MustBind, &syncFlags),
+	Run:      command.Adapt(runSync),
 }
 
-func runSync(env *command.Env) error {
-	if len(env.Args) == 0 {
-		return env.Usagef("missing source keys")
-	} else if syncFlags.Target == "" {
+func runSync(env *command.Env, sourceKeys ...string) error {
+	if syncFlags.Target == "" {
 		return env.Usagef("missing -to target store")
 	}
 
@@ -75,7 +72,7 @@ func runSync(env *command.Env) error {
 			// Find all the objects reachable from the specified starting points.
 			worklist := make(scanSet)
 			var indices []*index.Index
-			for _, elt := range env.Args {
+			for _, elt := range sourceKeys {
 				of, err := config.OpenPath(env.Context(), src, elt)
 				if err != nil {
 					return err

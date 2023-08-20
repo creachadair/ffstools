@@ -20,7 +20,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -63,7 +62,7 @@ a file may be specified in the following formats:
 			Usage: fileCmdUsage,
 			Help:  "Print the representation of a file object",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &showFlags) },
+			SetFlags: command.Flags(flax.MustBind, &showFlags),
 			Run:      runShow,
 		},
 		{
@@ -71,7 +70,7 @@ a file may be specified in the following formats:
 			Usage: fileCmdUsage,
 			Help:  "List file attributes in a style similar to the ls command",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &listFlags) },
+			SetFlags: command.Flags(flax.MustBind, &listFlags),
 			Run:      runList,
 		},
 		{
@@ -79,7 +78,7 @@ a file may be specified in the following formats:
 			Usage: fileCmdUsage,
 			Help:  "Read the binary contents of a file object",
 
-			Run: runRead,
+			Run: command.Adapt(runRead),
 		},
 		{
 			Name: "set",
@@ -94,7 +93,7 @@ The <target> may be a root-key/path or a @file-key/path. In both cases the path
 component is optional; if a root-key is given alone its root file is used as
 the target.`,
 
-			Run: runSet,
+			Run: command.Adapt(runSet),
 		},
 		{
 			Name: "remove",
@@ -126,7 +125,7 @@ The stat spec is a list of fields to update, one or more of:
 
 If the origin is from a root, the root is updated with the changes.`,
 
-			Run: runSetStat,
+			Run: command.Adapt(runSetStat),
 		},
 		{
 			Name: "resolve",
@@ -134,8 +133,8 @@ If the origin is from a root, the root is updated with the changes.`,
 @<origin-key>/<path>`,
 			Help: "Show the storage key targeted by the specified path.",
 
-			SetFlags: func(_ *command.Env, fs *flag.FlagSet) { flax.MustBind(fs, &resolveFlags) },
-			Run:      runResolve,
+			SetFlags: command.Flags(flax.MustBind, &resolveFlags),
+			Run:      command.Adapt(runResolve),
 		},
 	},
 }
@@ -338,13 +337,10 @@ func nameOrID(name string, id int) string {
 	return idstr
 }
 
-func runRead(env *command.Env) error {
-	if len(env.Args) == 0 {
-		return env.Usagef("missing required origin/path")
-	}
+func runRead(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
-		of, err := config.OpenPath(env.Context(), s, env.Args[0])
+		of, err := config.OpenPath(env.Context(), s, originPath)
 		if err != nil {
 			return err
 		}
@@ -354,18 +350,14 @@ func runRead(env *command.Env) error {
 	})
 }
 
-func runSet(env *command.Env) error {
-	if len(env.Args) != 2 {
-		return env.Usagef("got %d arguments, wanted origin/path, target", len(env.Args))
-	}
-
+func runSet(env *command.Env, originPath, target string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
-		tf, err := config.OpenPath(env.Context(), s, env.Args[1])
+		tf, err := config.OpenPath(env.Context(), s, target)
 		if err != nil {
 			return err
 		}
-		key, err := putlib.SetPath(env.Context(), s, env.Args[0], tf.File)
+		key, err := putlib.SetPath(env.Context(), s, originPath, tf.File)
 		if err != nil {
 			return err
 		}
@@ -404,12 +396,11 @@ func runRemove(env *command.Env) error {
 	})
 }
 
-func runSetStat(env *command.Env) error {
-	if len(env.Args) < 3 {
-		return env.Usagef("missing origin and stat spec")
+func runSetStat(env *command.Env, path string, mods []string) error {
+	if len(mods) == 0 {
+		return env.Usagef("missing stat spec")
 	}
-	path := env.Args[0]
-	mod, err := parseStatMod(env.Args[1:])
+	mod, err := parseStatMod(mods)
 	if err != nil {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
@@ -455,11 +446,7 @@ var resolveFlags struct {
 	Path bool `flag:"path,Show each key traversed by the path"`
 }
 
-func runResolve(env *command.Env) error {
-	if len(env.Args) != 1 {
-		return env.Usagef("missing origin/path")
-	}
-
+func runResolve(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
 	if !resolveFlags.Path {
 		return cfg.WithStore(env.Context(), func(s config.CAS) error {
@@ -472,7 +459,7 @@ func runResolve(env *command.Env) error {
 		})
 	}
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
-		base, rest := config.SplitPath(env.Args[0])
+		base, rest := config.SplitPath(originPath)
 		rf, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
 		if err != nil {
 			return err
