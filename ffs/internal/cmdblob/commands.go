@@ -16,7 +16,6 @@ package cmdblob
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -71,7 +70,7 @@ func sizeCmd(env *command.Env) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(hex.EncodeToString([]byte(key)), len(data))
+		fmt.Println(config.FormatKey(key), len(data))
 	}
 	return nil
 }
@@ -97,7 +96,7 @@ func delCmd(env *command.Env) (err error) {
 		} else if err != nil {
 			return err
 		}
-		fmt.Println(hex.EncodeToString([]byte(key)))
+		fmt.Println(config.FormatKey(key))
 	}
 	return nil
 }
