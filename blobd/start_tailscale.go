@@ -23,6 +23,7 @@ import (
 	"log"
 	"net"
 	"net/url"
+	"os"
 	"strconv"
 
 	"github.com/creachadair/chirp"
@@ -58,7 +59,7 @@ func parseTailscaleURL(s string) (string, *tsnet.Server, error) {
 	q := u.Query()
 	srv := &tsnet.Server{
 		Hostname:  host,
-		Dir:       q.Get("dir"),
+		Dir:       os.ExpandEnv(q.Get("dir")),
 		AuthKey:   q.Get("auth_key"),
 		Ephemeral: parseQueryBool(q.Get("ephemeral")),
 		Logf:      func(string, ...any) {},
