@@ -135,7 +135,7 @@ require (
 	go.etcd.io/bbolt v1.3.7 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
-	go4.org/netipx v0.0.0-20230824141953-6213f710f925 // indirect
+	go4.org/netipx v0.0.0-20230728180743-ad4cb58a6516 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.15.0 // indirect
@@ -155,6 +155,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230911183012-2d3300fd4832 // indirect
 	google.golang.org/grpc v1.58.0 // indirect
 	gvisor.dev/gvisor v0.0.0-20230504175454-7b0a1988a28f // indirect
+	honnef.co/go/tools v0.4.6 // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
