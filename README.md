@@ -30,3 +30,51 @@ See also https://github.com/creachadair/ffs.
   # To install:
   go install github.com/creachadair/ffstools/file2json@latest
   ```
+
+## Installation and Usage
+
+Install `blobd` and `ffs` as noted above, then:
+
+```bash
+# Start up a storage server (blobd) using local files as storage.
+export FFS_STORE=/tmp/test.db.sock
+blobd -store file:test.db -listen "$FFS_STORE" &
+
+# Create a root pointer to anchor some data.
+ffs root create example --desc 'Example root pointer'
+
+# Create some files to put into storage.
+mkdir -p files/sub
+echo "This is my file." > files/sub/f1.txt
+echo "Many others are like it" > files/sub/f2.txt
+echo "But this one is mine." > files/f3.txt
+
+# Copy the files directory into the store.
+ffs put -into example/test1 files
+
+# List the contents we just wrote...
+ffs file list -long example/test1
+ffs file list -long example/test1/sub
+
+# Move some files around...
+echo "That was your file." > files/sub/f1.txt
+mv files/sub/f2.txt files/f4.txt
+rm files/f3.txt
+
+# Add another copy of the structure.
+ffs put -into example/test2 files
+
+# List the revised contents...
+ffs file list -long example/test1
+ffs file list -long example/test2
+ffs file list -long example/test2/sub
+
+# List the stuff reachable from the root.
+ffs file list -long -key example
+
+# GC unreachable data in the store.
+ffs gc
+
+# Stop the blobd.
+kill %1 && wait
+```
