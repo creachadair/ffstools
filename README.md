@@ -39,6 +39,7 @@ Install `blobd` and `ffs` as noted above, then:
 # Start up a storage server (blobd) using local files as storage.
 export FFS_STORE=/tmp/test.db.sock
 blobd -store file:test.db -listen "$FFS_STORE" &
+while [[ ! -e "$FFS_STORE" ]] ; do sleep 1 ; done
 
 # Create a root pointer to anchor some data.
 ffs root create example --desc 'Example root pointer'
