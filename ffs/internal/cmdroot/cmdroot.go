@@ -37,11 +37,11 @@ var Command = &command.C{
 	Commands: []*command.C{
 		{
 			Name:  "list",
-			Usage: "[name-glob]",
+			Usage: "[name-glob ...]",
 			Help: `List the root keys known in the store.
 
-If a glob is provided, only names matching the glob are listed; otherwise all
-known keys are listed.`,
+If name globs are provided, only names matching those globs are listed; otherwise
+all known keys are listed.`,
 
 			SetFlags: command.Flags(flax.MustBind, &listFlags),
 			Run:      runList,
@@ -117,13 +117,20 @@ var listFlags struct {
 	JSON bool `flag:"json,Format output as JSON"`
 }
 
-func runList(env *command.Env) error {
-	if len(env.Args) > 1 {
-		return env.Usagef("extra arguments after command")
-	} else if len(env.Args) == 0 {
-		env.Args = append(env.Args, "*")
+func matchAny(key string, globs []string) bool {
+	for _, glob := range globs {
+		if ok, _ := path.Match(glob, key); ok {
+			return true
+		}
 	}
-	glob := env.Args[0]
+	return len(globs) == 0
+}
+
+func runList(env *command.Env) error {
+	glob := env.Args
+	if len(glob) == 0 {
+		glob = append(glob, "*")
+	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
@@ -131,7 +138,7 @@ func runList(env *command.Env) error {
 		defer w.Flush()
 
 		return s.Roots().List(env.Context(), "", func(key string) error {
-			if ok, _ := path.Match(glob, key); !ok {
+			if !matchAny(key, glob) {
 				return nil
 			} else if !listFlags.Long && !listFlags.JSON {
 				fmt.Println(key)
