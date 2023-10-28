@@ -128,6 +128,23 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run: command.Adapt(runSetStat),
 		},
 		{
+			Name: "xattr",
+			Usage: `<root-key>/<path> <xattr-spec>
+@<origin-key>/<path> <xattr-spec>`,
+			Help: `Edit extended attributes of the specified path beneath the origin
+
+The xattr spec is one of the following:
+
+  list               -- list the extended attribute names
+  get <name>         -- get the value of the xattr
+  delete <name>      -- delete the named xattr
+  set <name> <value> -- set the value of the xattr
+
+If the origin is from a root, the root is updated with the changes.`,
+
+			Run: command.Adapt(runXAttr),
+		},
+		{
 			Name: "resolve",
 			Usage: `<root-key>/<path>
 @<origin-key>/<path>`,
@@ -440,6 +457,74 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		fmt.Printf("set-stat: %s\n", config.FormatKey(key))
 		return nil
 	})
+}
+
+func runXAttr(env *command.Env, fileSpec, op string, args ...string) error {
+	if err := checkXAttrSpec(op, args); err != nil {
+		return err
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		of, err := config.OpenPath(env.Context(), s, fileSpec)
+		if err != nil {
+			return err
+		}
+		oldKey := of.BaseKey
+		xv := of.File.XAttr()
+
+		switch op {
+		case "list":
+			if xv.Len() != 0 {
+				fmt.Println(strings.Join(xv.Names(), "\n"))
+			}
+		case "clear":
+			if n := xv.Len(); n != 0 {
+				fmt.Fprintf(env, "removed %d xattr\n", n)
+			}
+			xv.Clear()
+		case "get":
+			if xv.Has(args[0]) {
+				fmt.Println(xv.Get(args[0]))
+			} else {
+				fmt.Fprintf(env, "xattr %q not found\n", args[0])
+			}
+		case "delete":
+			xv.Remove(args[0])
+		case "set":
+			xv.Set(args[0], args[1])
+		default:
+			panic("unknown xattr spec: " + op) // unreachable
+		}
+
+		key, err := of.Flush(env.Context())
+		if err != nil {
+			return err
+		}
+		if key != oldKey {
+			fmt.Printf("xattr: %s\n", config.FormatKey(key))
+		}
+		return nil
+	})
+}
+
+func checkXAttrSpec(op string, args []string) error {
+	switch op {
+	case "list", "clear":
+		if len(args) != 0 {
+			return fmt.Errorf("extra args after %q", op)
+		}
+	case "get", "delete":
+		if len(args) != 1 {
+			return fmt.Errorf("wrong number of args for %q (got %d, want 1)", op, len(args))
+		}
+	case "set":
+		if len(args) != 2 {
+			return fmt.Errorf("wrong number of args for %q (got %d, want 2)", op, len(args))
+		}
+	default:
+		return fmt.Errorf("unknown xattr operation %q", op)
+	}
+	return nil
 }
 
 var resolveFlags struct {
