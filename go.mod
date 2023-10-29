@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20231017191646-2413d3c6d598
 	github.com/creachadair/command v0.1.3
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.2
+	github.com/creachadair/ffs v0.0.3
 	github.com/creachadair/flax v0.0.0-20231006163155-9fabbdad68e2
 	github.com/creachadair/gcsstore v0.0.0-20231026033619-4f5171a74b06
 	github.com/creachadair/keyfile v0.7.2
