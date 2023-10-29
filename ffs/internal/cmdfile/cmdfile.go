@@ -136,6 +136,7 @@ If the origin is from a root, the root is updated with the changes.`,
 The xattr spec is one of the following:
 
   list               -- list the extended attribute names
+  clear              -- remove all extended attributes
   get <name>         -- get the value of the xattr
   delete <name>      -- delete the named xattr
   set <name> <value> -- set the value of the xattr
