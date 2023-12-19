@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/badgerstore v0.2.6
 	github.com/creachadair/bitcaskstore v0.0.0-20231211041333-a75e5a0b6c8e
 	github.com/creachadair/boltstore v0.0.0-20231214050211-0dc60de8ee37
-	github.com/creachadair/chirp v0.0.0-20231211041426-128559415fa4
+	github.com/creachadair/chirp v0.0.0-20231218230823-23928dd53c45
 	github.com/creachadair/chirpstore v0.0.0-20231211041526-a0498567eb97
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
@@ -17,19 +17,19 @@ require (
 	github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1
 	github.com/creachadair/gcsstore v0.0.0-20231215163841-bd2c4943aa64
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20231211041507-a98b6d353051
-	github.com/creachadair/mds v0.3.1
-	github.com/creachadair/pebblestore v0.0.0-20231211041428-dcb8a60a84c7
-	github.com/creachadair/pogrebstore v0.0.0-20231211041344-43c8b10de4d6
+	github.com/creachadair/leveldbstore v0.0.0-20231218230854-03d1d48df2da
+	github.com/creachadair/mds v0.3.3
+	github.com/creachadair/pebblestore v0.0.0-20231217183337-1c228f029a1d
+	github.com/creachadair/pogrebstore v0.0.0-20231218230831-d21eff52aaf1
 	github.com/creachadair/s3store v0.0.0-20231215163823-f995b223957d
-	github.com/creachadair/sqlitestore v0.0.0-20231211041553-63d2d6c51dad
+	github.com/creachadair/sqlitestore v0.0.0-20231218230925-d63500fc83ee
 	github.com/creachadair/taskgroup v0.6.2
 	github.com/pkg/xattr v0.4.9
-	golang.org/x/crypto v0.16.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/term v0.15.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	tailscale.com v1.56.0
+	tailscale.com v1.56.1
 )
 
 require (
@@ -45,7 +45,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go v1.49.3 // indirect
+	github.com/aws/aws-sdk-go v1.49.5 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.1 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.12 // indirect
@@ -168,13 +168,13 @@ require (
 	google.golang.org/genproto v0.0.0-20231212172506-995d672761c0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231212172506-995d672761c0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231212172506-995d672761c0 // indirect
-	google.golang.org/grpc v1.60.0 // indirect
+	google.golang.org/grpc v1.60.1 // indirect
 	gvisor.dev/gvisor v0.0.0-20230928000133-4fe30062272c // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.15 // indirect
-	modernc.org/libc v1.37.5 // indirect
+	modernc.org/libc v1.37.6 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
