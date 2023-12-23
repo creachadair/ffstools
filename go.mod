@@ -7,27 +7,27 @@ toolchain go1.21.3
 require (
 	github.com/creachadair/atomicfile v0.3.2
 	github.com/creachadair/badgerstore v0.2.6
-	github.com/creachadair/bitcaskstore v0.0.0-20231211041333-a75e5a0b6c8e
-	github.com/creachadair/boltstore v0.0.0-20231214050211-0dc60de8ee37
-	github.com/creachadair/chirp v0.0.0-20231218230823-23928dd53c45
-	github.com/creachadair/chirpstore v0.0.0-20231211041526-a0498567eb97
+	github.com/creachadair/bitcaskstore v0.0.0-20231221194902-10716bc11f67
+	github.com/creachadair/boltstore v0.0.0-20231221195054-c648f4a3ba1c
+	github.com/creachadair/chirp v0.0.0-20231221195111-c60fd32e7e07
+	github.com/creachadair/chirpstore v0.0.0-20231221195148-fd64e6716c8b
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.3
+	github.com/creachadair/ffs v0.0.4
 	github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1
-	github.com/creachadair/gcsstore v0.0.0-20231215163841-bd2c4943aa64
+	github.com/creachadair/gcsstore v0.0.0-20231221195106-51ed73911f1e
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20231218230854-03d1d48df2da
-	github.com/creachadair/mds v0.3.3
-	github.com/creachadair/pebblestore v0.0.0-20231217183337-1c228f029a1d
-	github.com/creachadair/pogrebstore v0.0.0-20231218230831-d21eff52aaf1
-	github.com/creachadair/s3store v0.0.0-20231215163823-f995b223957d
-	github.com/creachadair/sqlitestore v0.0.0-20231218230925-d63500fc83ee
+	github.com/creachadair/leveldbstore v0.0.0-20231221195142-de3ed40e0529
+	github.com/creachadair/mds v0.5.1
+	github.com/creachadair/pebblestore v0.0.0-20231221195123-2f6e2a67462e
+	github.com/creachadair/pogrebstore v0.0.0-20231221194909-25ffed9371e5
+	github.com/creachadair/s3store v0.0.0-20231221195211-2cc30d255a12
+	github.com/creachadair/sqlitestore v0.0.0-20231221195234-cb9a8a81c9e5
 	github.com/creachadair/taskgroup v0.6.2
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.17.0
 	golang.org/x/term v0.15.0
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.32.0
 	gopkg.in/yaml.v3 v3.0.1
 	tailscale.com v1.56.1
 )
@@ -45,20 +45,20 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go v1.49.5 // indirect
+	github.com/aws/aws-sdk-go v1.49.9 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.0 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.26.1 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.16.12 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.26.2 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.16.13 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.9 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.9 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.7.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.9 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.44.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.44.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.18.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.26.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.26.6 // indirect
 	github.com/aws/smithy-go v1.19.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
@@ -71,7 +71,7 @@ require (
 	github.com/coreos/go-iptables v0.7.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
-	github.com/dblohm7/wingoes v0.0.0-20231201174155-65927751e9eb // indirect
+	github.com/dblohm7/wingoes v0.0.0-20231220174005-6310b4cece37 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
@@ -79,7 +79,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
 	github.com/getsentry/sentry-go v0.25.0 // indirect
-	github.com/go-logr/logr v1.3.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.1-0.20230522191255-76236955d466 // indirect
@@ -152,7 +152,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20230824141953-6213f710f925 // indirect
-	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611 // indirect
+	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect
@@ -174,7 +174,7 @@ require (
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.15 // indirect
-	modernc.org/libc v1.37.6 // indirect
+	modernc.org/libc v1.38.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
