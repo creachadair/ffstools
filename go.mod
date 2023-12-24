@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20231221195148-fd64e6716c8b
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.0.4
+	github.com/creachadair/ffs v0.0.5
 	github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1
 	github.com/creachadair/gcsstore v0.0.0-20231221195106-51ed73911f1e
 	github.com/creachadair/keyfile v0.7.2
@@ -92,7 +92,7 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/flatbuffers/go v0.0.0-20230110200425-62e4d2e5b215 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c // indirect
+	github.com/google/nftables v0.1.1-0.20231222073318-ef45dd3322d6 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect

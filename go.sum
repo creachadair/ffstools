@@ -176,8 +176,8 @@ github.com/creachadair/command v0.1.5 h1:7Nl4qcV7OasGsKCnAHIGlzBW5uNdwzGZLbc3OM8
 github.com/creachadair/command v0.1.5/go.mod h1:YKwUE49nAi8qxLl8jCQ0GMPvwdxmIBkJW3LqxgZ7ljk=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.0.4 h1:HeIZT9XJegefH+mdHoH0+KFE7zXQL5RV30415WFtTC0=
-github.com/creachadair/ffs v0.0.4/go.mod h1:1sBBNDHv4Zvqo51DeFx1o65GDYjaZPlhqD9zBD/86nI=
+github.com/creachadair/ffs v0.0.5 h1:qFN60SF6CQo5oAw90sEfABNfDZdPGV3/s0AWantnoyI=
+github.com/creachadair/ffs v0.0.5/go.mod h1:1sBBNDHv4Zvqo51DeFx1o65GDYjaZPlhqD9zBD/86nI=
 github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1 h1:qT1aIcWGe9TZqjIkjwsLMZzziZN2e3QPpb0DVSZCrlM=
 github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1/go.mod h1:2vVCsqiB+GpV/qBKCQ0lKRrJhlKUPdI83SnaFKwJyNo=
 github.com/creachadair/gcsstore v0.0.0-20231221195106-51ed73911f1e h1:Jrl1b0KzNQuGgPDCRCBvH9Cv94keMU+ebtOrmn3jfcc=
@@ -342,8 +342,8 @@ github.com/google/martian/v3 v3.0.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIG
 github.com/google/martian/v3 v3.1.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIGO+w/tUAp0=
 github.com/google/martian/v3 v3.3.2 h1:IqNFLAmvJOgVlpdEBiQbDc2EwKW77amAycfTuWKdfvw=
 github.com/google/martian/v3 v3.3.2/go.mod h1:oBOf6HBosgwRXnUGWUB05QECsc6uvmMiJ3+6W4l/CUk=
-github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c h1:06RMfw+TMMHtRuUOroMeatRCCgSMWXCJQeABvHU69YQ=
-github.com/google/nftables v0.1.1-0.20230115205135-9aa6fdf5a28c/go.mod h1:BVIYo3cdnT4qSylnYqcd5YtmXhr51cJPGtnLBe/uLBU=
+github.com/google/nftables v0.1.1-0.20231222073318-ef45dd3322d6 h1:F2gJaa4L3h1BYi1wSHtl2dpyD/sv16E+7pDAGmNdT60=
+github.com/google/nftables v0.1.1-0.20231222073318-ef45dd3322d6/go.mod h1:KxupCGmcgEI3TVOAQE6vzfdSAHDQhDf4Cl5GpnneEzg=
 github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/pprof v0.0.0-20190515194954-54271f7e092f/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/pprof v0.0.0-20191218002539-d4f498aebedc/go.mod h1:ZgVRPoUq/hfqzAqh7sHMqb3I9Rq5C59dIz2SbBwJ4eM=
