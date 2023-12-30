@@ -168,10 +168,10 @@ github.com/creachadair/bitcaskstore v0.0.0-20231221194902-10716bc11f67 h1:+Asd1g
 github.com/creachadair/bitcaskstore v0.0.0-20231221194902-10716bc11f67/go.mod h1:C9VokJNI4te0S3OdLZbhq+C5lJjO6lQ4fnGlHqSrpm8=
 github.com/creachadair/boltstore v0.0.0-20231221195054-c648f4a3ba1c h1:yjVKTMLR7V2K+GXWscFvIvedtMGESJClGc05biLD5y4=
 github.com/creachadair/boltstore v0.0.0-20231221195054-c648f4a3ba1c/go.mod h1:Vs1wyfIrwpUoskPq1t/Px6ceCcIGtWiQHT5d865IX7k=
-github.com/creachadair/chirp v0.0.0-20231221195111-c60fd32e7e07 h1:Vx65FUwaGu23OyD9whCIxLEUxN2P3BH6GSiWW+D/vrI=
-github.com/creachadair/chirp v0.0.0-20231221195111-c60fd32e7e07/go.mod h1:UcuM4HZuPnCIlKwAW7iqGoNHsl6GI7AYHdoAeZ0dlBU=
-github.com/creachadair/chirpstore v0.0.0-20231221195148-fd64e6716c8b h1:eHHeUQeByu0vQIea66mSohaRQxGwlcboRi8tUfy8u0Q=
-github.com/creachadair/chirpstore v0.0.0-20231221195148-fd64e6716c8b/go.mod h1:2Xy33nI9mGyHwtuKbDTjAvevlpYG/6gt+VZkfr5Azrg=
+github.com/creachadair/chirp v0.0.0-20231230032004-8232eee73811 h1:FfJoiKPCr7kMnz06jb9zsYRak937ZszKJlIG4sqZwxM=
+github.com/creachadair/chirp v0.0.0-20231230032004-8232eee73811/go.mod h1:dXZmDtK5KWItUN6Zhrqgm5sleBRuV4X9Yh388Khrpic=
+github.com/creachadair/chirpstore v0.0.0-20231230033123-998fd6cbab30 h1:fmsUg+FdlqnVEf0jU1SyMjM7OuGA6Sj0iAjkqwk9BPI=
+github.com/creachadair/chirpstore v0.0.0-20231230033123-998fd6cbab30/go.mod h1:CnnbatDXpaPB8NuWKmsG/FVs1tCgmqEdFKSS7lGMdsk=
 github.com/creachadair/command v0.1.5 h1:7Nl4qcV7OasGsKCnAHIGlzBW5uNdwzGZLbc3OM8Rh/E=
 github.com/creachadair/command v0.1.5/go.mod h1:YKwUE49nAi8qxLl8jCQ0GMPvwdxmIBkJW3LqxgZ7ljk=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
@@ -186,8 +186,8 @@ github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20231221195142-de3ed40e0529 h1:G/24Zi+GrE61w09qtOewTSU28Z6UXLZAyd8G38V96I8=
 github.com/creachadair/leveldbstore v0.0.0-20231221195142-de3ed40e0529/go.mod h1:NLXztI5w/PWt5vAlKkQpAS6FnTfSse7jKKuYUCquMwc=
-github.com/creachadair/mds v0.5.1 h1:x0CzsB0SGxrgWdRFPcBd6UnNxu5Azpc1/Beh5hgK2mo=
-github.com/creachadair/mds v0.5.1/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
+github.com/creachadair/mds v0.6.0 h1:axT3ZDT7PD4chMpwul4IoJiHEViq45BYi8qgC6qiuXA=
+github.com/creachadair/mds v0.6.0/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
 github.com/creachadair/msync v0.0.4 h1:v4ZCidRtK7GnB8erBrG/VE5K5vNAYAuSsfe+jFU8v34=
 github.com/creachadair/msync v0.0.4/go.mod h1:5+WcF2IjxUVydSOxqTcUWCgK6pZJwX8uxbGF+FuQkZI=
 github.com/creachadair/pebblestore v0.0.0-20231221195123-2f6e2a67462e h1:2yneCg0rF8rOdN5nMX5XMiDbIek/y+UAlYKfFY4MZYk=
