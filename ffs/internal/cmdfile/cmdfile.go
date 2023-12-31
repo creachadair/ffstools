@@ -116,12 +116,23 @@ If the origin is from a root, the root is updated with the changes.
 The stat spec is a list of fields to update, one or more of:
 
  mode <perms>   -- set file permissions (e.g., 0755)
+ type <type>    -- set file type (see below)
  mtime <time>   -- update file timestamp ("now", @<seconds>, or RFC3339)
  uid <id>       -- set the owner UID
  gid <id>       -- set the group GID
  owner <name>   -- set the owner name ("" to clear)
  group <name>   -- set the group name ("" to clear)
  persist <ok>   -- set or unset stat persistence
+
+Allowed types include:
+
+ f, file:          regular file
+ d, dir:           directory
+ l, link, symlink: symbolic link
+ p, pipe, fifo:    named pipe (FIFO)
+ s, socket:        socket
+ b, block, bdev:   block device
+ c, char, cdev:    character device
 
 If the origin is from a root, the root is updated with the changes.`,
 
@@ -432,6 +443,9 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		if mod.perms != nil {
 			stat.Mode = (stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms)
 		}
+		if mod.ftype != nil {
+			stat.Mode = (stat.Mode &^ fs.ModeType) | *mod.ftype
+		}
 		if mod.modTime != nil {
 			stat.ModTime = *mod.modTime
 		}
@@ -566,6 +580,7 @@ func runResolve(env *command.Env, originPath string) error {
 
 type statMod struct {
 	perms        *int64
+	ftype        *fs.FileMode
 	modTime      *time.Time
 	uid, gid     *int
 	owner, group *string
@@ -584,6 +599,28 @@ func parseStatMod(args []string) (*statMod, error) {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
 			mod.perms = &v
+
+		case "type":
+			var ftype fs.FileMode
+			switch args[i+1] {
+			case "f", "file":
+				// OK, this is the default
+			case "d", "dir":
+				ftype |= fs.ModeDir
+			case "l", "link", "symlink":
+				ftype |= fs.ModeSymlink
+			case "p", "pipe", "fifo":
+				ftype |= fs.ModeNamedPipe
+			case "s", "socket":
+				ftype |= fs.ModeSocket
+			case "b", "block", "bdev", "dev":
+				ftype |= fs.ModeDevice
+			case "c", "char", "cdev":
+				ftype |= fs.ModeDevice | fs.ModeCharDevice
+			default:
+				return nil, fmt.Errorf("invalid type %q", args[i+1])
+			}
+			mod.ftype = &ftype
 
 		case "mtime":
 			var t time.Time
