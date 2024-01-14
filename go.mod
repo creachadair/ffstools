@@ -15,15 +15,15 @@ require (
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.1.1
 	github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1
-	github.com/creachadair/gcsstore v0.0.0-20240106233951-bc8e6f8b794a
+	github.com/creachadair/gcsstore v0.0.0-20240114023941-3516d5923583
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20240106234057-e176ee97880c
 	github.com/creachadair/mds v0.7.0
 	github.com/creachadair/pebblestore v0.0.0-20240106234035-207381c8d5d7
 	github.com/creachadair/pogrebstore v0.0.0-20240106233858-1c6be02202a5
-	github.com/creachadair/s3store v0.0.0-20240106234137-cb40d9eff69a
+	github.com/creachadair/s3store v0.0.0-20240114023613-9ef98c6eb66e
 	github.com/creachadair/sqlitestore v0.0.0-20240106234202-d80f5ef34c4e
-	github.com/creachadair/taskgroup v0.6.2
+	github.com/creachadair/taskgroup v0.7.1
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.18.0
 	golang.org/x/term v0.16.0
@@ -33,7 +33,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.111.0 // indirect
+	cloud.google.com/go v0.112.0 // indirect
 	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
@@ -45,7 +45,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go v1.49.17 // indirect
+	github.com/aws/aws-sdk-go v1.49.20 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.3 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.14 // indirect
@@ -163,7 +163,7 @@ require (
 	golang.org/x/tools v0.16.1 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
-	google.golang.org/api v0.155.0 // indirect
+	google.golang.org/api v0.156.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240108191215-35c7eff3a6b1 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240108191215-35c7eff3a6b1 // indirect
