@@ -21,7 +21,7 @@ require (
 	github.com/creachadair/mds v0.7.0
 	github.com/creachadair/pebblestore v0.0.0-20240112220823-99b3ee29c147
 	github.com/creachadair/pogrebstore v0.0.0-20240113152752-c1dc51ecf700
-	github.com/creachadair/s3store v0.0.0-20240114023613-9ef98c6eb66e
+	github.com/creachadair/s3store v0.0.0-20240115041025-72155dcf7755
 	github.com/creachadair/sqlitestore v0.0.0-20240112220917-af14f941ccd9
 	github.com/creachadair/taskgroup v0.7.1
 	github.com/pkg/xattr v0.4.9
