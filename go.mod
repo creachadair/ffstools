@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/badgerstore v0.2.6
 	github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438
 	github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9
-	github.com/creachadair/chirp v0.0.0-20240113152819-3257c6b09beb
+	github.com/creachadair/chirp v0.0.0-20240115231202-e9581d285634
 	github.com/creachadair/chirpstore v0.0.0-20240112220831-004aeaf1291b
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
@@ -173,7 +173,7 @@ require (
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.15 // indirect
-	modernc.org/libc v1.40.2 // indirect
+	modernc.org/libc v1.40.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
