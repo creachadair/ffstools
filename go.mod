@@ -9,8 +9,8 @@ require (
 	github.com/creachadair/badgerstore v0.3.0
 	github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438
 	github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9
-	github.com/creachadair/chirp v0.0.0-20240115231202-e9581d285634
-	github.com/creachadair/chirpstore v0.0.0-20240112220831-004aeaf1291b
+	github.com/creachadair/chirp v0.0.0-20240117050012-2bab4b1e30b2
+	github.com/creachadair/chirpstore v0.0.0-20240117053757-88a0ebc5dd30
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.2.0

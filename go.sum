@@ -168,10 +168,10 @@ github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438 h1:JY4H+B
 github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438/go.mod h1:+mAAExJL+JTRFlWusckVri8T4bRDJVXR7ldWTRk+JBM=
 github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9 h1:AFGbxRaGAC3ulpGKfB18ySk0ysSiuL7yO6pUh4SiNBU=
 github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9/go.mod h1:udQSAatsQ6Q1z44wmhYehMjkohnJkGSZWho92q522r4=
-github.com/creachadair/chirp v0.0.0-20240115231202-e9581d285634 h1:sAPrKcicnuVP8AD9Rq+3G8Udk5VdgvFw7HSKLMb2X1U=
-github.com/creachadair/chirp v0.0.0-20240115231202-e9581d285634/go.mod h1:1lQ5JwPWYKoXSM7BC2AL8U0+LO4LP4sVHcZjsyTYcYs=
-github.com/creachadair/chirpstore v0.0.0-20240112220831-004aeaf1291b h1:Lza29Ifvpx3txNrRFMY478a89VZdX5ofRqUm/yU7z2Q=
-github.com/creachadair/chirpstore v0.0.0-20240112220831-004aeaf1291b/go.mod h1:7zFUFhdfGH5oE2wrCqGvIM+U+Vjh5F5I7iUEDa5vHog=
+github.com/creachadair/chirp v0.0.0-20240117050012-2bab4b1e30b2 h1:Vp1Rta4D0tgQyz9Fcwve9oc/rTM+y5caCsHcXgTtuVE=
+github.com/creachadair/chirp v0.0.0-20240117050012-2bab4b1e30b2/go.mod h1:1lQ5JwPWYKoXSM7BC2AL8U0+LO4LP4sVHcZjsyTYcYs=
+github.com/creachadair/chirpstore v0.0.0-20240117053757-88a0ebc5dd30 h1:pQ2hpXOMZz0uNiWgLuv1lHbOZn2CKKoFxtE1JCDssNw=
+github.com/creachadair/chirpstore v0.0.0-20240117053757-88a0ebc5dd30/go.mod h1:XkzI5uZwzJYvXzwklHzInjNX/0Ujj2tOfhYTU2gfVM4=
 github.com/creachadair/command v0.1.5 h1:7Nl4qcV7OasGsKCnAHIGlzBW5uNdwzGZLbc3OM8Rh/E=
 github.com/creachadair/command v0.1.5/go.mod h1:YKwUE49nAi8qxLl8jCQ0GMPvwdxmIBkJW3LqxgZ7ljk=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
