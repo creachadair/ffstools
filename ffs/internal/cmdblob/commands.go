@@ -25,6 +25,7 @@ import (
 	"github.com/creachadair/ffs/storage/prefixed"
 	"github.com/creachadair/ffs/storage/suffixed"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/taskgroup"
 )
 
 func getCmd(env *command.Env) error {
@@ -86,19 +87,35 @@ func delCmd(env *command.Env) (err error) {
 	defer bs.Close(nctx)
 
 	missingOK := blobFlags.MissingOK
+	dctx, cancel := context.WithCancel(nctx)
+	defer cancel()
+
+	g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
+	c := taskgroup.NewCollector(func(key string) {
+		fmt.Println(config.FormatKey(key))
+	})
+
 	for _, arg := range env.Args {
+		if dctx.Err() != nil {
+			break
+		}
 		key, err := config.ParseKey(arg)
 		if err != nil {
 			return err
 		}
-		if err := bs.Delete(nctx, key); blob.IsKeyNotFound(err) && missingOK {
-			continue
-		} else if err != nil {
-			return err
-		}
-		fmt.Println(config.FormatKey(key))
+		run(c.Stream(func(ch chan<- string) error {
+			if err := bs.Delete(dctx, key); blob.IsKeyNotFound(err) && missingOK {
+				return nil
+			} else if err != nil {
+				return err
+			}
+			ch <- key
+			return nil
+		}))
 	}
-	return nil
+	err = g.Wait()
+	c.Wait()
+	return err
 }
 
 func listCmd(env *command.Env) error {

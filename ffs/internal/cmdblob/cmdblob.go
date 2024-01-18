@@ -80,8 +80,8 @@ the address or an @tag from the configuration file.
 		},
 		{
 			Name:  "delete",
-			Usage: "<key>",
-			Help:  "Delete a blob from the store",
+			Usage: "<key> ...",
+			Help:  "Delete blobs from the store",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("missing-ok").Bind(fs) },
 			Run:      delCmd,
