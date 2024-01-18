@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/creachadair/atomicfile v0.3.3
-	github.com/creachadair/badgerstore v0.3.0
+	github.com/creachadair/badgerstore v0.3.1
 	github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438
 	github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9
 	github.com/creachadair/chirp v0.0.0-20240117050012-2bab4b1e30b2
@@ -61,7 +61,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.7 // indirect
 	github.com/aws/smithy-go v1.19.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/errors v1.11.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
@@ -72,7 +71,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/creachadair/msync v0.0.4 // indirect
 	github.com/dblohm7/wingoes v0.0.0-20240112174850-6c64141b7297 // indirect
-	github.com/dgraph-io/badger/v3 v3.2103.5 // indirect
+	github.com/dgraph-io/badger/v4 v4.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
