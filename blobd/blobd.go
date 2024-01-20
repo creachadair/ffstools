@@ -25,7 +25,7 @@
 //
 //	Tag      | Description
 //	---------|--------------------------------------------------------------------------
-//	badger   | BadgerDB   https://godoc.org/github.com/dgraph-io/badger/v3
+//	badger   | BadgerDB   https://godoc.org/github.com/dgraph-io/badger/v4
 //	bitcask  | Bitcask    https://godoc.org/git.mills.io/prologic/bitcask
 //	bolt     | BoltDB     https://godoc.org/go.etcd.io/bbolt
 //	file     | Files      https://godoc.org/github.com/creachadair/ffs/storage/filestore
