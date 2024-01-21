@@ -352,7 +352,7 @@ const (
 )
 
 // Roots returns the root view of c.
-func (c CAS) Roots() blob.CAS { return c.CAS.Derive(rootKeyTag, rootBucketSuffix) }
+func (c CAS) Roots() blob.CAS { return CAS{CAS: c.CAS.Derive(rootKeyTag, rootBucketSuffix)} }
 
 // LoadIndex loads the contents of an index blob.
 func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {
