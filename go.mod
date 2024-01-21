@@ -181,3 +181,5 @@ require (
 	modernc.org/token v1.1.0 // indirect
 	nhooyr.io/websocket v1.8.10 // indirect
 )
+
+retract v0.4.1
