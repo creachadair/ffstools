@@ -22,8 +22,6 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/storage/prefixed"
-	"github.com/creachadair/ffs/storage/suffixed"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 )
@@ -133,11 +131,8 @@ func listCmd(env *command.Env) error {
 	}
 	defer bs.Close(ctx)
 
-	// If there is a prefix, apply it first since that will permit the
-	// underlying scan to terminate sooner.
 	if pfx != "" {
-		p := prefixed.NewCAS(bs.Base()).Derive(pfx)
-		bs.CAS = suffixed.NewCAS(p).Derive(blobFlags.Bucket)
+		bs.CAS = bs.CAS.WithPrefix(pfx)
 	}
 
 	var listed int
@@ -277,6 +272,6 @@ func storeFromEnv(env *command.Env) (context.Context, config.CAS, error) {
 
 	// Because the blob commands operate on the raw store, take off the default
 	// data bucket suffix and apply the one from the -bucket flag.
-	bs.CAS = bs.CAS.Derive(blobFlags.Bucket)
+	bs.CAS = bs.CAS.WithSuffix(blobFlags.Bucket)
 	return env.Context(), bs, err
 }

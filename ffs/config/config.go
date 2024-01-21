@@ -37,8 +37,7 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/index"
-	"github.com/creachadair/ffs/storage/prefixed"
-	"github.com/creachadair/ffs/storage/suffixed"
+	"github.com/creachadair/ffs/storage/affixed"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -339,10 +338,12 @@ func SplitPath(s string) (first, rest string) {
 // CAS is a wrapper around a blob.CAS that adds methods to expose the root and
 // data buckets.
 type CAS struct {
-	suffixed.CAS
+	affixed.CAS
 }
 
-func newCAS(bs blob.CAS) CAS { return CAS{CAS: suffixed.NewCAS(bs).Derive(dataBucketSuffix)} }
+func newCAS(bs blob.CAS) CAS {
+	return CAS{CAS: affixed.NewCAS(bs).WithSuffix(dataBucketSuffix)}
+}
 
 const (
 	dataBucketSuffix = "."
@@ -351,10 +352,7 @@ const (
 )
 
 // Roots returns the root view of c.
-func (c CAS) Roots() blob.CAS {
-	rs := prefixed.NewCAS(c.CAS.Derive("")).Derive(rootKeyTag)
-	return suffixed.NewCAS(rs).Derive(rootBucketSuffix)
-}
+func (c CAS) Roots() blob.CAS { return c.CAS.Derive(rootKeyTag, rootBucketSuffix) }
 
 // LoadIndex loads the contents of an index blob.
 func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {
