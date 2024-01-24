@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/creachadair/atomicfile v0.3.3
-	github.com/creachadair/badgerstore v0.3.1
+	github.com/creachadair/badgerstore v0.3.2
 	github.com/creachadair/bitcaskstore v0.0.0-20240112220549-53ead347d438
 	github.com/creachadair/boltstore v0.0.0-20240113152814-e2290db36cc9
 	github.com/creachadair/chirp v0.0.0-20240117050012-2bab4b1e30b2
