@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/badgerstore v0.3.2
 	github.com/creachadair/bitcaskstore v0.0.0-20240129200256-717a8716eccd
 	github.com/creachadair/boltstore v0.0.0-20240129154254-9312e3f9615d
-	github.com/creachadair/chirp v0.0.0-20240129154301-23e16ea4632b
+	github.com/creachadair/chirp v0.0.0-20240203181551-d56340d72f73
 	github.com/creachadair/chirpstore v0.0.0-20240129031055-5b1d99cf899e
 	github.com/creachadair/command v0.1.5
 	github.com/creachadair/ctrl v0.1.1
@@ -45,7 +45,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go v1.50.9 // indirect
+	github.com/aws/aws-sdk-go v1.50.10 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.26.6 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.16 // indirect
@@ -116,6 +116,7 @@ require (
 	github.com/mdlayher/socket v0.5.0 // indirect
 	github.com/miekg/dns v1.1.58 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
+	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plar/go-adaptive-radix-tree v1.0.5 // indirect
@@ -172,7 +173,7 @@ require (
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.15 // indirect
-	modernc.org/libc v1.40.10 // indirect
+	modernc.org/libc v1.40.18 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
