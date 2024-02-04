@@ -60,7 +60,7 @@ a file may be specified in the following formats:
 		{
 			Name:  "show",
 			Usage: fileCmdUsage,
-			Help:  "Print the representation of a file object",
+			Help:  "Print the representation of a file object.",
 
 			SetFlags: command.Flags(flax.MustBind, &showFlags),
 			Run:      runShow,
@@ -68,7 +68,7 @@ a file may be specified in the following formats:
 		{
 			Name:  "list",
 			Usage: fileCmdUsage,
-			Help:  "List file attributes in a style similar to the ls command",
+			Help:  "List file attributes in a style similar to the ls command.",
 
 			SetFlags: command.Flags(flax.MustBind, &listFlags),
 			Run:      runList,
@@ -84,7 +84,7 @@ a file may be specified in the following formats:
 			Name: "set",
 			Usage: `<root-key>/<path> <target>
 @<origin-key>/<path> <target>`,
-			Help: `Set the specified path beneath the origin to the given target
+			Help: `Set the specified path beneath the origin to the given target.
 
 The storage key of the modified origin is printed to stdout.
 If the origin is from a root, the root is updated with the modified origin.
@@ -111,7 +111,7 @@ If the origin is from a root, the root is updated with the changes.
 			Name: "set-stat",
 			Usage: `<root-key>/<path> <stat-spec>
 @<origin-key>/<path> <stat-spec>`,
-			Help: `Modify the stat message of the specified path beneath the origin
+			Help: `Modify the stat message of the specified path beneath the origin.
 
 The stat spec is a list of fields to update, one or more of:
 
@@ -142,7 +142,7 @@ If the origin is from a root, the root is updated with the changes.`,
 			Name: "xattr",
 			Usage: `<root-key>/<path> <xattr-spec>
 @<origin-key>/<path> <xattr-spec>`,
-			Help: `Edit extended attributes of the specified path beneath the origin
+			Help: `Edit extended attributes of the specified path beneath the origin.
 
 The xattr spec is one of the following:
 

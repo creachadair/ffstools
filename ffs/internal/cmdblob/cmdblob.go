@@ -61,13 +61,13 @@ the address or an @tag from the configuration file.
 		{
 			Name:  "get",
 			Usage: "get <key>...",
-			Help:  "Read blobs from the store",
+			Help:  "Read blobs from the store.",
 			Run:   getCmd,
 		},
 		{
 			Name:  "put",
 			Usage: "put <key> [<path>]",
-			Help:  "Write a blob to the store",
+			Help:  "Write a blob to the store.",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
 			Run:      command.Adapt(putCmd),
@@ -75,44 +75,44 @@ the address or an @tag from the configuration file.
 		{
 			Name:  "size",
 			Usage: "<key>...",
-			Help:  "Print the sizes of stored blobs",
+			Help:  "Print the sizes of stored blobs.",
 			Run:   sizeCmd,
 		},
 		{
 			Name:  "delete",
 			Usage: "<key> ...",
-			Help:  "Delete blobs from the store",
+			Help:  "Delete blobs from the store.",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("missing-ok").Bind(fs) },
 			Run:      delCmd,
 		},
 		{
 			Name: "list",
-			Help: "List keys in the store",
+			Help: "List keys in the store.",
 
 			SetFlags: command.Flags(flax.MustBind, &listFlags),
 			Run:      command.Adapt(listCmd),
 		},
 		{
 			Name: "len",
-			Help: "Print the number of stored keys",
+			Help: "Print the number of stored keys.",
 			Run:  command.Adapt(lenCmd),
 		},
 		{
 			Name: "cas-key",
-			Help: "Compute the key for a blob without writing it",
+			Help: "Compute the key for a blob without writing it.",
 			Run:  command.Adapt(casKeyCmd),
 		},
 		{
 			Name:  "cas-put",
 			Usage: "cas-put",
-			Help:  "Write a content-addressed blob to the store from stdin",
+			Help:  "Write a content-addressed blob to the store from stdin.",
 			Run:   command.Adapt(casPutCmd),
 		},
 		{
 			Name:     "copy",
 			Usage:    "<src> <dst>",
-			Help:     "Copy the contents of one blob to another key",
+			Help:     "Copy the contents of one blob to another key.",
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
 			Run:      command.Adapt(copyCmd),
 		},
