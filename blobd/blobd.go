@@ -63,6 +63,7 @@ import (
 	"github.com/creachadair/ffs/storage/filestore"
 	"github.com/creachadair/ffs/storage/zipstore"
 	"github.com/creachadair/ffstools/blobd/store"
+	"github.com/creachadair/ffstools/ffs/config"
 )
 
 var (
@@ -77,6 +78,9 @@ var (
 	zlibLevel  int
 	doReadOnly bool
 	doVersion  bool
+
+	// FFS config file (see getListenAddr).
+	configPath = config.Path()
 
 	// These storage implementations are built in by default.
 	// To include other stores, build with -tags set to their names.
@@ -116,11 +120,14 @@ of a Unix-domain socket.
 A store spec is a storage type and address: type:address
 The types understood are: %[1]s
 
-If -listen is:
+If --listen is:
 
- - A host:port address, a TCP listener is created at that address.`+tsAddress+`
+ - A store label of the form @name: The address associated with that
+   name in the FFS config file is used.
 
- - Otherwise, the address must be a path for a Unix-domain socket.
+ - A host:port address: A TCP listener is created at that address.`+tsAddress+`
+
+ - Otherwise: The address must be a path for a Unix-domain socket.
 
 With -keyfile, the store is opened with AES encryption.
 If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
@@ -139,6 +146,7 @@ Use -cache to enable a memory cache over the underlying store.`, strings.Join(st
 			fs.IntVar(&zlibLevel, "zlib", 0, "Enable ZLIB compression (0 means no compression)")
 			fs.BoolVar(&doReadOnly, "read-only", false, "Disallow modification of the store")
 			fs.BoolVar(&doVersion, "version", false, "Print version information and exit")
+			fs.StringVar(&configPath, "config", configPath, "PRIVATE:Configuration file path")
 		},
 
 		Run: blobd,
@@ -166,11 +174,10 @@ func blobd(env *command.Env) error {
 	switch {
 	case doVersion:
 		return printVersion()
-	case listenAddr == "":
-		ctrl.Exitf(1, "You must provide a non-empty -listen address")
 	case storeAddr == "":
-		ctrl.Exitf(1, "You must provide a non-empty -store address")
+		ctrl.Exitf(1, "You must provide a non-empty --store address")
 	}
+	listenAddr := getListenAddr()
 
 	ctx := context.Background()
 	bs, buf := mustOpenStore(ctx)
@@ -223,4 +230,18 @@ func blobd(env *command.Env) error {
 		}
 	}()
 	return loop.Wait()
+}
+
+func getListenAddr() string {
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		ctrl.Fatalf("Unable to open config file: %v", err)
+	}
+	addr := cfg.ResolveAddress(listenAddr)
+	if addr == "" {
+		ctrl.Fatalf("You must provide a non-empty --listen address")
+	} else if strings.HasPrefix(addr, "@") {
+		ctrl.Fatalf("No service address for label %q", listenAddr)
+	}
+	return addr
 }

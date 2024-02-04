@@ -32,7 +32,7 @@ import (
 
 const tsAddress = `
 
- - A ts://host:port?options URL, a TCP listener is created over Tailscale at
+ - A ts://host:port?options URL: A TCP listener is created over Tailscale at
    the specified host and port. The query parameters are:
 
    dir=path     : the path of the state directory (must exist; overrides default).
