@@ -121,13 +121,16 @@ func (s *Settings) OpenStore(ctx context.Context) (CAS, error) {
 // OpenStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
 func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (CAS, error) {
+	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
+	if s.EnableDebugLogging {
+		lg.Printf("dial %q", addr)
+	}
 	conn, err := Dial(chirp.SplitAddress(addr))
 	if err != nil {
 		return CAS{}, fmt.Errorf("dialing store: %w", err)
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
-		lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 		peer.LogPackets(func(pkt chirp.PacketInfo) { lg.Print(pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
