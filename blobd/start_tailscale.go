@@ -36,7 +36,6 @@ const tsAddress = `
    the specified host and port. The query parameters are:
 
    dir=path     : the path of the state directory (must exist; overrides default).
-   auth_key=k   : an authorization key (or use the TS_AUTHKEY environment).
    ephemeral=?  : whether to create an ephemeral (non-persistent) node.
    verbose=?    : whether to enable verbose logging from Tailscale to stderr.
 
@@ -60,7 +59,6 @@ func parseTailscaleURL(s string) (string, *tsnet.Server, error) {
 	srv := &tsnet.Server{
 		Hostname:  host,
 		Dir:       os.ExpandEnv(q.Get("dir")),
-		AuthKey:   q.Get("auth_key"),
 		Ephemeral: parseQueryBool(q.Get("ephemeral")),
 		Logf:      func(string, ...any) {},
 	}
