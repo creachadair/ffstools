@@ -44,7 +44,6 @@ package main
 import (
 	"archive/zip"
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -157,23 +156,11 @@ Use -cache to enable a memory cache over the underlying store.`, strings.Join(st
 	})
 }
 
-func printVersion() error {
-	bi := getBuildInfo()
-	if bi == nil {
-		return errors.New("no version information is available")
-	}
-	if bi.modified {
-		bi.revision += " (modified)"
-	}
-	fmt.Printf("%s built by %s at time %s rev %s\n",
-		filepath.Base(os.Args[0]), bi.toolchain, bi.buildTime, bi.revision)
-	return nil
-}
-
 func blobd(env *command.Env) error {
 	switch {
 	case doVersion:
-		return printVersion()
+		fmt.Println(command.GetVersionInfo())
+		return nil
 	case storeAddr == "":
 		ctrl.Exitf(1, "You must provide a non-empty --store address")
 	}

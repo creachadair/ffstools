@@ -25,7 +25,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +32,7 @@ import (
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/peers"
 	"github.com/creachadair/chirpstore"
+	"github.com/creachadair/command"
 	"github.com/creachadair/ctrl"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/cachestore"
@@ -41,6 +41,7 @@ import (
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/keyfile"
+	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/sha3"
@@ -183,13 +184,15 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	}
 	mx.Set("compressed", expvarBool(zlibLevel > 0))
 	mx.Set("cache_size", expvarInt(cacheSize))
-	if bi := getBuildInfo(); bi != nil {
+	if vi := command.GetVersionInfo(); true {
 		v := new(expvar.Map)
-		v.Set("go_version", expvarString(bi.toolchain))
-		v.Set("package", expvarString(bi.path))
-		v.Set("revision", expvarString(bi.revision))
-		v.Set("build_time", expvarString(bi.buildTime))
-		v.Set("modified", expvarBool(bi.modified))
+		v.Set("go_version", expvarString(vi.Toolchain))
+		v.Set("package", expvarString(vi.Path))
+		v.Set("revision", expvarString(slice.Coalesce(vi.Commit, vi.Version, "[unknown]")))
+		v.Set("modified", expvarBool(vi.Modified))
+		if vi.Time != nil {
+			v.Set("build_time", expvarString(vi.Time.Format(time.RFC3339)))
+		}
 		mx.Set("build_info", v)
 	}
 
@@ -204,46 +207,6 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 		}))
 	}
 	return mx
-}
-
-type buildInfo struct {
-	toolchain, path string
-	revision        string
-	buildTime       string
-	modified        bool
-}
-
-func first(ss ...string) string {
-	for _, s := range ss {
-		if s != "" {
-			return s
-		}
-	}
-	return ""
-}
-
-func getBuildInfo() *buildInfo {
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
-		return nil
-	}
-	out := &buildInfo{
-		toolchain: first(bi.GoVersion, "[unknown toolchain]"),
-		path:      first(bi.Path, "[unknown path]"),
-		buildTime: "[unknown build time]",
-		revision:  "[unknown revision]",
-	}
-	for _, s := range bi.Settings {
-		switch s.Key {
-		case "vcs.revision":
-			out.revision = s.Value
-		case "vcs.time":
-			out.buildTime = s.Value
-		case "vcs.modified":
-			out.modified = (s.Value != "false")
-		}
-	}
-	return out
 }
 
 type roStore struct {
