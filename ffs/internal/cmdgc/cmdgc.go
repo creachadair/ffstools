@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"strings"
@@ -37,8 +38,9 @@ import (
 )
 
 var gcFlags struct {
-	Force bool          `flag:"force,Force collection on empty root list (DANGER)"`
-	Limit time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
+	Force   bool          `flag:"force,Force collection on empty root list (DANGER)"`
+	Limit   time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
+	Verbose bool          `flag:"v,Enable verbose logging"`
 }
 
 var errSweepLimit = errors.New("sweep limit reached")
@@ -83,7 +85,8 @@ store without roots.
 			}
 			var idxs []*index.Index
 			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
-			fmt.Fprintf(env, "Begin GC of %d objects, roots=%+q\n", n, keys)
+			fmt.Fprintf(env, "Begin GC of %d objects from %d roots\n", n, len(keys))
+			dprintf(env, "Roots: %s\n", wrap(keys, 90, "  ", ", "))
 
 			// Mark phase: Scan all roots.
 			for i := 0; i < len(keys); i++ {
@@ -102,7 +105,7 @@ store without roots.
 					}
 					idxs = append(idxs, rpi)
 					idx.Add(rp.IndexKey)
-					fmt.Fprintf(env, "Loaded cached index for %q (%s)\n", key, config.FormatKey(rp.IndexKey))
+					dprintf(env, "Loaded cached index for %q (%s)\n", key, config.FormatKey(rp.IndexKey))
 					continue
 				}
 
@@ -114,7 +117,7 @@ store without roots.
 				}
 				idx.Add(rp.FileKey)
 
-				fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n",
+				dprintf(env, "Scanning data reachable from %q (%s)...\n",
 					config.PrintableKey(key), config.FormatKey(rp.FileKey))
 				scanned := mapset.New[string]()
 				start := time.Now()
@@ -132,7 +135,7 @@ store without roots.
 				}); err != nil {
 					return fmt.Errorf("scanning %q: %w", key, err)
 				}
-				fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
+				dprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 					idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 			}
 			idxs = append(idxs, idx)
@@ -198,4 +201,27 @@ func shuffledSeeds() []byte {
 		m[i], m[j] = m[j], m[i]
 	})
 	return m
+}
+
+func wrap(ss []string, n int, indent, sep string) string {
+	var sb strings.Builder
+	w := 0
+	for i, s := range ss {
+		sb.WriteString(s)
+		if i+1 < len(ss) {
+			sb.WriteString(sep)
+		}
+		w += len(s)
+		if w >= n {
+			sb.WriteString("\n" + indent)
+			w = 0
+		}
+	}
+	return sb.String()
+}
+
+func dprintf(w io.Writer, msg string, args ...any) {
+	if gcFlags.Verbose {
+		fmt.Fprintf(w, msg, args...)
+	}
 }
