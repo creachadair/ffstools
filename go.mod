@@ -13,12 +13,12 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20240129031055-5b1d99cf899e
 	github.com/creachadair/command v0.1.7
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.3.1
+	github.com/creachadair/ffs v0.3.2
 	github.com/creachadair/flax v0.0.0-20231211041532-4d51c109e3c1
 	github.com/creachadair/gcsstore v0.0.0-20240129031007-8f24e950511a
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20240129154321-2a57d6e213d4
-	github.com/creachadair/mds v0.8.2
+	github.com/creachadair/mds v0.10.0
 	github.com/creachadair/pebblestore v0.0.0-20240129031046-48fcf2703c51
 	github.com/creachadair/pogrebstore v0.0.0-20240129154237-54cc4489c300
 	github.com/creachadair/s3store v0.0.0-20240129031113-12c5d1579136
