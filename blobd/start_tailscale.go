@@ -24,6 +24,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/creachadair/chirp"
@@ -54,16 +55,27 @@ func parseTailscaleURL(s string) (string, *tsnet.Server, error) {
 	host, port, err := net.SplitHostPort(u.Host)
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid Tailscale address: %w", err)
+	} else if host == "" {
+		return "", nil, errors.New("empty Tailscale host name")
 	}
 	q := u.Query()
+	dir := os.ExpandEnv(q.Get("dir"))
+	if dir == "" {
+		uc, err := os.UserConfigDir()
+		if err != nil {
+			return "", nil, err
+		}
+		dir = filepath.Join(uc, "ts-blobd-%s", host)
+	}
+	logf := func(string, ...any) {}
+	if parseQueryBool(q.Get("verbose")) {
+		logf = log.Printf
+	}
 	srv := &tsnet.Server{
 		Hostname:  host,
-		Dir:       os.ExpandEnv(q.Get("dir")),
+		Dir:       dir,
 		Ephemeral: parseQueryBool(q.Get("ephemeral")),
-		Logf:      func(string, ...any) {},
-	}
-	if parseQueryBool(q.Get("verbose")) {
-		srv.Logf = log.Printf
+		Logf:      logf,
 	}
 
 	return port, srv, nil
