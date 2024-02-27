@@ -1,8 +1,7 @@
 update_mod() {
     go get -t -u ./...
     go get \
-	gvisor.dev/gvisor@v0.0.0-20230928000133-4fe30062272c \
-	go4.org/netipx@v0.0.0-20230824141953-6213f710f925
+	gvisor.dev/gvisor v0.0.0-20240119233241-c9c1d4f9b186
 }
 
 cleanup() {
