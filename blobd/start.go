@@ -187,7 +187,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	if vi := command.GetVersionInfo(); true {
 		v := new(expvar.Map)
 		v.Set("go_version", expvarString(vi.Toolchain))
-		v.Set("package", expvarString(vi.Path))
+		v.Set("package", expvarString(vi.ImportPath))
 		v.Set("revision", expvarString(slice.Coalesce(vi.Commit, vi.Version, "[unknown]")))
 		v.Set("modified", expvarBool(vi.Modified))
 		if vi.Time != nil {
