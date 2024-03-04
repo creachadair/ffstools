@@ -40,6 +40,7 @@ import (
 var gcFlags struct {
 	Force   bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit   time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
+	Tasks   int           `flag:"nw,default=64,PRIVATE:Number of current sweep tasks"`
 	Verbose bool          `flag:"v,Enable verbose logging"`
 }
 
@@ -147,7 +148,7 @@ store without roots.
 				fmt.Fprintf(env, "- sweep limit %v\n", gcFlags.Limit)
 				time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
 			}
-			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(64)
+			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(gcFlags.Tasks)
 
 			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
