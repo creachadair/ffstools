@@ -16,6 +16,8 @@ package cmdmount
 
 import (
 	"flag"
+	"fmt"
+	"log"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -44,10 +46,34 @@ var Command = &command.C{
 			svc.RootKey = rootKey
 			svc.Store = s
 			svc.ExecArgs = cmdArgs
-			if err := svc.Init(env.Context()); err != nil {
+			ctx := env.Context()
+			if err := svc.Init(ctx); err != nil {
 				return err
 			}
-			return svc.Run(env.Context())
+			// If the filesystem is read-only, we can run without follow-up.
+			if svc.ReadOnly {
+				return svc.Run(ctx)
+			}
+
+			// Otherwise, we need to persist the root once the filesystem exits.
+			// If the filesystem failed, don't overwrite the root with changes,
+			// but do give the user feedback about the latest state.
+			if err := svc.Run(ctx); err != nil {
+				if key, err := svc.Path.Base.Flush(ctx); err == nil {
+					fmt.Printf("state: %s\n", config.FormatKey(key))
+				} else {
+					log.Printf("WARNING: Flushing file state failed: %v", err)
+				}
+				return fmt.Errorf("filesystem failed: %w", err)
+			}
+
+			// Success: Write changed data back out, if any.
+			rk, err := svc.Path.Flush(ctx)
+			if err != nil {
+				return fmt.Errorf("flush file data: %w", err)
+			}
+			fmt.Printf("%s\n", config.FormatKey(rk))
+			return nil
 		})
 	}),
 }
