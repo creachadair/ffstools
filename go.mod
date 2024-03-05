@@ -12,6 +12,7 @@ require (
 	github.com/creachadair/command v0.1.9
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.3.2
+	github.com/creachadair/ffuse v0.0.0-20240305171456-90f12d6f61a6
 	github.com/creachadair/flax v0.0.0-20240212192608-428acafa3bbe
 	github.com/creachadair/gcsstore v0.0.0-20240301164206-0494e92ea05f
 	github.com/creachadair/keyfile v0.7.2
@@ -22,6 +23,7 @@ require (
 	github.com/creachadair/s3store v0.0.0-20240301164321-4756e21f77b9
 	github.com/creachadair/sqlitestore v0.0.0-20240301164329-57b3efe02876
 	github.com/creachadair/taskgroup v0.7.2
+	github.com/hanwen/go-fuse/v2 v2.5.0
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.21.0
 	golang.org/x/term v0.18.0
