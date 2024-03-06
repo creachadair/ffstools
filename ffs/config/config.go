@@ -158,9 +158,13 @@ func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(CAS
 	return f(bs)
 }
 
-// ParseKey parses the string encoding of a key.  By default, s must be hex
-// encoded. If s begins with "@", it is taken literally. If s begins with "+"
-// it is taken as base64.
+// ParseKey parses the string encoding of a key. A key must be a hex string, a
+// base64 string, or a literal string prefixed with "@":
+//
+//	@foo     encodes "foo"
+//	@@foo    encodes "@foo"
+//	414243   encodes "ABC"
+//	eHl6enk= encodes "xyzzy"
 func ParseKey(s string) (string, error) {
 	if strings.HasPrefix(s, "@") {
 		return s[1:], nil
