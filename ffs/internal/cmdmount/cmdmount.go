@@ -27,9 +27,26 @@ import (
 var svc = &driver.Service{Options: fuseOptions}
 
 var Command = &command.C{
-	Name:  "mount",
-	Usage: "<root-key>[/path] <mount-path> [cmd args...]\n@<file-key>[/path] <mount-path> [cmd args...]",
-	Help:  "Mount a file tree as a FUSE filesystem.",
+	Name: "mount",
+	Usage: `<root-key>[/path] <mount-path> [--exec cmd args...]
+@<file-key>[/path] <mount-path> [--exec cmd args...]`,
+
+	Help: `Mount a file tree as a FUSE filesystem.
+
+Mount a FUSE filesystem at the specified <mount-path> hosting the contents
+of the specified FFS file. By default, the mounted filesystem is writable.
+With --read-only, the filesystem is instead mounted as read-only.
+
+If the file is based on a root key, then changes made while the filesystem
+is mounted are flushed back to that root upon exit. If the --auto-flush flag
+is set, changes are additionally flushed at the specified interval.
+
+By default, the filesystem runs until the program is terminated by a signal
+or the filesystem is unmounted (e.g., by calling umount).  With --exec, the
+specified command and arguments are run as a subprocess with their initial
+working directory set to the root of the mounted filesystem. In this mode,
+the filesystem is automatically unmounted when the subprocess exits.
+`,
 
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&svc.ReadOnly, "read-only", false, "Mount the filesystem as read-only")
@@ -40,6 +57,9 @@ var Command = &command.C{
 	},
 
 	Run: command.Adapt(func(env *command.Env, rootKey, mountPath string, cmdArgs ...string) error {
+		if !svc.Exec && len(cmdArgs) != 0 {
+			return env.Usagef("extra arguments after command: %q", cmdArgs)
+		}
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(env.Context(), func(s config.CAS) error {
 			svc.MountPath = mountPath
