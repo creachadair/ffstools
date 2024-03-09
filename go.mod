@@ -12,7 +12,7 @@ require (
 	github.com/creachadair/command v0.1.9
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.3.2
-	github.com/creachadair/ffuse v0.0.0-20240305171456-90f12d6f61a6
+	github.com/creachadair/ffuse v0.0.0-20240309042802-2126582ac873
 	github.com/creachadair/flax v0.0.0-20240212192608-428acafa3bbe
 	github.com/creachadair/gcsstore v0.0.0-20240301164206-0494e92ea05f
 	github.com/creachadair/keyfile v0.7.2
@@ -27,7 +27,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.21.0
 	golang.org/x/term v0.18.0
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
 	tailscale.com v1.60.1
 )

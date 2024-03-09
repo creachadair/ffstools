@@ -50,7 +50,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&svc.ReadOnly, "read-only", false, "Mount the filesystem as read-only")
-		fs.IntVar(&svc.DebugLog, "dlog", 0, "Set debug logging level (1=ffs, 2=fuse, 3=both)")
+		fs.BoolVar(&svc.DebugLog, "debug-fuse", false, "PRIVATE:Enable FUSE debug logging (warning: prolific)")
 		fs.DurationVar(&svc.AutoFlush, "auto-flush", 0, "Automatically flush the root at this interval")
 		fs.BoolVar(&svc.Verbose, "v", false, "Enable verbose logging")
 		fs.BoolVar(&svc.Exec, "exec", false, "Execute a command, then unmount and exit")
