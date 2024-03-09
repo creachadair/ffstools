@@ -81,7 +81,7 @@ If a <file-key> is specified, the new root points to that file (which must exist
 			Run: runDelete,
 		},
 		{
-			Name:  "set-description",
+			Name:  "set-desc",
 			Usage: "<name> <description>...",
 			Help:  "Edit the description of the given root pointer.",
 
