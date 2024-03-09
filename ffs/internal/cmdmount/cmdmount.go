@@ -15,6 +15,7 @@
 package cmdmount
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -78,8 +79,11 @@ the filesystem is automatically unmounted when the subprocess exits.
 			// Otherwise, we need to persist the root once the filesystem exits.
 			// If the filesystem failed, don't overwrite the root with changes,
 			// but do give the user feedback about the latest state.
+			//
+			// Note when we do flush we do it with a background context, since the
+			// calling context may be already terminated (e.g., by a signal).
 			if err := svc.Run(ctx); err != nil {
-				if key, err := svc.Path.Base.Flush(ctx); err == nil {
+				if key, err := svc.Path.Base.Flush(context.Background()); err == nil {
 					fmt.Printf("state: %s\n", config.FormatKey(key))
 				} else {
 					log.Printf("WARNING: Flushing file state failed: %v", err)
@@ -88,7 +92,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			}
 
 			// Success: Write changed data back out, if any.
-			rk, err := svc.Path.Flush(ctx)
+			rk, err := svc.Path.Flush(context.Background())
 			if err != nil {
 				return fmt.Errorf("flush file data: %w", err)
 			}
