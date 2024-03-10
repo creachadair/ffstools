@@ -29,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -128,14 +129,29 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			// Remove from the worklist all objects already stored in the target
 			// that are not scheduled for replacement. Objects marked as root (R)
 			// or otherwise requiring replacement (+) are retained regardless.
-			if err := tgt.List(env.Context(), "", func(key string) error {
-				switch worklist[key] {
-				case '-', 'F':
-					delete(worklist, key)
+			// But don't bother with this if the worklist is small.
+			if len(worklist) < 500 {
+				debug("Skipping key scan for worklist with %d items", len(worklist))
+			} else {
+				// Only scan the ranges of the key space we need to.
+				var ns, nh int
+				for span := range worklist.spans() {
+					ns++
+					if err := tgt.List(env.Context(), span.min, func(key string) error {
+						if key > span.max {
+							return blob.ErrStopListing
+						}
+						switch worklist[key] {
+						case '-', 'F':
+							nh++
+							delete(worklist, key)
+						}
+						return nil
+					}); err != nil {
+						return err
+					}
 				}
-				return nil
-			}); err != nil {
-				return err
+				debug("Key scan processed %d spans, found %d matching keys", ns, nh)
 			}
 			fmt.Fprintf(env, "Have %d objects to copy\n", len(worklist))
 
@@ -184,6 +200,23 @@ func (s scanSet) addKey(key string) { s[key] = '-' }
 func (s scanSet) bareRoot(rootKey string, rp *root.Root) {
 	s[rootKey] = 'R'
 	s[rp.IndexKey] = '-'
+}
+
+type keySpan struct{ min, max string }
+
+func (s scanSet) spans() mapset.Set[*keySpan] {
+	p := make(map[string]*keySpan)
+	for key := range s {
+		m := p[key[:1]]
+		if m == nil {
+			p[key[:1]] = &keySpan{key, key}
+		} else if key < m.min {
+			m.min = key
+		} else if key > m.max {
+			m.max = key
+		}
+	}
+	return mapset.Values(p)
 }
 
 func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
