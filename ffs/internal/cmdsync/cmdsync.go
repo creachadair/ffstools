@@ -207,6 +207,9 @@ type keySpan struct{ min, max string }
 func (s scanSet) spans() mapset.Set[*keySpan] {
 	p := make(map[string]*keySpan)
 	for key := range s {
+		if key == "" {
+			continue
+		}
 		m := p[key[:1]]
 		if m == nil {
 			p[key[:1]] = &keySpan{key, key}
