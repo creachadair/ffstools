@@ -167,8 +167,8 @@ github.com/creachadair/command v0.1.9 h1:gkOXHgtGVX02gItIgDhu0VhrH67dK54yLKkoYmk
 github.com/creachadair/command v0.1.9/go.mod h1:YKwUE49nAi8qxLl8jCQ0GMPvwdxmIBkJW3LqxgZ7ljk=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.3.2 h1:ccf8qfUz9QW/Xnc9NCI6A02anzyIzc6yC0h6nuJ9yKs=
-github.com/creachadair/ffs v0.3.2/go.mod h1:knaDCtQ8LywYckbK/PXyvdrXMu0grMuabNYbs7PgkrA=
+github.com/creachadair/ffs v0.3.3 h1:QRwYUIdQANbfURswUTFCwm0+FlAYOzKUAi0Sf2TvXOU=
+github.com/creachadair/ffs v0.3.3/go.mod h1:n6nkZcVNm9xKHWYM4xyuaB2USLhN3NRohDqWzYF4ybA=
 github.com/creachadair/ffuse v0.0.0-20240309042802-2126582ac873 h1:RcyybylBZDdRHRYnKGgRPGI50ae3EhHpEMjz+IcqEuw=
 github.com/creachadair/ffuse v0.0.0-20240309042802-2126582ac873/go.mod h1:xbBiEmt4XZ2APlrbUIUpB6XvGOnRrJWZk3pTfaPyzqg=
 github.com/creachadair/flax v0.0.0-20240212192608-428acafa3bbe h1:Za5bZ3VxQXRJqfxcHnkmgk7FfmPxT4N1TjwlKjnkvlw=
@@ -179,8 +179,8 @@ github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20240302153119-6cd138ad7ea5 h1:0+V1NryxDUkkKw8+yqT4vbVNnOzhnCSXlIb/Rgabhgk=
 github.com/creachadair/leveldbstore v0.0.0-20240302153119-6cd138ad7ea5/go.mod h1:VHPgx4rO68LoF8fJwFXu8a6ygw68D+m5ZiPwE3zL3mI=
-github.com/creachadair/mds v0.11.0 h1:/SZHJlT/0ZmgMSbzJI3Skruzj7TVpO/jnrcHv/Qk7sY=
-github.com/creachadair/mds v0.11.0/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
+github.com/creachadair/mds v0.12.2 h1:CyJUaInwFnLUcMgJjVMLG3qYDziSbaY1KXBCvsLrTwQ=
+github.com/creachadair/mds v0.12.2/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
 github.com/creachadair/msync v0.1.0 h1:fQL2QbiXrL1VDbYTUYR3D85WswD3GceB2Ydb/6G7lKA=
 github.com/creachadair/msync v0.1.0/go.mod h1:a8QiWH7G5SKpsS8m6SmgTEN7W6gcwpZl//2M6poKMy8=
 github.com/creachadair/mtest v0.0.0-20231015022703-31f2ea539dce h1:BFjvg2Oq88/2DOcUFu1ScIwKUn7KJYYvLr6AeuCJD54=

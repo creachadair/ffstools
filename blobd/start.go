@@ -15,6 +15,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
@@ -41,7 +42,6 @@ import (
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/keyfile"
-	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/sha3"
@@ -188,7 +188,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 		v := new(expvar.Map)
 		v.Set("go_version", expvarString(vi.Toolchain))
 		v.Set("package", expvarString(vi.ImportPath))
-		v.Set("revision", expvarString(slice.Coalesce(vi.Commit, vi.Version, "[unknown]")))
+		v.Set("revision", expvarString(cmp.Or(vi.Commit, vi.Version, "[unknown]")))
 		v.Set("modified", expvarBool(vi.Modified))
 		if vi.Time != nil {
 			v.Set("build_time", expvarString(vi.Time.Format(time.RFC3339)))
