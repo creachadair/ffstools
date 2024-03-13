@@ -49,7 +49,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"sort"
 	"strings"
 	"syscall"
@@ -109,7 +108,7 @@ func main() {
 	sort.Strings(storeNames)
 
 	root := &command.C{
-		Name:  filepath.Base(os.Args[0]),
+		Name:  command.ProgramName(),
 		Usage: `[options] -store <spec> -listen <addr>`,
 		Help: fmt.Sprintf(`
 Start a server that serves content from the blob.Store described by the -store spec.

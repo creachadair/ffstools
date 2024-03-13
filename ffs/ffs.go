@@ -19,7 +19,6 @@ import (
 	"flag"
 	"os"
 	"os/signal"
-	"path/filepath"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -44,7 +43,7 @@ var (
 
 func main() {
 	root := &command.C{
-		Name: filepath.Base(os.Args[0]),
+		Name: command.ProgramName(),
 		Usage: `<command> [arguments]
 help [<command>]`,
 		Help: `A command-line tool to manage FFS file trees.`,
