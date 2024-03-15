@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"sync/atomic"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
+	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -129,30 +131,25 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			// Remove from the worklist all objects already stored in the target
 			// that are not scheduled for replacement. Objects marked as root (R)
 			// or otherwise requiring replacement (+) are retained regardless.
-			// But don't bother with this if the worklist is small.
-			if len(worklist) < 500 {
-				debug("Skipping key scan for worklist with %d items", len(worklist))
-			} else {
-				// Only scan the ranges of the key space we need to.
-				var ns, nh int
-				for span := range worklist.spans() {
-					ns++
-					if err := tgt.List(env.Context(), span.min, func(key string) error {
-						if key > span.max {
-							return blob.ErrStopListing
-						}
-						switch worklist[key] {
-						case '-', 'F':
-							nh++
+			var nspan, nmiss int
+			for _, span := range worklist.spans() {
+				nspan++
+				need, err := tgt.SyncKeys(env.Context(), span)
+				if err != nil {
+					return err
+				}
+				nmiss += len(need)
+				m := mapset.New(need...)
+				for _, key := range span {
+					switch worklist[key] {
+					case '-', 'F':
+						if !m.Has(key) {
 							delete(worklist, key)
 						}
-						return nil
-					}); err != nil {
-						return err
 					}
 				}
-				debug("Key scan processed %d spans, found %d matching keys", ns, nh)
 			}
+			debug("Key scan processed %d spans, found %d missing keys", nspan, nmiss)
 			fmt.Fprintf(env, "Have %d objects to copy\n", len(worklist))
 
 			// Copy all remaining objects.
@@ -202,24 +199,10 @@ func (s scanSet) bareRoot(rootKey string, rp *root.Root) {
 	s[rp.IndexKey] = '-'
 }
 
-type keySpan struct{ min, max string }
-
-func (s scanSet) spans() mapset.Set[*keySpan] {
-	p := make(map[string]*keySpan)
-	for key := range s {
-		if key == "" {
-			continue
-		}
-		m := p[key[:1]]
-		if m == nil {
-			p[key[:1]] = &keySpan{key, key}
-		} else if key < m.min {
-			m.min = key
-		} else if key > m.max {
-			m.max = key
-		}
-	}
-	return mapset.Values(p)
+func (s scanSet) spans() [][]string {
+	all := slice.MapKeys(s)
+	sort.Strings(all)
+	return slice.Chunks(all, 512)
 }
 
 func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {

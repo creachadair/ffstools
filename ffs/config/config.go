@@ -348,6 +348,24 @@ type CAS struct {
 	affixed.CAS
 }
 
+// SyncKeys implements the extension method of blob.SyncKeyer.
+func (c CAS) SyncKeys(ctx context.Context, keys []string) ([]string, error) {
+	// By construction, the base store will always satisfy this.
+	sk := c.CAS.Base().(blob.SyncKeyer)
+	wrapped := make([]string, len(keys))
+	for i, key := range keys {
+		wrapped[i] = c.CAS.WrapKey(key)
+	}
+	got, err := sk.SyncKeys(ctx, wrapped)
+	if err != nil {
+		return nil, err
+	}
+	for i, key := range got {
+		got[i] = c.CAS.UnwrapKey(key)
+	}
+	return got, nil
+}
+
 func newCAS(bs blob.CAS) CAS {
 	return CAS{CAS: affixed.NewCAS(bs).WithSuffix(dataBucketSuffix)}
 }
