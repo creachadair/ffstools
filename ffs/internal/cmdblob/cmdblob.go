@@ -116,5 +116,11 @@ the address or an @tag from the configuration file.
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
 			Run:      command.Adapt(copyCmd),
 		},
+		{
+			Name:  "sync-keys",
+			Usage: "<key>...",
+			Help:  "Report which of the specified keys are not in the store.",
+			Run:   command.Adapt(syncKeysCmd),
+		},
 	},
 }

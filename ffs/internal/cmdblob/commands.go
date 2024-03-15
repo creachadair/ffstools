@@ -255,6 +255,31 @@ func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
 	})
 }
 
+func syncKeysCmd(env *command.Env, keys []string) error {
+	var parsed []string
+	for _, key := range keys {
+		p, err := config.ParseKey(key)
+		if err != nil {
+			return err
+		}
+		parsed = append(parsed, p)
+	}
+	ctx, bs, err := storeFromEnv(env)
+	if err != nil {
+		return err
+	}
+	defer bs.Close(ctx)
+
+	need, err := bs.SyncKeys(ctx, parsed)
+	if err != nil {
+		return err
+	}
+	for _, key := range need {
+		fmt.Println(config.FormatKey(key))
+	}
+	return nil
+}
+
 func readData(ctx context.Context, cmd string, args []string) (data []byte, err error) {
 	if len(args) == 0 {
 		data, err = io.ReadAll(os.Stdin)
