@@ -24,6 +24,7 @@ require (
 	github.com/creachadair/sqlitestore v0.0.0-20240301164329-57b3efe02876
 	github.com/creachadair/taskgroup v0.7.2
 	github.com/hanwen/go-fuse/v2 v2.5.0
+	github.com/klauspost/compress v1.17.7
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.21.0
 	golang.org/x/term v0.18.0
@@ -105,7 +106,6 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/native v1.1.1-0.20230202152459-5c7d0dd6ab86 // indirect
 	github.com/jsimonetti/rtnetlink v1.4.1 // indirect
-	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/kortschak/wol v0.0.0-20200729010619-da482cc4850a // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
