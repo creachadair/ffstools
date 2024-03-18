@@ -38,9 +38,9 @@ import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/cachestore"
 	"github.com/creachadair/ffs/storage/codecs/encrypted"
-	"github.com/creachadair/ffs/storage/codecs/zlib"
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
+	"github.com/creachadair/ffstools/lib/zstdc"
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
@@ -113,8 +113,8 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 			ctrl.Fatalf("Opening buffer store: %v", err)
 		}
 	}
-	if zlibLevel > 0 {
-		bs = encoded.New(bs, zlib.NewCodec(zlib.Level(zlibLevel)))
+	if doCompress {
+		bs = encoded.New(bs, zstdc.New())
 	}
 	if keyFile == "" {
 		if doSignKeys {
@@ -182,7 +182,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 		mx.Set("keyfile", expvarString(keyFile))
 		mx.Set("signKeys", expvarBool(doSignKeys))
 	}
-	mx.Set("compressed", expvarBool(zlibLevel > 0))
+	mx.Set("compressed", expvarBool(doCompress))
 	mx.Set("cache_size", expvarInt(cacheSize))
 	if vi := command.GetVersionInfo(); true {
 		v := new(expvar.Map)

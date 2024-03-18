@@ -73,7 +73,7 @@ var (
 	doSignKeys bool
 	bufferDB   string
 	cacheSize  int
-	zlibLevel  int
+	doCompress bool
 	doReadOnly bool
 	doVersion  bool
 
@@ -141,7 +141,7 @@ Use -cache to enable a memory cache over the underlying store.`, strings.Join(st
 			fs.BoolVar(&doSignKeys, "sign-keys", false, "Sign content addresses (ignored without -keyfile)")
 			fs.StringVar(&bufferDB, "buffer", "", "Write-behind buffer database")
 			fs.IntVar(&cacheSize, "cache", 0, "Memory cache size in MiB (0 means no cache)")
-			fs.IntVar(&zlibLevel, "zlib", 0, "Enable ZLIB compression (0 means no compression)")
+			fs.BoolVar(&doCompress, "compress", false, "Enable zstd compression of blob data")
 			fs.BoolVar(&doReadOnly, "read-only", false, "Disallow modification of the store")
 			fs.BoolVar(&doVersion, "version", false, "Print version information and exit")
 			fs.StringVar(&configPath, "config", configPath, "PRIVATE:Configuration file path")
@@ -181,8 +181,8 @@ func blobd(env *command.Env) error {
 	if doReadOnly {
 		log.Print("Store is open in read-only mode")
 	}
-	if zlibLevel > 0 {
-		log.Printf("Compression enabled: ZLIB level %d", zlibLevel)
+	if doCompress {
+		log.Print("Compression enabled (zstd)")
 		if keyFile != "" {
 			log.Printf(">> WARNING: Compression and encryption are both enabled")
 		}
