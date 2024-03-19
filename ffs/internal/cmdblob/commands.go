@@ -101,18 +101,17 @@ func delCmd(env *command.Env) (err error) {
 		if err != nil {
 			return err
 		}
-		run(c.Stream(func(ch chan<- string) error {
+		run(c.Report(func(report func(string)) error {
 			if err := bs.Delete(dctx, key); blob.IsKeyNotFound(err) && missingOK {
 				return nil
 			} else if err != nil {
 				return err
 			}
-			ch <- key
+			report(key)
 			return nil
 		}))
 	}
 	err = g.Wait()
-	c.Wait()
 	return err
 }
 
