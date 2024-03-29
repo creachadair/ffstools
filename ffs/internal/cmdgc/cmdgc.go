@@ -31,7 +31,7 @@ import (
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/ffs/internal/pbar"
+	"github.com/creachadair/ffstools/lib/pbar"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
