@@ -22,7 +22,7 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/ffs/internal/putlib"
+	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
 )
 

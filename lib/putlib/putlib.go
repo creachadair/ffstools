@@ -36,6 +36,7 @@ import (
 
 var Default = Config{FilterName: ".ffsignore"}
 
+// Config carries settings for storing files into an FFS store.
 type Config struct {
 	Verbose    bool   // emit diagnostic output
 	XAttr      bool   // capture extended attributes

@@ -37,7 +37,7 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/ffs/internal/putlib"
+	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
 )
 
