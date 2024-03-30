@@ -153,8 +153,8 @@ github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfc
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/creachadair/atomicfile v0.3.3 h1:yJlDq8qk9QmD/6ol+jq1X4bcoLNVdYq95+owOnauziE=
 github.com/creachadair/atomicfile v0.3.3/go.mod h1:X1r9P4wigJlGkYJO1HXZREdkVn+b1yHrsBBMLSj7tak=
-github.com/creachadair/badgerstore v0.3.2 h1:284loEE/wapJLZynY+uJdBytt3sLJ8ZKsXbZvxF5xhI=
-github.com/creachadair/badgerstore v0.3.2/go.mod h1:C9uQImwdBaX0l5Kh8m+wf3unoBUeLMD2EC5GyLR/9nI=
+github.com/creachadair/badgerstore v0.3.3 h1:7bgRbNbisM2Tx/WtJH+XlATRXE34vQGcLIRpuqV5MFY=
+github.com/creachadair/badgerstore v0.3.3/go.mod h1:e1mTeUfySDy0AuitF6MffXmeSPIEgIEqJZgz1zuAOuM=
 github.com/creachadair/bitcaskstore v0.0.0-20240318173408-1bfb9bd43771 h1:bmQvCNsLZU5ORHplfyruXEKMgbIA/60cp29xP3pS74w=
 github.com/creachadair/bitcaskstore v0.0.0-20240318173408-1bfb9bd43771/go.mod h1:EBlX9j01cJT1sDRg5AAeiRbz/b89QvudLOo8JHuEXxs=
 github.com/creachadair/boltstore v0.0.0-20240318173650-96c68e186390 h1:OV1uvYCUEA/Q0xL8LBfiXiI9/V7RhBnshZaBwlaJbpg=
