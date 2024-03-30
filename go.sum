@@ -598,8 +598,6 @@ github.com/tailscale/golang-x-crypto v0.0.0-20240108194725-7ce1f622c780 h1:U0J2C
 github.com/tailscale/golang-x-crypto v0.0.0-20240108194725-7ce1f622c780/go.mod h1:ikbF+YT089eInTp9f2vmvy4+ZVnW5hzX1q2WknxSprQ=
 github.com/tailscale/goupnp v1.0.1-0.20210804030727-66b27ba4e403 h1:tB2UwtefWtWjIOp5UjU2eHPdP1EY3JZyAkes6WOsvIo=
 github.com/tailscale/goupnp v1.0.1-0.20210804030727-66b27ba4e403/go.mod h1:PdCqy9JzfWMJf1H5UJW2ip33/d4YkoKN0r67yKH1mG8=
-github.com/tailscale/gowebdav v0.0.0-20240130173557-d49b872b5126 h1:EBLH+PeC3efXmUi82yEMxjlcKhDwAUZTi0tIT4Q8oTg=
-github.com/tailscale/gowebdav v0.0.0-20240130173557-d49b872b5126/go.mod h1:UCbnLJ2ebWLs28V9ubpXbq4Qx3e0q1TVoM1AC3Z2b40=
 github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a h1:SJy1Pu0eH1C29XwJucQo73FrleVK6t4kYz4NVhp34Yw=
 github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a/go.mod h1:DFSS3NAGHthKo1gTlmEcSBiZrRJXi28rLNd/1udP1c8=
 github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85 h1:zrsUcqrG2uQSPhaUPjUQwozcRdDdSxxqhNgNZ3drZFk=
@@ -1091,8 +1089,8 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-gvisor.dev/gvisor v0.0.0-20240119233241-c9c1d4f9b186 h1:VWRSJX9ghfqsRSZGMAILL6QpYRKWnHcYPi24SCubQRs=
-gvisor.dev/gvisor v0.0.0-20240119233241-c9c1d4f9b186/go.mod h1:10sU+Uh5KKNv1+2x2A0Gvzt8FjD3ASIhorV3YsauXhk=
+gvisor.dev/gvisor v0.0.0-20240306221502-ee1e1f6070e3 h1:/8/t5pz/mgdRXhYOIeqqYhFAQLE4DDGegc0Y4ZjyFJM=
+gvisor.dev/gvisor v0.0.0-20240306221502-ee1e1f6070e3/go.mod h1:NQHVAzMwvZ+Qe3ElSiHmq9RUm1MdNHpUZ52fiEqvn+0=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190418001031-e561f6794a2a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
@@ -1137,5 +1135,5 @@ rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
 software.sslmate.com/src/go-pkcs12 v0.4.0 h1:H2g08FrTvSFKUj+D309j1DPfk5APnIdAQAB8aEykJ5k=
 software.sslmate.com/src/go-pkcs12 v0.4.0/go.mod h1:Qiz0EyvDRJjjxGyUQa2cCNZn/wMyzrRJ/qcDXOQazLI=
-tailscale.com v1.61.0-pre h1:x9JJRisJ+9J6kfWkGLyrH33XtyiyQVuGZYxan5bl4GU=
-tailscale.com v1.61.0-pre/go.mod h1:Is0MZ1B5R2WHpC2tW0yg5GzkLRY5tBC7WcjYIHlZp9o=
+tailscale.com v1.62.1 h1:6Wd218ug6azyoi7aJp2ca2rTadN6W5bPhUxESYqOzzM=
+tailscale.com v1.62.1/go.mod h1:cC0b0vYCoSDOLufJX5J5zDUrvV3lYwOLqlt9NW8y4cY=

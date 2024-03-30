@@ -30,7 +30,7 @@ require (
 	golang.org/x/term v0.18.0
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
-	tailscale.com v1.61.0-pre
+	tailscale.com v1.62.1
 )
 
 require (
@@ -169,7 +169,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240325203815-454cdb8f5daa // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240325203815-454cdb8f5daa // indirect
 	google.golang.org/grpc v1.62.1 // indirect
-	gvisor.dev/gvisor v0.0.0-20240119233241-c9c1d4f9b186 // indirect
+	gvisor.dev/gvisor v0.0.0-20240306221502-ee1e1f6070e3 // indirect
 	modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b // indirect
 	modernc.org/libc v1.49.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
