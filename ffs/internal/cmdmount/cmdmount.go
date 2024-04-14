@@ -96,7 +96,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			if err != nil {
 				return fmt.Errorf("flush file data: %w", err)
 			}
-			fmt.Printf("%s\n", config.FormatKey(rk))
+			fmt.Printf("flush: %s\n", config.FormatKey(rk))
 			return nil
 		})
 	}),
