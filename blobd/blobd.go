@@ -127,7 +127,11 @@ If --listen is:
 
  - Otherwise: The address must be a path for a Unix-domain socket.
 
-With -keyfile, the store is opened with AES encryption.
+With --keyfile, the store is opened with encryption (set by --encryption).
+If --keyfile begins with "@", the value is used as a key salt for HKDF
+with the user-provided passphrase. Double the "@" to escape this meaning.
+Otherwise the passphrase is used to unlock the key file.
+
 If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
 passphrase for the keyfile; otherwise blobd prompts at the terminal.
 

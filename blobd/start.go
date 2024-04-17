@@ -22,6 +22,7 @@ import (
 	"crypto/hmac"
 	"errors"
 	"expvar"
+	"fmt"
 	"hash"
 	"io"
 	"log"
@@ -44,6 +45,7 @@ import (
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
+	"golang.org/x/crypto/hkdf"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/term"
 )
@@ -118,22 +120,14 @@ func mustOpenStore(ctx context.Context) (cas blob.CAS, buf blob.Store) {
 	}
 	if keyFile == "" {
 		if doSignKeys {
-			log.Print("WARNING: Ignoring -hash-keys because -keyfile is unset")
+			log.Print("WARNING: Ignoring --sign-keys because --keyfile is unset")
 		}
 		return blob.NewCAS(bs, sha3.New256), buf
 	}
 
-	key, err := keyfile.LoadKey(keyFile, func() (string, error) {
-		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
-		if ok {
-			return pp, nil
-		}
-		io.WriteString(os.Stdout, "Passphrase: ")
-		bits, err := term.ReadPassword(0)
-		return string(bits), err
-	})
+	key, err := getEncryptionKey(keyFile)
 	if err != nil {
-		ctrl.Fatalf("Loading encryption key: %v", err)
+		ctrl.Fatalf("Error: %v", err)
 	}
 	var aead cipher.AEAD
 	switch strings.ToLower(aeadStyle) {
@@ -217,3 +211,43 @@ var errReadOnlyStore = errors.New("storage is read-only")
 
 func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
 func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
+
+func getEncryptionKey(keyFile string) ([]byte, error) {
+	if tail, ok := strings.CutPrefix(keyFile, "@@"); ok {
+		keyFile = "@" + tail // unescape leading "@"
+	} else if tail, ok := strings.CutPrefix(keyFile, "@"); ok {
+		if tail == "" {
+			return nil, errors.New("key generation salt is empty")
+		}
+		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
+		if !ok {
+			io.WriteString(os.Stdout, "Passphrase: ")
+			bits, err := term.ReadPassword(0)
+			if err != nil {
+				return nil, fmt.Errorf("read passphrase: %w", err)
+			}
+			pp = string(bits)
+		}
+
+		hr := hkdf.New(sha3.New256, []byte(pp), []byte(tail), nil)
+		var buf [32]byte
+		if _, err := io.ReadFull(hr, buf[:]); err != nil {
+			return nil, fmt.Errorf("generate key: %w", err)
+		}
+		return buf[:], nil
+	}
+
+	key, err := keyfile.LoadKey(keyFile, func() (string, error) {
+		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
+		if ok {
+			return pp, nil
+		}
+		io.WriteString(os.Stdout, "Passphrase: ")
+		bits, err := term.ReadPassword(0)
+		return string(bits), err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("load encryption key: %w", err)
+	}
+	return key, nil
+}
