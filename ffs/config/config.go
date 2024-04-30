@@ -344,6 +344,15 @@ func SplitPath(s string) (first, rest string) {
 
 // CAS is a wrapper around a blob.CAS that adds methods to expose the root and
 // data buckets.
+//
+// Tools using this package partition the keyspace into two buckets. The "data"
+// bucket comprises all content-addressed keys; the "roots" bucket is for all
+// other (non-content-addressed) keys. This is mapped onto the underlying store
+// by appending the suffix "." (Unicode 46) to data keys, and "@" (Unicode 64)
+// to root keys.
+//
+// The methods of the CAS access the data keyspace by default; call Roots to
+// derive a view of the root keyspace.
 type CAS struct {
 	affixed.CAS
 }
