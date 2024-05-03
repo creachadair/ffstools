@@ -169,8 +169,8 @@ github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
 github.com/creachadair/ffs v0.4.1 h1:8yoYYx/eiK9io+W1VYZnJystCYehxiVpGcc1VAMPnkc=
 github.com/creachadair/ffs v0.4.1/go.mod h1:n6nkZcVNm9xKHWYM4xyuaB2USLhN3NRohDqWzYF4ybA=
-github.com/creachadair/ffuse v0.0.0-20240324230313-a1c6a208ad68 h1:ZR6Soek03IiwAX9yjg/IVJ5mS1cEd2F0y8NfqnMDiYA=
-github.com/creachadair/ffuse v0.0.0-20240324230313-a1c6a208ad68/go.mod h1:zbfUuv5kT9XCSPvV2UmUQMoVTZlndt/hzvwcXxBAv8w=
+github.com/creachadair/ffuse v0.0.0-20240503150030-36da7c6275a5 h1:4hyScMd+zIj972i0Q0KF1hO3D8avd7f+7YB22CM2d34=
+github.com/creachadair/ffuse v0.0.0-20240503150030-36da7c6275a5/go.mod h1:vEi7vxM+1NiFzgKyIS1DhRbPharPJeLPqKURZ9EMStc=
 github.com/creachadair/flax v0.0.0-20240212192608-428acafa3bbe h1:Za5bZ3VxQXRJqfxcHnkmgk7FfmPxT4N1TjwlKjnkvlw=
 github.com/creachadair/flax v0.0.0-20240212192608-428acafa3bbe/go.mod h1:2vVCsqiB+GpV/qBKCQ0lKRrJhlKUPdI83SnaFKwJyNo=
 github.com/creachadair/gcsstore v0.0.0-20240416183346-6b9f32fd3901 h1:UHWUqGkA7qofBHHpnhEj7tRX5IdJL982Ms3T/wGxt4E=
@@ -179,8 +179,8 @@ github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20240416183610-6dc66a535a49 h1:P7rJbWYMWBFVcegiV0myblWvIeUR0Ah7/6z01WzAars=
 github.com/creachadair/leveldbstore v0.0.0-20240416183610-6dc66a535a49/go.mod h1:LCw1XsCMKyL6CB9jnJUeOSRIbXkZugUM8j/dJvspXwE=
-github.com/creachadair/mds v0.14.3 h1:yb5rf+OJJcKptGyBU/1oSRs/ybJmKKB4HTNWF8g4emc=
-github.com/creachadair/mds v0.14.3/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
+github.com/creachadair/mds v0.14.6 h1:osJ9Ibmvv2nzLWOwNONDwxPEIHEgtNf4Y9UYSsO3JWE=
+github.com/creachadair/mds v0.14.6/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
 github.com/creachadair/msync v0.2.0 h1:1thpy6nhEeKWX5PpKunhfA0bF5l6Js3E6vgWYiwQX/0=
 github.com/creachadair/msync v0.2.0/go.mod h1:fMAB2Ihnsojvz5nRxqzEEUmHgW2/CEKY64VPP4VskSY=
 github.com/creachadair/pebblestore v0.0.0-20240416183427-6cfa7312d9eb h1:U1+s8Ct4SVxoDLIlfwNIyfgimQbtGQaAVfgsC1eOiM8=
