@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"sort"
 	"sync/atomic"
@@ -36,14 +37,21 @@ import (
 )
 
 var syncFlags struct {
-	Target  string `flag:"to,Target store (required)"`
-	Verbose bool   `flag:"v,Enable verbose logging"`
-	NoIndex bool   `flag:"no-index,Do not use cached indices"`
+	Target   string `flag:"to,Target store (required)"`
+	Verbose  bool   `flag:"v,Enable verbose logging"`
+	VVerbose bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
+	NoIndex  bool   `flag:"no-index,Do not use cached indices"`
 }
 
 func debug(msg string, args ...any) {
-	if syncFlags.Verbose {
+	if syncFlags.VVerbose {
 		log.Printf(msg, args...)
+	}
+}
+
+func dprintf(w io.Writer, msg string, args ...any) {
+	if syncFlags.Verbose || syncFlags.VVerbose {
+		fmt.Fprintf(w, msg, args...)
 	}
 }
 
@@ -90,7 +98,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 						}
 						worklist.bareRoot(of.RootKey, of.Root)
 						indices = append(indices, idx)
-						fmt.Fprintf(env, "Loaded cached index for %q (%d keys)\n", elt, idx.Len())
+						dprintf(env, "Loaded cached index for %q (%d keys)\n", elt, idx.Len())
 						continue
 					}
 					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
@@ -120,7 +128,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				}); err != nil {
 					return err
 				}
-				fmt.Fprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
+				dprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
 			}
 
 			fmt.Fprintf(env, "Found %d reachable objects\n", len(worklist))
@@ -149,7 +157,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 					}
 				}
 			}
-			debug("Key scan processed %d spans, found %d missing keys", nspan, nmiss)
+			dprintf(env, "Key scan processed %d spans, found %d missing keys\n", nspan, nmiss)
 			fmt.Fprintf(env, "Have %d objects to copy\n", len(worklist))
 
 			// Copy all remaining objects.
