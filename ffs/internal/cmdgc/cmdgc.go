@@ -145,12 +145,13 @@ store without roots.
 			ctx, cancel := context.WithCancelCause(env.Context())
 			defer cancel(nil)
 			if gcFlags.Limit > 0 {
-				fmt.Fprintf(env, "- sweep limit %v\n", gcFlags.Limit)
 				time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
+				fmt.Fprintf(env, "Begin sweep over %d objects (limit %v)...\n", n, gcFlags.Limit)
+			} else {
+				fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			}
 			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(gcFlags.Tasks)
 
-			fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
 			pb := pbar.New(env, n).Start()
