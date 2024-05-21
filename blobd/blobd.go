@@ -141,7 +141,7 @@ Use -cache to enable a memory cache over the underlying store.`, strings.Join(st
 			fs.StringVar(&listenAddr, "listen", "", "Service address (required)")
 			fs.StringVar(&storeAddr, "store", "", "Store address (required)")
 			fs.StringVar(&keyFile, "keyfile", "", "Encryption key file (if empty, do not encrypt)")
-			fs.StringVar(&aeadStyle, "encryption", "aes", `Encryption algorithm ("aes" or "chacha")`)
+			fs.StringVar(&aeadStyle, "encryption", "chacha", `Encryption algorithm ("aes" or "chacha")`)
 			fs.BoolVar(&doSignKeys, "sign-keys", false, "Sign content addresses (ignored without -keyfile)")
 			fs.StringVar(&bufferDB, "buffer", "", "Write-behind buffer database")
 			fs.IntVar(&cacheSize, "cache", 0, "Memory cache size in MiB (0 means no cache)")
