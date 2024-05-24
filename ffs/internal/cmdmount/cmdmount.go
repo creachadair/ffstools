@@ -71,6 +71,8 @@ the filesystem is automatically unmounted when the subprocess exits.
 			if err := svc.Init(ctx); err != nil {
 				return err
 			}
+			fmt.Printf("mount: %s\n", config.FormatKey(svc.Path.FileKey))
+
 			// If the filesystem is read-only, we can run without follow-up.
 			if svc.ReadOnly {
 				return svc.Run(ctx)
