@@ -66,6 +66,9 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		if err := checkTarget(env, s, putFlags.Target); err != nil {
+			return err
+		}
 		keys := make([]string, len(env.Args))
 		for i, path := range env.Args {
 			if putConfig.Verbose {
@@ -101,4 +104,15 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 		}
 		return nil
 	})
+}
+
+func checkTarget(env *command.Env, s config.CAS, target string) error {
+	if target != "" {
+		root, _ := config.SplitPath(target)
+		_, err := config.OpenPath(env.Context(), s, root)
+		if err != nil {
+			return fmt.Errorf("target %q: %w", target, err)
+		}
+	}
+	return nil
 }
