@@ -38,10 +38,11 @@ import (
 )
 
 var gcFlags struct {
-	Force   bool          `flag:"force,Force collection on empty root list (DANGER)"`
-	Limit   time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks   int           `flag:"nw,default=64,PRIVATE:Number of current sweep tasks"`
-	Verbose bool          `flag:"v,Enable verbose logging"`
+	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
+	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
+	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of current sweep tasks"`
+	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
+	Verbose      bool          `flag:"v,Enable verbose logging"`
 }
 
 var errSweepLimit = errors.New("sweep limit reached")
@@ -108,6 +109,11 @@ store without roots.
 					idx.Add(rp.IndexKey)
 					dprintf(env, "Loaded cached index for %q (%s)\n", key, config.FormatKey(rp.IndexKey))
 					continue
+				}
+
+				// If an index is required, report an error.
+				if gcFlags.RequireIndex {
+					return fmt.Errorf("missing required index for %q", key)
 				}
 
 				// Otherwise, we need to compute the reachable set.
