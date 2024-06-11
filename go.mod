@@ -28,7 +28,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	golang.org/x/crypto v0.24.0
 	golang.org/x/term v0.21.0
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 	tailscale.com v1.66.4
 )
@@ -39,7 +39,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect
-	cloud.google.com/go/storage v1.41.0 // indirect
+	cloud.google.com/go/storage v1.42.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/aws/aws-sdk-go v1.53.19 // indirect
+	github.com/aws/aws-sdk-go v1.53.20 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.27.2 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.27.18 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.18 // indirect
@@ -167,16 +167,16 @@ require (
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/api v0.183.0 // indirect
-	google.golang.org/genproto v0.0.0-20240604185151-ef581f913117 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240604185151-ef581f913117 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
+	google.golang.org/genproto v0.0.0-20240610135401-a8a62080eff3 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240610135401-a8a62080eff3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240610135401-a8a62080eff3 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
-	gvisor.dev/gvisor v0.0.0-20240306221502-ee1e1f6070e3 // indirect
+	gvisor.dev/gvisor v0.0.0-20240611050212-c1661e7c84e8 // indirect
 	modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b // indirect
 	modernc.org/libc v1.53.1 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.30.0 // indirect
+	modernc.org/sqlite v1.30.1 // indirect
 	modernc.org/strutil v1.2.0 // indirect
 	modernc.org/token v1.1.0 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect
