@@ -123,7 +123,7 @@ If --listen is:
  - A store label of the form @name: The address associated with that
    name in the FFS config file is used.
 
- - A host:port address: A TCP listener is created at that address.`+tsAddress+`
+ - A host:port address: A TCP listener is created at that address.
 
  - Otherwise: The address must be a path for a Unix-domain socket.
 

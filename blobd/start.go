@@ -26,6 +26,7 @@ import (
 	"hash"
 	"io"
 	"log"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -56,6 +57,10 @@ type startConfig struct {
 	Address string
 	Store   blob.CAS
 	Buffer  blob.Store
+}
+
+func (s *startConfig) listen(ctx context.Context) (net.Listener, error) {
+	return net.Listen(chirp.SplitAddress(s.Address))
 }
 
 func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Single[error]) {
