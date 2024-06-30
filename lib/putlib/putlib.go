@@ -57,10 +57,7 @@ func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.File
 }
 
 func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
-	f := file.New(st.s, &file.NewOptions{
-		Name: st.fi.Name(),
-		Stat: c.fileInfoToStat(st.fi),
-	})
+	f := file.New(st.s, c.fileInfoToOptions(st.fi))
 
 	// Extended attributes (if -xattr is set)
 	if err := c.addExtAttrs(st.path, f); err != nil {
@@ -108,10 +105,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	}
 
 	// Directory
-	d := file.New(st.s, &file.NewOptions{
-		Name: fi.Name(),
-		Stat: c.fileInfoToStat(fi),
-	})
+	d := file.New(st.s, c.fileInfoToOptions(fi))
 
 	// Extended attributes (if -xattr is set)
 	if err := c.addExtAttrs(st.path, d); err != nil {
@@ -245,16 +239,20 @@ func (c Config) addExtAttrs(path string, f *file.File) error {
 	return nil
 }
 
-func (c Config) fileInfoToStat(fi fs.FileInfo) *file.Stat {
+func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
 	if c.NoStat {
-		return nil
+		return &file.NewOptions{Name: fi.Name()} // PersistStat == false
 	}
 	owner, group := ownerAndGroup(fi)
-	return &file.Stat{
-		Mode:    fi.Mode(),
-		ModTime: fi.ModTime(),
-		OwnerID: owner,
-		GroupID: group,
+	return &file.NewOptions{
+		Name: fi.Name(),
+		Stat: &file.Stat{
+			Mode:    fi.Mode(),
+			ModTime: fi.ModTime(),
+			OwnerID: owner,
+			GroupID: group,
+		},
+		PersistStat: true,
 	}
 }
 

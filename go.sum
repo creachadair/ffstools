@@ -125,8 +125,8 @@ github.com/creachadair/command v0.1.13 h1:UDKPF3QYPRS/quZPVYZ7sW1JLxLLOgiyVSLQ+7
 github.com/creachadair/command v0.1.13/go.mod h1:YKwUE49nAi8qxLl8jCQ0GMPvwdxmIBkJW3LqxgZ7ljk=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.4.3 h1:BjHqsdqu7/cwXVAookNDm7x7fWp8p58c8m0d1+/4Jno=
-github.com/creachadair/ffs v0.4.3/go.mod h1:XnnqYGbVxzZHN2Dh876DdYOMSdh2u7WOo4lZXvsflIU=
+github.com/creachadair/ffs v0.5.0 h1:3kBLanXD/V2DucbA++l07rljXdxQytaPAR2LLiG+FZ0=
+github.com/creachadair/ffs v0.5.0/go.mod h1:kxEjx9G3/334rvPATCbd6a8IaPUdirV/RkP42Gt/7EY=
 github.com/creachadair/ffuse v0.0.0-20240503150030-36da7c6275a5 h1:4hyScMd+zIj972i0Q0KF1hO3D8avd7f+7YB22CM2d34=
 github.com/creachadair/ffuse v0.0.0-20240503150030-36da7c6275a5/go.mod h1:vEi7vxM+1NiFzgKyIS1DhRbPharPJeLPqKURZ9EMStc=
 github.com/creachadair/flax v0.0.0-20240525192034-44db93b3a8ad h1:Fv6FRWgCJTHsslL0qRhhO7Jj7cL78YW8s1c8UxFGIIo=
@@ -137,8 +137,8 @@ github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20240605151855-6811851f9bdc h1:92XFWC74wA3V9YZqOwHggB3vnJ1qNBagodN8Bw06Nss=
 github.com/creachadair/leveldbstore v0.0.0-20240605151855-6811851f9bdc/go.mod h1:PX6UcGMahijTsPxCjrmZtQMZAQtypIz/7RFLfVQ4OOE=
-github.com/creachadair/mds v0.14.7 h1:VkY1pop2sqIfbDEeB9FObh/STRd/DNHyNtlE55Z95UQ=
-github.com/creachadair/mds v0.14.7/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
+github.com/creachadair/mds v0.15.0 h1:St6HvUcrX1UJ517Zha6GKxVibGyRDBDtInOjuaaHOrQ=
+github.com/creachadair/mds v0.15.0/go.mod h1:4vrFYUzTXMJpMBU+OA292I6IUxKWCCfZkgXg+/kBZMo=
 github.com/creachadair/msync v0.2.1 h1:nBrUkGnk+vhEO+fe6fEMcT6Reo/C9Oc4s62bL4Bj/Wo=
 github.com/creachadair/msync v0.2.1/go.mod h1:fMAB2Ihnsojvz5nRxqzEEUmHgW2/CEKY64VPP4VskSY=
 github.com/creachadair/pebblestore v0.0.0-20240605151714-3322ae54b8f1 h1:EoRaA/+iZ+Hsz0KcdZdjxP+H54Oh+WIysyvEwD9Ux9E=

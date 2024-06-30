@@ -209,7 +209,8 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			fk = tf.File.Key()
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
-				Stat: &file.Stat{Mode: os.ModeDir | 0755},
+				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
+				PersistStat: true,
 			}).Flush(env.Context())
 		default:
 			panic("unexpected mode: " + mode)
