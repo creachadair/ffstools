@@ -80,7 +80,7 @@ func (b *Bar) SetMeta(v int64) {
 	b.meta = v
 }
 
-// Add addsd v to the current value of the bar. The offset may be negative.  If
+// Add adds v to the current value of the bar. The offset may be negative.  If
 // the resulting value is less than zero it is pinned to zero. If the resulting
 // value exceeds the current maximum the bar length is extended.
 func (b *Bar) Add(v int64) {
