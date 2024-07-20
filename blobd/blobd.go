@@ -109,9 +109,9 @@ func main() {
 
 	root := &command.C{
 		Name:  command.ProgramName(),
-		Usage: `[options] -store <spec> -listen <addr>`,
+		Usage: `[options] --store <spec> --listen <addr>`,
 		Help: fmt.Sprintf(`
-Start a server that serves content from the blob.Store described by the -store spec.
+Start a server that serves content from the blob.Store described by the --store spec.
 The server listens at the specified address, which may be a host:port or the path
 of a Unix-domain socket.
 
@@ -127,15 +127,19 @@ If --listen is:
 
  - Otherwise: The address must be a path for a Unix-domain socket.
 
-With --keyfile, the store is opened with encryption (set by --encryption).
-If --keyfile begins with "@", the value is used as a key salt for HKDF
+With --cache, %[1]s provides a memory cache over the primary store.
+
+With --keyfile, the store is opened with encryption (chosen by --encryption).
+If --keyfile begins with "@", the remaining string is used as a key salt for HKDF
 with the user-provided passphrase. Double the "@" to escape this meaning.
 Otherwise the passphrase is used to unlock the key file.
 
 If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
 passphrase for the keyfile; otherwise blobd prompts at the terminal.
 
-Use -cache to enable a memory cache over the underlying store.`, strings.Join(storeNames, ", ")),
+Use --buffer to enable a local write-behind buffer. The syntax of its argument
+is the same as for --store. This is suitable for primary stores that are remote
+and slow (e.g., cloud storage).`, strings.Join(storeNames, ", ")),
 
 		SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&listenAddr, "listen", "", "Service address (required)")
