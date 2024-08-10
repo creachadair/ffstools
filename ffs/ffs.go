@@ -17,8 +17,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -66,6 +68,12 @@ help [<command>]`,
 			}
 			if debugLog {
 				cfg.EnableDebugLogging = true
+			} else if fd := os.Getenv("FFS_DEBUG"); fd != "" {
+				d, err := strconv.ParseBool(fd)
+				if err != nil {
+					return fmt.Errorf("invalid FFS_DEBUG value: %w", err)
+				}
+				cfg.EnableDebugLogging = d
 			}
 			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
@@ -82,7 +90,15 @@ help [<command>]`,
 			cmdgc.Command,
 			cmdblob.Command,
 			cmdstatus.Command,
-			command.HelpCommand(nil),
+			command.HelpCommand([]command.HelpTopic{{
+				Name: "environment",
+				Help: `Environment variables supported by ffs.
+
+FFS_CONFIG  : Configuration file path (default: ` + config.DefaultPath + `)
+FFS_DEBUG   : If true, enable debug logging (warning: noisy)
+FFS_STORE   : Storage service address (overrides config; overridden by --store)
+`,
+			}}),
 			command.VersionCommand(),
 		},
 	}
