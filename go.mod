@@ -3,26 +3,26 @@ module github.com/creachadair/ffstools
 go 1.22.0
 
 require (
-	github.com/creachadair/atomicfile v0.3.4
+	github.com/creachadair/atomicfile v0.3.5
 	github.com/creachadair/badgerstore v0.4.2
-	github.com/creachadair/bitcaskstore v0.0.0-20240725145103-3c992c441a23
-	github.com/creachadair/boltstore v0.0.0-20240725145307-06ec3eee1054
-	github.com/creachadair/chirp v0.0.0-20240726151925-6e937b72025a
-	github.com/creachadair/chirpstore v0.0.0-20240725145216-51e7f1fe6c02
+	github.com/creachadair/bitcaskstore v0.0.0-20240810152912-85f27a8564f6
+	github.com/creachadair/boltstore v0.0.0-20240810153101-5a59fbbdc38e
+	github.com/creachadair/chirp v0.0.0-20240811160328-0c7bc43ea2f9
+	github.com/creachadair/chirpstore v0.0.0-20240810153022-f29119a6023b
 	github.com/creachadair/command v0.1.13
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.5.1
-	github.com/creachadair/ffuse v0.0.0-20240718185857-47cb32c367a3
-	github.com/creachadair/flax v0.0.0-20240525192034-44db93b3a8ad
-	github.com/creachadair/gcsstore v0.0.0-20240725145125-f68dae29b38e
+	github.com/creachadair/ffuse v0.0.0-20240818150344-3245dc570226
+	github.com/creachadair/flax v0.0.1
+	github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda
 	github.com/creachadair/keyfile v0.7.2
-	github.com/creachadair/leveldbstore v0.0.0-20240725145328-434758105f64
-	github.com/creachadair/mds v0.15.6
-	github.com/creachadair/pebblestore v0.0.0-20240725145206-f63029d75973
-	github.com/creachadair/pogrebstore v0.0.0-20240725145250-590b2a5c3a0e
-	github.com/creachadair/s3store v0.0.0-20240725145235-a54c84fd5ddb
-	github.com/creachadair/sqlitestore v0.0.0-20240725145243-2e2f331c507e
-	github.com/creachadair/taskgroup v0.9.0
+	github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e
+	github.com/creachadair/mds v0.17.1
+	github.com/creachadair/pebblestore v0.0.0-20240810153014-4818f2316c01
+	github.com/creachadair/pogrebstore v0.0.0-20240810153044-926de1a39bb1
+	github.com/creachadair/s3store v0.0.0-20240810153032-f16fc6a6a275
+	github.com/creachadair/sqlitestore v0.0.0-20240810153039-d8e002c5838b
+	github.com/creachadair/taskgroup v0.9.1
 	github.com/hanwen/go-fuse/v2 v2.5.1
 	github.com/klauspost/compress v1.17.9
 	github.com/pkg/xattr v0.4.10
@@ -33,11 +33,11 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.115.0 // indirect
-	cloud.google.com/go/auth v0.7.3 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
+	cloud.google.com/go v0.115.1 // indirect
+	cloud.google.com/go/auth v0.9.1 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v1.1.12 // indirect
+	cloud.google.com/go/iam v1.2.0 // indirect
 	cloud.google.com/go/storage v1.43.0 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
 	github.com/DataDog/zstd v1.5.6 // indirect
@@ -47,9 +47,9 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cockroachdb/errors v1.11.3 // indirect
-	github.com/cockroachdb/fifo v0.0.0-20240616162244-4768e80dfb9a // indirect
+	github.com/cockroachdb/fifo v0.0.0-20240816210425-c5d0cb0b6fc0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
-	github.com/cockroachdb/pebble v1.1.1 // indirect
+	github.com/cockroachdb/pebble v1.1.2 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
 	github.com/creachadair/msync v0.2.1 // indirect
@@ -81,7 +81,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plar/go-adaptive-radix-tree v1.0.5 // indirect
-	github.com/prometheus/client_golang v1.19.1 // indirect
+	github.com/prometheus/client_golang v1.20.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
@@ -89,30 +89,30 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	go.etcd.io/bbolt v1.3.10 // indirect
+	go.etcd.io/bbolt v1.3.11 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
 	go.opentelemetry.io/otel v1.28.0 // indirect
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
+	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
-	google.golang.org/api v0.190.0 // indirect
-	google.golang.org/genproto v0.0.0-20240805194559-2c9e96a0b5d4 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240805194559-2c9e96a0b5d4 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240805194559-2c9e96a0b5d4 // indirect
+	google.golang.org/api v0.194.0 // indirect
+	google.golang.org/genproto v0.0.0-20240822170219-fc7c04adadcd // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240822170219-fc7c04adadcd // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd // indirect
 	google.golang.org/grpc v1.65.0 // indirect
 	modernc.org/gc/v3 v3.0.0-20240801135723-a856999a2e4a // indirect
-	modernc.org/libc v1.57.0 // indirect
+	modernc.org/libc v1.59.9 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.31.1 // indirect
+	modernc.org/sqlite v1.32.0 // indirect
 	modernc.org/strutil v1.2.0 // indirect
 	modernc.org/token v1.1.0 // indirect
 )
