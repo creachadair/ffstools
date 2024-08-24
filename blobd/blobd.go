@@ -127,7 +127,7 @@ If --listen is:
 
  - Otherwise: The address must be a path for a Unix-domain socket.
 
-With --cache, %[1]s provides a memory cache over the primary store.
+With --cache, the server provides a memory cache over the primary store.
 
 With --keyfile, the store is opened with encryption (chosen by --encryption).
 If --keyfile begins with "@", the remaining string is used as a key salt for HKDF
