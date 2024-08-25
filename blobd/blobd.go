@@ -155,7 +155,7 @@ and slow (e.g., cloud storage).`, strings.Join(storeNames, ", ")),
 			fs.StringVar(&configPath, "config", configPath, "PRIVATE:Configuration file path")
 		},
 
-		Run: blobd,
+		Run: command.Adapt(blobd),
 	}
 	ctrl.Run(func() error {
 		command.RunOrFail(root.NewEnv(nil), os.Args[1:])
