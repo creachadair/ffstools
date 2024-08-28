@@ -43,12 +43,12 @@ import (
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/ffstools/lib/zstdc"
+	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/hkdf"
 	"golang.org/x/crypto/sha3"
-	"golang.org/x/term"
 )
 
 type closer = func()
@@ -217,24 +217,45 @@ var errReadOnlyStore = errors.New("storage is read-only")
 func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
 func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
 
+func parseKeyFile(s string) (key string, salt, confirm bool) {
+	if tail, ok := strings.CutPrefix(s, "@@"); ok {
+		return "@" + tail, false, false
+	} else if tail, ok := strings.CutPrefix(s, "@"); ok {
+		return tail, true, false
+	}
+	if tail, ok := strings.CutPrefix(s, "%%"); ok {
+		return "%" + tail, false, false
+	} else if tail, ok := strings.CutPrefix(s, "%"); ok {
+		return tail, true, true
+	}
+	return s, false, false
+}
+
 func getEncryptionKey(keyFile string) ([]byte, error) {
-	if tail, ok := strings.CutPrefix(keyFile, "@@"); ok {
-		keyFile = "@" + tail // unescape leading "@"
-	} else if tail, ok := strings.CutPrefix(keyFile, "@"); ok {
-		if tail == "" {
+	kf, isSalt, doConfirm := parseKeyFile(keyFile)
+	if isSalt {
+		if kf == "" {
 			return nil, errors.New("key generation salt is empty")
 		}
 		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
 		if !ok {
-			io.WriteString(os.Stdout, "Passphrase: ")
-			bits, err := term.ReadPassword(0)
+			var err error
+			pp, err = getpass.Prompt("Passphrase: ")
 			if err != nil {
 				return nil, fmt.Errorf("read passphrase: %w", err)
 			}
-			pp = string(bits)
+			if doConfirm {
+				cf, err := getpass.Prompt("Confirm: ")
+				if err != nil {
+					return nil, fmt.Errorf("read confirmation: %w", err)
+				}
+				if cf != pp {
+					return nil, errors.New("passphrases do not match")
+				}
+			}
 		}
 
-		hr := hkdf.New(sha3.New256, []byte(pp), []byte(tail), nil)
+		hr := hkdf.New(sha3.New256, []byte(pp), []byte(kf), nil)
 		var buf [32]byte
 		if _, err := io.ReadFull(hr, buf[:]); err != nil {
 			return nil, fmt.Errorf("generate key: %w", err)
@@ -242,14 +263,12 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 		return buf[:], nil
 	}
 
-	key, err := keyfile.LoadKey(keyFile, func() (string, error) {
+	key, err := keyfile.LoadKey(kf, func() (string, error) {
 		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
 		if ok {
 			return pp, nil
 		}
-		io.WriteString(os.Stdout, "Passphrase: ")
-		bits, err := term.ReadPassword(0)
-		return string(bits), err
+		return getpass.Prompt("Passphrase: ")
 	})
 	if err != nil {
 		return nil, fmt.Errorf("load encryption key: %w", err)

@@ -130,9 +130,13 @@ If --listen is:
 With --cache, the server provides a memory cache over the primary store.
 
 With --keyfile, the store is opened with encryption (chosen by --encryption).
-If --keyfile begins with "@", the remaining string is used as a key salt for HKDF
-with the user-provided passphrase. Double the "@" to escape this meaning.
-Otherwise the passphrase is used to unlock the key file.
+
+By default, the user-provided passphrase is used to unlock the key file.
+
+If --keyfile begins with "@" or "%%", however, the remaining string is used as a
+key salt for HKDF with the user-provided passphrase. When the prefix is "%%",
+the user is prompted to confirm the passphrase; with "@" no confirmation is required.
+Double the "@" or "%%" to escape this treatment of the --keyfile argument.
 
 If BLOBD_KEYFILE_PASSPHRASE is set in the environment, it is used as the
 passphrase for the keyfile; otherwise blobd prompts at the terminal.

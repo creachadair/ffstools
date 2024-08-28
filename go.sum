@@ -169,6 +169,8 @@ github.com/creachadair/flax v0.0.1 h1:it+joEf9aEUalaV7XWll/pk6zA4/FbNvMImW9q/lS8
 github.com/creachadair/flax v0.0.1/go.mod h1:K8bFvn8hMdAljQkaKNc7I3os5Wk36JxkyCkfdZ7S8d4=
 github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda h1:6X0RhsZjEqIJDkm66S+nxzo0hszr/M1R421uq+UVVmk=
 github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda/go.mod h1:mod9dTqlWckAQpQDjo1HLBX/OIky3/Z4vAmYsSGZsb0=
+github.com/creachadair/getpass v0.2.1 h1:ZtLVMUa5HdBStZsvSoYv4+G+RxQM1vNrfCUc0/xIJW8=
+github.com/creachadair/getpass v0.2.1/go.mod h1:nz1KzZI7LDzvc3d8CmJfGC1Hkiu6zw1iPuevAFiBJ+Y=
 github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev7P5M=
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e h1:c8RlWEQbgycP6OTrdxAFzpYzd7UKHkwpcUGY6v2obvw=

@@ -15,6 +15,7 @@ require (
 	github.com/creachadair/ffuse v0.0.0-20240828025207-b3523815c88e
 	github.com/creachadair/flax v0.0.1
 	github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda
+	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e
 	github.com/creachadair/mds v0.17.1
@@ -27,7 +28,6 @@ require (
 	github.com/klauspost/compress v1.17.9
 	github.com/pkg/xattr v0.4.10
 	golang.org/x/crypto v0.26.0
-	golang.org/x/term v0.23.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -117,6 +117,7 @@ require (
 	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/term v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/api v0.194.0 // indirect
