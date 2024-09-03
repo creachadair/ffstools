@@ -235,17 +235,17 @@ func parseKeyFile(s string) (key string, salt, confirm bool) {
 }
 
 func getEncryptionKey(keyFile string) ([]byte, error) {
+	pp, ppOK := os.LookupEnv("FFS_PASSPHRASE")
+	if !ppOK {
+		// TODO(creachadair): Old name, get rid of it once usage is updated.
+		pp, ppOK = os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
+	}
 	kf, isSalt, doConfirm := parseKeyFile(keyFile)
 	if isSalt {
 		if kf == "" {
 			return nil, errors.New("key generation salt is empty")
 		}
-		pp, ok := os.LookupEnv("FFS_PASSPHRASE")
-		if !ok {
-			// TODO(creachadair): Old name, get rid of it once usage is updated.
-			pp, ok = os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
-		}
-		if !ok {
+		if !ppOK {
 			var err error
 			pp, err = getpass.Prompt("Passphrase: ")
 			if err != nil {
@@ -271,8 +271,7 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 	}
 
 	key, err := keyfile.LoadKey(kf, func() (string, error) {
-		pp, ok := os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
-		if ok {
+		if ppOK {
 			return pp, nil
 		}
 		return getpass.Prompt("Passphrase: ")
