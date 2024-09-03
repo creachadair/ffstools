@@ -60,8 +60,8 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/storage/filestore"
 	"github.com/creachadair/ffs/storage/zipstore"
-	"github.com/creachadair/ffstools/blobd/store"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/store"
 )
 
 var (
