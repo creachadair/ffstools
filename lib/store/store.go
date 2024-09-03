@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/creachadair/ffs/blob"
@@ -52,6 +53,17 @@ func (r Registry) Open(ctx context.Context, addr string) (blob.Store, error) {
 		return nil, fmt.Errorf("open [%s] %q: %w", tag, target, err)
 	}
 	return s, nil
+}
+
+// Names returns a slice of the names of the storage implementations in r.
+// The slice is sorted.
+func (r Registry) Names() []string {
+	out := make([]string, 0, len(r))
+	for name := range r {
+		out = append(out, name)
+	}
+	slices.Sort(out)
+	return out
 }
 
 var (
