@@ -35,7 +35,6 @@ import (
 )
 
 var flags struct {
-	// Flags (see root.SetFlags below).
 	ListenAddr string `flag:"listen,Service address (required)"`
 	KeyFile    string `flag:"key,Encryption key file or salt (if empty, do not encrypt)"`
 	Cipher     string `flag:"cipher,default=chacha,Encryption algorithm"`
