@@ -34,6 +34,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdput"
 	"github.com/creachadair/ffstools/ffs/internal/cmdroot"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
+	"github.com/creachadair/ffstools/ffs/internal/cmdstorage"
 	"github.com/creachadair/ffstools/ffs/internal/cmdsync"
 )
 
@@ -89,14 +90,16 @@ help [<command>]`,
 			cmdmount.Command,
 			cmdgc.Command,
 			cmdblob.Command,
+			cmdstorage.Command,
 			cmdstatus.Command,
 			command.HelpCommand([]command.HelpTopic{{
 				Name: "environment",
 				Help: `Environment variables supported by ffs.
 
-FFS_CONFIG  : Configuration file path (default: ` + config.DefaultPath + `)
-FFS_DEBUG   : If true, enable debug logging (warning: noisy)
-FFS_STORE   : Storage service address (overrides config; overridden by --store)
+FFS_CONFIG     : Configuration file path (default: ` + config.DefaultPath + `)
+FFS_DEBUG      : If true, enable debug logging (warning: noisy)
+FFS_PASSPHRASE : If set, contains the passphrase for a --key file
+FFS_STORE      : Storage service address (overrides config; overridden by --store)
 `,
 			}}),
 			command.VersionCommand(),
