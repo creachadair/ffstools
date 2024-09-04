@@ -41,6 +41,7 @@ import (
 	"github.com/creachadair/ffs/storage/codecs/encrypted"
 	"github.com/creachadair/ffs/storage/encoded"
 	"github.com/creachadair/ffs/storage/wbstore"
+	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/zstdc"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
@@ -106,7 +107,7 @@ func openStore(ctx context.Context, storeSpec string) (cas blob.CAS, buf blob.St
 		}
 	}()
 
-	bs, err := stores.Open(ctx, storeSpec)
+	bs, err := registry.Stores.Open(ctx, storeSpec)
 	if err != nil {
 		return nil, nil, fmt.Errorf("open store: %w", err)
 	}
@@ -117,7 +118,7 @@ func openStore(ctx context.Context, storeSpec string) (cas blob.CAS, buf blob.St
 	}
 
 	if flags.BufferDB != "" {
-		buf, err = stores.Open(ctx, flags.BufferDB)
+		buf, err = registry.Stores.Open(ctx, flags.BufferDB)
 		if err != nil {
 			return nil, nil, fmt.Errorf("open buffer: %w", err)
 		}

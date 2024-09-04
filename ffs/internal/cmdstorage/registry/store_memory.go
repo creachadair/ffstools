@@ -1,7 +1,7 @@
 //go:build all || memory
 
-package cmdstorage
+package registry
 
 import "github.com/creachadair/ffs/blob/memstore"
 
-func init() { stores["memory"] = memstore.Opener }
+func init() { Stores["memory"] = memstore.Opener }

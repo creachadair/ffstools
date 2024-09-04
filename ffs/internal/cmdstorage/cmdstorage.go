@@ -15,7 +15,6 @@
 package cmdstorage
 
 import (
-	"archive/zip"
 	"context"
 	"fmt"
 	"log"
@@ -25,12 +24,8 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/blob/memstore"
-	"github.com/creachadair/ffs/storage/filestore"
-	"github.com/creachadair/ffs/storage/zipstore"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/lib/store"
+	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/flax"
 )
 
@@ -43,23 +38,6 @@ var flags struct {
 	CacheSize  int    `flag:"cache,Memory cache size in MiB (0 means no cache)"`
 	Compress   bool   `flag:"compress,Enable zstd compression of blob data"`
 	ReadOnly   bool   `flag:"read-only,Disallow modification of the store"`
-}
-
-// These storage implementations are built in by default.  To include other
-// stores, build with -tags set to their names.  The known implementations are
-// in the store_*.go files.
-var stores = store.Registry{
-	"file": func(ctx context.Context, addr string) (blob.Store, error) {
-		if strings.HasSuffix(addr, ".zip") {
-			zf, err := zip.OpenReader(addr)
-			if err != nil {
-				return nil, err
-			}
-			return zipstore.New(zf, nil), nil
-		}
-		return filestore.Opener(ctx, addr)
-	},
-	"memory": memstore.Opener,
 }
 
 var Command = &command.C{
@@ -100,7 +78,8 @@ for the key file; otherwise it prompts at the terminal.
 
 Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores
-that are remote and slow (e.g., cloud storage).`, strings.Join(stores.Names(), ", ")),
+that are remote and slow (e.g., cloud storage).`,
+		strings.Join(registry.Stores.Names(), ", ")),
 
 	SetFlags: command.Flags(flax.MustBind, &flags),
 	Run:      command.Adapt(runStorage),
