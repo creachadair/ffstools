@@ -29,9 +29,9 @@ import (
 	"github.com/creachadair/ffstools/lib/store"
 )
 
-// These storage implementations are built in by default.  To include other
-// stores, build with -tags set to their names.  The known implementations are
-// in the store_*.go files.
+// Stores enumerates the storage implementations are built in by default.
+// To include other stores, build with -tags set to their names.  The known
+// implementations are in the store_*.go files.
 var Stores = store.Registry{
 	"file": func(ctx context.Context, addr string) (blob.Store, error) {
 		if strings.HasSuffix(addr, ".zip") {
