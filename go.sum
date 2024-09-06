@@ -161,8 +161,8 @@ github.com/creachadair/command v0.1.14 h1:lvAPKPrFU8ECyRQ4MEDCw5UEHhSOIYs5knLLNX
 github.com/creachadair/command v0.1.14/go.mod h1:JyiZVgQzhzPWa8DdE6Hfl+IOi7DMpXToBEvQCQoST7c=
 github.com/creachadair/ctrl v0.1.1 h1:sztvK/haLnCSL1IY4mFxEgg5ksAvQMRUFcjB0EeuGY0=
 github.com/creachadair/ctrl v0.1.1/go.mod h1:QORxQsErPqDEuQxtRDa907Chq+IwJUkMAhkHFsphops=
-github.com/creachadair/ffs v0.6.1 h1:Q6haTkyBp62wEebqbQXY/5BVzVY43Iyn/uuauTGEGsY=
-github.com/creachadair/ffs v0.6.1/go.mod h1:4aiTLABmn+3qOUgP3hYlA/7lP+0o9ydtwNvPLm9y2Ps=
+github.com/creachadair/ffs v0.6.2 h1:ivwM2b+YQpnZR7pJ02ZxGTyJgY4AMbrYjVI2+rJFeac=
+github.com/creachadair/ffs v0.6.2/go.mod h1:RpcBQjHU94hXjx6CVAaVzh3twNTxp50QQCL+mT/2l6M=
 github.com/creachadair/ffuse v0.0.0-20240828025207-b3523815c88e h1:X5m0L9a7A4MF9WmUANBnKiuBPekJ/pUhTg6yOktfy+k=
 github.com/creachadair/ffuse v0.0.0-20240828025207-b3523815c88e/go.mod h1:vEi7vxM+1NiFzgKyIS1DhRbPharPJeLPqKURZ9EMStc=
 github.com/creachadair/flax v0.0.1 h1:it+joEf9aEUalaV7XWll/pk6zA4/FbNvMImW9q/lS8o=
@@ -175,8 +175,8 @@ github.com/creachadair/keyfile v0.7.2 h1:vbhU4poDlhIwu0M9UcX3Fn8ZMrzARscsvkjT+Ev
 github.com/creachadair/keyfile v0.7.2/go.mod h1:VzWfjXRtRCeWD8pbCoBpAkL7/l7MfDye9TTE8Slga/0=
 github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e h1:c8RlWEQbgycP6OTrdxAFzpYzd7UKHkwpcUGY6v2obvw=
 github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e/go.mod h1:q1BPakdoAihzpUd2c031ExObOGiv1Jgz1aXYqp1awFc=
-github.com/creachadair/mds v0.19.1 h1:EZzKxgAqeHCGSGvFOHWkaESgO2MXSvreWZ+kLhZL7m4=
-github.com/creachadair/mds v0.19.1/go.mod h1:4b//mUiL8YldH6TImXjmW45myzTLNS1LLjOmrk888eg=
+github.com/creachadair/mds v0.19.2 h1:I5OdjsrG2jqGklMcyv50Iqo6gTrwUSIpIJVSnlVw85c=
+github.com/creachadair/mds v0.19.2/go.mod h1:4b//mUiL8YldH6TImXjmW45myzTLNS1LLjOmrk888eg=
 github.com/creachadair/msync v0.2.1 h1:nBrUkGnk+vhEO+fe6fEMcT6Reo/C9Oc4s62bL4Bj/Wo=
 github.com/creachadair/msync v0.2.1/go.mod h1:fMAB2Ihnsojvz5nRxqzEEUmHgW2/CEKY64VPP4VskSY=
 github.com/creachadair/pebblestore v0.0.0-20240810153014-4818f2316c01 h1:LeaUw6XzNtBahtmj5qhH0in/ZeAY+YzFgNpphL30orQ=
