@@ -89,7 +89,7 @@ func delCmd(env *command.Env) (err error) {
 	defer cancel()
 
 	g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
-	c := taskgroup.NewCollector(func(key string) {
+	c := taskgroup.Collect(func(key string) {
 		fmt.Println(config.FormatKey(key))
 	})
 

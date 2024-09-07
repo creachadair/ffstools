@@ -187,8 +187,8 @@ github.com/creachadair/s3store v0.0.0-20240824201411-496eb41b2bf9 h1:1mJdxIvrgWJ
 github.com/creachadair/s3store v0.0.0-20240824201411-496eb41b2bf9/go.mod h1:1A6o25e32//DmKAjcl/3w+sZlj0OAVFBtBEW3VK2ETw=
 github.com/creachadair/sqlitestore v0.0.0-20240810153039-d8e002c5838b h1:0yoNtqUApAbIhHRSUU5pvQdn+UvchhpPLtDOKAGb7xk=
 github.com/creachadair/sqlitestore v0.0.0-20240810153039-d8e002c5838b/go.mod h1:1qBLQ9BgXZWaOuMi8TJn8byMx8BfEWCL75jGd3/9YLA=
-github.com/creachadair/taskgroup v0.9.1 h1:oam4POtt6PpmUr4us+ycUUfb2mPWc0RmIycte2oWoWw=
-github.com/creachadair/taskgroup v0.9.1/go.mod h1:9oDDPt/5QPS4iylvPMC81GRlj+1je8AFDbjUh4zaQWo=
+github.com/creachadair/taskgroup v0.9.3 h1:PGvqKo+gvzckr/IL69Lj4aKzOSwY5cJBMZFlvW5eidU=
+github.com/creachadair/taskgroup v0.9.3/go.mod h1:9oDDPt/5QPS4iylvPMC81GRlj+1je8AFDbjUh4zaQWo=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

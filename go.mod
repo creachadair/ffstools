@@ -23,7 +23,7 @@ require (
 	github.com/creachadair/pogrebstore v0.0.0-20240810153044-926de1a39bb1
 	github.com/creachadair/s3store v0.0.0-20240824201411-496eb41b2bf9
 	github.com/creachadair/sqlitestore v0.0.0-20240810153039-d8e002c5838b
-	github.com/creachadair/taskgroup v0.9.1
+	github.com/creachadair/taskgroup v0.9.3
 	github.com/hanwen/go-fuse/v2 v2.5.1
 	github.com/klauspost/compress v1.17.9
 	github.com/pkg/xattr v0.4.10
