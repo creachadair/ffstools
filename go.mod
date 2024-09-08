@@ -13,8 +13,8 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20240810153022-f29119a6023b
 	github.com/creachadair/command v0.1.14
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.6.2
-	github.com/creachadair/ffuse v0.0.0-20240828025207-b3523815c88e
+	github.com/creachadair/ffs v0.6.3
+	github.com/creachadair/ffuse v0.0.0-20240908012438-e9f5934b977f
 	github.com/creachadair/flax v0.0.1
 	github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda
 	github.com/creachadair/getpass v0.2.1
@@ -29,7 +29,7 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.5.1
 	github.com/klauspost/compress v1.17.9
 	github.com/pkg/xattr v0.4.10
-	golang.org/x/crypto v0.26.0
+	golang.org/x/crypto v0.27.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -118,9 +118,9 @@ require (
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
-	golang.org/x/term v0.23.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/term v0.24.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/api v0.194.0 // indirect
 	google.golang.org/genproto v0.0.0-20240823204242-4ba0660f739c // indirect
