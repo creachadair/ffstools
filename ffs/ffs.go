@@ -107,5 +107,5 @@ FFS_STORE      : Storage service address (overrides config; overridden by --stor
 	}
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	command.RunOrFail(root.NewEnv(nil).SetContext(ctx).MergeFlags(true), os.Args[1:])
+	command.RunOrFail(root.NewEnv(nil).SetContext(ctx), os.Args[1:])
 }
