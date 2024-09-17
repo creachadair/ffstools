@@ -13,19 +13,19 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20240810153022-f29119a6023b
 	github.com/creachadair/command v0.1.15
 	github.com/creachadair/ctrl v0.1.1
-	github.com/creachadair/ffs v0.6.3
+	github.com/creachadair/ffs v0.6.4
 	github.com/creachadair/ffuse v0.0.0-20240908012438-e9f5934b977f
 	github.com/creachadair/flax v0.0.1
 	github.com/creachadair/gcsstore v0.0.0-20240810152929-5f967eb4dbda
 	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.7.2
 	github.com/creachadair/leveldbstore v0.0.0-20240810153125-2444f95cc61e
-	github.com/creachadair/mds v0.19.2
+	github.com/creachadair/mds v0.21.2
 	github.com/creachadair/pebblestore v0.0.0-20240810153014-4818f2316c01
 	github.com/creachadair/pogrebstore v0.0.0-20240810153044-926de1a39bb1
 	github.com/creachadair/s3store v0.0.0-20240824201411-496eb41b2bf9
 	github.com/creachadair/sqlitestore v0.0.0-20240810153039-d8e002c5838b
-	github.com/creachadair/taskgroup v0.9.3
+	github.com/creachadair/taskgroup v0.9.4
 	github.com/hanwen/go-fuse/v2 v2.5.1
 	github.com/klauspost/compress v1.17.9
 	github.com/pkg/xattr v0.4.10
@@ -71,7 +71,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.2 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/creachadair/msync v0.2.1 // indirect
+	github.com/creachadair/msync v0.3.0 // indirect
 	github.com/dgraph-io/badger/v4 v4.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
