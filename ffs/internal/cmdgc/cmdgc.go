@@ -41,7 +41,7 @@ import (
 var gcFlags struct {
 	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of current sweep tasks"`
+	Tasks        int           `flag:"nw,default=256,PRIVATE:Number of current sweep tasks"`
 	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
 	Verbose      bool          `flag:"v,Enable verbose logging"`
 }
@@ -157,6 +157,9 @@ store without roots.
 			} else {
 				fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
 			}
+
+			// We want to have _some_ basic limit here, but it does not need to be
+			// very tight.  Deletion rate limits are pretty forgiving.
 			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(gcFlags.Tasks)
 
 			start := time.Now()
