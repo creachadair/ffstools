@@ -6,7 +6,7 @@ toolchain go1.23.1
 
 require (
 	github.com/creachadair/atomicfile v0.3.5
-	github.com/creachadair/badgerstore v0.4.2
+	github.com/creachadair/badgerstore v0.5.0
 	github.com/creachadair/bitcaskstore v0.0.0-20240810152912-85f27a8564f6
 	github.com/creachadair/boltstore v0.0.0-20240810153101-5a59fbbdc38e
 	github.com/creachadair/chirp v0.0.0-20240811160328-0c7bc43ea2f9
@@ -72,8 +72,8 @@ require (
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
 	github.com/creachadair/msync v0.3.0 // indirect
-	github.com/dgraph-io/badger/v4 v4.2.0 // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
+	github.com/dgraph-io/badger/v4 v4.3.0 // indirect
+	github.com/dgraph-io/ristretto v0.1.2-0.20240116140435-c67e07994f91 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/getsentry/sentry-go v0.28.1 // indirect
@@ -81,7 +81,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/glog v1.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
