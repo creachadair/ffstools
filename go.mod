@@ -14,7 +14,7 @@ require (
 	github.com/creachadair/command v0.1.15
 	github.com/creachadair/ctrl v0.1.1
 	github.com/creachadair/ffs v0.6.5
-	github.com/creachadair/ffuse v0.0.0-20240919033956-330b8f4d3bbf
+	github.com/creachadair/ffuse v0.0.0-20240920034631-07626ed27cd5
 	github.com/creachadair/flax v0.0.1
 	github.com/creachadair/gcsstore v0.0.0-20240917005903-70471c95a091
 	github.com/creachadair/getpass v0.2.1
