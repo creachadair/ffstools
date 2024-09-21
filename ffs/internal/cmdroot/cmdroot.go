@@ -28,6 +28,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
 )
 
@@ -49,11 +50,17 @@ all known keys are listed.`,
 		},
 		{
 			Name:  "create",
-			Usage: "<name>\n<name> <file-key>\n-ref <name> <root>/<path>",
+			Usage: "<name>\n<name> <file-key>\n--ref <name> <root>/<path>",
 			Help: `Create a root pointer.
 
 If only a <name> is given, a new empty root pointer is created with that name.
-If a <file-key> is specified, the new root points to that file (which must exist).`,
+If a <file-key> is specified, the new root points to that file (which must exist).
+
+With --ref, the specified root/path is resolved, and root points to it.
+
+With --put, the specified filesystem path is copied, and root points to it.
+This copy is performed with default settings. For full control over the copy,
+use the "put" command separately.`,
 
 			SetFlags: command.Flags(flax.MustBind, &createFlags),
 			Run:      command.Adapt(runCreate),
@@ -180,13 +187,18 @@ var createFlags struct {
 	Replace bool   `flag:"replace,Replace an existing root name"`
 	Desc    string `flag:"desc,Set the human-readable description"`
 	Ref     bool   `flag:"ref,Treat the target as a root/path or file/path"`
+	Put     bool   `flag:"put,Treat the target as a local filesystem path to copy"`
 }
 
 func runCreate(env *command.Env, name string, rest ...string) error {
 	mode := "empty"
 	if len(rest) == 1 {
-		if createFlags.Ref {
+		if createFlags.Ref && createFlags.Put {
+			return env.Usagef("the --ref and --put flags are mutually exclusive")
+		} else if createFlags.Ref {
 			mode = "ref"
+		} else if createFlags.Put {
+			mode = "put"
 		} else {
 			mode = "file-key"
 		}
@@ -201,13 +213,23 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 
 		switch mode {
 		case "file-key":
-			fk, err = config.ParseKey(env.Args[1])
+			fk, err = config.ParseKey(rest[0])
 		case "ref":
-			tf, terr := config.OpenPath(env.Context(), s, env.Args[1])
+			tf, terr := config.OpenPath(env.Context(), s, rest[0])
 			if terr != nil {
 				return err
 			}
 			fk = tf.File.Key()
+		case "put":
+			tf, terr := putlib.Default.PutPath(env.Context(), s, rest[0])
+			if terr != nil {
+				return err
+			}
+			fk, terr = tf.Flush(env.Context())
+			if terr != nil {
+				return err
+			}
+			fmt.Printf("put: %s\n", config.FormatKey(fk))
 		case "empty":
 			fk, err = file.New(s, &file.NewOptions{
 				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
