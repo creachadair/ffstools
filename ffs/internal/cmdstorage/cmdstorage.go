@@ -69,17 +69,11 @@ The --listen flag must be one of:
 
 With --cache, the server provides a memory cache over the primary store.
 
-With --key, the store is opened with encryption (chosen by --encryption).
-By default, the user-provided passphrase is used to unlock the key file.
-
-If --key begins with "@" or "%%", however, the remaining string is used
-as a key salt for HKDF with the user-provided passphrase. When the prefix
-is "%%", the user is prompted to confirm the passphrase; with "@" no
-confirmation is required. Double the "@" or "%%" to escape this treatment
-of the --key argument.
-
-If FFS_PASSPHRASE is set in the environment, it is used as the passphrase
-for the key file; otherwise it prompts at the terminal.
+With --key, the store is opened with encryption (chosen by --cipher).
+The contents of the --key file are used as the cipher key.
+If the file has the format of http://godoc.org/github.com/creachadair/keyfile,
+it is unlocked using a passphrase, from the FFS_PASSPHRASE environment or
+prompted at the terminal. Otherwise its contents are used verbatim
 
 Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores

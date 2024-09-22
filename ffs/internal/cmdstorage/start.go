@@ -24,7 +24,6 @@ import (
 	"expvar"
 	"fmt"
 	"hash"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -47,7 +46,6 @@ import (
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
-	"golang.org/x/crypto/hkdf"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -221,66 +219,26 @@ var errReadOnlyStore = errors.New("storage is read-only")
 func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
 func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
 
-func parseKeyFile(s string) (key string, salt, confirm bool) {
-	if tail, ok := strings.CutPrefix(s, "@@"); ok {
-		return "@" + tail, false, false
-	} else if tail, ok := strings.CutPrefix(s, "@"); ok {
-		return tail, true, false
-	}
-	if tail, ok := strings.CutPrefix(s, "%%"); ok {
-		return "%" + tail, false, false
-	} else if tail, ok := strings.CutPrefix(s, "%"); ok {
-		return tail, true, true
-	}
-	return s, false, false
-}
-
 func getEncryptionKey(keyFile string) ([]byte, error) {
-	pp, ppOK := os.LookupEnv("FFS_PASSPHRASE")
-	if !ppOK {
-		// TODO(creachadair): Old name, get rid of it once usage is updated.
-		pp, ppOK = os.LookupEnv("BLOBD_KEYFILE_PASSPHRASE")
-	}
-	kf, isSalt, doConfirm := parseKeyFile(keyFile)
-	if isSalt {
-		if kf == "" {
-			return nil, errors.New("key generation salt is empty")
-		}
-		if !ppOK {
-			var err error
-			pp, err = getpass.Prompt("Passphrase: ")
-			if err != nil {
-				return nil, fmt.Errorf("read passphrase: %w", err)
-			}
-			if doConfirm {
-				cf, err := getpass.Prompt("Confirm: ")
-				if err != nil {
-					return nil, fmt.Errorf("read confirmation: %w", err)
-				}
-				if cf != pp {
-					return nil, errors.New("passphrases do not match")
-				}
-			}
-		}
-
-		hr := hkdf.New(sha3.New256, []byte(pp), []byte(kf), nil)
-		var buf [32]byte
-		if _, err := io.ReadFull(hr, buf[:]); err != nil {
-			return nil, fmt.Errorf("generate key: %w", err)
-		}
-		return buf[:], nil
-	}
-
-	key, err := keyfile.LoadKey(kf, func() (string, error) {
-		if ppOK {
-			return pp, nil
-		}
-		return getpass.Prompt("Passphrase: ")
-	})
+	data, err := os.ReadFile(keyFile)
 	if err != nil {
-		return nil, fmt.Errorf("load encryption key: %w", err)
+		return nil, err
 	}
-	return key, nil
+	kf, err := keyfile.Parse(data)
+	if err != nil {
+		if len(data) >= 16 {
+			return data, nil
+		}
+		return nil, fmt.Errorf("invalid key file: %w", err)
+	}
+	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
+	if !ok {
+		pp, err = getpass.Prompt("Passphrase: ")
+		if err != nil {
+			return nil, err
+		}
+	}
+	return kf.Get(pp)
 }
 
 func closeOnError(c interface{ Close(context.Context) error }, errp *error) func() {
