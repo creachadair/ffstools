@@ -2,25 +2,25 @@
 
 See also https://github.com/creachadair/ffs.
 
-- The [`blobd`](https://github.com/creachadair/ffstools/tree/main/blobd)
-  tool defines an RPC service that implements the FFS blob store interface
-  over various underlying key-value storage implementations.
-
-  ```sh
-  # To install:
-  go install github.com/creachadair/ffstools/blobd@latest
-  ```
+## Overview
 
 - The [`ffs`](https://github.com/creachadair/ffstools/tree/main/ffs) tool
-  also communicates with the `blobd` service and provides commands to
-  manipulate the contents of the store as FFS specific messages.
+  supports running and communicating with a blob storage service, and provides
+  commands to manipulate the contents of the store as FFS specific messages.
 
   ```sh
   # To install:
   go install github.com/creachadair/ffstools/ffs@latest
   ```
 
-  The `ffs blob` subcommand replaced the separate `blob` tool in #30.
+  The `ffs blob` subcommand replaced the formerly separate `blob` tool ([#30][]).
+  The `ffs storage` subcommand replaced the formerly separate `blobd` tool ([#35][]).
+
+  When installing, you may want to specify build `--tags` to enable other
+  storage backends. See [Storage Backends](#storage-backends).
+
+[#30]: https://github.com/creachadair/ffstools/pull/30
+[#35]: https://github.com/creachadair/ffstools/pull/35
 
 - The [`file2json`](https://github.com/creachadair/ffstools/tree/main/file2json)
   tool decodes wire-format node messages and translates them to JSON for easier
@@ -33,12 +33,12 @@ See also https://github.com/creachadair/ffs.
 
 ## Installation and Usage
 
-Install `blobd` and `ffs` as noted above, then:
+Install `ffs` as noted above, then:
 
 ```bash
-# Start up a storage server (blobd) using local files as storage.
+# Start up a storage server using local files as storage.
 export FFS_STORE=/tmp/test.db.sock
-blobd -store file:test.db -listen "$FFS_STORE" &
+ffs storage -store file:test.db -listen "$FFS_STORE" &
 while [[ ! -e "$FFS_STORE" ]] ; do sleep 1 ; done
 
 # Create a root pointer to anchor some data.
@@ -76,6 +76,29 @@ ffs file list -long -key example
 # GC unreachable data in the store.
 ffs gc
 
-# Stop the blobd.
+# Stop the storage server.
 kill %1 && wait
 ```
+
+## Storage Backends
+
+The following storage backends are currently supported by default:
+
+| Type   | Description                  | Implementation                                                 |
+|--------|------------------------------|----------------------------------------------------------------|
+| memory | In-memory storage (built-in) | https://godoc.org/github.com/creachadair/ffs/blob/memstore     |
+| file   | Local directory (built-in)   | https://godoc.org/github.com/creachadair/ffs/storage/filestore |
+
+The following storage backends can be enabled by building with the specified tags:
+
+| Type/Tag | Description | Implementation                                            |
+|----------|-------------|-----------------------------------------------------------|
+| badger   | BadgerDB    | https://godoc.org/github.com/dgraph-io/badger/v4          |
+| bitcask  | Bitcask     | https://godoc.org/git.mills.io/prologic/bitcask           |
+| bolt     | BoltDB      | https://godoc.org/go.etcd.io/bbolt                        |
+| gcs      | GCS         | https://godoc.org/cloud.google.com/go/storage             |
+| leveldb  | LevelDB     | https://godoc.org/github.com/syndtr/goleveldb/leveldb     |
+| pebble   | PebbleDB    | https://godoc.org/github.com/cockroachdb/pebble           |
+| pogreb   | Pogreb      | https://godoc.org/github.com/akrylysov/pogreb             |
+| s3       | Amazon S3   | https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3 |
+| sqlite   | SQLite3     | https://godoc.org/modernc.org/sqlite                      |
