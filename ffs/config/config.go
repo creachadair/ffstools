@@ -69,8 +69,9 @@ type Settings struct {
 
 // A StoreSpec associates a tag (handle) with a storage address.
 type StoreSpec struct {
-	Tag     string `json:"tag" yaml:"tag"`
-	Address string `json:"address" yaml:"address"`
+	Tag     string `json:"tag" yaml:"tag"`         // identifies the spec
+	Address string `json:"address" yaml:"address"` // the listen address
+	Spec    string `json:"spec" yaml:"spec"`       // the desired storage URL
 }
 
 // ResolveAddress resolves the given address against the settings.  If addr is
@@ -88,6 +89,24 @@ func (s *Settings) ResolveAddress(addr string) string {
 		}
 	}
 	return addr
+}
+
+// ResolveStoreSpec resolves the given store spec against the settings, and
+// reports whether there was a match.  If addr is of the form @tag and that tag
+// exists in the settings, the expanded form of that tag's store spec is
+// returned; otherwise it returns spec unmodified.
+func (s *Settings) ResolveStoreSpec(spec string) (string, bool) {
+	tail, ok := strings.CutPrefix(spec, "@")
+	if !ok {
+		return spec, false
+	}
+	for _, st := range s.Stores {
+		if tail == st.Tag && st.Spec != "" {
+			ExpandString(&st.Spec)
+			return st.Spec, true
+		}
+	}
+	return spec, false
 }
 
 // FindAddress reports whether s has a storage server address, and returns it

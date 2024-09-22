@@ -16,6 +16,7 @@
 package cmdstorage
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"log"
@@ -53,19 +54,22 @@ a host:port or the path of a Unix-domain socket.
 A store spec is a storage type and address: type:address
 The types understood are: %[1]s
 
-If --listen is:
+If --store has the form "@name", the storage spec associated with that
+name in the FFS config file is used (if defined).
 
- - A store label of the form @name: The address associated with that
-   name in the FFS config file is used.
+The --listen flag must be one of:
+
+ - A label of the form "@name": The address associated with that name
+   in the FFS config file is used. If --listen is empty and the --store
+   flag has the form "@name", it uses the address from that setting.
 
  - A host:port address: A TCP listener is created at that address.
 
- - Otherwise: The address must be a path for a Unix-domain socket.
+ - Otherwise: The path for a Unix-domain socket.
 
 With --cache, the server provides a memory cache over the primary store.
 
 With --key, the store is opened with encryption (chosen by --encryption).
-
 By default, the user-provided passphrase is used to unlock the key file.
 
 If --key begins with "@" or "%%", however, the remaining string is used
@@ -87,9 +91,13 @@ that are remote and slow (e.g., cloud storage).`,
 }
 
 func runStorage(env *command.Env) error {
-	storeSpec := env.Config.(*config.Settings).DefaultStore
+	s := env.Config.(*config.Settings)
+	storeSpec := s.DefaultStore
 	if storeSpec == "" {
 		return env.Usagef("you must provide a --store spec")
+	}
+	if rs, ok := s.ResolveStoreSpec(storeSpec); ok {
+		storeSpec = rs
 	}
 	listenAddr, err := getListenAddr(env)
 	if err != nil {
@@ -150,11 +158,12 @@ func runStorage(env *command.Env) error {
 
 func getListenAddr(env *command.Env) (string, error) {
 	cfg := env.Config.(*config.Settings)
-	addr := cfg.ResolveAddress(flags.ListenAddr)
+	target := cmp.Or(flags.ListenAddr, cfg.DefaultStore)
+	addr := cfg.ResolveAddress(target)
 	if addr == "" {
 		return "", env.Usagef("you must provide a non-empty --listen address")
 	} else if strings.HasPrefix(addr, "@") {
-		return "", fmt.Errorf("no service address for %q", flags.ListenAddr)
+		return "", fmt.Errorf("no service address for %q", target)
 	}
 	return addr, nil
 }
