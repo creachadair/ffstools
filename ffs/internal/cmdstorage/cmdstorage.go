@@ -157,12 +157,13 @@ func runStorage(env *command.Env) error {
 }
 
 func getListenAddr(env *command.Env) (string, error) {
-	cfg := env.Config.(*config.Settings)
-	target := cmp.Or(flags.ListenAddr, cfg.DefaultStore)
-	addr := cfg.ResolveAddress(target)
-	if addr == "" {
+	s := env.Config.(*config.Settings)
+	if flags.ListenAddr == "" && !strings.HasPrefix(s.DefaultStore, "@") {
 		return "", env.Usagef("you must provide a non-empty --listen address")
-	} else if strings.HasPrefix(addr, "@") {
+	}
+	target := cmp.Or(flags.ListenAddr, s.DefaultStore)
+	addr := s.ResolveAddress(target)
+	if addr == "" {
 		return "", fmt.Errorf("no service address for %q", target)
 	}
 	return addr, nil
