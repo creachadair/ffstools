@@ -18,6 +18,7 @@ package cmdstorage
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os/signal"
@@ -25,10 +26,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/getpass"
+	"github.com/creachadair/keyfile"
 )
 
 var flags struct {
@@ -82,6 +86,13 @@ that are remote and slow (e.g., cloud storage).`,
 
 	SetFlags: command.Flags(flax.MustBind, &flags),
 	Run:      command.Adapt(runStorage),
+
+	Commands: []*command.C{{
+		Name:  "keygen",
+		Usage: "<key-file>",
+		Help:  "Generate a random encryption key into the specified file.",
+		Run:   command.Adapt(runKeyGen),
+	}},
 }
 
 func runStorage(env *command.Env) error {
@@ -148,6 +159,29 @@ func runStorage(env *command.Env) error {
 		closer()
 	}()
 	return loop.Wait()
+}
+
+func runKeyGen(env *command.Env, keyFile string) error {
+	const keyBytes = 32 // suitable for AES-256 and chacha20poly1305.
+
+	pp, err := getpass.Prompt("Passphrase: ")
+	if err != nil {
+		return err
+	}
+	if cf, err := getpass.Prompt("(confirm) Passphrase: "); err != nil {
+		return err
+	} else if cf != pp {
+		return errors.New("passphrases do not match")
+	}
+	kf := keyfile.New()
+	if _, err := kf.Random(pp, keyBytes); err != nil {
+		return fmt.Errorf("generate key: %w", err)
+	}
+	if err := atomicfile.WriteData(keyFile, kf.Encode(), 0600); err != nil {
+		return fmt.Errorf("write key file: %w", err)
+	}
+	fmt.Fprintf(env, "Wrote a new %d-byte key to %q\n", keyBytes, keyFile)
+	return nil
 }
 
 func getListenAddr(env *command.Env) (string, error) {
