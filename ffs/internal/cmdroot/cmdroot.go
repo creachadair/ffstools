@@ -217,7 +217,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		case "ref":
 			tf, terr := config.OpenPath(env.Context(), s, rest[0])
 			if terr != nil {
-				return err
+				return terr
 			}
 			fk = tf.File.Key()
 		case "put":
