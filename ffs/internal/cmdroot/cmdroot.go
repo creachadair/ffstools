@@ -223,11 +223,11 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		case "put":
 			tf, terr := putlib.Default.PutPath(env.Context(), s, rest[0])
 			if terr != nil {
-				return err
+				return terr
 			}
 			fk, terr = tf.Flush(env.Context())
 			if terr != nil {
-				return err
+				return terr
 			}
 			fmt.Printf("put: %s\n", config.FormatKey(fk))
 		case "empty":
