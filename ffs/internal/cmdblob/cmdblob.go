@@ -50,8 +50,8 @@ Rule                                                     Example
 - If the key is all hex digits, decode it as hex         666f6f0a
 - Otherwise, it is treated as base64.                    Zm9vCg==
 
-If the BLOB_STORE environment variable is set, it is read to set the
-address of the storage server. Otherwise, -store must be set to either
+If the FFS_STORE environment variable is set, it is read to set the
+address of the storage server. Otherwise, --store must be set to either
 the address or an @tag from the configuration file.
 `,
 
