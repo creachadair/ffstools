@@ -160,8 +160,8 @@ github.com/creachadair/command v0.1.17 h1:2ZHtS5u/32RdbPYNQrpu9Wf5i6zEuq5YtwcIQQ
 github.com/creachadair/command v0.1.17/go.mod h1:JyiZVgQzhzPWa8DdE6Hfl+IOi7DMpXToBEvQCQoST7c=
 github.com/creachadair/ffs v0.6.5 h1:40OHIe9XF+gvTRTdL4qAxU2TVtY6ZcfP5fMZskq1ffw=
 github.com/creachadair/ffs v0.6.5/go.mod h1:BjzoFgDUI51jQwew8SvRgBlNiqcW1UpKE8qjsDnkDdw=
-github.com/creachadair/ffuse v0.0.0-20240920170604-29b1de242b75 h1:f2R/eOKnx26XMpb/Fc/ehiDSq2BiyGSvIzypy01FC8g=
-github.com/creachadair/ffuse v0.0.0-20240920170604-29b1de242b75/go.mod h1:kHBT2uNtaI2I17PO4T8SbQPeM/3Lumoul4r27UVQvFM=
+github.com/creachadair/ffuse v0.0.0-20241005135633-a73539c02257 h1:1gSK2C7PuZ+4RUunKO1IfT1faDaYAVdPzWDDUPMd/BI=
+github.com/creachadair/ffuse v0.0.0-20241005135633-a73539c02257/go.mod h1:kHBT2uNtaI2I17PO4T8SbQPeM/3Lumoul4r27UVQvFM=
 github.com/creachadair/flax v0.0.1 h1:it+joEf9aEUalaV7XWll/pk6zA4/FbNvMImW9q/lS8o=
 github.com/creachadair/flax v0.0.1/go.mod h1:K8bFvn8hMdAljQkaKNc7I3os5Wk36JxkyCkfdZ7S8d4=
 github.com/creachadair/gcsstore v0.0.0-20240929224518-0229dd83e050 h1:RxEwwQoLcp+ru/nlhr/pms6y3bZmjmN4X2DC6naJfe4=
