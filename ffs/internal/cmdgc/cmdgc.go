@@ -160,7 +160,7 @@ store without roots.
 
 			// We want to have _some_ basic limit here, but it does not need to be
 			// very tight.  Deletion rate limits are pretty forgiving.
-			g, run := taskgroup.New(taskgroup.Listen(cancel)).Limit(gcFlags.Tasks)
+			g, run := taskgroup.New(cancel).Limit(gcFlags.Tasks)
 
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64

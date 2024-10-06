@@ -88,8 +88,8 @@ func delCmd(env *command.Env) (err error) {
 	dctx, cancel := context.WithCancel(nctx)
 	defer cancel()
 
-	g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
-	c := taskgroup.Collect(func(key string) {
+	g, run := taskgroup.New(cancel).Limit(64)
+	c := taskgroup.Gather(run, func(key string) {
 		fmt.Println(config.FormatKey(key))
 	})
 
@@ -101,7 +101,7 @@ func delCmd(env *command.Env) (err error) {
 		if err != nil {
 			return err
 		}
-		run(c.Report(func(report func(string)) error {
+		c.Report(func(report func(string)) error {
 			if err := bs.Delete(dctx, key); blob.IsKeyNotFound(err) && missingOK {
 				return nil
 			} else if err != nil {
@@ -109,7 +109,7 @@ func delCmd(env *command.Env) (err error) {
 			}
 			report(key)
 			return nil
-		}))
+		})
 	}
 	err = g.Wait()
 	return err

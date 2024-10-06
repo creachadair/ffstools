@@ -183,7 +183,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	if len(files) != 0 {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
-		g, start := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
+		g, start := taskgroup.New(cancel).Limit(64)
 		for _, e := range files {
 			e := e
 			start(func() error {

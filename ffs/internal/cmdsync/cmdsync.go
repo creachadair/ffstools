@@ -168,7 +168,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			ctx, cancel := context.WithCancel(env.Context())
 			defer cancel()
 
-			g, run := taskgroup.New(taskgroup.Trigger(cancel)).Limit(64)
+			g, run := taskgroup.New(cancel).Limit(64)
 			for key, tag := range worklist {
 				if ctx.Err() != nil {
 					break
