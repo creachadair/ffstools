@@ -150,7 +150,7 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (CAS, error)
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
-		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%c %v", dir, pkt) })
+		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
 	bs := chirpstore.NewCAS(peer, nil)
 	return newCAS(bs), nil
