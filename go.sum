@@ -180,8 +180,8 @@ github.com/creachadair/command v0.1.17 h1:2ZHtS5u/32RdbPYNQrpu9Wf5i6zEuq5YtwcIQQ
 github.com/creachadair/command v0.1.17/go.mod h1:JyiZVgQzhzPWa8DdE6Hfl+IOi7DMpXToBEvQCQoST7c=
 github.com/creachadair/ffs v0.6.6 h1:XmqSmnU8hbCFtGvnj0xxfxmRmCLfjcpiN0BnJeF3cGA=
 github.com/creachadair/ffs v0.6.6/go.mod h1:bXYm4aum7FWDdXtI6AJd/e/y1fO0yhBG4ibRhChTI5Y=
-github.com/creachadair/ffuse v0.0.0-20241006225456-478c71db425a h1:CoVVB4rQGqEqfcatjFTJYc8JzX8nqYJiW7PhIn9lrr0=
-github.com/creachadair/ffuse v0.0.0-20241006225456-478c71db425a/go.mod h1:cmPEfPqMoRbkNTmEFRXBs4INFRqclC3AyzoVo9QIK7c=
+github.com/creachadair/ffuse v0.0.0-20241007022749-d20dd0e83f60 h1:mkI/MrX3rXxzQr5ieYy+GVrermz4KDJFwvrtz2N2ku8=
+github.com/creachadair/ffuse v0.0.0-20241007022749-d20dd0e83f60/go.mod h1:AEE9LrSFa85FV3dMuRB5ZLczdlstmwpV+/wDUIKR/IQ=
 github.com/creachadair/flax v0.0.1 h1:it+joEf9aEUalaV7XWll/pk6zA4/FbNvMImW9q/lS8o=
 github.com/creachadair/flax v0.0.1/go.mod h1:K8bFvn8hMdAljQkaKNc7I3os5Wk36JxkyCkfdZ7S8d4=
 github.com/creachadair/gcsstore v0.0.0-20241006224658-6404a11840e7 h1:Kb1F3U9HADtXQDLr5yCv6cATm7pHnxKhABO3Ue8osYA=
@@ -945,8 +945,8 @@ google.golang.org/protobuf v1.24.0/go.mod h1:r/3tXBNzIEhYS9I1OUVjXDlt8tc493IdKGj
 google.golang.org/protobuf v1.25.0/go.mod h1:9JNX74DMeImyA3h4bdi1ymwjUzf21/xIlbajtzgsN7c=
 google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
 google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
-google.golang.org/protobuf v1.34.2 h1:6xV6lTsCfpGD21XK49h7MhtcApnLqkfYgPcdHftf6hg=
-google.golang.org/protobuf v1.34.2/go.mod h1:qYOHts0dSfpeUzUFpOMr/WGzszTmLH+DiWniOlNbLDw=
+google.golang.org/protobuf v1.35.1 h1:m3LfL6/Ca+fqnjnlqQXNpFPABW1UD7mjh8KO2mKFytA=
+google.golang.org/protobuf v1.35.1/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
