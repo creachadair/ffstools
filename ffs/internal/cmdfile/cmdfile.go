@@ -274,6 +274,16 @@ func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) err
 
 func listFormat(f *file.File, name, target string) string {
 	s := f.Stat()
+	size := f.Data().Size()
+	if s.Mode.IsDir() {
+		size = 0
+		for _, kid := range f.Child().Names() {
+			size += int64(32 + len(kid))
+			// +32 for the storage key. This is just an estimate; the point here
+			// is to have some stable number that approximates how much storage
+			// the directory occupies.
+		}
+	}
 	var date string
 	if now := time.Now(); now.Year() != s.ModTime.Year() {
 		date = s.ModTime.Format("Jan _2  2006")
@@ -303,7 +313,8 @@ func listFormat(f *file.File, name, target string) string {
 	return fmt.Sprintf("%s%s%s\t%3d\t%s\t%s\v%9d\t%s\t%s%s\f",
 		skey, s.Mode, xtag, 1+f.Child().Len(),
 		nameOrID(s.OwnerName, s.OwnerID), nameOrID(s.GroupName, s.GroupID),
-		f.Data().Size(), date, name, xattrs)
+		size, date, name, xattrs,
+	)
 }
 
 func jsonFormat(f *file.File, name, target string) string {
