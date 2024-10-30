@@ -21,19 +21,16 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"sort"
 	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/file"
-	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
-	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -82,7 +79,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			fmt.Fprintf(env, "Target store: %q\n", taddr)
 
 			// Find all the objects reachable from the specified starting points.
-			worklist := make(scanSet)
+			worklist := scanlib.NewScanner(src)
 			var indices []*index.Index
 			for _, elt := range sourceKeys {
 				of, err := config.OpenPath(env.Context(), src, elt)
@@ -97,16 +94,16 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 						if err != nil {
 							return err
 						}
-						worklist.bareRoot(of.RootKey, of.Root)
+						worklist.RootOnly(of.RootKey, of.Root)
 						indices = append(indices, idx)
 						dprintf(env, "Loaded cached index for %q (%d keys)\n", elt, idx.Len())
 						continue
 					}
 					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
-					err = worklist.root(env.Context(), src, of.RootKey, of.Root)
+					err = worklist.Root(env.Context(), of.RootKey, of.Root)
 				} else {
 					fmt.Fprintf(env, "Scanning data reachable from file %s", config.FormatKey(of.FileKey))
-					err = worklist.file(env.Context(), of.File)
+					err = worklist.File(env.Context(), of.File)
 				}
 				fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
 				if err != nil {
@@ -120,7 +117,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				if err := src.List(env.Context(), "", func(key string) error {
 					for _, idx := range indices {
 						if idx.Has(key) {
-							worklist.addKey(key)
+							worklist.Blob(key)
 							numAdded++
 							break
 						}
@@ -132,8 +129,8 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				dprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
 			}
 
-			fmt.Fprintf(env, "Found %d reachable objects\n", len(worklist))
-			if len(worklist) == 0 {
+			fmt.Fprintf(env, "Found %d reachable objects\n", worklist.Len())
+			if worklist.Len() == 0 {
 				return errors.New("no matching objects")
 			}
 
@@ -141,7 +138,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			// that are not scheduled for replacement. Objects marked as root (R)
 			// or otherwise requiring replacement (+) are retained regardless.
 			var nspan, nmiss int
-			for _, span := range worklist.spans() {
+			for span := range worklist.Chunks(512) {
 				nspan++
 				need, err := tgt.SyncKeys(env.Context(), span)
 				if err != nil {
@@ -150,16 +147,13 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				nmiss += len(need)
 				m := mapset.New(need...)
 				for _, key := range span {
-					switch worklist[key] {
-					case '-', 'F':
-						if !m.Has(key) {
-							delete(worklist, key)
-						}
+					if !worklist.IsRoot(key) && !m.Has(key) {
+						worklist.Remove(key)
 					}
 				}
 			}
 			dprintf(env, "Key scan processed %d spans, found %d missing keys\n", nspan, nmiss)
-			fmt.Fprintf(env, "Have %d objects to copy\n", len(worklist))
+			fmt.Fprintf(env, "Have %d objects to copy\n", worklist.Len())
 
 			// Copy all remaining objects.
 			start := time.Now()
@@ -169,12 +163,11 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			defer cancel()
 
 			g, run := taskgroup.New(cancel).Limit(64)
-			for key, tag := range worklist {
+			for key, tag := range worklist.All() {
 				if ctx.Err() != nil {
 					break
 				}
 
-				key, tag := key, tag
 				run(func() error {
 					defer atomic.AddInt64(&nb, 1)
 					switch tag {
@@ -196,46 +189,6 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				nb, time.Since(start).Truncate(10*time.Millisecond))
 			return cerr
 		})
-	})
-}
-
-type scanSet map[string]byte
-
-func (s scanSet) addKey(key string) { s[key] = '-' }
-
-func (s scanSet) bareRoot(rootKey string, rp *root.Root) {
-	s[rootKey] = 'R'
-	s[rp.IndexKey] = '-'
-}
-
-func (s scanSet) spans() [][]string {
-	all := slice.MapKeys(s)
-	sort.Strings(all)
-	return slice.Chunks(all, 512)
-}
-
-func (s scanSet) root(ctx context.Context, src blob.CAS, rootKey string, rp *root.Root) error {
-	s.bareRoot(rootKey, rp)
-	fp, err := rp.File(ctx, src)
-	if err != nil {
-		return err
-	}
-	return s.file(ctx, fp)
-}
-
-func (s scanSet) file(ctx context.Context, fp *file.File) error {
-	return fp.Scan(ctx, func(si file.ScanItem) bool {
-		key := si.Key()
-		if _, ok := s[key]; ok {
-			return false // skip repeats of the same file
-		}
-		s[key] = 'F'
-
-		// Record all the data blocks.
-		for _, dkey := range si.Data().Keys() {
-			s[dkey] = '-'
-		}
-		return true
 	})
 }
 
