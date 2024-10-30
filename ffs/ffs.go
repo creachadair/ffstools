@@ -33,6 +33,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdmount"
 	"github.com/creachadair/ffstools/ffs/internal/cmdput"
 	"github.com/creachadair/ffstools/ffs/internal/cmdroot"
+	"github.com/creachadair/ffstools/ffs/internal/cmdscan"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage"
 	"github.com/creachadair/ffstools/ffs/internal/cmdsync"
@@ -87,6 +88,7 @@ help [<command>]`,
 			cmdput.Command,
 			cmdexport.Command,
 			cmdsync.Command,
+			cmdscan.Command,
 			cmdmount.Command,
 			cmdgc.Command,
 			cmdblob.Command,
