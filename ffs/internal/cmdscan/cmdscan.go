@@ -33,7 +33,7 @@ var Command = &command.C{
 	Name: "scan",
 	Usage: `@<file-key>[/path/...] ...
 <root-key>[/path/...] ...`,
-	Help:     `Scan blobs readchable from the specified file trees.`,
+	Help:     `Scan blobs reachable from the specified file trees.`,
 	SetFlags: command.Flags(flax.MustBind, &scanFlags),
 	Run:      command.Adapt(runScan),
 }
