@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20241021001458-e7612096aaba
 	github.com/creachadair/command v0.1.17
 	github.com/creachadair/ffs v0.6.6
-	github.com/creachadair/ffuse v0.0.0-20241024152508-1a0053aa5834
+	github.com/creachadair/ffuse v0.0.0-20241031145033-4ba344c19094
 	github.com/creachadair/flax v0.0.2
 	github.com/creachadair/gcsstore v0.0.0-20241021001449-6ad473236f3c
 	github.com/creachadair/getpass v0.2.1
@@ -25,7 +25,7 @@ require (
 	github.com/creachadair/s3store v0.0.0-20241021001503-ce3524c247f4
 	github.com/creachadair/sqlitestore v0.0.0-20241016151749-c6556d88d55d
 	github.com/creachadair/taskgroup v0.12.0
-	github.com/hanwen/go-fuse/v2 v2.6.1
+	github.com/hanwen/go-fuse/v2 v2.6.3
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
 	golang.org/x/crypto v0.28.0

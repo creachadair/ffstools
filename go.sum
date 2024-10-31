@@ -180,8 +180,8 @@ github.com/creachadair/command v0.1.17 h1:2ZHtS5u/32RdbPYNQrpu9Wf5i6zEuq5YtwcIQQ
 github.com/creachadair/command v0.1.17/go.mod h1:JyiZVgQzhzPWa8DdE6Hfl+IOi7DMpXToBEvQCQoST7c=
 github.com/creachadair/ffs v0.6.6 h1:XmqSmnU8hbCFtGvnj0xxfxmRmCLfjcpiN0BnJeF3cGA=
 github.com/creachadair/ffs v0.6.6/go.mod h1:bXYm4aum7FWDdXtI6AJd/e/y1fO0yhBG4ibRhChTI5Y=
-github.com/creachadair/ffuse v0.0.0-20241024152508-1a0053aa5834 h1:03uBawkpBgxmz7hYj+waXUJbovI4bNHPyt5m6PVmOag=
-github.com/creachadair/ffuse v0.0.0-20241024152508-1a0053aa5834/go.mod h1:yKG4o/RWnVY9e5ar3ZGHpiLtAqpc4s1ntl6Vyg2PmiU=
+github.com/creachadair/ffuse v0.0.0-20241031145033-4ba344c19094 h1:3tnrOJdbMUZ56T6mgAMxey+AkNDVkifl8OUD+ZuUlJo=
+github.com/creachadair/ffuse v0.0.0-20241031145033-4ba344c19094/go.mod h1:m4SxfdZEXt7jcMh2h6hY79bAm2Xk7qvPG4Q5+YZVAT4=
 github.com/creachadair/flax v0.0.2 h1:E0cc6njSIhSh6wSP9jSp/Rdx9pPDtru4vhaazxbNU5k=
 github.com/creachadair/flax v0.0.2/go.mod h1:K8bFvn8hMdAljQkaKNc7I3os5Wk36JxkyCkfdZ7S8d4=
 github.com/creachadair/gcsstore v0.0.0-20241021001449-6ad473236f3c h1:cIJzxlldZxKwO2KQnXKpaDdrX6mynFV1vaYR1cz8z4U=
@@ -357,8 +357,8 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.0.0/go.mod h1:FiyG127CGDf3tlThmg
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
-github.com/hanwen/go-fuse/v2 v2.6.1 h1:F3RUMbAuRhVTi3fvgf8HjMPvOm9xEv5wjuy/AXJtEwI=
-github.com/hanwen/go-fuse/v2 v2.6.1/go.mod h1:ugNaD/iv5JYyS1Rcvi57Wz7/vrLQJo10mmketmoef48=
+github.com/hanwen/go-fuse/v2 v2.6.3 h1:tDcEkLRx93lXu4XyN1/j8Z74VWvhHDl6qU1kNnvFUqI=
+github.com/hanwen/go-fuse/v2 v2.6.3/go.mod h1:ugNaD/iv5JYyS1Rcvi57Wz7/vrLQJo10mmketmoef48=
 github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
 github.com/hashicorp/consul/sdk v0.1.1/go.mod h1:VKf9jXwCTEY1QZP2MOLRhb5i/I/ssyNV1vwHyQBF0x8=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
