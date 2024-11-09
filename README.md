@@ -2,6 +2,8 @@
 
 See also https://github.com/creachadair/ffs.
 
+[![CI](https://github.com/creachadair/ffstools/actions/workflows/go-presubmit.yml/badge.svg?event=push&branch=main)](https://github.com/creachadair/ffstools/actions/workflows/go-presubmit.yml)
+
 ## Overview
 
 - The [`ffs`](https://github.com/creachadair/ffstools/tree/main/ffs) tool
