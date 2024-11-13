@@ -69,7 +69,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			svc.Store = s
 			svc.ExecArgs = cmdArgs
 			ctx := env.Context()
-			if err := svc.Init(ctx); err != nil {
+			if err := svc.Mount(ctx); err != nil {
 				return err
 			}
 			fmt.Printf("mount: %s\n", config.FormatKey(svc.Path.FileKey))

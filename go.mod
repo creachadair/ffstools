@@ -13,7 +13,7 @@ require (
 	github.com/creachadair/chirpstore v0.0.0-20241021001458-e7612096aaba
 	github.com/creachadair/command v0.1.17
 	github.com/creachadair/ffs v0.6.6
-	github.com/creachadair/ffuse v0.0.0-20241031145033-4ba344c19094
+	github.com/creachadair/ffuse v0.0.0-20241113015842-99455d877c2e
 	github.com/creachadair/flax v0.0.2
 	github.com/creachadair/gcsstore v0.0.0-20241021001449-6ad473236f3c
 	github.com/creachadair/getpass v0.2.1
@@ -31,7 +31,7 @@ require (
 	golang.org/x/crypto v0.28.0
 	google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v3 v3.0.1
-	honnef.co/go/tools v0.0.1-2020.1.4
+	honnef.co/go/tools v0.5.1
 )
 
 require (
@@ -44,7 +44,6 @@ require (
 	cloud.google.com/go/monitoring v1.21.2 // indirect
 	cloud.google.com/go/storage v1.45.0 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
-	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/DataDog/zstd v1.5.6 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.24.3 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.3 // indirect
@@ -128,6 +127,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.31.0 // indirect
 	go.opentelemetry.io/otel/trace v1.31.0 // indirect
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
+	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
