@@ -7,29 +7,29 @@ toolchain go1.23.1
 require (
 	github.com/creachadair/atomicfile v0.3.5
 	github.com/creachadair/badgerstore v0.5.1
-	github.com/creachadair/bitcaskstore v0.0.0-20241109215526-70a3bbc26440
+	github.com/creachadair/bitcaskstore v0.0.0-20241114003131-4f230f3b308e
 	github.com/creachadair/boltstore v0.0.0-20241109220605-bec182704945
-	github.com/creachadair/chirp v0.0.0-20241113142151-e02ef3ab2cd9
-	github.com/creachadair/chirpstore v0.0.0-20241109184309-b0835efb894f
-	github.com/creachadair/command v0.1.18
+	github.com/creachadair/chirp v0.0.0-20241114003105-4baf44dd0411
+	github.com/creachadair/chirpstore v0.0.0-20241114003119-c53e8563b6d0
+	github.com/creachadair/command v0.1.19
 	github.com/creachadair/ffs v0.6.6
-	github.com/creachadair/ffuse v0.0.0-20241114000914-e98d5840e1d5
+	github.com/creachadair/ffuse v0.0.0-20241114002908-1e2004126a44
 	github.com/creachadair/flax v0.0.2
-	github.com/creachadair/gcsstore v0.0.0-20241109220415-a071e4c27078
+	github.com/creachadair/gcsstore v0.0.0-20241114003012-1cac03db12b0
 	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.8.3
 	github.com/creachadair/leveldbstore v0.0.0-20241109215721-c254f2dfd84d
 	github.com/creachadair/mds v0.21.4
-	github.com/creachadair/pebblestore v0.0.0-20241109215846-7e1a05d4f65d
+	github.com/creachadair/pebblestore v0.0.0-20241114003027-b4f195f7ed6b
 	github.com/creachadair/pogrebstore v0.0.0-20241109215653-1f5fe5392a97
-	github.com/creachadair/s3store v0.0.0-20241109220458-212e4e905ba7
-	github.com/creachadair/sqlitestore v0.0.0-20241109220224-0fb34e2e7668
-	github.com/creachadair/taskgroup v0.13.0
+	github.com/creachadair/s3store v0.0.0-20241114003043-cca1eee5b803
+	github.com/creachadair/sqlitestore v0.0.0-20241114003202-f621a63a07bb
+	github.com/creachadair/taskgroup v0.13.1
 	github.com/hanwen/go-fuse/v2 v2.6.3
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
 	golang.org/x/crypto v0.29.0
-	google.golang.org/protobuf v1.35.1
+	google.golang.org/protobuf v1.35.2
 	gopkg.in/yaml.v3 v3.0.1
 	honnef.co/go/tools v0.5.1
 )
@@ -42,7 +42,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/iam v1.2.2 // indirect
 	cloud.google.com/go/monitoring v1.21.2 // indirect
-	cloud.google.com/go/storage v1.46.0 // indirect
+	cloud.google.com/go/storage v1.47.0 // indirect
 	git.mills.io/prologic/bitcask v1.0.2 // indirect
 	github.com/DataDog/zstd v1.5.6 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.25.0 // indirect
@@ -52,8 +52,8 @@ require (
 	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.4 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.6 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.28.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.44 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.28.4 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.45 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.19 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.23 // indirect
@@ -63,10 +63,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.4.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.66.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.67.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.24.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.32.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.33.0 // indirect
 	github.com/aws/smithy-go v1.22.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
