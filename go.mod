@@ -25,7 +25,7 @@ require (
 	github.com/creachadair/s3store v0.0.0-20241116020223-73c1d669783c
 	github.com/creachadair/sqlitestore v0.0.0-20241114003202-f621a63a07bb
 	github.com/creachadair/taskgroup v0.13.1
-	github.com/hanwen/go-fuse/v2 v2.7.0
+	github.com/hanwen/go-fuse/v2 v2.6.4
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
 	golang.org/x/crypto v0.29.0
