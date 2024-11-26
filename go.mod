@@ -1,8 +1,6 @@
 module github.com/creachadair/ffstools
 
-go 1.23
-
-toolchain go1.23.1
+go 1.23.3
 
 require (
 	github.com/creachadair/atomicfile v0.3.6
@@ -22,6 +20,7 @@ require (
 	github.com/creachadair/mds v0.21.4
 	github.com/creachadair/pebblestore v0.0.0-20241116020203-5eb8bfbd9e6e
 	github.com/creachadair/pogrebstore v0.0.0-20241109215653-1f5fe5392a97
+	github.com/creachadair/rosedbstore v0.0.0-20241126163137-8e3c71322851
 	github.com/creachadair/s3store v0.0.0-20241116020223-73c1d669783c
 	github.com/creachadair/sqlitestore v0.0.0-20241114003202-f621a63a07bb
 	github.com/creachadair/taskgroup v0.13.1
@@ -69,6 +68,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.1 // indirect
 	github.com/aws/smithy-go v1.22.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20240905190251-b4127c9b8d78 // indirect
@@ -93,6 +93,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/btree v1.1.2 // indirect
 	github.com/google/flatbuffers/go v0.0.0-20230110200425-62e4d2e5b215 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
@@ -113,9 +114,13 @@ require (
 	github.com/prometheus/common v0.60.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
+	github.com/rosedblabs/rosedb/v2 v2.3.9 // indirect
+	github.com/rosedblabs/wal v1.3.8 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.32.0 // indirect

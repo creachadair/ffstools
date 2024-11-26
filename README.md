@@ -102,5 +102,6 @@ The following storage backends can be enabled by building with the specified tag
 | leveldb  | LevelDB     | https://godoc.org/github.com/syndtr/goleveldb/leveldb     |
 | pebble   | PebbleDB    | https://godoc.org/github.com/cockroachdb/pebble           |
 | pogreb   | Pogreb      | https://godoc.org/github.com/akrylysov/pogreb             |
+| rosedb   | RoseDB      | https://godoc.org/github.com/rosedblabs/rosedb/v2         |
 | s3       | Amazon S3   | https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3 |
 | sqlite   | SQLite3     | https://godoc.org/modernc.org/sqlite                      |
