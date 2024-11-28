@@ -7,6 +7,7 @@ require (
 	github.com/creachadair/badgerstore v0.5.2
 	github.com/creachadair/bitcaskstore v0.0.0-20241116172654-ad678d2b4a03
 	github.com/creachadair/boltstore v0.0.0-20241116172722-de2708deb492
+	github.com/creachadair/buntdbstore v0.0.0-20241128212057-59cab0dba233
 	github.com/creachadair/chirp v0.0.0-20241118023217-64c4a0f86b93
 	github.com/creachadair/chirpstore v0.0.0-20241116020249-5a62ca391222
 	github.com/creachadair/command v0.1.19
@@ -120,6 +121,14 @@ require (
 	github.com/rosedblabs/wal v1.3.8 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/tidwall/btree v1.4.2 // indirect
+	github.com/tidwall/buntdb v1.3.2 // indirect
+	github.com/tidwall/gjson v1.14.3 // indirect
+	github.com/tidwall/grect v0.1.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/rtred v0.1.2 // indirect
+	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.opencensus.io v0.24.0 // indirect
