@@ -40,13 +40,13 @@ var Command = &command.C{
 
 Recursively copy each specified path from the local filesystem to the
 store, and print the storage key. By default, file and directory stat
-info are recorded; use -nostat to disable this. Use -xattr to capture
+info are recorded; use --nostat to disable this. Use --xattr to capture
 extended attributes.
 
 Symbolic links are captured, but devices, sockets, FIFO, and other
 special files are skipped.
 
-With "-into", the resulting file is stored under the specified path of
+With "--into", the resulting file is stored under the specified path of
 the form <root-key>/<path> or @<file-key>/<path>. In this form, only one
 input path is allowed.`,
 

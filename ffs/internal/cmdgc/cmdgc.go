@@ -53,7 +53,7 @@ var Command = &command.C{
 	Help: `Garbage-collect objects not reachable from known roots.
 
 If no roots are defined, an error is reported without making any changes
-unless -force is set. This avoids accidentally deleting everything in a
+unless --force is set. This avoids accidentally deleting everything in a
 store without roots.
 `,
 
@@ -75,7 +75,7 @@ store without roots.
 			} else if len(keys) == 0 {
 				fmt.Fprint(env, `>> WARNING <<
 * No root keys found!
-* Proceeding with collection anyway because -force is set
+* Proceeding with collection anyway because --force is set
 
 `)
 			}

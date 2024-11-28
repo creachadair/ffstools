@@ -52,9 +52,9 @@ var Command = &command.C{
 Export a file tree to the local filesystem.
 
 Recursively export the file indicated by the selected root or file storage
-key to the path indicated by -to. By default, stat information (permissions,
-modification time, etc.) is copied to the output; use -nostat to omit this.
-Use -xattr to export extended attributes, if any are stored.`,
+key to the path indicated by --to. By default, stat information (permissions,
+modification time, etc.) is copied to the output; use --nostat to omit this.
+Use --xattr to export extended attributes, if any are stored.`,
 
 	SetFlags: command.Flags(flax.MustBind, &exportFlags),
 	Run:      command.Adapt(runExport),
