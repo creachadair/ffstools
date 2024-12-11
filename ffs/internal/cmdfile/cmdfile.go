@@ -124,6 +124,7 @@ The stat spec is a list of fields to update, one or more of:
  owner <name>   -- set the owner name ("" to clear)
  group <name>   -- set the group name ("" to clear)
  persist <ok>   -- set or unset stat persistence
+ clear          -- clear all current stat values to zero (applies first)
 
 Allowed types include:
 
@@ -452,6 +453,10 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 			return err
 		}
 		stat := tf.File.Stat()
+		if mod.clear {
+			stat.Clear()
+			stat = tf.File.Stat()
+		}
 		if mod.perms != nil {
 			stat.Mode = (stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms)
 		}
@@ -597,13 +602,22 @@ type statMod struct {
 	uid, gid     *int
 	owner, group *string
 	persist      *bool
+	clear        bool
 }
 
 func parseStatMod(args []string) (*statMod, error) {
 	var mod statMod
 
 	i := 0
-	for i+1 < len(args) {
+	for i < len(args) {
+		if args[i] == "clear" {
+			mod.clear = true
+			i++
+			continue
+		}
+		if i+1 >= len(args) {
+			return nil, errors.New("odd-length argument list")
+		}
 		switch args[i] {
 		case "mode":
 			v, err := strconv.ParseInt(args[i+1], 0, 32)
@@ -682,11 +696,7 @@ func parseStatMod(args []string) (*statMod, error) {
 		default:
 			return nil, fmt.Errorf("unknown stat field %q", args[i])
 		}
-
 		i += 2
-	}
-	if i < len(args) {
-		return nil, errors.New("odd-length argument list")
 	}
 	return &mod, nil
 }
