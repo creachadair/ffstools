@@ -98,6 +98,7 @@ The following storage backends can be enabled by building with the specified tag
 | badger   | BadgerDB    | https://godoc.org/github.com/dgraph-io/badger/v4          |
 | bitcask  | Bitcask     | https://godoc.org/git.mills.io/prologic/bitcask           |
 | bolt     | BoltDB      | https://godoc.org/go.etcd.io/bbolt                        |
+| buntdb   | BuntDB      | https://godoc.org/github.com/tidwall/buntdb               |
 | gcs      | GCS         | https://godoc.org/cloud.google.com/go/storage             |
 | leveldb  | LevelDB     | https://godoc.org/github.com/syndtr/goleveldb/leveldb     |
 | pebble   | PebbleDB    | https://godoc.org/github.com/cockroachdb/pebble           |
