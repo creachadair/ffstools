@@ -55,6 +55,7 @@ type startConfig struct {
 	Address string
 	Spec    string
 	Store   blob.CAS
+	Prefix  string
 	Buffer  blob.Store
 }
 
@@ -73,7 +74,7 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}
 	log.Printf("[chirp] Service: %q", opts.Address)
 
-	service := chirpstore.NewService(opts.Store, nil)
+	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOpts{Prefix: opts.Prefix})
 	mx := newServerMetrics(ctx, opts)
 	loop := taskgroup.Go(func() error {
 		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
