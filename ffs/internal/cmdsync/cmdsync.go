@@ -74,9 +74,8 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(src config.CAS) error {
-		taddr := cfg.ResolveAddress(syncFlags.Target)
-		return cfg.WithStoreAddress(env.Context(), taddr, func(tgt config.CAS) error {
-			fmt.Fprintf(env, "Target store: %q\n", taddr)
+		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt config.CAS) error {
+			fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
 
 			// Find all the objects reachable from the specified starting points.
 			worklist := scanlib.NewScanner(src)
