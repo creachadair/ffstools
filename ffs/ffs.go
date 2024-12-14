@@ -40,9 +40,10 @@ import (
 )
 
 var (
-	configPath = config.Path()
-	storeAddr  string
-	debugLog   bool
+	configPath  = config.Path()
+	storeAddr   string
+	storePrefix string
+	debugLog    bool
 )
 
 func main() {
@@ -55,6 +56,7 @@ help [<command>]`,
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
 			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
+			fs.StringVar(&storePrefix, "prefix", storePrefix, "Store service prefix (overrides config and environment)")
 			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
 		},
 
@@ -67,6 +69,11 @@ help [<command>]`,
 				cfg.DefaultStore = storeAddr
 			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
 				cfg.DefaultStore = bs
+			}
+			if storePrefix != "" {
+				cfg.DefaultPrefix = storePrefix
+			} else if sp := os.Getenv("FFS_PREFIX"); sp != "" {
+				cfg.DefaultPrefix = sp
 			}
 			if debugLog {
 				cfg.EnableDebugLogging = true
@@ -102,6 +109,7 @@ FFS_CONFIG     : Configuration file path (default: ` + config.DefaultPath + `)
 FFS_DEBUG      : If true, enable debug logging (warning: noisy)
 FFS_PASSPHRASE : If set, contains the passphrase for a --key file
 FFS_STORE      : Storage service address (overrides config; overridden by --store)
+FFS_PREFIX     : Storage service method name prefix (overrides config; overridden by --prefix)
 `,
 			}}),
 			command.VersionCommand(),
