@@ -26,7 +26,7 @@ import (
 
 var errBadAddress = errors.New("bad memstore address")
 
-func newMemStore(_ context.Context, addr string) (blob.Store, error) {
+func newMemStore(_ context.Context, addr string) (blob.KV, error) {
 	if addr != "" {
 		return nil, errBadAddress
 	}

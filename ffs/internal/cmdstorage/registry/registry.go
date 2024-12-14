@@ -33,7 +33,7 @@ import (
 // To include other stores, build with -tags set to their names.  The known
 // implementations are in the store_*.go files.
 var Stores = store.Registry{
-	"file": func(ctx context.Context, addr string) (blob.Store, error) {
+	"file": func(ctx context.Context, addr string) (blob.KV, error) {
 		if strings.HasSuffix(addr, ".zip") {
 			zf, err := zip.OpenReader(addr)
 			if err != nil {

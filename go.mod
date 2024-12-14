@@ -4,26 +4,26 @@ go 1.23.3
 
 require (
 	github.com/creachadair/atomicfile v0.3.6
-	github.com/creachadair/badgerstore v0.5.2
-	github.com/creachadair/bitcaskstore v0.0.0-20241130173206-cf3fd497c9c2
-	github.com/creachadair/boltstore v0.0.0-20241202163233-7059d2f6a5d9
-	github.com/creachadair/buntdbstore v0.0.0-20241128212057-59cab0dba233
+	github.com/creachadair/badgerstore v0.6.0
+	github.com/creachadair/bitcaskstore v0.0.0-20241215020431-c0f7f6f6c4ae
+	github.com/creachadair/boltstore v0.0.0-20241215020742-24601957a26b
+	github.com/creachadair/buntdbstore v0.0.0-20241215021052-150ad633c11c
 	github.com/creachadair/chirp v0.0.0-20241203170543-75c3b4b20b68
-	github.com/creachadair/chirpstore v0.0.0-20241203170943-299f48fe4598
+	github.com/creachadair/chirpstore v0.0.0-20241215021335-35d223886b33
 	github.com/creachadair/command v0.1.19
-	github.com/creachadair/ffs v0.6.9
+	github.com/creachadair/ffs v0.7.0
 	github.com/creachadair/ffuse v0.0.0-20241203171001-22453680d999
 	github.com/creachadair/flax v0.0.4
-	github.com/creachadair/gcsstore v0.0.0-20241202163430-c17e8ca3e58f
+	github.com/creachadair/gcsstore v0.0.0-20241215021417-7fe3c36bce52
 	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.8.3
-	github.com/creachadair/leveldbstore v0.0.0-20241122165421-206e218a247a
+	github.com/creachadair/leveldbstore v0.0.0-20241215021545-8798b5e61732
 	github.com/creachadair/mds v0.22.0
-	github.com/creachadair/pebblestore v0.0.0-20241202163507-ad4c5ea1c926
-	github.com/creachadair/pogrebstore v0.0.0-20241122165357-dac94d1bb772
-	github.com/creachadair/rosedbstore v0.0.0-20241126185025-f1a6dc6073a5
-	github.com/creachadair/s3store v0.0.0-20241202163525-df4526104918
-	github.com/creachadair/sqlitestore v0.0.0-20241130173233-ea82f0aca5e5
+	github.com/creachadair/pebblestore v0.0.0-20241215021757-c76b0a88bdda
+	github.com/creachadair/pogrebstore v0.0.0-20241215021938-ac1a0a51d39d
+	github.com/creachadair/rosedbstore v0.0.0-20241215022003-26d683d097ea
+	github.com/creachadair/s3store v0.0.0-20241215022045-cbaa75319887
+	github.com/creachadair/sqlitestore v0.0.0-20241215022117-270e2adb85d4
 	github.com/creachadair/taskgroup v0.13.2
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11

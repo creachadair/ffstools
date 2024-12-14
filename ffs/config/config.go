@@ -143,9 +143,7 @@ func (s *Settings) openStoreAddress(_ context.Context, spec StoreSpec) (CAS, err
 	if s.EnableDebugLogging {
 		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
-	bs := chirpstore.NewCAS(peer, &chirpstore.StoreOpts{
-		Prefix: spec.Prefix,
-	})
+	bs := chirpstore.NewCAS(peer, &chirpstore.KVOptions{Prefix: spec.Prefix})
 	return newCAS(bs), nil
 }
 

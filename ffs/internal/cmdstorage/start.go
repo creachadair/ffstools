@@ -56,7 +56,7 @@ type startConfig struct {
 	Spec    string
 	Store   blob.CAS
 	Prefix  string
-	Buffer  blob.Store
+	Buffer  blob.KV
 }
 
 func (s *startConfig) listen(ctx context.Context) (net.Listener, error) {
@@ -74,7 +74,7 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}
 	log.Printf("[chirp] Service: %q", opts.Address)
 
-	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOpts{Prefix: opts.Prefix})
+	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOptions{Prefix: opts.Prefix})
 	mx := newServerMetrics(ctx, opts)
 	loop := taskgroup.Go(func() error {
 		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
@@ -93,7 +93,7 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}, loop, nil
 }
 
-func openStore(ctx context.Context, storeSpec string) (cas blob.CAS, buf blob.Store, oerr error) {
+func openStore(ctx context.Context, storeSpec string) (cas blob.CAS, buf blob.KV, oerr error) {
 	defer func() {
 		if x := recover(); x != nil {
 			panic(x)
@@ -212,7 +212,7 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 }
 
 type roStore struct {
-	blob.Store
+	blob.KV
 }
 
 var errReadOnlyStore = errors.New("storage is read-only")
