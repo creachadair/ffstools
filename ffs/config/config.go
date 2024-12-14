@@ -60,6 +60,9 @@ type Settings struct {
 	// either a store tag (@name) or an address.
 	DefaultStore string `json:"defaultStore" yaml:"default-store"`
 
+	// The default method name prefix to use for the service.
+	DefaultPrefix string `json:"defaultPrefix" yaml:"default-prefix"`
+
 	// Enable debug logging for the storage service.
 	EnableDebugLogging bool `json:"enableDebugLogging" yaml:"enable-debug-logging"`
 
@@ -72,79 +75,67 @@ type StoreSpec struct {
 	Tag     string `json:"tag" yaml:"tag"`         // identifies the spec
 	Address string `json:"address" yaml:"address"` // the listen address
 	Spec    string `json:"spec" yaml:"spec"`       // the desired storage URL
+	Prefix  string `json:"prefix" yaml:"prefix"`   // service method name prefix
 }
 
-// ResolveAddress resolves the given address against the settings.  If addr is
-// of the form @tag and that tag exists in the settings, the expanded form of
-// the tag is returned; otherwise addr is returned unmodified.
-func (s *Settings) ResolveAddress(addr string) string {
-	if !strings.HasPrefix(addr, "@") {
-		return addr
-	}
-	tag := strings.TrimPrefix(addr, "@")
-	for _, st := range s.Stores {
-		if tag == st.Tag {
-			ExpandString(&st.Address)
-			return st.Address
-		}
-	}
-	return addr
-}
-
-// ResolveStoreSpec resolves the given store spec against the settings, and
-// reports whether there was a match.  If addr is of the form @tag and that tag
-// exists in the settings, the expanded form of that tag's store spec is
-// returned; otherwise it returns spec unmodified.
-func (s *Settings) ResolveStoreSpec(spec string) (string, bool) {
-	tail, ok := strings.CutPrefix(spec, "@")
-	if !ok {
-		return spec, false
-	}
-	for _, st := range s.Stores {
-		if tail == st.Tag && st.Spec != "" {
-			ExpandString(&st.Spec)
-			return st.Spec, true
-		}
-	}
-	return spec, false
-}
-
-// FindAddress reports whether s has a storage server address, and returns it
-// if so. If a tag was selected but not matched, it is returned.
-func (s *Settings) FindAddress() (string, bool) {
-	if s.DefaultStore == "" {
-		return "", false
-	} else if strings.HasPrefix(s.DefaultStore, "@") {
-		tag := strings.TrimPrefix(s.DefaultStore, "@")
+// ResolveAddress resolves the given address against the settings. If addr is
+// of the form @tag and that tag exists in the settings, the spec for that tag
+// is returned; otherwise it returns a spec whose address is addr.
+func (s *Settings) ResolveAddress(addr string) StoreSpec {
+	tag, ok := strings.CutPrefix(addr, "@")
+	if ok {
 		for _, st := range s.Stores {
 			if tag == st.Tag {
-				ExpandString(&st.Address)
-				return st.Address, true
+				cp := *st
+				ExpandString(&cp.Address)
+				if cp.Prefix == "" {
+					cp.Prefix = s.DefaultPrefix
+				}
+				return cp
 			}
 		}
-		return tag, false
 	}
-	return s.DefaultStore, true
+	return StoreSpec{Address: addr, Prefix: s.DefaultPrefix}
+}
+
+// ResolveSpec resolves the given store spec against the settings.  If spec is
+// of the form @tag and that tag exists in the settings, the expanded form of
+// that spec is returned; otherwise it returns a verbatim spec.
+func (s *Settings) ResolveSpec(spec string) StoreSpec {
+	tag, ok := strings.CutPrefix(spec, "@")
+	if ok {
+		for _, st := range s.Stores {
+			if tag == st.Tag {
+				cp := *st
+				ExpandString(&cp.Spec)
+				if cp.Prefix == "" {
+					cp.Prefix = s.DefaultPrefix
+				}
+				return cp
+			}
+		}
+	}
+	return StoreSpec{Spec: spec, Prefix: s.DefaultPrefix}
 }
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
 func (s *Settings) OpenStore(ctx context.Context) (CAS, error) {
-	addr, ok := s.FindAddress()
-	if !ok {
-		return CAS{}, fmt.Errorf("no store service address (%q)", addr)
+	spec := s.ResolveAddress(s.DefaultStore)
+	if spec.Address == "" {
+		return CAS{}, fmt.Errorf("no store service address (%q)", s.DefaultStore)
 	}
-	return s.OpenStoreAddress(ctx, addr)
+	return s.openStoreAddress(ctx, spec)
 }
 
-// OpenStoreAddress connects to the store service at addr.  The caller is
+// openStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (CAS, error) {
+func (s *Settings) openStoreAddress(_ context.Context, spec StoreSpec) (CAS, error) {
 	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 	if s.EnableDebugLogging {
-		lg.Printf("dial %q", addr)
+		lg.Printf("dial %q", spec.Address)
 	}
-	conn, err := Dial(chirp.SplitAddress(addr))
+	conn, err := Dial(chirp.SplitAddress(spec.Address))
 	if err != nil {
 		return CAS{}, fmt.Errorf("dialing store: %w", err)
 	}
@@ -152,24 +143,32 @@ func (s *Settings) OpenStoreAddress(_ context.Context, addr string) (CAS, error)
 	if s.EnableDebugLogging {
 		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
-	bs := chirpstore.NewCAS(peer, nil)
+	bs := chirpstore.NewCAS(peer, &chirpstore.StoreOpts{
+		Prefix: spec.Prefix,
+	})
 	return newCAS(bs), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
 // closed after f returns. The error returned by f is returned by WithStore.
 func (s *Settings) WithStore(ctx context.Context, f func(CAS) error) error {
-	addr, ok := s.FindAddress()
-	if !ok {
-		return fmt.Errorf("no store service address (%q)", addr)
+	spec := s.ResolveAddress(s.DefaultStore)
+	if spec.Address == "" {
+		return fmt.Errorf("no store service address (%q)", s.DefaultStore)
 	}
-	return s.WithStoreAddress(ctx, addr, f)
+	bs, err := s.openStoreAddress(ctx, spec)
+	if err != nil {
+		return err
+	}
+	defer bs.Close(ctx)
+	return f(bs)
 }
 
 // WithStoreAddress calls f with a store opened at addr. The store is closed
-// after f returns. The error returned by f is returned by WithStore.
+// after f returns. The error returned by f is returned by WithStoreAddress.
 func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(CAS) error) error {
-	bs, err := s.OpenStoreAddress(ctx, addr)
+	spec := s.ResolveAddress(addr)
+	bs, err := s.openStoreAddress(ctx, spec)
 	if err != nil {
 		return err
 	}

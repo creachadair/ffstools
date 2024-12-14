@@ -97,19 +97,16 @@ that are remote and slow (e.g., cloud storage).`,
 
 func runStorage(env *command.Env) error {
 	s := env.Config.(*config.Settings)
-	storeSpec := s.DefaultStore
-	if storeSpec == "" {
+	rs := s.ResolveSpec(s.DefaultStore)
+	if rs.Spec == "" {
 		return env.Usagef("you must provide a --store spec")
-	}
-	if rs, ok := s.ResolveStoreSpec(storeSpec); ok {
-		storeSpec = rs
 	}
 	listenAddr, err := getListenAddr(env)
 	if err != nil {
 		return err
 	}
 
-	bs, buf, err := openStore(env.Context(), storeSpec)
+	bs, buf, err := openStore(env.Context(), rs.Spec)
 	if err != nil {
 		return err
 	}
@@ -123,7 +120,7 @@ func runStorage(env *command.Env) error {
 			log.Printf("Warning: closing store: %v", err)
 		}
 	}()
-	log.Printf("Store: %q", storeSpec)
+	log.Printf("Store: %q", rs.Spec)
 	if flags.ReadOnly {
 		log.Print("Store is open in read-only mode")
 	}
@@ -142,8 +139,9 @@ func runStorage(env *command.Env) error {
 
 	config := startConfig{
 		Address: listenAddr,
-		Spec:    storeSpec,
+		Spec:    rs.Spec,
 		Store:   bs,
+		Prefix:  rs.Prefix,
 		Buffer:  buf,
 	}
 
@@ -190,9 +188,9 @@ func getListenAddr(env *command.Env) (string, error) {
 		return "", env.Usagef("you must provide a non-empty --listen address")
 	}
 	target := cmp.Or(flags.ListenAddr, s.DefaultStore)
-	addr := s.ResolveAddress(target)
-	if addr == "" {
+	spec := s.ResolveAddress(target)
+	if spec.Address == "" {
 		return "", fmt.Errorf("no service address for %q", target)
 	}
-	return addr, nil
+	return spec.Address, nil
 }
