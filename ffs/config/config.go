@@ -37,7 +37,6 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/index"
-	"github.com/creachadair/ffs/storage/affixed"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -130,7 +129,7 @@ func (s *Settings) OpenStore(ctx context.Context) (CAS, error) {
 
 // openStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
-func (s *Settings) openStoreAddress(_ context.Context, spec StoreSpec) (CAS, error) {
+func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (CAS, error) {
 	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 	if s.EnableDebugLogging {
 		lg.Printf("dial %q", spec.Address)
@@ -139,12 +138,35 @@ func (s *Settings) openStoreAddress(_ context.Context, spec StoreSpec) (CAS, err
 	if err != nil {
 		return CAS{}, fmt.Errorf("dialing store: %w", err)
 	}
-	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
+	peer := chirp.NewPeer()
 	if s.EnableDebugLogging {
 		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
-	bs := chirpstore.NewCAS(peer, &chirpstore.KVOptions{Prefix: spec.Prefix})
-	return newCAS(bs), nil
+	bs := chirpstore.NewStore(peer, &chirpstore.StoreOptions{
+		MethodPrefix: spec.Prefix,
+	})
+	rootKV, err := bs.KV(ctx, "root")
+	if err != nil {
+		conn.Close()
+		return CAS{}, fmt.Errorf("open root keyspace: %w", err)
+	}
+	fileKV, err := bs.KV(ctx, "file")
+	if err != nil {
+		conn.Close()
+		return CAS{}, fmt.Errorf("open file keyspace: %w", err)
+	}
+	fileCAS, err := bs.CAS(ctx, "file")
+	if err != nil {
+		conn.Close()
+		return CAS{}, fmt.Errorf("open file keyspace: %w", err)
+	}
+	peer.Start(channel.IO(conn, conn))
+	return CAS{
+		roots: rootKV,
+		files: fileCAS,
+		fsync: fileKV,
+		s:     bs,
+	}, nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
@@ -305,7 +327,7 @@ func OpenPath(ctx context.Context, s CAS, path string) (*PathInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		rf, err := rp.File(ctx, s)
+		rf, err := rp.File(ctx, s.Files())
 		if err != nil {
 			return nil, err
 		}
@@ -318,7 +340,7 @@ func OpenPath(ctx context.Context, s CAS, path string) (*PathInfo, error) {
 	} else if fk, err := ParseKey(strings.TrimPrefix(first, "@")); err != nil {
 		return nil, err
 
-	} else if fp, err := file.Open(ctx, s, fk); err != nil {
+	} else if fp, err := file.Open(ctx, s.Files(), fk); err != nil {
 		return nil, err
 
 	} else {
@@ -358,51 +380,30 @@ func SplitPath(s string) (first, rest string) {
 	return pre, path.Clean(post)
 }
 
-// CAS is a wrapper around a blob.CAS that adds methods to expose the root and
+// CAS is a wrapper around a store that adds methods to expose the root and
 // data buckets.
-//
-// Tools using this package partition the keyspace into two buckets. The "data"
-// bucket comprises all content-addressed keys; the "roots" bucket is for all
-// other (non-content-addressed) keys. This is mapped onto the underlying store
-// by appending the suffix "." (Unicode 46) to data keys, and "@" (Unicode 64)
-// to root keys.
-//
-// The methods of the CAS access the data keyspace by default; call Roots to
-// derive a view of the root keyspace.
 type CAS struct {
-	affixed.CAS
+	roots blob.KV
+	files blob.CAS
+	fsync blob.KV
+
+	s blob.StoreCloser
 }
 
-// SyncKeys implements the extension method of blob.SyncKeyer.
-func (c CAS) SyncKeys(ctx context.Context, keys []string) ([]string, error) {
-	// By construction, the base store will always satisfy this.
-	sk := c.CAS.Base().(blob.SyncKeyer)
-	wrapped := make([]string, len(keys))
-	for i, key := range keys {
-		wrapped[i] = c.CAS.WrapKey(key)
-	}
-	got, err := sk.SyncKeys(ctx, wrapped)
-	if err != nil {
-		return nil, err
-	}
-	for i, key := range got {
-		got[i] = c.CAS.UnwrapKey(key)
-	}
-	return got, nil
-}
+// Files returns the files bucket of the underlying storage.
+func (c CAS) Files() blob.CAS { return c.files }
 
-func newCAS(bs blob.CAS) CAS {
-	return CAS{CAS: affixed.NewCAS(bs).WithSuffix(dataBucketSuffix)}
-}
+// Roots returns the roots bucket of the underlying storage.
+func (c CAS) Roots() blob.KV { return c.roots }
 
-const (
-	dataBucketSuffix = "."
-	rootBucketSuffix = "@"
-	rootKeyTag       = "\x00\x00"
-)
+// Sync returns a sync view of the files bucket.
+func (c CAS) Sync() blob.KV { return c.fsync }
 
-// Roots returns the root view of c.
-func (c CAS) Roots() blob.CAS { return CAS{CAS: c.CAS.Derive(rootKeyTag, rootBucketSuffix)} }
+// Store returns the underlying store for c.
+func (c CAS) Store() blob.Store { return c.s }
+
+// Close closes the store attached to c.
+func (c CAS) Close(ctx context.Context) error { return c.s.Close(ctx) }
 
 // LoadIndex loads the contents of an index blob.
 func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {
