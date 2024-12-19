@@ -145,6 +145,8 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (CAS, e
 	bs := chirpstore.NewStore(peer, &chirpstore.StoreOptions{
 		MethodPrefix: spec.Prefix,
 	})
+	peer.Start(channel.IO(conn, conn))
+
 	rootKV, err := bs.KV(ctx, "root")
 	if err != nil {
 		conn.Close()
@@ -160,7 +162,6 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (CAS, e
 		conn.Close()
 		return CAS{}, fmt.Errorf("open file keyspace: %w", err)
 	}
-	peer.Start(channel.IO(conn, conn))
 	return CAS{
 		roots: rootKV,
 		files: fileCAS,

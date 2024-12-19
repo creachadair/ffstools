@@ -19,11 +19,9 @@ import (
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/hmac"
 	"errors"
 	"expvar"
 	"fmt"
-	"hash"
 	"log"
 	"net"
 	"os"
@@ -46,7 +44,6 @@ import (
 	"github.com/creachadair/keyfile"
 	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
-	"golang.org/x/crypto/sha3"
 )
 
 type closer = func()
@@ -54,7 +51,7 @@ type closer = func()
 type startConfig struct {
 	Address string
 	Spec    string
-	Store   blob.CAS
+	Store   blob.StoreCloser
 	Prefix  string
 	Buffer  blob.KV
 }
@@ -74,7 +71,9 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}
 	log.Printf("[chirp] Service: %q", opts.Address)
 
-	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOptions{Prefix: opts.Prefix})
+	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOptions{
+		Prefix: opts.Prefix,
+	})
 	mx := newServerMetrics(ctx, opts)
 	loop := taskgroup.Go(func() error {
 		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
@@ -93,76 +92,61 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}, loop, nil
 }
 
-func openStore(ctx context.Context, storeSpec string) (cas blob.CAS, buf blob.KV, oerr error) {
-	defer func() {
-		if x := recover(); x != nil {
-			panic(x)
-		}
-		if buf != nil {
-			cas = wbstore.New(ctx, cas, buf)
-		}
-		if flags.CacheSize > 0 {
-			cas = cachestore.NewCAS(cas, flags.CacheSize<<20)
-		}
-	}()
-
+func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr error) {
 	bs, err := registry.Stores.Open(ctx, storeSpec)
 	if err != nil {
-		return nil, nil, fmt.Errorf("open store: %w", err)
+		return nil, fmt.Errorf("open store: %w", err)
 	}
 	defer closeOnError(bs, &oerr)
 
-	if flags.ReadOnly {
-		bs = roStore{bs}
+	if flags.CacheSize > 0 {
+		bs = cachestore.New(bs, flags.CacheSize<<20)
 	}
-
-	if flags.BufferDB != "" {
-		buf, err = registry.Stores.Open(ctx, flags.BufferDB)
+	if flags.KeyFile != "" {
+		key, err := getEncryptionKey(flags.KeyFile)
 		if err != nil {
-			return nil, nil, fmt.Errorf("open buffer: %w", err)
+			return nil, fmt.Errorf("get encryption key: %w", err)
 		}
-		defer closeOnError(buf, &oerr)
+		var aead cipher.AEAD
+		switch strings.ToLower(flags.Cipher) {
+		case "aes", "gcm", "aes256-gcm":
+			c, err := aes.NewCipher(key)
+			if err != nil {
+				return nil, fmt.Errorf("create cipher: %w", err)
+			}
+			aead, err = cipher.NewGCM(c)
+			if err != nil {
+				return nil, err
+			}
+		case "chacha", "chacha20-poly1305":
+			aead, err = chacha20poly1305.NewX(key)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			return nil, fmt.Errorf("unknown cipher %q", flags.Cipher)
+		}
+		bs = encoded.New(bs, encrypted.New(aead, nil))
 	}
 	if flags.Compress {
 		bs = encoded.New(bs, zstdc.New())
 	}
-	if flags.KeyFile == "" {
-		if flags.SignKeys {
-			log.Print("WARNING: Ignoring --sign-keys because --key is unset")
-		}
-		return blob.NewCAS(bs, sha3.New256), buf, nil
+	if flags.ReadOnly {
+		bs = roStore{bs}
 	}
-
-	key, err := getEncryptionKey(flags.KeyFile)
-	if err != nil {
-		return nil, nil, fmt.Errorf("get encryption key: %w", err)
-	}
-	var aead cipher.AEAD
-	switch strings.ToLower(flags.Cipher) {
-	case "aes", "gcm", "aes256-gcm":
-		c, err := aes.NewCipher(key)
+	if flags.BufferDB != "" {
+		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
 		if err != nil {
-			return nil, nil, fmt.Errorf("create cipher: %w", err)
+			return nil, fmt.Errorf("open buffer: %w", berr)
 		}
-		aead, err = cipher.NewGCM(c)
+		defer closeOnError(bdb, &oerr)
+		buf, err := bdb.KV(ctx, "")
 		if err != nil {
-			return nil, nil, err
+			return nil, fmt.Errorf("buffer keyspace: %w", err)
 		}
-	case "chacha", "chacha20-poly1305":
-		aead, err = chacha20poly1305.NewX(key)
-		if err != nil {
-			return nil, nil, err
-		}
-	default:
-		return nil, nil, fmt.Errorf("unknown cipher %q", flags.Cipher)
+		bs = wbstore.New(ctx, bs, buf)
 	}
-
-	hcons := sha3.New256
-	if flags.SignKeys {
-		hcons = func() hash.Hash { return hmac.New(sha3.New256, key) }
-	}
-	bs = encoded.New(bs, encrypted.New(aead, nil))
-	return blob.NewCAS(bs, hcons), buf, nil
+	return bs, nil
 }
 
 func expvarString(s string) *expvar.String { v := new(expvar.String); v.Set(s); return v }
@@ -182,7 +166,6 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	mx.Set("encrypted", expvarBool(flags.KeyFile != ""))
 	if flags.KeyFile != "" {
 		mx.Set("keyfile", expvarString(flags.KeyFile))
-		mx.Set("signKeys", expvarBool(flags.SignKeys))
 	}
 	mx.Set("compressed", expvarBool(flags.Compress))
 	mx.Set("cache_size", expvarInt(flags.CacheSize))
@@ -212,13 +195,46 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 }
 
 type roStore struct {
-	blob.KV
+	blob.StoreCloser
+}
+
+func (r roStore) KV(ctx context.Context, name string) (blob.KV, error) {
+	kv, err := r.StoreCloser.KV(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return roKV{kv}, nil
+}
+
+func (r roStore) CAS(ctx context.Context, name string) (blob.CAS, error) {
+	cas, err := r.StoreCloser.CAS(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return roCAS{cas}, nil
+}
+
+func (r roStore) Sub(ctx context.Context, name string) (blob.Store, error) {
+	sub, err := r.StoreCloser.Sub(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return roStore{nopCloser{sub}}, nil
 }
 
 var errReadOnlyStore = errors.New("storage is read-only")
 
-func (roStore) Put(context.Context, blob.PutOptions) error { return errReadOnlyStore }
-func (roStore) Delete(context.Context, string) error       { return errReadOnlyStore }
+type nopCloser struct{ blob.Store }
+
+func (nopCloser) Close(context.Context) error { return nil }
+
+type roKV struct{ blob.KV }
+type roCAS struct{ blob.CAS }
+
+func (roKV) Put(context.Context, blob.PutOptions) error      { return errReadOnlyStore }
+func (roCAS) CASPut(context.Context, []byte) (string, error) { return "", errReadOnlyStore }
+func (roKV) Delete(context.Context, string) error            { return errReadOnlyStore }
+func (roCAS) Delete(context.Context, string) error           { return errReadOnlyStore }
 
 func getEncryptionKey(keyFile string) ([]byte, error) {
 	data, err := os.ReadFile(keyFile)
@@ -242,7 +258,7 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 	return kf.Get(pp)
 }
 
-func closeOnError(c interface{ Close(context.Context) error }, errp *error) func() {
+func closeOnError(c blob.Closer, errp *error) func() {
 	return func() {
 		if *errp != nil {
 			c.Close(context.Background())

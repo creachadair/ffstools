@@ -28,6 +28,7 @@ import (
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/flax"
@@ -39,7 +40,6 @@ var flags struct {
 	ListenAddr string `flag:"listen,Service address (required)"`
 	KeyFile    string `flag:"key,Encryption key file or salt (if empty, do not encrypt)"`
 	Cipher     string `flag:"cipher,default=chacha,Encryption algorithm"`
-	SignKeys   bool   `flag:"sign-keys,Sign content addresses (requires --key)"`
 	BufferDB   string `flag:"buffer,Write-behind buffer database"`
 	CacheSize  int    `flag:"cache,Memory cache size in MiB (0 means no cache)"`
 	Compress   bool   `flag:"compress,Enable zstd compression of blob data"`
@@ -106,7 +106,7 @@ func runStorage(env *command.Env) error {
 		return err
 	}
 
-	bs, buf, err := openStore(env.Context(), rs.Spec)
+	bs, err := openStore(env.Context(), rs.Spec)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,9 @@ func runStorage(env *command.Env) error {
 		Spec:    rs.Spec,
 		Store:   bs,
 		Prefix:  rs.Prefix,
-		Buffer:  buf,
+	}
+	if wb, ok := bs.(wbstore.Store); ok {
+		config.Buffer = wb.Buffer()
 	}
 
 	sctx, cancel := signal.NotifyContext(env.Context(), syscall.SIGINT, syscall.SIGTERM)
