@@ -221,7 +221,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fk = tf.File.Key()
 		case "put":
-			tf, terr := putlib.Default.PutPath(env.Context(), s, rest[0])
+			tf, terr := putlib.Default.PutPath(env.Context(), s.Blobs(), rest[0])
 			if terr != nil {
 				return terr
 			}
@@ -231,7 +231,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fmt.Printf("put: %s\n", config.FormatKey(fk))
 		case "empty":
-			fk, err = file.New(s, &file.NewOptions{
+			fk, err = file.New(s.Blobs(), &file.NewOptions{
 				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
 				PersistStat: true,
 			}).Flush(env.Context())
@@ -240,7 +240,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		}
 		if err != nil {
 			return err
-		} else if _, err := file.Open(env.Context(), s, fk); err != nil {
+		} else if _, err := file.Open(env.Context(), s.Blobs(), fk); err != nil {
 			return err
 		}
 
@@ -314,7 +314,7 @@ func runEditFile(env *command.Env) error {
 	}
 	if err != nil {
 		return err
-	} else if _, err := file.Open(na.Context, na.Store, key); err != nil {
+	} else if _, err := file.Open(na.Context, na.Store.Blobs(), key); err != nil {
 		return err
 	}
 

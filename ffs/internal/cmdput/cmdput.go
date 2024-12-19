@@ -75,7 +75,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 			if putConfig.Verbose {
 				log.Printf("begin put: %s", path)
 			}
-			f, err := putConfig.PutPath(env.Context(), s, path)
+			f, err := putConfig.PutPath(env.Context(), s.Blobs(), path)
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 		}
 
 		if putFlags.Target != "" {
-			tf, err := file.Open(env.Context(), s, keys[0])
+			tf, err := file.Open(env.Context(), s.Blobs(), keys[0])
 			if err != nil {
 				return err
 			}

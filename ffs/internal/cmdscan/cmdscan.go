@@ -42,7 +42,7 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(src config.CAS) error {
 		// Find all the objects reachable from the specified starting points.
-		worklist := scanlib.NewScanner(src)
+		worklist := scanlib.NewScanner(src.Blobs())
 		for _, elt := range sourceKeys {
 			of, err := config.OpenPath(env.Context(), src, elt)
 			if err != nil {
