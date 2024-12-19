@@ -10,6 +10,6 @@ import (
 )
 
 func TestStore(t *testing.T) {
-	m := encoded.New(memstore.New(), zstdc.New())
-	storetest.Run(t, m)
+	m := encoded.New(memstore.New(nil), zstdc.New())
+	storetest.Run(t, storetest.NopCloser(m))
 }
