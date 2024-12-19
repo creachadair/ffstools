@@ -20,7 +20,6 @@ require (
 	github.com/creachadair/leveldbstore v0.0.0-20241215021545-8798b5e61732
 	github.com/creachadair/mds v0.22.0
 	github.com/creachadair/pebblestore v0.0.0-20241215021757-c76b0a88bdda
-	github.com/creachadair/pogrebstore v0.0.0-20241215021938-ac1a0a51d39d
 	github.com/creachadair/rosedbstore v0.0.0-20241215022003-26d683d097ea
 	github.com/creachadair/s3store v0.0.0-20241215022045-cbaa75319887
 	github.com/creachadair/sqlitestore v0.0.0-20241215022117-270e2adb85d4
@@ -49,7 +48,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.49.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.49.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
-	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.6 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.7 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.28.6 // indirect

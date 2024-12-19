@@ -102,7 +102,6 @@ The following storage backends can be enabled by building with the specified tag
 | gcs      | GCS         | [docs](https://godoc.org/cloud.google.com/go/storage)             | No local storage; requires GCP credentials |
 | leveldb  | LevelDB     | [docs](https://godoc.org/github.com/syndtr/goleveldb/leveldb)     | LSM, directory, not fast                   |
 | pebble   | PebbleDB    | [docs](https://godoc.org/github.com/cockroachdb/pebble)           | LSM, directory; RocksDB layout             |
-| pogreb   | Pogreb      | [docs](https://godoc.org/github.com/akrylysov/pogreb)             | LSM, directory, slow writes                |
 | rosedb   | RoseDB      | [docs](https://godoc.org/github.com/rosedblabs/rosedb/v2)         | LSM, multiple files, Bitcask layout        |
 | s3       | Amazon S3   | [docs](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3) | No local storage; requires AWS credentials |
 | sqlite   | SQLite3     | [docs](https://godoc.org/modernc.org/sqlite)                      | SQL, single-file                           |
