@@ -26,19 +26,22 @@ import (
 	"github.com/creachadair/ffs/blob"
 )
 
-// An Opener opens a [blob.KV] instance associated with the given address.  The
-// address passed to the Opener has its dispatch tag removed.  The format of
-// the address is opaque to the registry, and the opener is responsible for
+// An Opener opens a [blob.Store] instance associated with the given address.
+// The address passed to the Opener has its dispatch tag removed.  The format
+// of the address is opaque to the registry, and the opener is responsible for
 // checking its validity.
-type Opener func(ctx context.Context, addr string) (blob.KV, error)
+type Opener func(ctx context.Context, addr string) (blob.StoreCloser, error)
 
 // A Registry maintains a mapping from dispatch tags to Opener values.
 type Registry map[string]Opener
 
 // Open opens a [blob.KV] for the specified address of the form "tag" or
 // "tag:value".  If the address does not have this form, or if the tag does not
-// correspond to any known implementation, Open reports ErrInvalidAddress.
-func (r Registry) Open(ctx context.Context, addr string) (blob.KV, error) {
+// correspond to any known implementation, Open reports [ErrInvalidAddress].
+//
+// On success, the caller is responsible for closing the store when it is no
+// longer in use.
+func (r Registry) Open(ctx context.Context, addr string) (blob.StoreCloser, error) {
 	tag, target := addr, ""
 	if i := strings.Index(addr, ":"); i > 0 {
 		tag, target = addr[:i], addr[i+1:]
