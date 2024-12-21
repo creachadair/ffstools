@@ -61,7 +61,7 @@ store without roots.
 
 	Run: command.Adapt(func(env *command.Env) error {
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.Store) error {
 			var keys []string
 			if err := s.Roots().List(env.Context(), "", func(key string) error {
 				keys = append(keys, key)

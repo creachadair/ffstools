@@ -73,8 +73,8 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src config.CAS) error {
-		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt config.CAS) error {
+	return cfg.WithStore(env.Context(), func(src config.Store) error {
+		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt config.Store) error {
 			fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
 
 			// Find all the objects reachable from the specified starting points.

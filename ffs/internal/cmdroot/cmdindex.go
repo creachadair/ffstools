@@ -37,7 +37,7 @@ func runIndex(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		n, err := s.Files().Len(env.Context())
 		if err != nil {
 			return err

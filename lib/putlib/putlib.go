@@ -263,7 +263,7 @@ func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
 //
 // If path has only a root-key, the base file of that root is replaced.
 // If path has only a file-keyi, it is an error.
-func SetPath(ctx context.Context, s config.CAS, path string, tf *file.File) (string, error) {
+func SetPath(ctx context.Context, s config.Store, path string, tf *file.File) (string, error) {
 	obase, orest := config.SplitPath(path)
 	if orest == "." {
 		orest = "" // setting root

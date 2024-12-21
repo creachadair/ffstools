@@ -141,7 +141,7 @@ func runList(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -207,7 +207,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		var fk string
 		var err error
 
@@ -277,7 +277,7 @@ func runDelete(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		roots := s.Roots()
 		for _, key := range env.Args {
 			if err := roots.Delete(env.Context(), key); err != nil {
@@ -330,7 +330,7 @@ type rootArgs struct {
 	Key     string
 	Args    []string
 	Root    *root.Root
-	Store   config.CAS
+	Store   config.Store
 	Close   func()
 }
 

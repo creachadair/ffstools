@@ -31,7 +31,7 @@ var Command = &command.C{
 
 	Run: command.Adapt(func(env *command.Env) error {
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.Store) error {
 			cs, ok := s.Roots().(chirpstore.KV)
 			if !ok {
 				return errors.New("store does not support the status command")

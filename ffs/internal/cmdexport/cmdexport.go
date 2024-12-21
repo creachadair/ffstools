@@ -71,7 +71,7 @@ func runExport(env *command.Env, originPath string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		of, err := config.OpenPath(env.Context(), s, originPath)
 		if err != nil {
 			return err

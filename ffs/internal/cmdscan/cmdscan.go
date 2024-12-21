@@ -40,7 +40,7 @@ var Command = &command.C{
 
 func runScan(env *command.Env, sourceKeys ...string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src config.CAS) error {
+	return cfg.WithStore(env.Context(), func(src config.Store) error {
 		// Find all the objects reachable from the specified starting points.
 		worklist := scanlib.NewScanner(src.Files())
 		for _, elt := range sourceKeys {
