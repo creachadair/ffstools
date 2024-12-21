@@ -31,7 +31,7 @@ func getCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <key>")
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		for _, arg := range env.Args {
 			key, err := config.ParseKey(arg)
 			if err != nil {
@@ -51,7 +51,7 @@ func sizeCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <key>")
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		for _, arg := range env.Args {
 			key, err := config.ParseKey(arg)
 			if err != nil {
@@ -71,7 +71,7 @@ func delCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <key>")
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		missingOK := blobFlags.MissingOK
 		dctx, cancel := context.WithCancel(env.Context())
 		defer cancel()
@@ -112,7 +112,7 @@ func listCmd(env *command.Env) error {
 	if err != nil {
 		return err
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		var listed int
 		return bs.List(env.Context(), start, func(key string) error {
 			if !strings.HasPrefix(key, pfx) {
@@ -133,7 +133,7 @@ func listCmd(env *command.Env) error {
 }
 
 func lenCmd(env *command.Env) error {
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		n, err := bs.Len(env.Context())
 		if err != nil {
 			return err
@@ -143,38 +143,8 @@ func lenCmd(env *command.Env) error {
 	})
 }
 
-func casPutCmd(env *command.Env) (err error) {
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
-		data, err := readData(env.Context(), "put", env.Args)
-		if err != nil {
-			return err
-		}
-		key, err := bs.CASPut(env.Context(), blob.CASPutOptions{Data: data})
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s\n", config.FormatKey(key))
-		return nil
-	})
-}
-
-func casKeyCmd(env *command.Env) error {
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
-		data, err := readData(env.Context(), "key", env.Args)
-		if err != nil {
-			return err
-		}
-		key, err := bs.CASKey(env.Context(), blob.CASPutOptions{Data: data})
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s\n", config.FormatKey(key))
-		return nil
-	})
-}
-
 func copyCmd(env *command.Env, srcArg, dstArg string) error {
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		srcKey, err := config.ParseKey(srcArg)
 		if err != nil {
 			return err
@@ -203,7 +173,7 @@ func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
 	if err != nil {
 		return err
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		data, err := readData(env.Context(), "put", rest)
 		if err != nil {
 			return err
@@ -226,7 +196,7 @@ func syncKeysCmd(env *command.Env, keys []string) error {
 		}
 		parsed = append(parsed, p)
 	}
-	return withStoreFromEnv(env, func(bs blob.CAS) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
 		need, err := bs.(blob.SyncKeyer).SyncKeys(env.Context(), parsed)
 		if err != nil {
 			return err
@@ -249,14 +219,14 @@ func readData(ctx context.Context, cmd string, args []string) (data []byte, err 
 	return
 }
 
-func withStoreFromEnv(env *command.Env, f func(blob.CAS) error) error {
+func withStoreFromEnv(env *command.Env, f func(blob.KV) error) error {
 	bs, err := env.Config.(*config.Settings).OpenStore(env.Context())
 	if err != nil {
 		return err
 	}
-	raw, err := bs.Store().Keyspace(env.Context(), blobFlags.Bucket)
+	kv, err := bs.Store().KV(env.Context(), blobFlags.KV)
 	if err != nil {
-		return fmt.Errorf("open raw store: %w", err)
+		return fmt.Errorf("open kv %q: %w", blobFlags.KV, err)
 	}
-	return f(raw.(blob.CAS))
+	return f(kv)
 }
