@@ -78,7 +78,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
 
 			// Find all the objects reachable from the specified starting points.
-			worklist := scanlib.NewScanner(src.Blobs())
+			worklist := scanlib.NewScanner(src.Files())
 			var indices []*index.Index
 			for _, elt := range sourceKeys {
 				of, err := config.OpenPath(env.Context(), src, elt)
@@ -89,7 +89,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
 					if of.Root.IndexKey != "" && !syncFlags.NoIndex {
-						idx, err := config.LoadIndex(env.Context(), src.Blobs(), of.Root.IndexKey)
+						idx, err := config.LoadIndex(env.Context(), src.Files(), of.Root.IndexKey)
 						if err != nil {
 							return err
 						}
@@ -113,7 +113,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			// If we loaded cached indices, fill the worklist with matching keys.
 			if len(indices) != 0 {
 				var numAdded int
-				if err := src.Blobs().List(env.Context(), "", func(key string) error {
+				if err := src.Files().List(env.Context(), "", func(key string) error {
 					for _, idx := range indices {
 						if idx.Has(key) {
 							worklist.Blob(key)
@@ -139,7 +139,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			var nspan, nmiss int
 			for span := range worklist.Chunks(512) {
 				nspan++
-				need, err := tgt.Sync().SyncKeys(env.Context(), span)
+				need, err := blob.SyncKeys(env.Context(), tgt.Files(), span)
 				if err != nil {
 					return err
 				}
@@ -175,9 +175,9 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 						return copyBlob(ctx, src.Roots(), tgt.Roots(), key, true)
 					case 'F':
 						debug("- copying file %s", config.FormatKey(key))
-						return copyBlob(ctx, src.Blobs(), tgt.Blobs(), key, false)
+						return copyBlob(ctx, src.Sync(), tgt.Sync(), key, false)
 					case '-':
-						return copyBlob(ctx, src.Blobs(), tgt.Blobs(), key, false)
+						return copyBlob(ctx, src.Sync(), tgt.Sync(), key, false)
 					default:
 						panic("unknown tag " + string(tag))
 					}
@@ -191,7 +191,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 	})
 }
 
-func copyBlob(ctx context.Context, src, tgt blob.CAS, key string, replace bool) error {
+func copyBlob(ctx context.Context, src, tgt blob.KV, key string, replace bool) error {
 	if key == "" {
 		return nil
 	}
