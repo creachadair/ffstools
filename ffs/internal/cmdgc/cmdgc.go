@@ -80,7 +80,7 @@ store without roots.
 `)
 			}
 
-			n, err := s.Blobs().Len(env.Context())
+			n, err := s.Files().Len(env.Context())
 			if err != nil {
 				return err
 			} else if n == 0 {
@@ -102,7 +102,7 @@ store without roots.
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
-					rpi, err := config.LoadIndex(env.Context(), s.Blobs(), rp.IndexKey)
+					rpi, err := config.LoadIndex(env.Context(), s.Files(), rp.IndexKey)
 					if err != nil {
 						return err
 					}
@@ -119,7 +119,7 @@ store without roots.
 
 				// Otherwise, we need to compute the reachable set.
 				// TODO(creachadair): Maybe cache the results here too.
-				rf, err := rp.File(env.Context(), s.Blobs())
+				rf, err := rp.File(env.Context(), s.Files())
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", rp.FileKey, err)
 				}
@@ -168,7 +168,7 @@ store without roots.
 			for _, p := range shuffledSeeds() {
 				pfx := string([]byte{p})
 				run(func() error {
-					return s.Blobs().List(ctx, pfx, func(key string) error {
+					return s.Files().List(ctx, pfx, func(key string) error {
 						if !strings.HasPrefix(key, pfx) {
 							return blob.ErrStopListing
 						}
@@ -180,7 +180,7 @@ store without roots.
 							}
 						}
 						pb.SetMeta(numDrop.Add(1))
-						if err := s.Blobs().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
+						if err := s.Files().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
 						}
 						return nil
