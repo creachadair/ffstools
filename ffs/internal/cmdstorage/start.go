@@ -136,7 +136,7 @@ func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr 
 	}
 	if flags.BufferDB != "" {
 		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
-		if err != nil {
+		if berr != nil {
 			return nil, fmt.Errorf("open buffer: %w", berr)
 		}
 		defer closeOnError(bdb, &oerr)
