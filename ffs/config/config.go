@@ -391,8 +391,6 @@ type Store struct {
 	s blob.StoreCloser
 }
 
-type CAS = Store // Temporary migration alias for ffuse
-
 // Files returns the files bucket of the underlying storage.
 func (s Store) Files() blob.CAS { return s.files }
 
