@@ -40,10 +40,10 @@ import (
 )
 
 var (
-	configPath  = config.Path()
-	storeAddr   string
-	storePrefix string
-	debugLog    bool
+	configPath    = config.Path()
+	storeAddr     string
+	servicePrefix string
+	debugLog      bool
 )
 
 func main() {
@@ -56,7 +56,7 @@ help [<command>]`,
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
 			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
-			fs.StringVar(&storePrefix, "prefix", storePrefix, "Store service prefix (overrides config and environment)")
+			fs.StringVar(&servicePrefix, "service-prefix", servicePrefix, "Store service method prefix (overrides config and environment)")
 			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
 		},
 
@@ -70,8 +70,8 @@ help [<command>]`,
 			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
 				cfg.DefaultStore = bs
 			}
-			if storePrefix != "" {
-				cfg.DefaultPrefix = storePrefix
+			if servicePrefix != "" {
+				cfg.DefaultPrefix = servicePrefix
 			} else if sp := os.Getenv("FFS_PREFIX"); sp != "" {
 				cfg.DefaultPrefix = sp
 			}
