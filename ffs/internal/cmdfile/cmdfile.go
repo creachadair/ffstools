@@ -179,7 +179,7 @@ func runShow(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		for _, arg := range env.Args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
@@ -217,7 +217,7 @@ func runList(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -381,7 +381,7 @@ func nameOrID(name string, id int) string {
 
 func runRead(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		of, err := config.OpenPath(env.Context(), s, originPath)
 		if err != nil {
 			return err
@@ -394,7 +394,7 @@ func runRead(env *command.Env, originPath string) error {
 
 func runSet(env *command.Env, originPath, target string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		tf, err := config.OpenPath(env.Context(), s, target)
 		if err != nil {
 			return err
@@ -414,7 +414,7 @@ func runRemove(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		for _, arg := range env.Args {
 			base, rest := config.SplitPath(arg)
 			if rest == "" || rest == "." {
@@ -447,7 +447,7 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		tf, err := config.OpenPath(env.Context(), s, path)
 		if err != nil {
 			return err
@@ -496,7 +496,7 @@ func runXAttr(env *command.Env, fileSpec, op string, args ...string) error {
 		return err
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		of, err := config.OpenPath(env.Context(), s, fileSpec)
 		if err != nil {
 			return err
@@ -566,7 +566,7 @@ var resolveFlags struct {
 func runResolve(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
 	if !resolveFlags.Path {
-		return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.Store) error {
 			rf, err := config.OpenPath(env.Context(), s, env.Args[0])
 			if err != nil {
 				return err
@@ -575,7 +575,7 @@ func runResolve(env *command.Env, originPath string) error {
 			return nil
 		})
 	}
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		base, rest := config.SplitPath(originPath)
 		rf, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
 		if err != nil {

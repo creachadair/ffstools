@@ -24,7 +24,7 @@ import (
 )
 
 var blobFlags struct {
-	Bucket    string `flag:"bucket,Filter keys to this bucket label"`            // global
+	KV        string `flag:"kv,Filter keys to this keyspace label"`              // global
 	Replace   bool   `flag:"replace,Replace an existing key"`                    // put
 	MissingOK bool   `flag:"missing-ok,Do not report an error for missing keys"` // delete
 }
@@ -55,7 +55,7 @@ address of the storage server. Otherwise, --store must be set to either
 the address or an @tag from the configuration file.
 `,
 
-	SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("bucket").Bind(fs) },
+	SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("kv").Bind(fs) },
 
 	Commands: []*command.C{
 		{
@@ -97,17 +97,6 @@ the address or an @tag from the configuration file.
 			Name: "len",
 			Help: "Print the number of stored keys.",
 			Run:  command.Adapt(lenCmd),
-		},
-		{
-			Name: "cas-key",
-			Help: "Compute the key for a blob without writing it.",
-			Run:  command.Adapt(casKeyCmd),
-		},
-		{
-			Name:  "cas-put",
-			Usage: "cas-put",
-			Help:  "Write a content-addressed blob to the store from stdin.",
-			Run:   command.Adapt(casPutCmd),
 		},
 		{
 			Name:     "copy",

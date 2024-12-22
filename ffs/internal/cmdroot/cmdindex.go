@@ -37,8 +37,8 @@ func runIndex(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
-		n, err := s.Base().Len(env.Context())
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
+		n, err := s.Files().Len(env.Context())
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func runIndex(env *command.Env) error {
 				fmt.Fprintf(env, "Root %q is already indexed\n", key)
 				continue
 			}
-			fp, err := rp.File(env.Context(), s)
+			fp, err := rp.File(env.Context(), s.Files())
 			if err != nil {
 				return err
 			}
@@ -77,7 +77,7 @@ func runIndex(env *command.Env) error {
 			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 				idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 
-			rp.IndexKey, err = wiretype.Save(env.Context(), s, &wiretype.Object{
+			rp.IndexKey, err = wiretype.Save(env.Context(), s.Files(), &wiretype.Object{
 				Value: &wiretype.Object_Index{Index: index.Encode(idx)},
 			})
 			if err != nil {

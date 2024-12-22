@@ -66,7 +66,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		if err := checkTarget(env, s, putFlags.Target); err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 			if putConfig.Verbose {
 				log.Printf("begin put: %s", path)
 			}
-			f, err := putConfig.PutPath(env.Context(), s, path)
+			f, err := putConfig.PutPath(env.Context(), s.Files(), path)
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 		}
 
 		if putFlags.Target != "" {
-			tf, err := file.Open(env.Context(), s, keys[0])
+			tf, err := file.Open(env.Context(), s.Files(), keys[0])
 			if err != nil {
 				return err
 			}
@@ -107,7 +107,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 	})
 }
 
-func checkTarget(env *command.Env, s config.CAS, target string) error {
+func checkTarget(env *command.Env, s config.Store, target string) error {
 	if target != "" {
 		root, _ := config.SplitPath(target)
 		_, err := config.OpenPath(env.Context(), s, root)

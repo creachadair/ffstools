@@ -63,7 +63,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			return env.Usagef("extra arguments after command: %q", cmdArgs)
 		}
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.CAS) error {
+		return cfg.WithStore(env.Context(), func(s config.Store) error {
 			svc.MountPath = mountPath
 			svc.RootKey = rootKey
 			svc.Store = s

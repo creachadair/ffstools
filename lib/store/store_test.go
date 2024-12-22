@@ -26,11 +26,11 @@ import (
 
 var errBadAddress = errors.New("bad memstore address")
 
-func newMemStore(_ context.Context, addr string) (blob.KV, error) {
+func newMemStore(_ context.Context, addr string) (blob.StoreCloser, error) {
 	if addr != "" {
 		return nil, errBadAddress
 	}
-	return memstore.New(), nil
+	return memstore.New(nil), nil
 }
 
 func TestRegistryOpen(t *testing.T) {

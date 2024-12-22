@@ -141,7 +141,7 @@ func runList(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -207,7 +207,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		var fk string
 		var err error
 
@@ -221,7 +221,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fk = tf.File.Key()
 		case "put":
-			tf, terr := putlib.Default.PutPath(env.Context(), s, rest[0])
+			tf, terr := putlib.Default.PutPath(env.Context(), s.Files(), rest[0])
 			if terr != nil {
 				return terr
 			}
@@ -231,7 +231,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fmt.Printf("put: %s\n", config.FormatKey(fk))
 		case "empty":
-			fk, err = file.New(s, &file.NewOptions{
+			fk, err = file.New(s.Files(), &file.NewOptions{
 				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
 				PersistStat: true,
 			}).Flush(env.Context())
@@ -240,7 +240,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		}
 		if err != nil {
 			return err
-		} else if _, err := file.Open(env.Context(), s, fk); err != nil {
+		} else if _, err := file.Open(env.Context(), s.Files(), fk); err != nil {
 			return err
 		}
 
@@ -277,7 +277,7 @@ func runDelete(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.CAS) error {
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
 		roots := s.Roots()
 		for _, key := range env.Args {
 			if err := roots.Delete(env.Context(), key); err != nil {
@@ -314,7 +314,7 @@ func runEditFile(env *command.Env) error {
 	}
 	if err != nil {
 		return err
-	} else if _, err := file.Open(na.Context, na.Store, key); err != nil {
+	} else if _, err := file.Open(na.Context, na.Store.Files(), key); err != nil {
 		return err
 	}
 
@@ -330,7 +330,7 @@ type rootArgs struct {
 	Key     string
 	Args    []string
 	Root    *root.Root
-	Store   config.CAS
+	Store   config.Store
 	Close   func()
 }
 
