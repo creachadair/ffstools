@@ -60,7 +60,10 @@ type Settings struct {
 	DefaultStore string `json:"defaultStore" yaml:"default-store"`
 
 	// The default method name prefix to use for the service.
-	DefaultPrefix string `json:"defaultPrefix" yaml:"default-prefix"`
+	ServicePrefix string `json:"servicePrefix" yaml:"service-prefix"`
+
+	// The substore name to use within the service.
+	Substore string `json:"substore" yaml:"substore"`
 
 	// Enable debug logging for the storage service.
 	EnableDebugLogging bool `json:"enableDebugLogging" yaml:"enable-debug-logging"`
@@ -88,13 +91,13 @@ func (s *Settings) ResolveAddress(addr string) StoreSpec {
 				cp := *st
 				ExpandString(&cp.Address)
 				if cp.Prefix == "" {
-					cp.Prefix = s.DefaultPrefix
+					cp.Prefix = s.ServicePrefix
 				}
 				return cp
 			}
 		}
 	}
-	return StoreSpec{Address: addr, Prefix: s.DefaultPrefix}
+	return StoreSpec{Address: addr, Prefix: s.ServicePrefix}
 }
 
 // ResolveSpec resolves the given store spec against the settings.  If spec is
@@ -108,13 +111,13 @@ func (s *Settings) ResolveSpec(spec string) StoreSpec {
 				cp := *st
 				ExpandString(&cp.Spec)
 				if cp.Prefix == "" {
-					cp.Prefix = s.DefaultPrefix
+					cp.Prefix = s.ServicePrefix
 				}
 				return cp
 			}
 		}
 	}
-	return StoreSpec{Spec: spec, Prefix: s.DefaultPrefix}
+	return StoreSpec{Spec: spec, Prefix: s.ServicePrefix}
 }
 
 // OpenStore connects to the store service address in the configuration.  The
@@ -138,26 +141,33 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 	if err != nil {
 		return Store{}, fmt.Errorf("dialing store: %w", err)
 	}
-	peer := chirp.NewPeer()
+	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
 		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
 	bs := chirpstore.NewStore(peer, &chirpstore.StoreOptions{
 		MethodPrefix: spec.Prefix,
 	})
-	peer.Start(channel.IO(conn, conn))
+	var sub blob.Store = bs
+	if s.Substore != "" {
+		sub, err = bs.Sub(ctx, s.Substore)
+		if err != nil {
+			conn.Close()
+			return Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
+		}
+	}
 
-	rootKV, err := bs.KV(ctx, "root")
+	rootKV, err := sub.KV(ctx, "root")
 	if err != nil {
 		conn.Close()
 		return Store{}, fmt.Errorf("open root keyspace: %w", err)
 	}
-	fileKV, err := bs.KV(ctx, "file")
+	fileKV, err := sub.KV(ctx, "file")
 	if err != nil {
 		conn.Close()
 		return Store{}, fmt.Errorf("open file keyspace: %w", err)
 	}
-	fileCAS, err := bs.CAS(ctx, "file")
+	fileCAS, err := sub.CAS(ctx, "file")
 	if err != nil {
 		conn.Close()
 		return Store{}, fmt.Errorf("open file keyspace: %w", err)
@@ -166,7 +176,8 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 		roots: rootKV,
 		files: fileCAS,
 		fsync: fileKV,
-		s:     bs,
+		s:     sub,
+		c:     bs, // N.B. top-level store, for closing
 	}, nil
 }
 
@@ -388,7 +399,8 @@ type Store struct {
 	files blob.CAS
 	fsync blob.KV
 
-	s blob.StoreCloser
+	s blob.Store
+	c blob.Closer
 }
 
 // Files returns the files bucket of the underlying storage.
@@ -404,7 +416,7 @@ func (s Store) Sync() blob.KV { return s.fsync }
 func (s Store) Store() blob.Store { return s.s }
 
 // Close closes the store attached to c.
-func (s Store) Close(ctx context.Context) error { return s.s.Close(ctx) }
+func (s Store) Close(ctx context.Context) error { return s.c.Close(ctx) }
 
 // LoadIndex loads the contents of an index blob.
 func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {

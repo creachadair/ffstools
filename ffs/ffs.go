@@ -43,6 +43,7 @@ var (
 	configPath    = config.Path()
 	storeAddr     string
 	servicePrefix string
+	substoreName  string
 	debugLog      bool
 )
 
@@ -55,8 +56,9 @@ help [<command>]`,
 
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
-			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (overrides config and environment)")
-			fs.StringVar(&servicePrefix, "service-prefix", servicePrefix, "Store service method prefix (overrides config and environment)")
+			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address")
+			fs.StringVar(&substoreName, "substore", substoreName, "Substore name")
+			fs.StringVar(&servicePrefix, "service-prefix", servicePrefix, "Store service method prefix")
 			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
 		},
 
@@ -71,9 +73,14 @@ help [<command>]`,
 				cfg.DefaultStore = bs
 			}
 			if servicePrefix != "" {
-				cfg.DefaultPrefix = servicePrefix
+				cfg.ServicePrefix = servicePrefix
 			} else if sp := os.Getenv("FFS_PREFIX"); sp != "" {
-				cfg.DefaultPrefix = sp
+				cfg.ServicePrefix = sp
+			}
+			if substoreName != "" {
+				cfg.Substore = substoreName
+			} else if sub := os.Getenv("FFS_SUBSTORE"); sub != "" {
+				cfg.Substore = sub
 			}
 			if debugLog {
 				cfg.EnableDebugLogging = true
@@ -110,6 +117,7 @@ FFS_DEBUG      : If true, enable debug logging (warning: noisy)
 FFS_PASSPHRASE : If set, contains the passphrase for a --key file
 FFS_STORE      : Storage service address (overrides config; overridden by --store)
 FFS_PREFIX     : Storage service method name prefix (overrides config; overridden by --prefix)
+FFS_SUBSTORE   : Substore name to use (overrides config; overridden by --substore)
 `,
 			}}),
 			command.VersionCommand(),
