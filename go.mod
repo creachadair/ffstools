@@ -11,10 +11,10 @@ require (
 	github.com/creachadair/chirp v0.0.0-20241222235553-93ed1110995d
 	github.com/creachadair/chirpstore v0.0.0-20241221205937-91f1cd01dfbc
 	github.com/creachadair/command v0.1.20
-	github.com/creachadair/ffs v0.9.4
+	github.com/creachadair/ffs v0.9.5
 	github.com/creachadair/ffuse v0.0.0-20241222035556-0c48937dd869
 	github.com/creachadair/flax v0.0.4
-	github.com/creachadair/gcsstore v0.0.0-20241221000905-17f4464fa8f0
+	github.com/creachadair/gcsstore v0.0.0-20241223210518-99d83a6a5888
 	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.8.3
 	github.com/creachadair/leveldbstore v0.0.0-20241221000929-597836349cb0
