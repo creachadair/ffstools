@@ -28,7 +28,6 @@ import (
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/flax"
@@ -106,7 +105,7 @@ func runStorage(env *command.Env) error {
 		return err
 	}
 
-	bs, err := openStore(env.Context(), rs.Spec)
+	bs, buf, err := openStore(env.Context(), rs.Spec)
 	if err != nil {
 		return err
 	}
@@ -142,9 +141,7 @@ func runStorage(env *command.Env) error {
 		Spec:    rs.Spec,
 		Store:   bs,
 		Prefix:  rs.Prefix,
-	}
-	if wb, ok := bs.(wbstore.Store); ok {
-		config.Buffer = wb.Buffer()
+		Buffer:  buf,
 	}
 
 	sctx, cancel := signal.NotifyContext(env.Context(), syscall.SIGINT, syscall.SIGTERM)

@@ -92,36 +92,36 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 	}, loop, nil
 }
 
-func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr error) {
+func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv blob.KV, oerr error) {
 	bs, err := registry.Stores.Open(ctx, storeSpec)
 	if err != nil {
-		return nil, fmt.Errorf("open store: %w", err)
+		return nil, nil, fmt.Errorf("open store: %w", err)
 	}
 	defer closeOnError(bs, &oerr)
 
 	if flags.KeyFile != "" {
 		key, err := getEncryptionKey(flags.KeyFile)
 		if err != nil {
-			return nil, fmt.Errorf("get encryption key: %w", err)
+			return nil, nil, fmt.Errorf("get encryption key: %w", err)
 		}
 		var aead cipher.AEAD
 		switch strings.ToLower(flags.Cipher) {
 		case "aes", "gcm", "aes256-gcm":
 			c, err := aes.NewCipher(key)
 			if err != nil {
-				return nil, fmt.Errorf("create cipher: %w", err)
+				return nil, nil, fmt.Errorf("create cipher: %w", err)
 			}
 			aead, err = cipher.NewGCM(c)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		case "chacha", "chacha20-poly1305":
 			aead, err = chacha20poly1305.NewX(key)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		default:
-			return nil, fmt.Errorf("unknown cipher %q", flags.Cipher)
+			return nil, nil, fmt.Errorf("unknown cipher %q", flags.Cipher)
 		}
 		bs = encoded.New(bs, encrypted.New(aead, nil))
 	}
@@ -131,22 +131,23 @@ func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr 
 	if flags.ReadOnly {
 		bs = roStore{bs}
 	}
-	if flags.CacheSize > 0 {
-		bs = cachestore.New(bs, flags.CacheSize<<20)
-	}
 	if flags.BufferDB != "" {
 		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
 		if berr != nil {
-			return nil, fmt.Errorf("open buffer: %w", berr)
+			return nil, nil, fmt.Errorf("open buffer: %w", berr)
 		}
 		defer closeOnError(bdb, &oerr)
 		buf, err := bdb.KV(ctx, "")
 		if err != nil {
-			return nil, fmt.Errorf("buffer keyspace: %w", err)
+			return nil, nil, fmt.Errorf("buffer keyspace: %w", err)
 		}
 		bs = wbstore.New(ctx, bs, buf)
+		bkv = buf
 	}
-	return bs, nil
+	if flags.CacheSize > 0 {
+		bs = cachestore.New(bs, flags.CacheSize<<20)
+	}
+	return
 }
 
 func expvarString(s string) *expvar.String { v := new(expvar.String); v.Set(s); return v }
