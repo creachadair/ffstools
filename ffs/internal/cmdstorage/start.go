@@ -99,9 +99,6 @@ func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr 
 	}
 	defer closeOnError(bs, &oerr)
 
-	if flags.CacheSize > 0 {
-		bs = cachestore.New(bs, flags.CacheSize<<20)
-	}
 	if flags.KeyFile != "" {
 		key, err := getEncryptionKey(flags.KeyFile)
 		if err != nil {
@@ -133,6 +130,9 @@ func openStore(ctx context.Context, storeSpec string) (_ blob.StoreCloser, oerr 
 	}
 	if flags.ReadOnly {
 		bs = roStore{bs}
+	}
+	if flags.CacheSize > 0 {
+		bs = cachestore.New(bs, flags.CacheSize<<20)
 	}
 	if flags.BufferDB != "" {
 		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
