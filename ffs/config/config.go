@@ -74,10 +74,11 @@ type Settings struct {
 
 // A StoreSpec associates a tag (handle) with a storage address.
 type StoreSpec struct {
-	Tag     string `json:"tag" yaml:"tag"`         // identifies the spec
-	Address string `json:"address" yaml:"address"` // the listen address
-	Spec    string `json:"spec" yaml:"spec"`       // the desired storage URL
-	Prefix  string `json:"prefix" yaml:"prefix"`   // service method name prefix
+	Tag      string `json:"tag" yaml:"tag"`           // identifies the spec
+	Address  string `json:"address" yaml:"address"`   // the listen address
+	Spec     string `json:"spec" yaml:"spec"`         // the desired storage URL
+	Prefix   string `json:"prefix" yaml:"prefix"`     // service method name prefix
+	Substore string `json:"substore" yaml:"substore"` // substore name (optional)
 }
 
 // ResolveAddress resolves the given address against the settings. If addr is
@@ -93,11 +94,14 @@ func (s *Settings) ResolveAddress(addr string) StoreSpec {
 				if cp.Prefix == "" {
 					cp.Prefix = s.ServicePrefix
 				}
+				if cp.Substore == "" {
+					cp.Substore = s.Substore
+				}
 				return cp
 			}
 		}
 	}
-	return StoreSpec{Address: addr, Prefix: s.ServicePrefix}
+	return StoreSpec{Address: addr, Prefix: s.ServicePrefix, Substore: s.Substore}
 }
 
 // ResolveSpec resolves the given store spec against the settings.  If spec is
@@ -149,8 +153,8 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 		MethodPrefix: spec.Prefix,
 	})
 	var sub blob.Store = bs
-	if s.Substore != "" {
-		sub, err = bs.Sub(ctx, s.Substore)
+	if spec.Substore != "" {
+		sub, err = bs.Sub(ctx, spec.Substore)
 		if err != nil {
 			conn.Close()
 			return Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
