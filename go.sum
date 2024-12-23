@@ -204,8 +204,8 @@ github.com/creachadair/pebblestore v0.0.0-20241221001009-7ef51bd79619 h1:Bv+VlMz
 github.com/creachadair/pebblestore v0.0.0-20241221001009-7ef51bd79619/go.mod h1:Za1a66mVe5jONPgeiYRZASufwsxyEw07sXanDvwtcCk=
 github.com/creachadair/rosedbstore v0.0.0-20241221001101-6b74ffdce472 h1:MM82YNw0yJALtpymuKFmCvmqfnmCC2kwDmoAQ8Ivn6Q=
 github.com/creachadair/rosedbstore v0.0.0-20241221001101-6b74ffdce472/go.mod h1:w6PVNCLtbb3PvVHC6/K4qPmc170zrGGtHXABqffL8ts=
-github.com/creachadair/s3store v0.0.0-20241221001131-5fd032eb95a9 h1:mx2kD2oKZbtxvHIGuluGOuCylgyleiDQx4zR1VZZfsk=
-github.com/creachadair/s3store v0.0.0-20241221001131-5fd032eb95a9/go.mod h1:BXxsZEDnNC9G6+rw8pLyX2XC9FkwLOf4DcG5EExo3k8=
+github.com/creachadair/s3store v0.0.0-20241223220159-d82cce720f1c h1:UIaiNBzNydKrLfCufp673srLD3LXPlLI86xdLJ1clyQ=
+github.com/creachadair/s3store v0.0.0-20241223220159-d82cce720f1c/go.mod h1:1P+3Ohq9Y9pT8P7gs7YpYACGKlyPtD2jb7YnkwzMucs=
 github.com/creachadair/sqlitestore v0.0.0-20241221001155-44dbcd00957c h1:/S7rpE+MgnJp4uB29MxJsjsXuLytbrlbErMJVz7hj0U=
 github.com/creachadair/sqlitestore v0.0.0-20241221001155-44dbcd00957c/go.mod h1:SuWApmqPSG547RO8FiCDlMKeuKA1Ev0GTsO09KCNWYk=
 github.com/creachadair/taskgroup v0.13.2 h1:3KyqakBuFsm3KkXi/9XIb0QcA8tEzLHLgaoidf0MdVc=

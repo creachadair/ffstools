@@ -21,7 +21,7 @@ require (
 	github.com/creachadair/mds v0.22.0
 	github.com/creachadair/pebblestore v0.0.0-20241221001009-7ef51bd79619
 	github.com/creachadair/rosedbstore v0.0.0-20241221001101-6b74ffdce472
-	github.com/creachadair/s3store v0.0.0-20241221001131-5fd032eb95a9
+	github.com/creachadair/s3store v0.0.0-20241223220159-d82cce720f1c
 	github.com/creachadair/sqlitestore v0.0.0-20241221001155-44dbcd00957c
 	github.com/creachadair/taskgroup v0.13.2
 	github.com/hanwen/go-fuse/v2 v2.7.2
