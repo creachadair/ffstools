@@ -197,7 +197,7 @@ func syncKeysCmd(env *command.Env, keys []string) error {
 		parsed = append(parsed, p)
 	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
-		need, err := bs.(blob.SyncKeyer).SyncKeys(env.Context(), parsed)
+		need, err := blob.SyncKeys(env.Context(), bs, parsed)
 		if err != nil {
 			return err
 		}
