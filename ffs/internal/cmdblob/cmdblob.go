@@ -73,10 +73,10 @@ the address or an @tag from the configuration file.
 			Run:      command.Adapt(putCmd),
 		},
 		{
-			Name:  "size",
+			Name:  "stat",
 			Usage: "<key>...",
-			Help:  "Print the sizes of stored blobs.",
-			Run:   sizeCmd,
+			Help:  "Print the status of stored blobs.",
+			Run:   statCmd,
 		},
 		{
 			Name:  "delete",

@@ -47,21 +47,29 @@ func getCmd(env *command.Env) error {
 	})
 }
 
-func sizeCmd(env *command.Env) error {
+func statCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <key>")
 	}
+	var parsed []string
+	for _, raw := range env.Args {
+		key, err := config.ParseKey(raw)
+		if err != nil {
+			return err
+		}
+		parsed = append(parsed, key)
+	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
-		for _, arg := range env.Args {
-			key, err := config.ParseKey(arg)
-			if err != nil {
-				return err
+		stat, err := bs.Stat(env.Context(), parsed...)
+		if err != nil {
+			return err
+		}
+		for _, want := range parsed {
+			if st, ok := stat[want]; ok {
+				fmt.Println(config.FormatKey(want), st.Size)
+			} else {
+				fmt.Println(config.FormatKey(want), "<missing>")
 			}
-			data, err := bs.Get(env.Context(), key)
-			if err != nil {
-				return err
-			}
-			fmt.Println(config.FormatKey(key), len(data))
 		}
 		return nil
 	})
