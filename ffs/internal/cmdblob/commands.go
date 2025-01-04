@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/creachadair/command"
@@ -47,7 +48,7 @@ func getCmd(env *command.Env) error {
 	})
 }
 
-func statCmd(env *command.Env) error {
+func hasCmd(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <key>")
 	}
@@ -60,16 +61,14 @@ func statCmd(env *command.Env) error {
 		parsed = append(parsed, key)
 	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
-		stat, err := bs.Stat(env.Context(), parsed...)
+		stat, err := bs.Has(env.Context(), parsed...)
 		if err != nil {
 			return err
 		}
-		for _, want := range parsed {
-			if st, ok := stat[want]; ok {
-				fmt.Println(config.FormatKey(want), st.Size)
-			} else {
-				fmt.Println(config.FormatKey(want), "<missing>")
-			}
+		has := stat.Slice()
+		slices.Sort(has)
+		for _, v := range has {
+			fmt.Println(config.FormatKey(v))
 		}
 		return nil
 	})
