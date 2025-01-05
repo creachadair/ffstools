@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
@@ -63,11 +62,11 @@ store without roots.
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(env.Context(), func(s config.Store) error {
 			var keys []string
-			if err := s.Roots().List(env.Context(), "", func(key string) error {
+			for key, err := range s.Roots().List(env.Context(), "") {
+				if err != nil {
+					return fmt.Errorf("listing roots: %w", err)
+				}
 				keys = append(keys, key)
-				return nil
-			}); err != nil {
-				return fmt.Errorf("listing roots: %w", err)
 			}
 
 			if len(keys) == 0 && !gcFlags.Force {
@@ -168,9 +167,11 @@ store without roots.
 			for _, p := range shuffledSeeds() {
 				pfx := string([]byte{p})
 				run(func() error {
-					return s.Files().List(ctx, pfx, func(key string) error {
-						if !strings.HasPrefix(key, pfx) {
-							return blob.ErrStopListing
+					for key, err := range s.Files().List(ctx, pfx) {
+						if err != nil {
+							return err
+						} else if !strings.HasPrefix(key, pfx) {
+							return nil
 						}
 						pb.Add(1)
 						for _, idx := range idxs {
@@ -183,8 +184,8 @@ store without roots.
 						if err := s.Files().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
 							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
 						}
-						return nil
-					})
+					}
+					return nil
 				})
 			}
 			serr := g.Wait()

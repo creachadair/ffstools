@@ -121,8 +121,10 @@ func listCmd(env *command.Env) error {
 	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
 		var listed int
-		return bs.List(env.Context(), start, func(key string) error {
-			if !strings.HasPrefix(key, pfx) {
+		for key, err := range bs.List(env.Context(), start) {
+			if err != nil {
+				return err
+			} else if !strings.HasPrefix(key, pfx) {
 				return nil
 			}
 			if listFlags.Raw {
@@ -132,10 +134,10 @@ func listCmd(env *command.Env) error {
 			}
 			listed++
 			if listFlags.MaxKeys > 0 && listed == listFlags.MaxKeys {
-				return blob.ErrStopListing
+				break
 			}
-			return nil
-		})
+		}
+		return nil
 	})
 }
 

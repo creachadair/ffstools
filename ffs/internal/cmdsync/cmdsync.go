@@ -113,7 +113,10 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			// If we loaded cached indices, fill the worklist with matching keys.
 			if len(indices) != 0 {
 				var numAdded int
-				if err := src.Files().List(env.Context(), "", func(key string) error {
+				for key, err := range src.Files().List(env.Context(), "") {
+					if err != nil {
+						return err
+					}
 					for _, idx := range indices {
 						if idx.Has(key) {
 							worklist.Blob(key)
@@ -121,9 +124,6 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 							break
 						}
 					}
-					return nil
-				}); err != nil {
-					return err
 				}
 				dprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
 			}

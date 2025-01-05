@@ -145,8 +145,10 @@ func runList(env *command.Env) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
-		return s.Roots().List(env.Context(), "", func(key string) error {
-			if !matchAny(key, glob) {
+		for key, err := range s.Roots().List(env.Context(), "") {
+			if err != nil {
+				return err
+			} else if !matchAny(key, glob) {
 				return nil
 			} else if !listFlags.Long && !listFlags.JSON {
 				fmt.Println(key)
@@ -178,8 +180,8 @@ func runList(env *command.Env) error {
 				}{key, rp.Description, []byte(rp.FileKey), []byte(rp.IndexKey)})
 				fmt.Println(string(data))
 			}
-			return nil
-		})
+		}
+		return nil
 	})
 }
 

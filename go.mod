@@ -4,25 +4,25 @@ go 1.23.3
 
 require (
 	github.com/creachadair/atomicfile v0.3.6
-	github.com/creachadair/badgerstore v0.9.0
-	github.com/creachadair/bitcaskstore v0.0.0-20250104204052-e86c09c5d18d
-	github.com/creachadair/boltstore v0.0.0-20250104204223-dac1be8dff0e
-	github.com/creachadair/buntdbstore v0.0.0-20250104204336-deb774202b74
+	github.com/creachadair/badgerstore v0.10.0
+	github.com/creachadair/bitcaskstore v0.0.0-20250105013023-c4ec3ce05974
+	github.com/creachadair/boltstore v0.0.0-20250105013244-fe212ea883a2
+	github.com/creachadair/buntdbstore v0.0.0-20250105013531-4b23a635e6c7
 	github.com/creachadair/chirp v0.0.0-20241228164031-5e99fe2af4d9
-	github.com/creachadair/chirpstore v0.0.0-20250104205639-5641859c1431
+	github.com/creachadair/chirpstore v0.0.0-20250105013809-a3a12b00427e
 	github.com/creachadair/command v0.1.20
-	github.com/creachadair/ffs v0.11.1
+	github.com/creachadair/ffs v0.12.0
 	github.com/creachadair/ffuse v0.0.0-20241222035556-0c48937dd869
 	github.com/creachadair/flax v0.0.4
-	github.com/creachadair/gcsstore v0.0.0-20250104205833-4d21a6579b07
+	github.com/creachadair/gcsstore v0.0.0-20250105014249-cdf949cc21ba
 	github.com/creachadair/getpass v0.2.1
 	github.com/creachadair/keyfile v0.8.3
-	github.com/creachadair/leveldbstore v0.0.0-20250104210123-6de32c24f56b
+	github.com/creachadair/leveldbstore v0.0.0-20250105014525-6b5f73c11fd3
 	github.com/creachadair/mds v0.22.1
-	github.com/creachadair/pebblestore v0.0.0-20250104210240-27fb0239821a
-	github.com/creachadair/rosedbstore v0.0.0-20250104210329-fe4c31213d6c
-	github.com/creachadair/s3store v0.0.0-20250104210459-d690f0ac6628
-	github.com/creachadair/sqlitestore v0.0.0-20250104210632-af032fdb5105
+	github.com/creachadair/pebblestore v0.0.0-20250105014918-4207d6e475bc
+	github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f
+	github.com/creachadair/s3store v0.0.0-20250105015437-f2053317d7b2
+	github.com/creachadair/sqlitestore v0.0.0-20250105015636-0c7fc3865370
 	github.com/creachadair/taskgroup v0.13.2
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11
