@@ -1,4 +1,0 @@
-cleanup() {
-    go install -tags badger,bolt,gcs,s3 github.com/creachadair/ffstools/ffs
-    go install github.com/creachadair/ffstools/file2json
-}
