@@ -167,6 +167,7 @@ store without roots.
 			for _, p := range shuffledSeeds() {
 				pfx := string([]byte{p})
 				run(func() error {
+				nextKey:
 					for key, err := range s.Files().List(ctx, pfx) {
 						if err != nil {
 							return err
@@ -177,7 +178,7 @@ store without roots.
 						for _, idx := range idxs {
 							if idx.Has(key) {
 								numKeep.Add(1)
-								return nil
+								continue nextKey
 							}
 						}
 						pb.SetMeta(numDrop.Add(1))

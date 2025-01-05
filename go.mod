@@ -164,6 +164,7 @@ require (
 )
 
 retract (
+	v0.10.10 // early return bug in "ffs gc" mark
 	[v0.10.8, v0.10.9] // output bug in "ffs root list"
 	v0.8.6 // broken go-fuse on macOS
 	v0.4.1
