@@ -149,10 +149,10 @@ func runList(env *command.Env) error {
 			if err != nil {
 				return err
 			} else if !matchAny(key, glob) {
-				return nil
+				continue
 			} else if !listFlags.Long && !listFlags.JSON {
 				fmt.Println(key)
-				return nil
+				continue
 			}
 
 			rp, err := root.Open(env.Context(), s.Roots(), key)
