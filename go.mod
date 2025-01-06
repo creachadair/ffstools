@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.23.3
 
 require (
-	github.com/creachadair/atomicfile v0.3.6
+	github.com/creachadair/atomicfile v0.3.7
 	github.com/creachadair/badgerstore v0.10.0
 	github.com/creachadair/bitcaskstore v0.0.0-20250105013023-c4ec3ce05974
 	github.com/creachadair/boltstore v0.0.0-20250105013244-fe212ea883a2
@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirp v0.0.0-20241228164031-5e99fe2af4d9
 	github.com/creachadair/chirpstore v0.0.0-20250105044830-cb1693434563
 	github.com/creachadair/command v0.1.20
-	github.com/creachadair/ffs v0.12.2
+	github.com/creachadair/ffs v0.12.3
 	github.com/creachadair/ffuse v0.0.0-20241222035556-0c48937dd869
 	github.com/creachadair/flax v0.0.4
 	github.com/creachadair/gcsstore v0.0.0-20250105014249-cdf949cc21ba
@@ -77,7 +77,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.3 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/creachadair/msync v0.4.1 // indirect
+	github.com/creachadair/msync v0.5.0 // indirect
 	github.com/dgraph-io/badger/v4 v4.5.0 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -143,7 +143,7 @@ require (
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect

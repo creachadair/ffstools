@@ -210,7 +210,7 @@ func syncKeysCmd(env *command.Env, keys []string) error {
 		if err != nil {
 			return err
 		}
-		for _, key := range need {
+		for key := range need {
 			fmt.Println(config.FormatKey(key))
 		}
 		return nil

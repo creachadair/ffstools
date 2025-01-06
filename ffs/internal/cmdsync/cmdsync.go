@@ -30,7 +30,6 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
-	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -144,9 +143,8 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 					return err
 				}
 				nmiss += len(need)
-				m := mapset.New(need...)
 				for _, key := range span {
-					if !worklist.IsRoot(key) && !m.Has(key) {
+					if !worklist.IsRoot(key) && !need.Has(key) {
 						worklist.Remove(key)
 					}
 				}
