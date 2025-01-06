@@ -119,13 +119,19 @@ func listCmd(env *command.Env) error {
 	if err != nil {
 		return err
 	}
+	if start == "" && pfx != "" {
+		start = pfx
+	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
 		var listed int
 		for key, err := range bs.List(env.Context(), start) {
 			if err != nil {
 				return err
 			} else if !strings.HasPrefix(key, pfx) {
-				return nil
+				if key > pfx {
+					break
+				}
+				continue
 			}
 			if listFlags.Raw {
 				fmt.Println(key)
