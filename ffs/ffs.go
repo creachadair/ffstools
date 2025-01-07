@@ -115,8 +115,8 @@ help [<command>]`,
 FFS_CONFIG     : Configuration file path (default: ` + config.DefaultPath + `)
 FFS_DEBUG      : If true, enable debug logging (warning: noisy)
 FFS_PASSPHRASE : If set, contains the passphrase for a --key file
-FFS_STORE      : Storage service address (overrides config; overridden by --store)
 FFS_PREFIX     : Storage service method name prefix (overrides config; overridden by --prefix)
+FFS_STORE      : Storage service address (overrides config; overridden by --store)
 FFS_SUBSTORE   : Substore name to use (overrides config; overridden by --substore)
 `,
 			}}),
