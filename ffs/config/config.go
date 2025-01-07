@@ -84,9 +84,16 @@ type StoreSpec struct {
 // ResolveAddress resolves the given address against the settings. If addr is
 // of the form @tag and that tag exists in the settings, the spec for that tag
 // is returned; otherwise it returns a spec whose address is addr.
+//
+// As a special case, if @tag has the form "@name:tag", the name without the
+// separator is used as a substore indicator, overriding the config.
 func (s *Settings) ResolveAddress(addr string) StoreSpec {
 	tag, ok := strings.CutPrefix(addr, "@")
 	if ok {
+		sub := s.Substore
+		if name, rest, ok := strings.Cut(tag, ":"); ok {
+			sub, tag = name, rest
+		}
 		for _, st := range s.Stores {
 			if tag == st.Tag {
 				cp := *st
@@ -94,7 +101,9 @@ func (s *Settings) ResolveAddress(addr string) StoreSpec {
 				if cp.Prefix == "" {
 					cp.Prefix = s.ServicePrefix
 				}
-				if cp.Substore == "" {
+				if sub != "" {
+					cp.Substore = sub
+				} else if cp.Substore == "" {
 					cp.Substore = s.Substore
 				}
 				return cp
