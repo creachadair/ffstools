@@ -56,7 +56,7 @@ help [<command>]`,
 
 		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
 			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
-			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address")
+			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (socket path, host:port, or @[sub:]name)")
 			fs.StringVar(&substoreName, "substore", substoreName, "Substore name")
 			fs.StringVar(&servicePrefix, "service-prefix", servicePrefix, "Store service method prefix")
 			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
