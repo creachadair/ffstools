@@ -40,7 +40,7 @@ import (
 var gcFlags struct {
 	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=256,PRIVATE:Number of current sweep tasks"`
+	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
 	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
 	Verbose      bool          `flag:"v,Enable verbose logging"`
 }
@@ -166,7 +166,7 @@ store without roots.
 			pb := pbar.New(env, n).Start()
 			for _, p := range shuffledSeeds() {
 				pfx := string([]byte{p})
-				run(func() error {
+				g.Go(func() error {
 				nextKey:
 					for key, err := range s.Files().List(ctx, pfx) {
 						if err != nil {
@@ -181,10 +181,12 @@ store without roots.
 								continue nextKey
 							}
 						}
-						pb.SetMeta(numDrop.Add(1))
-						if err := s.Files().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
-							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
-						}
+						run.Run(func() {
+							pb.SetMeta(numDrop.Add(1))
+							if err := s.Files().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
+								log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
+							}
+						})
 					}
 					return nil
 				})
