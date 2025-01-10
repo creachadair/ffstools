@@ -75,13 +75,11 @@ func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup
 		Prefix: opts.Prefix,
 	})
 	mx := newServerMetrics(ctx, opts)
+	root := chirp.NewPeer()
+	root.Metrics().Set("blobd", mx)
+	service.Register(root)
 	loop := taskgroup.Go(func() error {
-		return peers.Loop(ctx, peers.NetAccepter(lst), func() *chirp.Peer {
-			p := chirp.NewPeer()
-			p.Metrics().Set("blobd", mx)
-			service.Register(p)
-			return p
-		})
+		return peers.Loop(ctx, peers.NetAccepter(lst), root)
 	})
 
 	return func() {
