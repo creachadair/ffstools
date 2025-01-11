@@ -10,13 +10,13 @@ require (
 	github.com/creachadair/buntdbstore v0.0.0-20250105013531-4b23a635e6c7
 	github.com/creachadair/chirp v0.0.0-20250110175337-c9a157b224ce
 	github.com/creachadair/chirpstore v0.0.0-20250105044830-cb1693434563
-	github.com/creachadair/command v0.1.20
+	github.com/creachadair/command v0.1.21
 	github.com/creachadair/ffs v0.12.4
-	github.com/creachadair/ffuse v0.0.0-20241222035556-0c48937dd869
+	github.com/creachadair/ffuse v0.0.0-20250103204821-d910921eb6fb
 	github.com/creachadair/flax v0.0.4
 	github.com/creachadair/gcsstore v0.0.0-20250105014249-cdf949cc21ba
-	github.com/creachadair/getpass v0.2.1
-	github.com/creachadair/keyfile v0.8.3
+	github.com/creachadair/getpass v0.2.2
+	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250105014525-6b5f73c11fd3
 	github.com/creachadair/mds v0.23.0
 	github.com/creachadair/pebblestore v0.0.0-20250105014918-4207d6e475bc
