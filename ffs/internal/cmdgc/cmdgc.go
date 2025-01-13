@@ -40,9 +40,13 @@ import (
 var gcFlags struct {
 	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
+	Tasks        int           `flag:"nw,default=2048,PRIVATE:Number of concurrent sweep tasks"`
 	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
 	Verbose      bool          `flag:"v,Enable verbose logging"`
+
+	// N.B. The tasks value is chosen to allow a small multiple of the number of
+	// sweep seeds to proceed concurrently. There are 256 seeds, so 2048 is 8x
+	// per seed.
 }
 
 var errSweepLimit = errors.New("sweep limit reached")
