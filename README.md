@@ -106,4 +106,4 @@ The following storage backends can be enabled by building with the specified tag
 | s3       | Amazon S3   | [docs](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3) | No local storage; requires AWS credentials |
 | sqlite   | SQLite3     | [docs](https://godoc.org/modernc.org/sqlite)                      | SQL, single-file                           |
 
-For local storage, I generally use BadgerDB unless I want a single file.
+For local storage, I generally use BadgerDB unless I want a single file, in which case I currently prefer BuntDB.
