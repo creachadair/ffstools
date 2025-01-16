@@ -87,6 +87,9 @@ type StoreSpec struct {
 //
 // As a special case, if @tag has the form "@name:tag", the name without the
 // separator is used as a substore indicator, overriding the config.
+//
+// As a special case, if the address has a "+name" suffix, the name without the
+// separator is used as a substore indicator.
 func (s *Settings) ResolveAddress(addr string) StoreSpec {
 	tag, ok := strings.CutPrefix(addr, "@")
 	if ok {
@@ -109,6 +112,8 @@ func (s *Settings) ResolveAddress(addr string) StoreSpec {
 				return cp
 			}
 		}
+	} else if i := strings.LastIndex(addr, "+"); i >= 0 {
+		return StoreSpec{Address: addr[:i], Prefix: s.ServicePrefix, Substore: addr[i+1:]}
 	}
 	return StoreSpec{Address: addr, Prefix: s.ServicePrefix, Substore: s.Substore}
 }
