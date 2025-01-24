@@ -26,9 +26,12 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/ffstools/lib/storeservice"
+	"github.com/fortytw2/leaktest"
 )
 
 func TestService(t *testing.T) {
+	defer leaktest.Check(t)()
+
 	store := memstore.New(nil)
 
 	srv := storeservice.New(storeservice.Config{

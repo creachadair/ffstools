@@ -19,19 +19,13 @@ import (
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
-	"errors"
 	"expvar"
 	"fmt"
-	"log"
-	"net"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/creachadair/chirp"
-	"github.com/creachadair/chirp/peers"
-	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/cachestore"
@@ -42,53 +36,8 @@ import (
 	"github.com/creachadair/ffstools/lib/zstdc"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
-	"github.com/creachadair/taskgroup"
 	"golang.org/x/crypto/chacha20poly1305"
 )
-
-type closer = func()
-
-type startConfig struct {
-	Address string
-	Spec    string
-	Store   blob.StoreCloser
-	Prefix  string
-	Buffer  blob.KV
-}
-
-func (s *startConfig) listen(ctx context.Context) (net.Listener, error) {
-	return net.Listen(chirp.SplitAddress(s.Address))
-}
-
-func startChirpServer(ctx context.Context, opts startConfig) (closer, *taskgroup.Single[error], error) {
-	lst, err := opts.listen(ctx)
-	if err != nil {
-		return nil, nil, fmt.Errorf("listen: %w", err)
-	}
-	isUnix := lst.Addr().Network() == "unix"
-	if isUnix {
-		os.Chmod(opts.Address, 0600) // best-effort
-	}
-	log.Printf("[chirp] Service: %q", opts.Address)
-
-	service := chirpstore.NewService(opts.Store, &chirpstore.ServiceOptions{
-		Prefix: opts.Prefix,
-	})
-	mx := newServerMetrics(ctx, opts)
-	root := chirp.NewPeer()
-	root.Metrics().Set("blobd", mx)
-	service.Register(root)
-	loop := taskgroup.Go(func() error {
-		return peers.Loop(ctx, peers.NetAccepter(lst), root)
-	})
-
-	return func() {
-		lst.Close()
-		if isUnix {
-			defer os.Remove(opts.Address)
-		}
-	}, loop, nil
-}
 
 func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv blob.KV, oerr error) {
 	bs, err := registry.Stores.Open(ctx, storeSpec)
@@ -126,9 +75,6 @@ func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv 
 	if flags.Compress {
 		bs = encoded.New(bs, zstdc.New())
 	}
-	if flags.ReadOnly {
-		bs = roStore{bs}
-	}
 	if flags.BufferDB != "" {
 		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
 		if berr != nil {
@@ -156,10 +102,10 @@ type expvarBool bool
 
 func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
 
-func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
+func newServerMetrics(ctx context.Context, spec string, buf blob.KV) *expvar.Map {
 	mx := new(expvar.Map)
 	mx.Set("started", expvarString(time.Now().UTC().Format(time.RFC3339)))
-	mx.Set("store", expvarString(opts.Spec))
+	mx.Set("store", expvarString(spec))
 	mx.Set("pid", expvarInt(os.Getpid()))
 	mx.Set("writable", expvarBool(!flags.ReadOnly))
 	mx.Set("encrypted", expvarBool(flags.KeyFile != ""))
@@ -180,10 +126,10 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 		mx.Set("build_info", v)
 	}
 
-	if opts.Buffer != nil {
+	if buf != nil {
 		mx.Set("buffer_db", expvarString(flags.BufferDB))
 		mx.Set("buffer_len", expvar.Func(func() any {
-			n, err := opts.Buffer.Len(ctx)
+			n, err := buf.Len(ctx)
 			if err != nil {
 				return "unknown"
 			}
@@ -192,48 +138,6 @@ func newServerMetrics(ctx context.Context, opts startConfig) *expvar.Map {
 	}
 	return mx
 }
-
-type roStore struct {
-	blob.StoreCloser
-}
-
-func (r roStore) KV(ctx context.Context, name string) (blob.KV, error) {
-	kv, err := r.StoreCloser.KV(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return roKV{kv}, nil
-}
-
-func (r roStore) CAS(ctx context.Context, name string) (blob.CAS, error) {
-	cas, err := r.StoreCloser.CAS(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return roCAS{cas}, nil
-}
-
-func (r roStore) Sub(ctx context.Context, name string) (blob.Store, error) {
-	sub, err := r.StoreCloser.Sub(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return roStore{nopCloser{sub}}, nil
-}
-
-var errReadOnlyStore = errors.New("storage is read-only")
-
-type nopCloser struct{ blob.Store }
-
-func (nopCloser) Close(context.Context) error { return nil }
-
-type roKV struct{ blob.KV }
-type roCAS struct{ blob.CAS }
-
-func (roKV) Put(context.Context, blob.PutOptions) error      { return errReadOnlyStore }
-func (roCAS) CASPut(context.Context, []byte) (string, error) { return "", errReadOnlyStore }
-func (roKV) Delete(context.Context, string) error            { return errReadOnlyStore }
-func (roCAS) Delete(context.Context, string) error           { return errReadOnlyStore }
 
 func getEncryptionKey(keyFile string) ([]byte, error) {
 	data, err := os.ReadFile(keyFile)

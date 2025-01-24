@@ -30,6 +30,7 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
+	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
@@ -136,26 +137,25 @@ func runStorage(env *command.Env) error {
 		log.Printf("Encryption key: %q", flags.KeyFile)
 	}
 
-	config := startConfig{
-		Address: listenAddr,
-		Spec:    rs.Spec,
-		Store:   bs,
-		Prefix:  rs.Prefix,
-		Buffer:  buf,
-	}
-
 	sctx, cancel := signal.NotifyContext(env.Context(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
-	closer, loop, err := startChirpServer(sctx, config)
-	if err != nil {
+
+	srv := storeservice.New(storeservice.Config{
+		Address:  listenAddr,
+		Store:    bs,
+		Prefix:   rs.Prefix,
+		ReadOnly: flags.ReadOnly,
+	})
+	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, buf))
+
+	if err := srv.Start(sctx); err != nil {
 		return fmt.Errorf("start server: %w", err)
 	}
 	go func() {
 		<-sctx.Done()
 		log.Print("Received signal, closing listener")
-		closer()
 	}()
-	return loop.Wait()
+	return srv.Wait()
 }
 
 func runKeyGen(env *command.Env, keyFile string) error {

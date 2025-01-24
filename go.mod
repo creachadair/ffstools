@@ -24,6 +24,7 @@ require (
 	github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95
 	github.com/creachadair/sqlitestore v0.0.0-20250120175340-8c526194146a
 	github.com/creachadair/taskgroup v0.13.2
+	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
