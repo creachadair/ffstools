@@ -25,55 +25,34 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/storage/cachestore"
-	"github.com/creachadair/ffs/storage/codecs/encrypted"
-	"github.com/creachadair/ffs/storage/encoded"
-	"github.com/creachadair/ffs/storage/wbstore"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
-	"github.com/creachadair/ffstools/lib/zstdc"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
-	"golang.org/x/crypto/chacha20poly1305"
 )
 
 func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv blob.KV, oerr error) {
+	// Open the primary store.
 	bs, err := registry.Stores.Open(ctx, storeSpec)
 	if err != nil {
 		return nil, nil, fmt.Errorf("open store: %w", err)
 	}
+	if flags.BufferDB == "" {
+		return bs, nil, nil
+	}
 	defer closeOnError(bs, &oerr)
 
-	if flags.KeyFile != "" {
-		key, err := getEncryptionKey(flags.KeyFile)
-		if err != nil {
-			return nil, nil, fmt.Errorf("get encryption key: %w", err)
-		}
-		aead, err := chacha20poly1305.NewX(key)
-		if err != nil {
-			return nil, nil, err
-		}
-		bs = encoded.New(bs, encrypted.New(aead, nil))
+	// Open a KV on the write-behind store.
+	bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
+	if berr != nil {
+		return nil, nil, fmt.Errorf("open buffer: %w", berr)
 	}
-	if flags.Compress {
-		bs = encoded.New(bs, zstdc.New())
+	defer closeOnError(bdb, &oerr)
+
+	buf, err := bdb.KV(ctx, "")
+	if err != nil {
+		return nil, nil, fmt.Errorf("buffer keyspace: %w", err)
 	}
-	if flags.BufferDB != "" {
-		bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
-		if berr != nil {
-			return nil, nil, fmt.Errorf("open buffer: %w", berr)
-		}
-		defer closeOnError(bdb, &oerr)
-		buf, err := bdb.KV(ctx, "")
-		if err != nil {
-			return nil, nil, fmt.Errorf("buffer keyspace: %w", err)
-		}
-		bs = wbstore.New(ctx, bs, buf)
-		bkv = buf
-	}
-	if flags.CacheSize > 0 {
-		bs = cachestore.New(bs, flags.CacheSize<<20)
-	}
-	return
+	return bs, buf, nil
 }
 
 func expvarString(s string) *expvar.String { v := new(expvar.String); v.Set(s); return v }
@@ -122,9 +101,12 @@ func newServerMetrics(ctx context.Context, spec string, buf blob.KV) *expvar.Map
 }
 
 func getEncryptionKey(keyFile string) ([]byte, error) {
+	if keyFile == "" {
+		return nil, nil // no key, no error
+	}
 	data, err := os.ReadFile(keyFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read key file: %w", err)
 	}
 	kf, err := keyfile.Parse(data)
 	if err != nil {
@@ -137,7 +119,7 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 	if !ok {
 		pp, err = getpass.Prompt("Passphrase: ")
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("read passphrase: %w", err)
 		}
 	}
 	return kf.Get(pp)

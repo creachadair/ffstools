@@ -104,7 +104,10 @@ func runStorage(env *command.Env) error {
 	if err != nil {
 		return err
 	}
-
+	encryptionKey, err := getEncryptionKey(flags.KeyFile)
+	if err != nil {
+		return err
+	}
 	bs, buf, err := openStore(env.Context(), rs.Spec)
 	if err != nil {
 		return err
@@ -140,10 +143,15 @@ func runStorage(env *command.Env) error {
 	defer cancel()
 
 	srv := storeservice.New(storeservice.Config{
-		Address:  listenAddr,
-		Store:    bs,
-		Prefix:   rs.Prefix,
-		ReadOnly: flags.ReadOnly,
+		Address:        listenAddr,
+		Store:          bs,
+		Buffer:         buf,
+		Compress:       flags.Compress,
+		EncryptionKey:  encryptionKey,
+		CacheSizeBytes: flags.CacheSize << 20,
+		MethodPrefix:   rs.Prefix,
+		ReadOnly:       flags.ReadOnly,
+		Logf:           log.Printf,
 	})
 	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, buf))
 
