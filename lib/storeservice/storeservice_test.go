@@ -15,6 +15,7 @@
 package storeservice_test
 
 import (
+	"bytes"
 	"context"
 	"net"
 	"path/filepath"
@@ -35,9 +36,11 @@ func TestService(t *testing.T) {
 	store := memstore.New(nil)
 
 	srv := storeservice.New(storeservice.Config{
-		Address: filepath.Join(t.TempDir(), "srv.sock"),
-		Store:   store,
-		Logf:    t.Logf,
+		Address:        filepath.Join(t.TempDir(), "srv.sock"),
+		Store:          store,
+		CacheSizeBytes: 4096,
+		EncryptionKey:  bytes.Repeat([]byte("0"), 32),
+		Logf:           t.Logf,
 	})
 	defer srv.Stop()
 
@@ -48,23 +51,36 @@ func TestService(t *testing.T) {
 		t.Fatalf("Start service: %v", err)
 	}
 
-	conn, err := net.Dial(chirp.SplitAddress(srv.Address()))
-	if err != nil {
-		t.Fatalf("Dial service: %v", err)
+	runTest := func(t *testing.T) {
+		t.Helper()
+		conn, err := net.Dial(chirp.SplitAddress(srv.Address()))
+		if err != nil {
+			t.Fatalf("Dial service: %v", err)
+		}
+		defer conn.Close()
+
+		cp := chirp.NewPeer().Start(channel.IO(conn, conn))
+		cli := chirpstore.NewStore(cp, nil)
+
+		storetest.Run(t, cli)
+
+		if err := cli.Close(ctx); err != nil {
+			t.Errorf("Store close: unexpected error: %v", err)
+		}
 	}
-	defer conn.Close()
+	t.Run("Check", runTest)
 
-	cp := chirp.NewPeer().Start(channel.IO(conn, conn))
-	cli := chirpstore.NewStore(cp, nil)
-
-	storetest.Run(t, cli)
-
-	if err := cli.Close(ctx); err != nil {
-		t.Errorf("Store close: unexpected error: %v", err)
+	if err := srv.Stop(); err != nil {
+		t.Errorf("Service stop: unexpected error: %v", err)
 	}
+
+	if err := srv.Start(ctx); err != nil {
+		t.Fatalf("Restart service: %v", err)
+	}
+	t.Run("Recheck", runTest)
 
 	cancel()
 	if err := srv.Wait(); err != nil {
-		t.Logf("Service wait: unexpected error: %v", err)
+		t.Errorf("Service wait: unexpected error: %v", err)
 	}
 }
