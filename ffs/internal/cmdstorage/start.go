@@ -17,13 +17,10 @@ package cmdstorage
 import (
 	"cmp"
 	"context"
-	"crypto/aes"
-	"crypto/cipher"
 	"expvar"
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/creachadair/command"
@@ -51,24 +48,9 @@ func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv 
 		if err != nil {
 			return nil, nil, fmt.Errorf("get encryption key: %w", err)
 		}
-		var aead cipher.AEAD
-		switch strings.ToLower(flags.Cipher) {
-		case "aes", "gcm", "aes256-gcm":
-			c, err := aes.NewCipher(key)
-			if err != nil {
-				return nil, nil, fmt.Errorf("create cipher: %w", err)
-			}
-			aead, err = cipher.NewGCM(c)
-			if err != nil {
-				return nil, nil, err
-			}
-		case "chacha", "chacha20-poly1305":
-			aead, err = chacha20poly1305.NewX(key)
-			if err != nil {
-				return nil, nil, err
-			}
-		default:
-			return nil, nil, fmt.Errorf("unknown cipher %q", flags.Cipher)
+		aead, err := chacha20poly1305.NewX(key)
+		if err != nil {
+			return nil, nil, err
 		}
 		bs = encoded.New(bs, encrypted.New(aead, nil))
 	}

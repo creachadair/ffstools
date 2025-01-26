@@ -39,7 +39,6 @@ import (
 var flags struct {
 	ListenAddr string `flag:"listen,Service address (required)"`
 	KeyFile    string `flag:"key,Encryption key file or salt (if empty, do not encrypt)"`
-	Cipher     string `flag:"cipher,default=chacha,Encryption algorithm"`
 	BufferDB   string `flag:"buffer,Write-behind buffer database"`
 	CacheSize  int    `flag:"cache,Memory cache size in MiB (0 means no cache)"`
 	Compress   bool   `flag:"compress,Enable zstd compression of blob data"`
@@ -73,7 +72,7 @@ The --listen flag must be one of:
 
 With --cache, the server provides a memory cache over the primary store.
 
-With --key, the store is opened with encryption (chosen by --cipher).
+With --key, the store is opened with chacha20-poly1305 encryption.
 The contents of the --key file are used as the cipher key.
 If the file has the format of http://godoc.org/github.com/creachadair/keyfile,
 it is unlocked using a passphrase, from the FFS_PASSPHRASE environment or
