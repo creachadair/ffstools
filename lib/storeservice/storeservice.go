@@ -25,7 +25,13 @@ import (
 	"github.com/creachadair/chirp/peers"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/cachestore"
+	"github.com/creachadair/ffs/storage/codecs/encrypted"
+	"github.com/creachadair/ffs/storage/encoded"
+	"github.com/creachadair/ffs/storage/wbstore"
+	"github.com/creachadair/ffstools/lib/zstdc"
 	"github.com/creachadair/taskgroup"
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 // Config carries the settings for a [Service].
@@ -43,9 +49,25 @@ type Config struct {
 	// when called.
 	ReadOnly bool
 
-	// Prefix is prepended to the method names exportd by the service.
+	// Compress, if true, enables zstd compression on the store.
+	Compress bool
+
+	// EncryptionKey, if non-empty, is used as an encryption key to wrap the
+	// store. Blobs are encrypted using a chacha20-poly1305 AEAD.
+	// A valid key must be 32 bytes in length, or New will panic.
+	EncryptionKey []byte
+
+	// CacheSizeBytes, if positive, wraps the store in a memory cache of the
+	// specified size. If zero or negative, no cache is enabled.
+	CacheSizeBytes int
+
+	// Buffer, if non-nil, uses the specified KV as a writeback buffer for
+	// writes to the underlying store.
+	Buffer blob.KV
+
+	// MethodPrefix is prepended to the method names exportd by the service.
 	// Any caller must use the same prefix.
-	Prefix string
+	MethodPrefix string
 
 	// Logf, if set, is used to write text debug logs.
 	// If nil, logs are discarded.
@@ -55,12 +77,14 @@ type Config struct {
 // Service manages a running server, accepting connections and delegating them
 // to a peer implementing the [chirpstore.Service] methods.
 type Service struct {
-	root  *chirp.Peer
-	addr  string
-	store blob.StoreCloser
-	loop  *taskgroup.Single[error]
-	stop  func()
-	logf  func(string, ...any)
+	root   *chirp.Peer
+	addr   string
+	prefix string
+	store  blob.StoreCloser
+	buffer blob.KV
+	loop   *taskgroup.Single[error]
+	stop   func()
+	logf   func(string, ...any)
 }
 
 // New creates a new, unstarted service for the specified config.
@@ -81,16 +105,27 @@ func New(config Config) *Service {
 	if config.ReadOnly {
 		store = roStore{config.Store}
 	}
-	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{
-		Prefix: config.Prefix,
-	})
-	root := chirp.NewPeer()
-	svc.Register(root)
+	if len(config.EncryptionKey) != 0 {
+		aead, err := chacha20poly1305.NewX([]byte(config.EncryptionKey))
+		if err != nil {
+			panic(fmt.Sprintf("create cipher context: %v", err))
+		}
+		store = encoded.New(store, encrypted.New(aead, nil))
+	}
+	if config.Compress {
+		store = encoded.New(store, zstdc.New())
+	}
+	if config.CacheSizeBytes > 0 {
+		store = cachestore.New(store, config.CacheSizeBytes)
+	}
+
 	return &Service{
-		root:  root,
-		addr:  config.Address,
-		store: store,
-		logf:  logf,
+		root:   chirp.NewPeer(),
+		addr:   config.Address,
+		prefix: config.MethodPrefix,
+		store:  store,
+		buffer: config.Buffer,
+		logf:   logf,
 	}
 }
 
@@ -111,11 +146,23 @@ func (s *Service) Start(ctx context.Context) error {
 	if s.loop != nil {
 		panic("service is already running")
 	}
+
+	// If a buffer was enabled, set it up now, so that it runs with the context
+	// that will govern the lifecycle of the running service.
+	store := s.store
+	if s.buffer != nil {
+		store = wbstore.New(ctx, store, s.buffer)
+	}
+
+	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
+	svc.Register(s.root)
+
 	lst, err := net.Listen(chirp.SplitAddress(s.addr))
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
 	s.logf("[chirp] service: %q", s.addr)
+
 	s.loop = taskgroup.Go(func() error {
 		defer lst.Close()
 		return peers.Loop(ctx, peers.NetAccepter(lst), s.root)
@@ -125,17 +172,25 @@ func (s *Service) Start(ctx context.Context) error {
 }
 
 // Stop shuts down the service and waits for it to finish.  If s is not
-// started, Stop does nothing without error.
+// started, Stop does nothing without error. After Stop has returned, s can be
+// restarted with a new context.
 func (s *Service) Stop() error {
+	if s.stop != nil {
+		s.stop()
+	}
+	return s.Wait()
+}
+
+// Wait blocks until s has finished running. If s is not running, Wait returns
+// immediately without error.  After Wait has returned, s can be restarted with
+// a new context.
+func (s *Service) Wait() error {
 	if s.loop == nil {
 		return nil
 	}
-	s.stop()
+	defer func() { s.loop = nil }()
 	return s.loop.Wait()
 }
-
-// Wait blocks until s has finished running.
-func (s *Service) Wait() error { return s.loop.Wait() }
 
 type roStore struct {
 	blob.Store
