@@ -93,7 +93,7 @@ use the "put" command separately.`,
 			Usage: "<name> <description>...",
 			Help:  "Edit the description of the given root pointer.",
 
-			Run: runEditDesc,
+			Run: command.Adapt(runEditDesc),
 		},
 		{
 			Name:  "set-file",
@@ -102,7 +102,7 @@ use the "put" command separately.`,
 
 If a <file-key> is specified, it must already exist in the store.`,
 
-			Run: runEditFile,
+			Run: command.Adapt(runEditFile),
 		},
 		{
 			Name:  "index",
@@ -291,7 +291,7 @@ func runDelete(env *command.Env) error {
 	})
 }
 
-func runEditDesc(env *command.Env) error {
+func runEditDesc(env *command.Env, target string, rest ...string) error {
 	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
@@ -301,7 +301,7 @@ func runEditDesc(env *command.Env) error {
 	return na.Root.Save(na.Context, na.Key, true)
 }
 
-func runEditFile(env *command.Env) error {
+func runEditFile(env *command.Env, root, target string) error {
 	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
