@@ -71,7 +71,7 @@ use the "put" command separately.`,
 			Help:  "Duplicate a root pointer under a new name.",
 
 			SetFlags: command.Flags(flax.MustBind, &copyFlags),
-			Run:      runCopy,
+			Run:      command.Adapt(runCopy),
 		},
 		{
 			Name:  "rename",
@@ -79,7 +79,7 @@ use the "put" command separately.`,
 			Help:  "Rename a root pointer (equivalent to copy + remove).",
 
 			SetFlags: command.Flags(flax.MustBind, &copyFlags),
-			Run:      runCopy,
+			Run:      command.Adapt(runCopy),
 		},
 		{
 			Name:  "delete",
@@ -257,7 +257,7 @@ var copyFlags struct {
 	Replace bool `flag:"replace,Replace an existing target root name"`
 }
 
-func runCopy(env *command.Env) error {
+func runCopy(env *command.Env, src, dst string) error {
 	na, err := getNameArgs(env, env.Args)
 	if err != nil {
 		return err
