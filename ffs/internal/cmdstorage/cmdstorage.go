@@ -28,6 +28,7 @@ import (
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
@@ -118,6 +119,11 @@ func runStorage(env *command.Env) error {
 		// close gets stuck, however.
 		cctx, cancel := context.WithTimeout(env.Context(), 5*time.Second)
 		defer cancel()
+		if c, ok := buf.(blob.Closer); ok {
+			if err := c.Close(cctx); err != nil {
+				log.Printf("Warning: closing buffer: %v", err)
+			}
+		}
 		if err := bs.Close(cctx); err != nil {
 			log.Printf("Warning: closing store: %v", err)
 		}
