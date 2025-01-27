@@ -43,28 +43,27 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 	return cfg.WithStore(env.Context(), func(src config.Store) error {
 		// Find all the objects reachable from the specified starting points.
 		worklist := scanlib.NewScanner(src.Files())
+		scanStart := time.Now()
 		for _, elt := range sourceKeys {
 			of, err := config.OpenPath(env.Context(), src, elt)
 			if err != nil {
 				return err
 			}
 
-			scanStart := time.Now()
 			if of.Root != nil && of.Base == of.File {
-				fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
+				fmt.Fprintf(env, "Scanning data reachable from root %q...\n", of.RootKey)
 				err = worklist.Root(env.Context(), of.RootKey, of.Root)
 			} else {
-				fmt.Fprintf(env, "Scanning data reachable from file %s", config.FormatKey(of.FileKey))
+				fmt.Fprintf(env, "Scanning data reachable from file %s ...\n", config.FormatKey(of.FileKey))
 				err = worklist.File(env.Context(), of.File)
 			}
-			fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
 			if err != nil {
 				return err
 			}
 		}
 		stats := worklist.Stats()
-		fmt.Fprintf(env, "Found %d reachable objects (%d roots, %d files, %d blobs)\n", worklist.Len(),
-			stats.NumRoots, stats.NumFiles, stats.NumBlobs)
+		fmt.Fprintf(env, "Found %d reachable objects (%d roots, %d files, %d blobs) [%v elapsed]\n",
+			worklist.Len(), stats.NumRoots, stats.NumFiles, stats.NumBlobs, time.Since(scanStart).Round(time.Millisecond))
 
 		if scanFlags.Keys {
 			for chunk := range worklist.Chunks(256) {
