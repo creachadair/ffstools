@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirp v0.0.0-20250115221431-d0705d7949ac
 	github.com/creachadair/chirpstore v0.0.0-20250120175213-bf7842eed43a
 	github.com/creachadair/command v0.1.21
-	github.com/creachadair/ffs v0.12.4
+	github.com/creachadair/ffs v0.12.6
 	github.com/creachadair/ffuse v0.0.0-20250120175957-72382396a44a
 	github.com/creachadair/flax v0.0.4
 	github.com/creachadair/gcsstore v0.0.0-20250120175758-51d6f88c7f1a
@@ -78,7 +78,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.3 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/creachadair/msync v0.5.0 // indirect
+	github.com/creachadair/msync v0.5.1 // indirect
 	github.com/dgraph-io/badger/v4 v4.5.0 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
