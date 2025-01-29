@@ -95,8 +95,7 @@ store without roots.
 			dprintf(env, "Roots: %s\n", wrap(keys, 90, "  ", ", "))
 
 			// Mark phase: Scan all roots.
-			for i := 0; i < len(keys); i++ {
-				key := keys[i]
+			for _, key := range keys {
 				rp, err := root.Open(env.Context(), s.Roots(), key)
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
