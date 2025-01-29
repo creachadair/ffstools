@@ -202,6 +202,21 @@ func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
 	})
 }
 
+func casPutCmd(env *command.Env) error {
+	return withStoreFromEnv(env, func(bs blob.KV) error {
+		data, err := readData(env.Context(), "cas-put", env.Args)
+		if err != nil {
+			return err
+		}
+		key, err := blob.CASFromKV(bs).CASPut(env.Context(), data)
+		if err != nil {
+			return err
+		}
+		fmt.Println(config.FormatKey(key))
+		return nil
+	})
+}
+
 func syncKeysCmd(env *command.Env, keys []string) error {
 	var parsed []string
 	for _, key := range keys {

@@ -60,17 +60,23 @@ the address or an @tag from the configuration file.
 	Commands: []*command.C{
 		{
 			Name:  "get",
-			Usage: "get <key>...",
+			Usage: "<key>...",
 			Help:  "Read blobs from the store.",
 			Run:   getCmd,
 		},
 		{
 			Name:  "put",
-			Usage: "put <key> [<path>]",
+			Usage: "<key> [<path>]",
 			Help:  "Write a blob to the store.",
 
 			SetFlags: func(env *command.Env, fs *flag.FlagSet) { bf.Flag("replace").Bind(fs) },
 			Run:      command.Adapt(putCmd),
+		},
+		{
+			Name:  "cas-put",
+			Usage: "[<path>]",
+			Help:  "Write a content-addressed blob to the store.",
+			Run:   command.Adapt(casPutCmd),
 		},
 		{
 			Name:  "has",
