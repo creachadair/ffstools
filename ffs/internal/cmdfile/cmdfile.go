@@ -40,6 +40,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/mapset"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -166,6 +167,15 @@ If the origin is from a root, the root is updated with the changes.`,
 
 			SetFlags: command.Flags(flax.MustBind, &resolveFlags),
 			Run:      command.Adapt(runResolve),
+		},
+		{
+			Name: "find-keys",
+			Usage: `<root-key>/<path> <key> ...
+@<origin-key>/<path> <key> ...`,
+			Help: "Find where the specified keys are used.",
+
+			SetFlags: command.Flags(flax.MustBind, &findFlags),
+			Run:      command.Adapt(runFindKeys),
 		},
 	},
 }
@@ -592,6 +602,56 @@ func runResolve(env *command.Env, originPath string) error {
 			fmt.Printf("%s %s\n", config.FormatKey(f.Key()), parts[i])
 		}
 		return err
+	})
+}
+
+var findFlags struct {
+	All bool `flag:"all,Find all occurrences"`
+}
+
+var errFindFound = errors.New("found")
+
+func runFindKeys(env *command.Env, origin string, keys ...string) error {
+	cfg := env.Config.(*config.Settings)
+	var parsed []string
+	for i, key := range keys {
+		p, err := config.ParseKey(key)
+		if err != nil {
+			return fmt.Errorf("key %d: %w", i+1, err)
+		}
+		parsed = append(parsed, p)
+	}
+
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
+		of, err := config.OpenPath(env.Context(), s, origin)
+		if err != nil {
+			return err
+		}
+		want := mapset.New(parsed...)
+		werr := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
+			if e.Err != nil {
+				return err
+			}
+			if want.Has(e.File.Key()) {
+				fmt.Printf("file %q %s\n", e.Path, config.FormatKey(e.File.Key()))
+				if !findFlags.All {
+					return errFindFound
+				}
+			}
+			for i, dkey := range e.File.Data().Keys() {
+				if want.Has(dkey) {
+					fmt.Printf("data %q [%d] %s\n", e.Path, i, config.FormatKey(dkey))
+					if !findFlags.All {
+						return errFindFound
+					}
+				}
+			}
+			return nil
+		})
+		if errors.Is(werr, errFindFound) {
+			return nil
+		}
+		return werr
 	})
 }
 
