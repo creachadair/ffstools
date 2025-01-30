@@ -674,6 +674,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			} else {
 				fmt.Printf("check %q %s\n", of.Path, config.FormatKey(of.File.Key()))
 			}
+			var uniq mapset.Set[string]
 			var nfile, ndata, nlost, nerrs int
 
 			// If this file came from a root pointer, and the root has an index,
@@ -698,7 +699,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				}
 				nfile++
 				want := mapset.New(e.File.Data().Keys()...)
-				ndata += len(want)
+				uniq.AddAll(want)
+				ndata += e.File.Data().Len()
 				have, err := s.Files().Has(env.Context(), e.File.Data().Keys()...)
 				if err != nil {
 					fmt.Printf("* check data %q: %v", e.Path, err)
@@ -716,8 +718,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}); err != nil {
 				return err
 			}
-			fmt.Printf("- %s (%d files, %d blocks, %d lost, %d errors)\n",
-				value.Cond(nerrs == 0, "OK", "FAILED"), nfile, ndata, nlost, nerrs)
+			fmt.Printf("- %s (%d files, %d blocks, %d unique, %d lost, %d errors)\n",
+				value.Cond(nerrs == 0, "OK", "FAILED"), nfile, ndata, uniq.Len(), nlost, nerrs)
 		}
 		return nil
 	})
