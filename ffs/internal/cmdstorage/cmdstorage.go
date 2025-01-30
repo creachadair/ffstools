@@ -51,8 +51,8 @@ var Command = &command.C{
 	Usage: "--store <spec> --listen <addr> [options]",
 	Help: fmt.Sprintf(`Run a storage server.
 
-Start a server that serves content from the blob.Store described by the
---store spec. The server listens at the --listen address, which may be
+Serve content from the blob.Store described by the --store spec.
+The server listens at the --listen address, which may be either
 a host:port or the path of a Unix-domain socket.
 
 A store spec is a storage type and address: type:address
@@ -77,7 +77,7 @@ With --key, the store is opened with chacha20-poly1305 encryption.
 The contents of the --key file are used as the cipher key.
 If the file has the format of http://godoc.org/github.com/creachadair/keyfile,
 it is unlocked using a passphrase, from the FFS_PASSPHRASE environment or
-prompted at the terminal. Otherwise its contents are used verbatim
+prompted at the terminal. Otherwise its contents are used verbatim.
 
 Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores
