@@ -674,6 +674,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			} else {
 				fmt.Printf("check %q %s\n", of.Path, config.FormatKey(of.File.Key()))
 			}
+
+			start := time.Now()
+			var done mapset.Set[string]
 			var uniq mapset.Set[string]
 			var nfile, ndata, nlost, nerrs int
 
@@ -697,7 +700,13 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					nerrs++
 					return e.Err
 				}
+
 				nfile++
+				if done.Has(e.File.Key()) {
+					return nil // already handled
+				}
+				done.Add(e.File.Key())
+
 				want := mapset.New(e.File.Data().Keys()...)
 				uniq.AddAll(want)
 				ndata += e.File.Data().Len()
@@ -718,9 +727,10 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}); err != nil {
 				return err
 			}
-			fmt.Printf("- %s (%d files, %d blocks, %d unique, %d lost, %d errors)\n",
-				value.Cond(nerrs == 0 && nlost == 0, "OK", "FAILED"),
-				nfile, ndata, uniq.Len(), nlost, nerrs,
+			fmt.Printf("%s: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
+				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
+				nfile, done.Len(), ndata, uniq.Len(), nlost, nerrs,
+				time.Since(start).Round(time.Millisecond),
 			)
 		}
 		return nil
