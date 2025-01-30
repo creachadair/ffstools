@@ -62,7 +62,7 @@ Use --xattr to export extended attributes, if any are stored.`,
 
 func runExport(env *command.Env, originPath string) error {
 	if exportFlags.Target == "" {
-		return env.Usagef("missing required -to path")
+		return env.Usagef("missing required --to path")
 	}
 
 	// Create leading components of the target directory path, as required.

@@ -41,6 +41,7 @@ import (
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
+	"github.com/creachadair/mds/value"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -160,10 +161,9 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run: command.Adapt(runXAttr),
 		},
 		{
-			Name: "resolve",
-			Usage: `<root-key>/<path>
-@<origin-key>/<path>`,
-			Help: "Show the storage key targeted by the specified path.",
+			Name:  "resolve",
+			Usage: fileCmdUsage,
+			Help:  "Show the storage key targeted by the specified path.",
 
 			SetFlags: command.Flags(flax.MustBind, &resolveFlags),
 			Run:      command.Adapt(runResolve),
@@ -176,6 +176,12 @@ If the origin is from a root, the root is updated with the changes.`,
 
 			SetFlags: command.Flags(flax.MustBind, &findFlags),
 			Run:      command.Adapt(runFindKeys),
+		},
+		{
+			Name:  "fsck",
+			Usage: fileCmdUsage,
+			Help:  "Check file tree integrity.",
+			Run:   command.Adapt(runFileCheck),
 		},
 	},
 }
@@ -652,6 +658,53 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 			return nil
 		}
 		return werr
+	})
+}
+
+func runFileCheck(env *command.Env, origins ...string) error {
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s config.Store) error {
+		for _, org := range origins {
+			of, err := config.OpenPath(env.Context(), s, org)
+			if err != nil {
+				return err
+			}
+			if of.Root == nil && of.Base == of.File {
+				fmt.Printf("check %s\n", config.FormatKey(of.FileKey))
+			} else {
+				fmt.Printf("check %q %s\n", of.Path, config.FormatKey(of.File.Key()))
+			}
+			var nfile, ndata, nlost, nerrs int
+			if err := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
+				if e.Err != nil {
+					fmt.Printf("* error %q: %v\n", e.Path, e.Err)
+					nerrs++
+					return e.Err
+				}
+				nfile++
+				want := mapset.New(e.File.Data().Keys()...)
+				ndata += len(want)
+				have, err := s.Files().Has(env.Context(), e.File.Data().Keys()...)
+				if err != nil {
+					fmt.Printf("* check data %q: %v", e.Path, err)
+					nerrs++
+					return nil
+				}
+				want.RemoveAll(have)
+				if !want.IsEmpty() {
+					for m := range want {
+						fmt.Printf("* data missing %s\n", config.FormatKey(m))
+						nlost++
+					}
+				}
+				return nil
+			}); err != nil {
+				return err
+			}
+			fmt.Printf("- %s (%d files, %d blocks, %d lost, %d errors)\n",
+				value.Cond(nerrs == 0, "OK", "FAILED"), nfile, ndata, nlost, nerrs)
+		}
+		return nil
 	})
 }
 
