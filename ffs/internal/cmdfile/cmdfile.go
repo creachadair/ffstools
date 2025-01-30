@@ -675,6 +675,21 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				fmt.Printf("check %q %s\n", of.Path, config.FormatKey(of.File.Key()))
 			}
 			var nfile, ndata, nlost, nerrs int
+
+			// If this file came from a root pointer, and the root has an index,
+			// verify that we can load the index data successfully.
+			if of.Root != nil && of.Root.IndexKey != "" {
+				_, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey)
+				if err != nil {
+					fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
+					nerrs++
+				} else {
+					fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
+				}
+			}
+
+			// Verify that all reachable files are loadable, and that their data
+			// blocks exist in the store (without fetching them).
 			if err := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
 				if e.Err != nil {
 					fmt.Printf("* error %q: %v\n", e.Path, e.Err)
