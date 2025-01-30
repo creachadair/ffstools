@@ -710,7 +710,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				want.RemoveAll(have)
 				if !want.IsEmpty() {
 					for m := range want {
-						fmt.Printf("* data missing %s\n", config.FormatKey(m))
+						fmt.Printf("* data missing %q %s\n", e.Path, config.FormatKey(m))
 						nlost++
 					}
 				}
