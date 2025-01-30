@@ -719,7 +719,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				return err
 			}
 			fmt.Printf("- %s (%d files, %d blocks, %d unique, %d lost, %d errors)\n",
-				value.Cond(nerrs == 0, "OK", "FAILED"), nfile, ndata, uniq.Len(), nlost, nerrs)
+				value.Cond(nerrs == 0 && nlost == 0, "OK", "FAILED"),
+				nfile, ndata, uniq.Len(), nlost, nerrs,
+			)
 		}
 		return nil
 	})
