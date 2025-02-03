@@ -77,14 +77,15 @@ type Config struct {
 // Service manages a running server, accepting connections and delegating them
 // to a peer implementing the [chirpstore.Service] methods.
 type Service struct {
-	root   *chirp.Peer
-	addr   string
-	prefix string
-	store  blob.StoreCloser
-	buffer blob.KV
-	loop   *taskgroup.Single[error]
-	stop   func()
-	logf   func(string, ...any)
+	root      *chirp.Peer
+	addr      string
+	prefix    string
+	store     blob.StoreCloser
+	cacheSize int
+	buffer    blob.KV
+	loop      *taskgroup.Single[error]
+	stop      func()
+	logf      func(string, ...any)
 }
 
 // New creates a new, unstarted service for the specified config.
@@ -115,17 +116,14 @@ func New(config Config) *Service {
 	if config.Compress {
 		store = encoded.New(store, zstdc.New())
 	}
-	if config.CacheSizeBytes > 0 {
-		store = cachestore.New(store, config.CacheSizeBytes)
-	}
-
 	return &Service{
-		root:   chirp.NewPeer(),
-		addr:   config.Address,
-		prefix: config.MethodPrefix,
-		store:  store,
-		buffer: config.Buffer,
-		logf:   logf,
+		root:      chirp.NewPeer(),
+		addr:      config.Address,
+		prefix:    config.MethodPrefix,
+		store:     store,
+		cacheSize: config.CacheSizeBytes,
+		buffer:    config.Buffer,
+		logf:      logf,
 	}
 }
 
@@ -152,6 +150,9 @@ func (s *Service) Start(ctx context.Context) error {
 	store := s.store
 	if s.buffer != nil {
 		store = wbstore.New(ctx, store, s.buffer)
+	}
+	if s.cacheSize > 0 {
+		store = cachestore.New(store, s.cacheSize)
 	}
 
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
