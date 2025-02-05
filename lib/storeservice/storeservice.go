@@ -151,7 +151,7 @@ func (s *Service) Start(ctx context.Context) error {
 	// that will govern the lifecycle of the running service.
 	store := s.store
 	if s.buffer != nil {
-		store = wbstore.New(ctx, store, s.buffer)
+		store = wbstore.New(ctx, store, cachestore.NewKV(s.buffer, 10<<20))
 	}
 
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
