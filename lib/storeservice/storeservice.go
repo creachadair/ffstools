@@ -61,9 +61,9 @@ type Config struct {
 	// specified size. If zero or negative, no cache is enabled.
 	CacheSizeBytes int
 
-	// Buffer, if non-nil, uses the specified KV as a writeback buffer for
+	// Buffer, if non-nil, uses the specified store as a writeback buffer for
 	// writes to the underlying store.
-	Buffer blob.KV
+	Buffer blob.StoreCloser
 
 	// MethodPrefix is prepended to the method names exportd by the service.
 	// Any caller must use the same prefix.
@@ -77,14 +77,15 @@ type Config struct {
 // Service manages a running server, accepting connections and delegating them
 // to a peer implementing the [chirpstore.Service] methods.
 type Service struct {
-	root   *chirp.Peer
-	addr   string
-	prefix string
-	store  blob.StoreCloser
-	buffer blob.KV
-	loop   *taskgroup.Single[error]
-	stop   func()
-	logf   func(string, ...any)
+	root    *chirp.Peer
+	addr    string
+	prefix  string
+	store   blob.StoreCloser
+	buffer  blob.StoreCloser
+	loop    *taskgroup.Single[error]
+	stop    func()
+	logf    func(string, ...any)
+	bufSize func() int64
 }
 
 // New creates a new, unstarted service for the specified config.
@@ -151,7 +152,15 @@ func (s *Service) Start(ctx context.Context) error {
 	// that will govern the lifecycle of the running service.
 	store := s.store
 	if s.buffer != nil {
-		store = wbstore.New(ctx, store, cachestore.NewKV(s.buffer, 10<<20))
+		wb := wbstore.New(ctx, store, s.buffer)
+		store = wb
+		s.bufSize = func() int64 {
+			n, err := wb.BufferLen(ctx)
+			if err != nil {
+				return -1
+			}
+			return n
+		}
 	}
 
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
@@ -169,6 +178,15 @@ func (s *Service) Start(ctx context.Context) error {
 	})
 	s.stop = func() { lst.Close() }
 	return nil
+}
+
+// BufferLen reports the total number of keys in the buffer store.
+// If there is no buffer store, or in case of error, it returns -1.
+func (s *Service) BufferLen() int64 {
+	if s.bufSize == nil {
+		return -1
+	}
+	return s.bufSize()
 }
 
 // Stop shuts down the service and waits for it to finish.  If s is not
