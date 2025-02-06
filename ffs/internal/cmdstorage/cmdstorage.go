@@ -159,7 +159,7 @@ func runStorage(env *command.Env) error {
 		ReadOnly:       flags.ReadOnly,
 		Logf:           log.Printf,
 	})
-	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, buf))
+	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, srv))
 
 	if err := srv.Start(sctx); err != nil {
 		return fmt.Errorf("start server: %w", err)

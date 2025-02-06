@@ -26,11 +26,12 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
+	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
 )
 
-func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv blob.KV, oerr error) {
+func openStore(ctx context.Context, storeSpec string) (bs, buf blob.StoreCloser, oerr error) {
 	// Open the primary store.
 	bs, err := registry.Stores.Open(ctx, storeSpec)
 	if err != nil {
@@ -42,15 +43,9 @@ func openStore(ctx context.Context, storeSpec string) (bs blob.StoreCloser, bkv 
 	defer closeOnError(bs, &oerr)
 
 	// Open a KV on the write-behind store.
-	bdb, berr := registry.Stores.Open(ctx, flags.BufferDB)
+	buf, berr := registry.Stores.Open(ctx, flags.BufferDB)
 	if berr != nil {
 		return nil, nil, fmt.Errorf("open buffer: %w", berr)
-	}
-	defer closeOnError(bdb, &oerr)
-
-	buf, err := bdb.KV(ctx, "")
-	if err != nil {
-		return nil, nil, fmt.Errorf("buffer keyspace: %w", err)
 	}
 	return bs, buf, nil
 }
@@ -63,7 +58,7 @@ type expvarBool bool
 
 func (b expvarBool) String() string { return strconv.FormatBool(bool(b)) }
 
-func newServerMetrics(ctx context.Context, spec string, buf blob.KV) *expvar.Map {
+func newServerMetrics(ctx context.Context, spec string, srv *storeservice.Service) *expvar.Map {
 	mx := new(expvar.Map)
 	mx.Set("started", expvarString(time.Now().UTC().Format(time.RFC3339)))
 	mx.Set("store", expvarString(spec))
@@ -87,15 +82,9 @@ func newServerMetrics(ctx context.Context, spec string, buf blob.KV) *expvar.Map
 		mx.Set("build_info", v)
 	}
 
-	if buf != nil {
+	if flags.BufferDB != "" {
 		mx.Set("buffer_db", expvarString(flags.BufferDB))
-		mx.Set("buffer_len", expvar.Func(func() any {
-			n, err := buf.Len(ctx)
-			if err != nil {
-				return "unknown"
-			}
-			return strconv.FormatInt(n, 10)
-		}))
+		mx.Set("buffer_len", expvar.Func(func() any { return srv.BufferLen() }))
 	}
 	return mx
 }
