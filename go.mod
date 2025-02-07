@@ -152,8 +152,7 @@ require (
 	google.golang.org/genproto v0.0.0-20250102185135-69823020774d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
-	google.golang.org/grpc v1.68.1 // indirect
-	google.golang.org/grpc/stats/opentelemetry v0.0.0-20241028142157-ada6787961b3 // indirect
+	google.golang.org/grpc v1.70.0 // indirect
 	modernc.org/libc v1.61.9 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
@@ -166,3 +165,5 @@ retract (
 	v0.8.6 // broken go-fuse on macOS
 	v0.4.1
 )
+
+exclude google.golang.org/grpc/stats/opentelemetry v0.0.0-20241028142157-ada6787961b3
