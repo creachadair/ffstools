@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/index"
@@ -186,7 +187,8 @@ store without roots.
 						}
 						run.Run(func() {
 							pb.SetMeta(numDrop.Add(1))
-							if err := s.Files().Delete(ctx, key); err != nil && !errors.Is(err, context.Canceled) {
+							err := s.Files().Delete(ctx, key)
+							if err != nil && !errors.Is(err, context.Canceled) && !blob.IsKeyNotFound(err) {
 								log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
 							}
 						})
