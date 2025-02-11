@@ -124,6 +124,10 @@ func (s *Settings) ResolveAddress(addr string) StoreSpec {
 func (s *Settings) ResolveSpec(spec string) StoreSpec {
 	tag, ok := strings.CutPrefix(spec, "@")
 	if ok {
+		sub := s.Substore
+		if i := strings.LastIndex(tag, "+"); i >= 0 {
+			tag, sub = tag[:i], tag[i+1:]
+		}
 		for _, st := range s.Stores {
 			if tag == st.Tag {
 				cp := *st
@@ -131,11 +135,16 @@ func (s *Settings) ResolveSpec(spec string) StoreSpec {
 				if cp.Prefix == "" {
 					cp.Prefix = s.ServicePrefix
 				}
+				if sub != "" {
+					cp.Substore = sub
+				} else if cp.Substore == "" {
+					cp.Substore = s.Substore
+				}
 				return cp
 			}
 		}
 	}
-	return StoreSpec{Spec: spec, Prefix: s.ServicePrefix}
+	return StoreSpec{Spec: spec, Prefix: s.ServicePrefix, Substore: s.Substore}
 }
 
 // OpenStore connects to the store service address in the configuration.  The

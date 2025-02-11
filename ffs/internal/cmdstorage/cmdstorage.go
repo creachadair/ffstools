@@ -59,7 +59,9 @@ A store spec is a storage type and address: type:address
 The types understood are: %[1]s
 
 If --store has the form "@name", the storage spec associated with that
-name in the FFS config file is used (if defined).
+name in the FFS config file is used (if defined). If the name has the
+form "@name+sub", or if the --substore flag is set, only the specified
+substore of that base store is exported.
 
 The --listen flag must be one of:
 
@@ -109,7 +111,7 @@ func runStorage(env *command.Env) error {
 	if err != nil {
 		return err
 	}
-	bs, buf, err := openStore(env.Context(), rs.Spec)
+	bs, buf, err := openStore(env.Context(), rs)
 	if err != nil {
 		return err
 	}

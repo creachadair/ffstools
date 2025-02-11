@@ -25,22 +25,30 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
 )
 
-func openStore(ctx context.Context, storeSpec string) (bs, buf blob.StoreCloser, oerr error) {
+func openStore(ctx context.Context, store config.StoreSpec) (bs, buf blob.StoreCloser, oerr error) {
 	// Open the primary store.
-	bs, err := registry.Stores.Open(ctx, storeSpec)
+	bs, err := registry.Stores.Open(ctx, store.Spec)
 	if err != nil {
 		return nil, nil, fmt.Errorf("open store: %w", err)
+	}
+	defer closeOnError(bs, &oerr)
+	if store.Substore != "" {
+		sub, err := bs.Sub(ctx, store.Substore)
+		if err != nil {
+			return nil, nil, fmt.Errorf("open substore %q: %w", store.Substore, err)
+		}
+		bs = subCloser{Store: sub, Closer: bs}
 	}
 	if flags.BufferDB == "" {
 		return bs, nil, nil
 	}
-	defer closeOnError(bs, &oerr)
 
 	// Open a KV on the write-behind store.
 	buf, berr := registry.Stores.Open(ctx, flags.BufferDB)
@@ -120,4 +128,9 @@ func closeOnError(c blob.Closer, errp *error) func() {
 			c.Close(context.Background())
 		}
 	}
+}
+
+type subCloser struct {
+	blob.Store
+	blob.Closer
 }
