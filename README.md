@@ -15,14 +15,8 @@ See also https://github.com/creachadair/ffs.
   go install github.com/creachadair/ffstools/ffs@latest
   ```
 
-  The `ffs blob` subcommand replaced the formerly separate `blob` tool ([#30][]).
-  The `ffs storage` subcommand replaced the formerly separate `blobd` tool ([#35][]).
-
   When installing, you may want to specify build `--tags` to enable other
   storage backends. See [Storage Backends](#storage-backends).
-
-[#30]: https://github.com/creachadair/ffstools/pull/30
-[#35]: https://github.com/creachadair/ffstools/pull/35
 
 - The [`file2json`](https://github.com/creachadair/ffstools/tree/main/file2json)
   tool decodes wire-format node messages and translates them to JSON for easier
