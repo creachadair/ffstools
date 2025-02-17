@@ -77,15 +77,16 @@ type Config struct {
 // Service manages a running server, accepting connections and delegating them
 // to a peer implementing the [chirpstore.Service] methods.
 type Service struct {
-	root    *chirp.Peer
-	addr    string
-	prefix  string
-	store   blob.StoreCloser
-	buffer  blob.StoreCloser
-	loop    *taskgroup.Single[error]
-	stop    func()
-	logf    func(string, ...any)
-	bufSize func() int64
+	root       *chirp.Peer
+	addr       string
+	prefix     string
+	store      blob.StoreCloser
+	buffer     blob.StoreCloser
+	cacheBytes int
+	loop       *taskgroup.Single[error]
+	stop       func()
+	logf       func(string, ...any)
+	bufSize    func() int64
 }
 
 // New creates a new, unstarted service for the specified config.
@@ -116,17 +117,21 @@ func New(config Config) *Service {
 	if config.Compress {
 		store = encoded.New(store, zstdc.New())
 	}
-	if config.CacheSizeBytes > 0 {
+
+	// Enable the cache if requested. But if we have a write-behind buffer,
+	// defer this until Start, so that the cache remains frontmost in the stack.
+	if config.CacheSizeBytes > 0 && config.Buffer == nil {
 		store = cachestore.New(store, config.CacheSizeBytes)
 	}
 
 	return &Service{
-		root:   chirp.NewPeer(),
-		addr:   config.Address,
-		prefix: config.MethodPrefix,
-		store:  store,
-		buffer: config.Buffer,
-		logf:   logf,
+		root:       chirp.NewPeer(),
+		addr:       config.Address,
+		prefix:     config.MethodPrefix,
+		store:      store,
+		buffer:     config.Buffer,
+		cacheBytes: config.CacheSizeBytes,
+		logf:       logf,
 	}
 }
 
@@ -153,13 +158,20 @@ func (s *Service) Start(ctx context.Context) error {
 	store := s.store
 	if s.buffer != nil {
 		wb := wbstore.New(ctx, store, s.buffer)
-		store = wb
+
 		s.bufSize = func() int64 {
 			n, err := wb.BufferLen(ctx)
 			if err != nil {
 				return -1
 			}
 			return n
+		}
+		store = wb
+
+		// If the cache size is positive, it means we want a cache, but we had to
+		// defer creating it because of the buffer.
+		if s.cacheBytes > 0 {
+			store = cachestore.New(store, s.cacheBytes)
 		}
 	}
 
