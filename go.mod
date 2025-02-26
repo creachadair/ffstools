@@ -11,14 +11,14 @@ require (
 	github.com/creachadair/chirp v0.0.0-20250115221431-d0705d7949ac
 	github.com/creachadair/chirpstore v0.0.0-20250120175213-bf7842eed43a
 	github.com/creachadair/command v0.1.21
-	github.com/creachadair/ffs v0.13.13
+	github.com/creachadair/ffs v0.13.14
 	github.com/creachadair/ffuse v0.0.0-20250120175957-72382396a44a
 	github.com/creachadair/flax v0.0.4
 	github.com/creachadair/gcsstore v0.0.0-20250210170313-bc152950ed24
 	github.com/creachadair/getpass v0.2.2
 	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
-	github.com/creachadair/mds v0.23.0
+	github.com/creachadair/mds v0.24.0
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
 	github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f
 	github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95
@@ -28,7 +28,7 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
-	golang.org/x/crypto v0.32.0
+	golang.org/x/crypto v0.35.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/yaml.v3 v3.0.1
 	honnef.co/go/tools v0.5.1
@@ -94,7 +94,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers/go v0.0.0-20230110200425-62e4d2e5b215 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -145,7 +145,7 @@ require (
 	golang.org/x/oauth2 v0.26.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/term v0.28.0 // indirect
+	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
