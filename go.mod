@@ -18,11 +18,11 @@ require (
 	github.com/creachadair/getpass v0.2.2
 	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
-	github.com/creachadair/mds v0.24.0
+	github.com/creachadair/mds v0.24.1
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
 	github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f
 	github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95
-	github.com/creachadair/sqlitestore v0.0.0-20250120175340-8c526194146a
+	github.com/creachadair/sqlitestore v0.0.0-20250313235304-673b89e74d12
 	github.com/creachadair/taskgroup v0.13.2
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.7.2
@@ -89,7 +89,7 @@ require (
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers/go v0.0.0-20230110200425-62e4d2e5b215 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -136,7 +136,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
@@ -153,10 +153,10 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/grpc v1.71.0 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
-	modernc.org/libc v1.61.9 // indirect
+	modernc.org/libc v1.61.13 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
-	modernc.org/sqlite v1.34.5 // indirect
+	modernc.org/sqlite v1.36.0 // indirect
 )
 
 retract (
