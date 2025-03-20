@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/creachadair/command"
@@ -57,6 +58,10 @@ is terminated by a signal.`,
 				defer cancel()
 				srv.Shutdown(ctx)
 			}()
+			if strings.HasPrefix(address, ":") {
+				address = "localhost" + address
+			}
+			fmt.Fprintf(env, "Serving at http://%s/\n", address)
 			srv.ListenAndServe()
 			fmt.Fprintln(env, "Server exited")
 			return nil
