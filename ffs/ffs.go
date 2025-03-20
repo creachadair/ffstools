@@ -37,6 +37,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage"
 	"github.com/creachadair/ffstools/ffs/internal/cmdsync"
+	"github.com/creachadair/ffstools/ffs/internal/cmdweb"
 )
 
 var (
@@ -107,6 +108,7 @@ help [<command>]`,
 			cmdgc.Command,
 			cmdblob.Command,
 			cmdstorage.Command,
+			cmdweb.Command,
 			cmdstatus.Command,
 			command.HelpCommand([]command.HelpTopic{{
 				Name: "environment",
