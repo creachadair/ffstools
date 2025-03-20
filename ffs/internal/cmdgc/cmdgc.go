@@ -111,7 +111,9 @@ store without roots.
 					}
 					idxs = append(idxs, rpi)
 					idx.Add(rp.IndexKey)
-					dprintf(env, "Loaded cached index for %q (%s)\n", key, config.FormatKey(rp.IndexKey))
+					dprintf(env, "Loaded cached index for %q (%d keys, %s)\n",
+						key, rpi.Stats().NumKeys, config.FormatKey(rp.IndexKey),
+					)
 					continue
 				}
 
