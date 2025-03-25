@@ -114,6 +114,11 @@ func New(config Config) *Service {
 		}
 		store = encoded.New(store, encrypted.New(aead, nil))
 	}
+
+	// N.B. Compression, if enabled, needs to happen before encryption, since
+	// the encryption step makes the data effectively incompressible. However,
+	// the encrypted storage wrapper already does compression, so it is not
+	// necessary to enable both in most cases.
 	if config.Compress {
 		store = encoded.New(store, zstdc.New())
 	}
