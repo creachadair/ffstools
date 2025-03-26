@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -41,13 +40,13 @@ import (
 var gcFlags struct {
 	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=2048,PRIVATE:Number of concurrent sweep tasks"`
+	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
 	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
 	Verbose      bool          `flag:"v,Enable verbose logging"`
 
-	// N.B. The tasks value is chosen to allow a small multiple of the number of
-	// sweep seeds to proceed concurrently. There are 256 seeds, so 2048 is 8x
-	// per seed.
+	// The expensive part of a GC is deleting the keys, which in cloud storage
+	// are often heavily rate-limited. We want to proceed concurrently to the
+	// extent practical, but there are diminishing returns.
 }
 
 var errSweepLimit = errors.New("sweep limit reached")
@@ -153,59 +152,76 @@ store without roots.
 			}
 			idxs = append(idxs, idx)
 
+			hasKey := func(key string) bool {
+				for _, idx := range idxs {
+					if idx.Has(key) {
+						return true
+					}
+				}
+				return false
+			}
+
 			// Sweep phase: Remove objects not indexed.
 			ctx, cancel := context.WithCancelCause(env.Context())
 			defer cancel(nil)
 			if gcFlags.Limit > 0 {
 				time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
-				fmt.Fprintf(env, "Begin sweep over %d objects (limit %v)...\n", n, gcFlags.Limit)
+				fmt.Fprintf(env, "Begin sweep over %d objects (limit %v)\n", n, gcFlags.Limit)
 			} else {
-				fmt.Fprintf(env, "Begin sweep over %d objects...\n", n)
+				fmt.Fprintf(env, "Begin sweep over %d objects\n", n)
 			}
 
-			// We want to have _some_ basic limit here, but it does not need to be
-			// very tight.  Deletion rate limits are pretty forgiving.
 			g, run := taskgroup.New(cancel).Limit(gcFlags.Tasks)
 
 			start := time.Now()
 			var numKeep, numDrop atomic.Int64
-			pb := pbar.New(env, n).Start()
-			for _, p := range shuffledSeeds() {
-				pfx := string([]byte{p})
-				g.Go(func() error {
-				nextKey:
-					for key, err := range s.Files().List(ctx, pfx) {
-						if err != nil {
-							return err
-						} else if !strings.HasPrefix(key, pfx) {
-							return nil
-						}
-						pb.Add(1)
-						for _, idx := range idxs {
-							if idx.Has(key) {
-								numKeep.Add(1)
-								continue nextKey
-							}
-						}
-						run.Run(func() {
-							pb.SetMeta(numDrop.Add(1))
-							err := s.Files().Delete(ctx, key)
-							if err != nil && !errors.Is(err, context.Canceled) && !blob.IsKeyNotFound(err) {
-								log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
-							}
-						})
-					}
-					return nil
-				})
+
+			// Sweep phase 1: Collect all the keys eligible for deletion.
+			var toDrop mapset.Set[string]
+			for key, err := range s.Files().List(ctx, "") {
+				if err != nil {
+					return err
+				}
+
+				if hasKey(key) {
+					numKeep.Add(1)
+					continue
+				}
+				toDrop.Add(key)
 			}
-			serr := g.Wait()
-			pb.Stop()
-			fmt.Fprintln(env, " *")
-			if serr != nil {
-				if errors.Is(context.Cause(ctx), errSweepLimit) {
-					fmt.Fprintln(env, "(sweep limit reached)")
-				} else {
-					return fmt.Errorf("sweeping failed: %w", serr)
+			fmt.Fprintf(env, "Found %d objects to delete\n", toDrop.Len())
+
+			if !toDrop.IsEmpty() {
+				// Sweep phase 2: Delete all the eligible keys. This will be the bulk
+				// of the work, for stores with expensive backends (e.g., cloud storage).
+				pb := pbar.New(env, int64(toDrop.Len())).Start()
+				for key := range toDrop {
+					if ctx.Err() != nil {
+						break
+					}
+					pb.Add(1)
+					run.Go(func() error {
+						err := s.Files().Delete(ctx, key)
+						if err == nil || blob.IsKeyNotFound(err) {
+							pb.SetMeta(numDrop.Add(1))
+							return nil
+						} else if !errors.Is(err, context.Canceled) {
+							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
+						}
+						return err
+					})
+				}
+
+				// Clean up and report.
+				serr := g.Wait()
+				pb.Stop()
+				fmt.Fprintln(env, " *")
+				if serr != nil {
+					if errors.Is(context.Cause(ctx), errSweepLimit) {
+						fmt.Fprintln(env, "(sweep limit reached)")
+					} else {
+						return fmt.Errorf("sweeping failed: %w", serr)
+					}
 				}
 			}
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
@@ -213,17 +229,6 @@ store without roots.
 			return nil
 		})
 	}),
-}
-
-func shuffledSeeds() []byte {
-	m := make([]byte, 256)
-	for i := range m {
-		m[i] = byte(i)
-	}
-	rand.Shuffle(256, func(i, j int) {
-		m[i], m[j] = m[j], m[i]
-	})
-	return m
 }
 
 func wrap(ss []string, n int, indent, sep string) string {
