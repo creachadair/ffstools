@@ -199,8 +199,8 @@ store without roots.
 					if ctx.Err() != nil {
 						break
 					}
-					pb.Add(1)
 					run.Go(func() error {
+						pb.Add(1)
 						err := s.Files().Delete(ctx, key)
 						if err == nil || blob.IsKeyNotFound(err) {
 							pb.SetMeta(numDrop.Add(1))
