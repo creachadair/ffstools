@@ -165,7 +165,8 @@ store without roots.
 			ctx, cancel := context.WithCancelCause(env.Context())
 			defer cancel(nil)
 			if gcFlags.Limit > 0 {
-				time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
+				t := time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
+				defer t.Stop()
 				fmt.Fprintf(env, "Begin sweep over %d objects (limit %v)\n", n, gcFlags.Limit)
 			} else {
 				fmt.Fprintf(env, "Begin sweep over %d objects\n", n)
@@ -189,9 +190,10 @@ store without roots.
 				}
 				toDrop.Add(key)
 			}
-			fmt.Fprintf(env, "Found %d objects to delete\n", toDrop.Len())
 
 			if !toDrop.IsEmpty() {
+				fmt.Fprintf(env, "Found %d objects to delete\n", toDrop.Len())
+
 				// Sweep phase 2: Delete all the eligible keys. This will be the bulk
 				// of the work, for stores with expensive backends (e.g., cloud storage).
 				pb := pbar.New(env, int64(toDrop.Len())).Start()
