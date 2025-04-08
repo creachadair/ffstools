@@ -16,14 +16,12 @@ package main
 
 import (
 	"context"
-	"flag"
-	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 
 	// Subcommands.
 	"github.com/creachadair/ffstools/ffs/internal/cmdblob"
@@ -40,13 +38,13 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdweb"
 )
 
-var (
-	configPath    = config.Path()
-	storeAddr     string
-	servicePrefix string
-	substoreName  string
-	debugLog      bool
-)
+var flags = struct {
+	ConfigPath    string `flag:"config,default=*,Configuration file path"`
+	StoreAddr     string `flag:"store,default=$FFS_STORE,Store service address (socket path, host:port[+sub], or @name[+sub])"`
+	ServicePrefix string `flag:"service-prefix,default=$FFS_PREFIX,Store service method prefix"`
+	SubstoreName  string `flag:"substore,default=$FFS_SUBSTORE,Substore name"`
+	DebugLog      bool   `flag:"debug,default=$FFS_DEBUG,Enable debug logging (warning: noisy)"`
+}{ConfigPath: config.Path()}
 
 func main() {
 	root := &command.C{
@@ -55,42 +53,24 @@ func main() {
 help [<command>]`,
 		Help: `A command-line tool to manage FFS file trees.`,
 
-		SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-			fs.StringVar(&configPath, "config", configPath, "Configuration file path")
-			fs.StringVar(&storeAddr, "store", storeAddr, "Store service address (socket path, host:port[+sub], or @name[+sub]")
-			fs.StringVar(&substoreName, "substore", substoreName, "Substore name")
-			fs.StringVar(&servicePrefix, "service-prefix", servicePrefix, "Store service method prefix")
-			fs.BoolVar(&debugLog, "debug", debugLog, "Enable debug logging (warning: noisy)")
-		},
+		SetFlags: command.Flags(flax.MustBind, &flags),
 
 		Init: func(env *command.Env) error {
-			cfg, err := config.Load(configPath)
+			cfg, err := config.Load(flags.ConfigPath)
 			if err != nil {
 				return err
 			}
-			if storeAddr != "" {
-				cfg.DefaultStore = storeAddr
-			} else if bs := os.Getenv("FFS_STORE"); bs != "" {
-				cfg.DefaultStore = bs
+			if s := flags.StoreAddr; s != "" {
+				cfg.DefaultStore = s
 			}
-			if servicePrefix != "" {
-				cfg.ServicePrefix = servicePrefix
-			} else if sp := os.Getenv("FFS_PREFIX"); sp != "" {
-				cfg.ServicePrefix = sp
+			if s := flags.ServicePrefix; s != "" {
+				cfg.ServicePrefix = s
 			}
-			if substoreName != "" {
-				cfg.Substore = substoreName
-			} else if sub := os.Getenv("FFS_SUBSTORE"); sub != "" {
-				cfg.Substore = sub
+			if s := flags.SubstoreName; s != "" {
+				cfg.Substore = s
 			}
-			if debugLog {
+			if flags.DebugLog {
 				cfg.EnableDebugLogging = true
-			} else if fd := os.Getenv("FFS_DEBUG"); fd != "" {
-				d, err := strconv.ParseBool(fd)
-				if err != nil {
-					return fmt.Errorf("invalid FFS_DEBUG value: %w", err)
-				}
-				cfg.EnableDebugLogging = d
 			}
 			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
