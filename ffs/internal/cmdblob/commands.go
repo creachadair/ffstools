@@ -16,6 +16,7 @@ package cmdblob
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -69,6 +70,33 @@ func hasCmd(env *command.Env) error {
 		slices.Sort(has)
 		for _, v := range has {
 			fmt.Println(config.FormatKey(v))
+		}
+		return nil
+	})
+}
+
+func sizeCmd(env *command.Env) error {
+	if len(env.Args) == 0 {
+		return env.Usagef("missing required <key>")
+	}
+	var parsed []string
+	for _, raw := range env.Args {
+		key, err := config.ParseKey(raw)
+		if err != nil {
+			return err
+		}
+		parsed = append(parsed, key)
+	}
+	return withStoreFromEnv(env, func(bs blob.KV) error {
+		for _, key := range parsed {
+			data, err := bs.Get(env.Context(), key)
+			if errors.Is(err, blob.ErrKeyNotFound) {
+				fmt.Print(config.FormatKey(key), "\tnot found\n")
+			} else if err != nil {
+				return err
+			} else {
+				fmt.Print(config.FormatKey(key), "\t", len(data), "\n")
+			}
 		}
 		return nil
 	})

@@ -85,6 +85,12 @@ the address or an @tag from the configuration file.
 			Run:   hasCmd,
 		},
 		{
+			Name:  "size",
+			Usage: "<key>...",
+			Help:  "Report the size in bytes of each specified key in the store.",
+			Run:   sizeCmd,
+		},
+		{
 			Name:  "delete",
 			Usage: "<key> ...",
 			Help:  "Delete blobs from the store.",
