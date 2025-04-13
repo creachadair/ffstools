@@ -27,6 +27,7 @@ import (
 
 var scanFlags struct {
 	Keys bool `flag:"keys,Print keys to stdout"`
+	Type bool `flag:"type,Print the type of each key (with --keys)"`
 }
 
 var Command = &command.C{
@@ -68,7 +69,11 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 		if scanFlags.Keys {
 			for chunk := range worklist.Chunks(256) {
 				for _, key := range chunk {
-					fmt.Println(config.FormatKey(key))
+					if scanFlags.Type {
+						fmt.Printf("%c %s\n", worklist.Type(key), config.FormatKey(key))
+					} else {
+						fmt.Println(config.FormatKey(key))
+					}
 				}
 			}
 		}
