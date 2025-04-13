@@ -118,7 +118,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 					}
 					for _, idx := range indices {
 						if idx.Has(key) {
-							worklist.Blob(key)
+							worklist.Data(key)
 							numAdded++
 							break
 						}
@@ -168,13 +168,13 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				run(func() error {
 					defer atomic.AddInt64(&nb, 1)
 					switch tag {
-					case 'R':
+					case scanlib.Root:
 						debug("- copying root %q", key)
 						return copyBlob(ctx, src.Roots(), tgt.Roots(), key, true)
-					case 'F':
+					case scanlib.File:
 						debug("- copying file %s", config.FormatKey(key))
 						return copyBlob(ctx, src.Sync(), tgt.Sync(), key, false)
-					case '-':
+					case scanlib.Data, scanlib.Index:
 						return copyBlob(ctx, src.Sync(), tgt.Sync(), key, false)
 					default:
 						panic("unknown tag " + string(tag))
