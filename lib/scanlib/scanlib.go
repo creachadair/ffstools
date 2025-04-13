@@ -15,16 +15,26 @@ import (
 	"github.com/creachadair/mds/slice"
 )
 
+// Type represents the type of a blob.
+type Type byte
+
+const (
+	Data  Type = '-' // An unstructured data blob
+	File  Type = 'F' // A file record (Node)
+	Root  Type = 'R' // A root record (Root)
+	Index Type = 'I' // An index record (Index)
+)
+
 // A Scanner scans all the blobs reachable from a collection of root and file
 // pointers.
 type Scanner struct {
-	keys map[string]byte
+	keys map[string]Type
 	src  blob.CAS
 }
 
 // NewScanner creates a new empty Scanner that reads data from src.
 func NewScanner(src blob.CAS) *Scanner {
-	return &Scanner{keys: make(map[string]byte), src: src}
+	return &Scanner{keys: make(map[string]Type), src: src}
 }
 
 // RootOnly adds the specified root to the scan, including its index (if any),
@@ -32,9 +42,9 @@ func NewScanner(src blob.CAS) *Scanner {
 //
 // Use [Scanner.Root] to completely scan a root.
 func (s *Scanner) RootOnly(rootKey string, rp *root.Root) {
-	s.keys[rootKey] = 'R'
+	s.keys[rootKey] = Root
 	if ik := rp.IndexKey; ik != "" {
-		s.keys[rp.IndexKey] = '-'
+		s.keys[rp.IndexKey] = Index
 	}
 }
 
@@ -56,31 +66,38 @@ func (s *Scanner) File(ctx context.Context, fp *file.File) error {
 		if _, ok := s.keys[key]; ok {
 			return false // skip repeats of the same file
 		}
-		s.keys[key] = 'F'
+		s.keys[key] = File
 
 		// Record all the data blocks.
 		for _, dkey := range si.Data().Keys() {
-			s.keys[dkey] = '-'
+			s.Data(dkey)
 		}
 		return true
 	})
 }
 
-// Blob adds the specified data blob to s.
-func (s *Scanner) Blob(key string) { s.keys[key] = '-' }
+// Data adds the specified data blob to s.
+func (s *Scanner) Data(key string) { s.keys[key] = Data }
 
 // Len reports the total number of keys in s, of all kinds.
 func (s *Scanner) Len() int { return len(s.keys) }
 
 // IsRoot reports whether key is recorded as a root pointer in s.
-func (s *Scanner) IsRoot(key string) bool { return s.keys[key] == 'R' }
+func (s *Scanner) IsRoot(key string) bool { return s.keys[key] == Root }
 
 // Remove removes the specified key from s.
 func (s *Scanner) Remove(key string) { delete(s.keys, key) }
 
-// All returns an iterator over all the key/value pairs in s.  The value for
-// each key is 'R' for a root, 'F' for a file, and '-' for a data blob.
-func (s *Scanner) All() iter.Seq2[string, byte] { return maps.All(s.keys) }
+// Type reports the type of the specified key. It panics if key is not in s.
+func (s *Scanner) Type(key string) Type {
+	if k, ok := s.keys[key]; ok {
+		return k
+	}
+	panic(fmt.Sprintf("no such key %x", key))
+}
+
+// All returns an iterator over all the key/type pairs in s.
+func (s *Scanner) All() iter.Seq2[string, Type] { return maps.All(s.keys) }
 
 // Chunks returns consecutive chunks of the keys in s each having at most n
 // elements and together spanning the complete set of keys recorded.  The keys
@@ -112,11 +129,11 @@ func (s *Scanner) Stats() Stats {
 	var out Stats
 	for _, kind := range s.keys {
 		switch kind {
-		case '-':
+		case Data, Index:
 			out.NumBlobs++
-		case 'R':
+		case Root:
 			out.NumRoots++
-		case 'F':
+		case File:
 			out.NumFiles++
 		default:
 			panic(fmt.Sprintf("unexpected key type %q", kind))
