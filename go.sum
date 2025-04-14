@@ -200,8 +200,8 @@ github.com/creachadair/msync v0.5.1 h1:Mh6zQPlJ+r7YYqgx/dhVLeGvaX8bFdeRrlrh89RBF
 github.com/creachadair/msync v0.5.1/go.mod h1:ojX1tv8DbrMrnTK2M/xx92oQvnk7N/mjDzLLbtO6Y1Q=
 github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a h1:K7eJr6cOTTD6zwIlUu1zqD7zgsWh9MjTyuSk3AqE/I0=
 github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a/go.mod h1:VwXZdn4tWX4aI/sNovbh0zJKu7BjCPkrmiPdvyECPKQ=
-github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f h1:vVoO98LKX8XQewWYPVno467w11hL8FfbEmMUeQpDriE=
-github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f/go.mod h1:uqeWo7RMW6wzwmsIZLjh3FsNivzdL7/eE8dItNcwgAo=
+github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88 h1:3QzDFPw6HXp524yPF44bRcjgWxW/muipSLkOsie416U=
+github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88/go.mod h1:uqeWo7RMW6wzwmsIZLjh3FsNivzdL7/eE8dItNcwgAo=
 github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95 h1:zhnzAY8TekgvFyY/IUdAKmi6wDDAU8aEKnolDFeFJkI=
 github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95/go.mod h1:QedfCRyKQ11P3zXsRvKBHyqptVpT3q5tVVQADNTZpg8=
 github.com/creachadair/sqlitestore v0.0.0-20250313235304-673b89e74d12 h1:jHegBS3O14scAYT1qr3wqAPHgEYWb9JQXvQfu4cHnQc=

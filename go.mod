@@ -20,7 +20,7 @@ require (
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
 	github.com/creachadair/mds v0.24.1
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
-	github.com/creachadair/rosedbstore v0.0.0-20250105015130-761ce2be027f
+	github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88
 	github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95
 	github.com/creachadair/sqlitestore v0.0.0-20250313235304-673b89e74d12
 	github.com/creachadair/taskgroup v0.13.2
