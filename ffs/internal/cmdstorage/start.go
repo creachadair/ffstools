@@ -107,7 +107,7 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 	}
 	kf, err := keyfile.Parse(data)
 	if err != nil {
-		if len(data) >= 16 {
+		if len(data) == 32 { // chacha20 key length
 			return data, nil
 		}
 		return nil, fmt.Errorf("invalid key file: %w", err)
