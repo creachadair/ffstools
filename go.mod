@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.24
 
 require (
-	github.com/creachadair/atomicfile v0.3.7
+	github.com/creachadair/atomicfile v0.3.8
 	github.com/creachadair/badgerstore v0.10.0
 	github.com/creachadair/bitcaskstore v0.0.0-20250120175303-c377a553aa6a
 	github.com/creachadair/boltstore v0.0.0-20250120175019-69d7c0db9a1e
@@ -11,24 +11,24 @@ require (
 	github.com/creachadair/chirp v0.0.0-20250115221431-d0705d7949ac
 	github.com/creachadair/chirpstore v0.0.0-20250120175213-bf7842eed43a
 	github.com/creachadair/command v0.1.21
-	github.com/creachadair/ffs v0.13.15
+	github.com/creachadair/ffs v0.13.16
 	github.com/creachadair/ffuse v0.0.0-20250120175957-72382396a44a
 	github.com/creachadair/flax v0.0.5
 	github.com/creachadair/gcsstore v0.0.0-20250403223016-1047f431bbd3
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
-	github.com/creachadair/mds v0.24.1
+	github.com/creachadair/mds v0.24.2
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
 	github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88
 	github.com/creachadair/s3store v0.0.0-20250120175202-87a5f95d6a95
-	github.com/creachadair/sqlitestore v0.0.0-20250313235304-673b89e74d12
+	github.com/creachadair/sqlitestore v0.0.0-20250428235354-60d75826f843
 	github.com/creachadair/taskgroup v0.13.2
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.37.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -76,7 +76,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.3 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/creachadair/msync v0.5.1 // indirect
+	github.com/creachadair/msync v0.5.2 // indirect
 	github.com/dgraph-io/badger/v4 v4.5.0 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -136,27 +136,27 @@ require (
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
+	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	golang.org/x/tools v0.31.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/api v0.227.0 // indirect
 	google.golang.org/genproto v0.0.0-20250324211829-b45e905df463 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250324211829-b45e905df463 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 	google.golang.org/grpc v1.71.0 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
-	modernc.org/libc v1.61.13 // indirect
+	modernc.org/libc v1.64.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.8.2 // indirect
-	modernc.org/sqlite v1.36.0 // indirect
+	modernc.org/memory v1.10.0 // indirect
+	modernc.org/sqlite v1.37.0 // indirect
 )
 
 retract (
