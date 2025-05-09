@@ -18,6 +18,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -39,11 +40,12 @@ import (
 )
 
 var flags = struct {
-	ConfigPath    string `flag:"config,default=*,Configuration file path"`
-	StoreAddr     string `flag:"store,default=$FFS_STORE,Store service address (socket path, host:port[+sub], or @name[+sub])"`
-	ServicePrefix string `flag:"service-prefix,default=$FFS_PREFIX,Store service method prefix"`
-	SubstoreName  string `flag:"substore,default=$FFS_SUBSTORE,Substore name"`
-	DebugLog      bool   `flag:"debug,default=$FFS_DEBUG,Enable debug logging (warning: noisy)"`
+	ConfigPath    string        `flag:"config,default=*,Configuration file path"`
+	StoreAddr     string        `flag:"store,default=$FFS_STORE,Store service address (socket path, host:port[+sub], or @name[+sub])"`
+	ServicePrefix string        `flag:"service-prefix,default=$FFS_PREFIX,Store service method prefix"`
+	SubstoreName  string        `flag:"substore,default=$FFS_SUBSTORE,Substore name"`
+	DebugLog      bool          `flag:"debug,default=$FFS_DEBUG,Enable debug logging (warning: noisy)"`
+	DialTimeout   time.Duration `flag:"dial-timeout,PRIVATE:Store service dial timeout"`
 }{ConfigPath: config.Path()}
 
 func main() {
@@ -68,6 +70,9 @@ help [<command>]`,
 			}
 			if s := flags.SubstoreName; s != "" {
 				cfg.Substore = s
+			}
+			if s := flags.DialTimeout; s > 0 {
+				cfg.DialTimeout = config.Duration(s)
 			}
 			if flags.DebugLog {
 				cfg.EnableDebugLogging = true

@@ -24,9 +24,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/channel"
@@ -67,6 +69,9 @@ type Settings struct {
 
 	// Enable debug logging for the storage service.
 	EnableDebugLogging bool `json:"enableDebugLogging" yaml:"enable-debug-logging"`
+
+	// Timeout for dialing store connections.
+	DialTimeout Duration `json:"dialTimeout" yaml:"dial-timeout"`
 
 	// Well-known store specifications, addressable by tag.
 	Stores []*StoreSpec `json:"stores" yaml:"stores"`
@@ -164,7 +169,11 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 	if s.EnableDebugLogging {
 		lg.Printf("dial %q", spec.Address)
 	}
-	conn, err := Dial(chirp.SplitAddress(spec.Address))
+	var d net.Dialer
+	if s.DialTimeout > 0 {
+		d.Timeout = time.Duration(s.DialTimeout)
+	}
+	conn, err := d.Dial(chirp.SplitAddress(spec.Address))
 	if err != nil {
 		return Store{}, fmt.Errorf("dialing store: %w", err)
 	}
@@ -457,4 +466,22 @@ func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error
 	}
 
 	return index.Decode(ridx)
+}
+
+// Duration is a wrapper around [time.Duration] that encodes as a string in JSON.
+type Duration time.Duration
+
+func (t Duration) Duration() time.Duration { return time.Duration(t) }
+
+func (t Duration) MarshalText() ([]byte, error) {
+	return []byte(time.Duration(t).String()), nil
+}
+
+func (t *Duration) UnmarshalText(text []byte) error {
+	d, err := time.ParseDuration(string(text))
+	if err != nil {
+		return err
+	}
+	*t = Duration(d)
+	return nil
 }
