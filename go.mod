@@ -11,14 +11,14 @@ require (
 	github.com/creachadair/chirp v0.0.0-20250115221431-d0705d7949ac
 	github.com/creachadair/chirpstore v0.0.0-20250120175213-bf7842eed43a
 	github.com/creachadair/command v0.1.21
-	github.com/creachadair/ffs v0.13.16
+	github.com/creachadair/ffs v0.13.18
 	github.com/creachadair/ffuse v0.0.0-20250120175957-72382396a44a
 	github.com/creachadair/flax v0.0.5
 	github.com/creachadair/gcsstore v0.0.0-20250403223016-1047f431bbd3
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
-	github.com/creachadair/mds v0.24.2
+	github.com/creachadair/mds v0.24.3
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
 	github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88
 	github.com/creachadair/s3store v0.0.0-20250514152101-71e9386719c6
@@ -28,7 +28,7 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.7.2
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
-	golang.org/x/crypto v0.37.0
+	golang.org/x/crypto v0.38.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -76,7 +76,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.3 // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/creachadair/msync v0.5.2 // indirect
+	github.com/creachadair/msync v0.5.4 // indirect
 	github.com/dgraph-io/badger/v4 v4.5.0 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -141,10 +141,10 @@ require (
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/term v0.31.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/api v0.227.0 // indirect
