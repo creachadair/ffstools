@@ -40,7 +40,7 @@ import (
 var gcFlags struct {
 	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
 	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=16,PRIVATE:Number of concurrent sweep tasks"`
+	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
 	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
 	Verbose      bool          `flag:"v,Enable verbose logging"`
 
