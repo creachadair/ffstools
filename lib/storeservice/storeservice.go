@@ -65,7 +65,7 @@ type Config struct {
 	// writes to the underlying store.
 	Buffer blob.StoreCloser
 
-	// MethodPrefix is prepended to the method names exportd by the service.
+	// MethodPrefix is prepended to the method names exported by the service.
 	// Any caller must use the same prefix.
 	MethodPrefix string
 
