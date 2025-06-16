@@ -727,9 +727,16 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}); err != nil {
 				return err
 			}
-			fmt.Printf("%s: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
+			totalUnique := done.Len() + uniq.Len()
+			if of.Root != nil {
+				totalUnique++ // the root
+				if of.Root.IndexKey != "" {
+					totalUnique++ // the index
+				}
+			}
+			fmt.Printf("%s: %d objects: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
 				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
-				nfile, done.Len(), ndata, uniq.Len(), nlost, nerrs,
+				totalUnique, nfile, done.Len(), ndata, uniq.Len(), nlost, nerrs,
 				time.Since(start).Round(time.Millisecond),
 			)
 		}
