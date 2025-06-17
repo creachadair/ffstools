@@ -701,15 +701,19 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					return e.Err
 				}
 
+				// Count each occurrence of a file and its data blocks even if we've already seen it.
 				nfile++
-				if done.Has(e.File.Key()) {
-					return nil // already handled
-				}
-				done.Add(e.File.Key())
-
 				want := mapset.New(e.File.Data().Keys()...)
 				uniq.AddAll(want)
 				ndata += e.File.Data().Len()
+
+				// If (and only if) this is the first time we've seen this file,
+				// make sure its data blocks are stored.
+				if done.Has(e.File.Key()) {
+					return nil // data blocks already checked
+				}
+
+				done.Add(e.File.Key())
 				have, err := s.Files().Has(env.Context(), e.File.Data().Keys()...)
 				if err != nil {
 					fmt.Printf("* check data %q: %v", e.Path, err)
