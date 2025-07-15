@@ -38,6 +38,7 @@ var syncFlags struct {
 	Verbose  bool   `flag:"v,Enable verbose logging"`
 	VVerbose bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
 	NoIndex  bool   `flag:"no-index,Do not use cached indices"`
+	NoRoot   bool   `flag:"no-root,Do not copy referenced root pointers"`
 }
 
 func debug(msg string, args ...any) {
@@ -59,7 +60,8 @@ var Command = &command.C{
 	Help: `Synchronize file trees between stores.
 
 Transfer all the objects reachable from the specified file or root
-paths into the given target store.
+paths into the given target store. By default, any roots mentioned
+are also copied to the target; use --no-root to skip this step.
 `,
 
 	SetFlags: command.Flags(flax.MustBind, &syncFlags),
@@ -166,6 +168,10 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				}
 
 				run(func() error {
+					if tag == scanlib.Root && syncFlags.NoRoot {
+						dprintf(env, "NOTE: Skipping root %q [--no-root]\n", key)
+						return nil
+					}
 					defer atomic.AddInt64(&nb, 1)
 					switch tag {
 					case scanlib.Root:
