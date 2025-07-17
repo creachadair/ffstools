@@ -30,6 +30,7 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
@@ -263,13 +264,13 @@ func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
 //
 // If path has only a root-key, the base file of that root is replaced.
 // If path has only a file-keyi, it is an error.
-func SetPath(ctx context.Context, s config.Store, path string, tf *file.File) (string, error) {
-	obase, orest := config.SplitPath(path)
+func SetPath(ctx context.Context, s filetree.Store, path string, tf *file.File) (string, error) {
+	obase, orest := filetree.SplitPath(path)
 	if orest == "." {
 		orest = "" // setting root
 	}
 
-	of, err := config.OpenPath(ctx, s, obase) // N.B. No path; see below
+	of, err := filetree.OpenPath(ctx, s, obase) // N.B. No path; see below
 	if err != nil {
 		return "", err
 	}

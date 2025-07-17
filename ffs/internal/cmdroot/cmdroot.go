@@ -27,6 +27,7 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
@@ -141,7 +142,7 @@ func runList(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -209,15 +210,15 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		var fk string
 		var err error
 
 		switch mode {
 		case "file-key":
-			fk, err = config.ParseKey(rest[0])
+			fk, err = filetree.ParseKey(rest[0])
 		case "ref":
-			tf, terr := config.OpenPath(env.Context(), s, rest[0])
+			tf, terr := filetree.OpenPath(env.Context(), s, rest[0])
 			if terr != nil {
 				return terr
 			}
@@ -279,7 +280,7 @@ func runDelete(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		roots := s.Roots()
 		for _, key := range env.Args {
 			if err := roots.Delete(env.Context(), key); err != nil {
@@ -312,7 +313,7 @@ func runEditFile(env *command.Env, root, target string) error {
 	if len(na.Args) != 1 {
 		return env.Usagef("incorrect arguments")
 	} else {
-		key, err = config.ParseKey(na.Args[0])
+		key, err = filetree.ParseKey(na.Args[0])
 	}
 	if err != nil {
 		return err
@@ -332,7 +333,7 @@ type rootArgs struct {
 	Key     string
 	Args    []string
 	Root    *root.Root
-	Store   config.Store
+	Store   filetree.Store
 	Close   func()
 }
 

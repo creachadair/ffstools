@@ -29,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/pbar"
@@ -64,7 +65,7 @@ store without roots.
 
 	Run: command.Adapt(func(env *command.Env) error {
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.Store) error {
+		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 			var keys []string
 			for key, err := range s.Roots().List(env.Context(), "") {
 				if err != nil {

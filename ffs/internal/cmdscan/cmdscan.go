@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
@@ -41,12 +42,12 @@ var Command = &command.C{
 
 func runScan(env *command.Env, sourceKeys ...string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src config.Store) error {
+	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
 		// Find all the objects reachable from the specified starting points.
 		worklist := scanlib.NewScanner(src.Files())
 		scanStart := time.Now()
 		for _, elt := range sourceKeys {
-			of, err := config.OpenPath(env.Context(), src, elt)
+			of, err := filetree.OpenPath(env.Context(), src, elt)
 			if err != nil {
 				return err
 			}

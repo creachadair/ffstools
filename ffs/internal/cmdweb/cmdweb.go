@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 )
@@ -40,8 +41,8 @@ is terminated by a signal.`,
 
 	Run: command.Adapt(func(env *command.Env, address, rootKey string) error {
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.Store) error {
-			pi, err := config.OpenPath(env.Context(), s, rootKey)
+		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+			pi, err := filetree.OpenPath(env.Context(), s, rootKey)
 			if err != nil {
 				return err
 			}

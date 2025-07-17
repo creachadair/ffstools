@@ -22,6 +22,7 @@ import (
 
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 )
 
@@ -31,7 +32,7 @@ var Command = &command.C{
 
 	Run: command.Adapt(func(env *command.Env) error {
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.Store) error {
+		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 			cs, ok := s.Roots().(chirpstore.KV)
 			if !ok {
 				return errors.New("store does not support the status command")

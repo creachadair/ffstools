@@ -8,17 +8,17 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20250120175303-c377a553aa6a
 	github.com/creachadair/boltstore v0.0.0-20250120175019-69d7c0db9a1e
 	github.com/creachadair/buntdbstore v0.0.0-20250120175250-42f8ce8c9298
-	github.com/creachadair/chirp v0.0.0-20250613030156-bb9ffd4b9e2a
-	github.com/creachadair/chirpstore v0.0.0-20250627004531-f7165ceba2cb
-	github.com/creachadair/command v0.1.22
-	github.com/creachadair/ffs v0.13.20
-	github.com/creachadair/ffuse v0.0.0-20250624214047-8a86f105dd7f
+	github.com/creachadair/chirp v0.0.0-20250707162423-d55b3c4ebd47
+	github.com/creachadair/chirpstore v0.0.0-20250707162438-bfebf0f558fe
+	github.com/creachadair/command v0.1.23
+	github.com/creachadair/ffs v0.14.0
+	github.com/creachadair/ffuse v0.0.0-20250717151842-00d000676779
 	github.com/creachadair/flax v0.0.5
 	github.com/creachadair/gcsstore v0.0.0-20250403223016-1047f431bbd3
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.4
 	github.com/creachadair/leveldbstore v0.0.0-20250120175243-9b22659b15db
-	github.com/creachadair/mds v0.25.0
+	github.com/creachadair/mds v0.25.2
 	github.com/creachadair/pebblestore v0.0.0-20250120175134-ae007cbb8e9a
 	github.com/creachadair/rosedbstore v0.0.0-20250414170012-195b6796aa88
 	github.com/creachadair/s3store v0.0.0-20250514152101-71e9386719c6
@@ -28,7 +28,7 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.8.0
 	github.com/klauspost/compress v1.17.11
 	github.com/pkg/xattr v0.4.10
-	golang.org/x/crypto v0.39.0
+	golang.org/x/crypto v0.40.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -139,14 +139,14 @@ require (
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/term v0.32.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/term v0.33.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	golang.org/x/tools v0.33.0 // indirect
+	golang.org/x/tools v0.34.0 // indirect
 	google.golang.org/api v0.227.0 // indirect
 	google.golang.org/genproto v0.0.0-20250324211829-b45e905df463 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250324211829-b45e905df463 // indirect

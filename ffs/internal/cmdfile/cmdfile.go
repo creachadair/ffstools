@@ -36,6 +36,7 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/wiretype"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
@@ -195,12 +196,12 @@ func runShow(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		for _, arg := range env.Args {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			of, err := config.OpenPath(env.Context(), s, arg)
+			of, err := filetree.OpenPath(env.Context(), s, arg)
 			if err != nil {
 				return err
 			}
@@ -233,7 +234,7 @@ func runList(env *command.Env) error {
 		return env.Usagef("missing required origin/path")
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 2, 2, 1, ' ', 0)
 		defer w.Flush()
 
@@ -241,7 +242,7 @@ func runList(env *command.Env) error {
 			if arg == "" {
 				return env.Usagef("origin may not be empty")
 			}
-			pi, err := config.OpenPath(env.Context(), s, arg)
+			pi, err := filetree.OpenPath(env.Context(), s, arg)
 			if err != nil {
 				return err
 			}
@@ -397,8 +398,8 @@ func nameOrID(name string, id int) string {
 
 func runRead(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		of, err := config.OpenPath(env.Context(), s, originPath)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		of, err := filetree.OpenPath(env.Context(), s, originPath)
 		if err != nil {
 			return err
 		}
@@ -410,8 +411,8 @@ func runRead(env *command.Env, originPath string) error {
 
 func runSet(env *command.Env, originPath, target string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		tf, err := config.OpenPath(env.Context(), s, target)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		tf, err := filetree.OpenPath(env.Context(), s, target)
 		if err != nil {
 			return err
 		}
@@ -430,13 +431,13 @@ func runRemove(env *command.Env) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		for _, arg := range env.Args {
-			base, rest := config.SplitPath(arg)
+			base, rest := filetree.SplitPath(arg)
 			if rest == "" || rest == "." {
 				return fmt.Errorf("missing path %q", arg)
 			}
-			of, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
+			of, err := filetree.OpenPath(env.Context(), s, base) // N.B. No path; see below
 			if err != nil {
 				return err
 			}
@@ -463,8 +464,8 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		return fmt.Errorf("invalid mod spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		tf, err := config.OpenPath(env.Context(), s, path)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		tf, err := filetree.OpenPath(env.Context(), s, path)
 		if err != nil {
 			return err
 		}
@@ -512,8 +513,8 @@ func runXAttr(env *command.Env, fileSpec, op string, args ...string) error {
 		return err
 	}
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		of, err := config.OpenPath(env.Context(), s, fileSpec)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		of, err := filetree.OpenPath(env.Context(), s, fileSpec)
 		if err != nil {
 			return err
 		}
@@ -582,8 +583,8 @@ var resolveFlags struct {
 func runResolve(env *command.Env, originPath string) error {
 	cfg := env.Config.(*config.Settings)
 	if !resolveFlags.Path {
-		return cfg.WithStore(env.Context(), func(s config.Store) error {
-			rf, err := config.OpenPath(env.Context(), s, env.Args[0])
+		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+			rf, err := filetree.OpenPath(env.Context(), s, env.Args[0])
 			if err != nil {
 				return err
 			}
@@ -591,9 +592,9 @@ func runResolve(env *command.Env, originPath string) error {
 			return nil
 		})
 	}
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		base, rest := config.SplitPath(originPath)
-		rf, err := config.OpenPath(env.Context(), s, base) // N.B. No path; see below
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		base, rest := filetree.SplitPath(originPath)
+		rf, err := filetree.OpenPath(env.Context(), s, base) // N.B. No path; see below
 		if err != nil {
 			return err
 		}
@@ -621,15 +622,15 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 	cfg := env.Config.(*config.Settings)
 	var parsed []string
 	for i, key := range keys {
-		p, err := config.ParseKey(key)
+		p, err := filetree.ParseKey(key)
 		if err != nil {
 			return fmt.Errorf("key %d: %w", i+1, err)
 		}
 		parsed = append(parsed, p)
 	}
 
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
-		of, err := config.OpenPath(env.Context(), s, origin)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		of, err := filetree.OpenPath(env.Context(), s, origin)
 		if err != nil {
 			return err
 		}
@@ -663,9 +664,9 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 
 func runFileCheck(env *command.Env, origins ...string) error {
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		for _, org := range origins {
-			of, err := config.OpenPath(env.Context(), s, org)
+			of, err := filetree.OpenPath(env.Context(), s, org)
 			if err != nil {
 				return err
 			}

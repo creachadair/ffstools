@@ -20,13 +20,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -34,10 +32,8 @@ import (
 	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/file"
-	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
-	"github.com/creachadair/ffs/fpath"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -154,17 +150,17 @@ func (s *Settings) ResolveSpec(spec string) StoreSpec {
 
 // OpenStore connects to the store service address in the configuration.  The
 // caller is responsible for closing the store when it is no longer needed.
-func (s *Settings) OpenStore(ctx context.Context) (Store, error) {
+func (s *Settings) OpenStore(ctx context.Context) (filetree.Store, error) {
 	spec := s.ResolveAddress(s.DefaultStore)
 	if spec.Address == "" {
-		return Store{}, fmt.Errorf("no store service address (%q)", s.DefaultStore)
+		return filetree.Store{}, fmt.Errorf("no store service address (%q)", s.DefaultStore)
 	}
 	return s.openStoreAddress(ctx, spec)
 }
 
 // openStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
-func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store, error) {
+func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetree.Store, error) {
 	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 	if s.EnableDebugLogging {
 		lg.Printf("dial %q", spec.Address)
@@ -175,7 +171,7 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 	}
 	conn, err := d.Dial(chirp.SplitAddress(spec.Address))
 	if err != nil {
-		return Store{}, fmt.Errorf("dialing store: %w", err)
+		return filetree.Store{}, fmt.Errorf("dialing store: %w", err)
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
@@ -189,37 +185,15 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (Store,
 		sub, err = bs.Sub(ctx, spec.Substore)
 		if err != nil {
 			conn.Close()
-			return Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
+			return filetree.Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
 		}
 	}
-
-	rootKV, err := sub.KV(ctx, "root")
-	if err != nil {
-		conn.Close()
-		return Store{}, fmt.Errorf("open root keyspace: %w", err)
-	}
-	fileKV, err := sub.KV(ctx, "file")
-	if err != nil {
-		conn.Close()
-		return Store{}, fmt.Errorf("open file keyspace: %w", err)
-	}
-	fileCAS, err := sub.CAS(ctx, "file")
-	if err != nil {
-		conn.Close()
-		return Store{}, fmt.Errorf("open file keyspace: %w", err)
-	}
-	return Store{
-		roots: rootKV,
-		files: fileCAS,
-		fsync: fileKV,
-		s:     sub,
-		c:     bs, // N.B. top-level store, for closing
-	}, nil
+	return filetree.NewStore(ctx, sub)
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
 // closed after f returns. The error returned by f is returned by WithStore.
-func (s *Settings) WithStore(ctx context.Context, f func(Store) error) error {
+func (s *Settings) WithStore(ctx context.Context, f func(filetree.Store) error) error {
 	spec := s.ResolveAddress(s.DefaultStore)
 	if spec.Address == "" {
 		return fmt.Errorf("no store service address (%q)", s.DefaultStore)
@@ -234,7 +208,7 @@ func (s *Settings) WithStore(ctx context.Context, f func(Store) error) error {
 
 // WithStoreAddress calls f with a store opened at addr. The store is closed
 // after f returns. The error returned by f is returned by WithStoreAddress.
-func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(Store) error) error {
+func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(filetree.Store) error) error {
 	spec := s.ResolveAddress(addr)
 	bs, err := s.openStoreAddress(ctx, spec)
 	if err != nil {
@@ -242,32 +216,6 @@ func (s *Settings) WithStoreAddress(ctx context.Context, addr string, f func(Sto
 	}
 	defer bs.Close(ctx)
 	return f(bs)
-}
-
-// ParseKey parses the string encoding of a key. A key must be a hex string, a
-// base64 string, or a literal string prefixed with "@":
-//
-//	@foo     encodes "foo"
-//	@@foo    encodes "@foo"
-//	414243   encodes "ABC"
-//	eHl6enk= encodes "xyzzy"
-func ParseKey(s string) (string, error) {
-	if strings.HasPrefix(s, "@") {
-		return s[1:], nil
-	}
-	var key []byte
-	var err error
-	if isAllHex(s) {
-		key, err = hex.DecodeString(s)
-	} else if strings.HasSuffix(s, "=") {
-		key, err = base64.StdEncoding.DecodeString(s)
-	} else {
-		key, err = base64.RawStdEncoding.DecodeString(s) // tolerate missing padding
-	}
-	if err != nil {
-		return "", fmt.Errorf("invalid key %q: %w", s, err)
-	}
-	return string(key), nil
 }
 
 // ExpandString calls os.ExpandEnv to expand environment variables in *s.
@@ -318,141 +266,6 @@ func ToJSON(msg any) string {
 	}
 	return buf.String()
 }
-
-func isAllHex(s string) bool {
-	for _, c := range s {
-		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F') {
-			return false
-		}
-	}
-	return true
-}
-
-// PathInfo is the result of parsing and opening a path spec.
-type PathInfo struct {
-	Path    string     // the original input path (unparsed)
-	Base    *file.File // the root or starting file of the path
-	BaseKey string     // the storage key of the base file
-	File    *file.File // the target file of the path
-	FileKey string     // the storage key of the target file
-	Root    *root.Root // the specified root, or nil if none
-	RootKey string     // the key of root, or ""
-}
-
-// Flush flushes the base file to reflect any changes and returns its updated
-// storage key. If p is based on a root, the root is also updated and saved.
-func (p *PathInfo) Flush(ctx context.Context) (string, error) {
-	key, err := p.Base.Flush(ctx)
-	if err != nil {
-		return "", err
-	}
-	p.BaseKey = key
-
-	// If this path started at a root, write out the updated contents.
-	if p.Root != nil {
-		// If the file has changed, invalidate the index.
-		if p.Root.FileKey != key {
-			p.Root.IndexKey = ""
-		}
-		p.Root.FileKey = key
-		if err := p.Root.Save(ctx, p.RootKey, true); err != nil {
-			return "", err
-		}
-	}
-	return key, nil
-}
-
-// OpenPath parses and opens the specified path in s.
-// The path has either the form "<root-key>/some/path" or "@<file-key>/some/path".
-func OpenPath(ctx context.Context, s Store, path string) (*PathInfo, error) {
-	out := &PathInfo{Path: path}
-
-	first, rest := SplitPath(path)
-
-	// Check for a @file key prefix; otherwise it should be a root.
-	if !strings.HasPrefix(first, "@") {
-		rp, err := root.Open(ctx, s.Roots(), first)
-		if err != nil {
-			return nil, err
-		}
-		rf, err := rp.File(ctx, s.Files())
-		if err != nil {
-			return nil, err
-		}
-		out.Root = rp
-		out.RootKey = first
-		out.Base = rf
-		out.File = rf
-		out.FileKey = rp.FileKey // provisional
-
-	} else if fk, err := ParseKey(strings.TrimPrefix(first, "@")); err != nil {
-		return nil, err
-
-	} else if fp, err := file.Open(ctx, s.Files(), fk); err != nil {
-		return nil, err
-
-	} else {
-		out.Base = fp
-		out.File = fp
-		out.FileKey = fk
-	}
-	out.BaseKey = out.Base.Key() // safe, it was just opened
-
-	// If the rest of the path is empty, the starting point is the target.
-	if rest == "" {
-		return out, nil
-	}
-
-	// Otherwise, open a path relative to the base.
-	tf, err := fpath.Open(ctx, out.Base, rest)
-	if err != nil {
-		return nil, err
-	}
-	out.File = tf
-	out.FileKey = out.File.Key() // safe, it was just opened
-	return out, nil
-}
-
-// SplitPath parses s as a slash-separated path specification.
-// The first segment of s identifies the storage key of a root or file, the
-// rest indicates a sequence of child names starting from that file.
-// The rest may be empty.
-func SplitPath(s string) (first, rest string) {
-	if pre, post, ok := strings.Cut(s, "=/"); ok { // <base64>=/more/stuff
-		return pre + "=", path.Clean(post)
-	}
-	if strings.HasSuffix(s, "=") {
-		return s, ""
-	}
-	pre, post, _ := strings.Cut(s, "/")
-	return pre, path.Clean(post)
-}
-
-// Store is a wrapper around a store that adds methods to expose the root and
-// data buckets.
-type Store struct {
-	roots blob.KV
-	files blob.CAS
-	fsync blob.KV
-
-	s blob.Store
-	c blob.Closer
-}
-
-// Files returns the files bucket of the underlying storage.
-func (s Store) Files() blob.CAS { return s.files }
-
-// Roots returns the roots bucket of the underlying storage.
-func (s Store) Roots() blob.KV { return s.roots }
-
-// Sync returns a sync view of the files bucket.
-func (s Store) Sync() blob.KV { return s.fsync }
-
-// Store returns the underlying store for c.
-func (s Store) Store() blob.Store { return s.s }
-
-// Close closes the store attached to c.
-func (s Store) Close(ctx context.Context) error { return s.c.Close(ctx) }
 
 // LoadIndex loads the contents of an index blob.
 func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {

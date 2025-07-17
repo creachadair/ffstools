@@ -22,6 +22,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
@@ -66,7 +67,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s config.Store) error {
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		if err := checkTarget(env, s, putFlags.Target); err != nil {
 			return err
 		}
@@ -107,10 +108,10 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 	})
 }
 
-func checkTarget(env *command.Env, s config.Store, target string) error {
+func checkTarget(env *command.Env, s filetree.Store, target string) error {
 	if target != "" {
-		root, _ := config.SplitPath(target)
-		_, err := config.OpenPath(env.Context(), s, root)
+		root, _ := filetree.SplitPath(target)
+		_, err := filetree.OpenPath(env.Context(), s, root)
 		if err != nil {
 			return fmt.Errorf("target %q: %w", target, err)
 		}

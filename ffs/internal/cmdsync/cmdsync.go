@@ -26,6 +26,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/scanlib"
@@ -74,15 +75,15 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src config.Store) error {
-		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt config.Store) error {
+	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
+		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt filetree.Store) error {
 			fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
 
 			// Find all the objects reachable from the specified starting points.
 			worklist := scanlib.NewScanner(src.Files())
 			var indices []*index.Index
 			for _, elt := range sourceKeys {
-				of, err := config.OpenPath(env.Context(), src, elt)
+				of, err := filetree.OpenPath(env.Context(), src, elt)
 				if err != nil {
 					return err
 				}

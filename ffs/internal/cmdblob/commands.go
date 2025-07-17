@@ -25,6 +25,7 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 )
@@ -35,7 +36,7 @@ func getCmd(env *command.Env) error {
 	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
 		for _, arg := range env.Args {
-			key, err := config.ParseKey(arg)
+			key, err := filetree.ParseKey(arg)
 			if err != nil {
 				return err
 			}
@@ -55,7 +56,7 @@ func hasCmd(env *command.Env) error {
 	}
 	var parsed []string
 	for _, raw := range env.Args {
-		key, err := config.ParseKey(raw)
+		key, err := filetree.ParseKey(raw)
 		if err != nil {
 			return err
 		}
@@ -81,7 +82,7 @@ func sizeCmd(env *command.Env) error {
 	}
 	var parsed []string
 	for _, raw := range env.Args {
-		key, err := config.ParseKey(raw)
+		key, err := filetree.ParseKey(raw)
 		if err != nil {
 			return err
 		}
@@ -120,7 +121,7 @@ func delCmd(env *command.Env) error {
 			if dctx.Err() != nil {
 				break
 			}
-			key, err := config.ParseKey(arg)
+			key, err := filetree.ParseKey(arg)
 			if err != nil {
 				return err
 			}
@@ -139,11 +140,11 @@ func delCmd(env *command.Env) error {
 }
 
 func listCmd(env *command.Env) error {
-	start, err := config.ParseKey(listFlags.Start)
+	start, err := filetree.ParseKey(listFlags.Start)
 	if err != nil {
 		return err
 	}
-	pfx, err := config.ParseKey(listFlags.Prefix)
+	pfx, err := filetree.ParseKey(listFlags.Prefix)
 	if err != nil {
 		return err
 	}
@@ -188,11 +189,11 @@ func lenCmd(env *command.Env) error {
 
 func copyCmd(env *command.Env, srcArg, dstArg string) error {
 	return withStoreFromEnv(env, func(bs blob.KV) error {
-		srcKey, err := config.ParseKey(srcArg)
+		srcKey, err := filetree.ParseKey(srcArg)
 		if err != nil {
 			return err
 		}
-		dstKey, err := config.ParseKey(dstArg)
+		dstKey, err := filetree.ParseKey(dstArg)
 		if err != nil {
 			return err
 		}
@@ -212,7 +213,7 @@ func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
 	if len(rest) > 1 {
 		return env.Usagef("extra arguments after path: %q", rest[1:])
 	}
-	key, err := config.ParseKey(keyArg)
+	key, err := filetree.ParseKey(keyArg)
 	if err != nil {
 		return err
 	}
@@ -248,7 +249,7 @@ func casPutCmd(env *command.Env) error {
 func syncKeysCmd(env *command.Env, keys []string) error {
 	var parsed []string
 	for _, key := range keys {
-		p, err := config.ParseKey(key)
+		p, err := filetree.ParseKey(key)
 		if err != nil {
 			return err
 		}
@@ -282,7 +283,7 @@ func withStoreFromEnv(env *command.Env, f func(blob.KV) error) error {
 	if err != nil {
 		return err
 	}
-	kv, err := bs.Store().KV(env.Context(), blobFlags.KV)
+	kv, err := bs.Base().KV(env.Context(), blobFlags.KV)
 	if err != nil {
 		return fmt.Errorf("open kv %q: %w", blobFlags.KV, err)
 	}

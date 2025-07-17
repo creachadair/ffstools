@@ -24,6 +24,7 @@ import (
 	"log"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffuse/driver"
 )
@@ -65,7 +66,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			return env.Usagef("extra arguments after command: %q", cmdArgs)
 		}
 		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s config.Store) error {
+		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 			svc.MountPath = mountPath
 			svc.RootKey = rootKey
 			svc.Store = s
