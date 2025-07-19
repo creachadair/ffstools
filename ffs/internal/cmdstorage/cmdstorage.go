@@ -39,7 +39,7 @@ import (
 
 var flags struct {
 	ListenAddr string `flag:"listen,Service address (required)"`
-	KeyFile    string `flag:"key,Encryption key file or salt (if empty, do not encrypt)"`
+	KeyFile    string `flag:"key,Encryption key file (if empty, do not encrypt)"`
 	BufferDB   string `flag:"buffer,Write-behind buffer database"`
 	CacheSize  int    `flag:"cache,Memory cache size in MiB (0 means no cache)"`
 	Compress   bool   `flag:"compress,Enable zstd compression of blob data"`
