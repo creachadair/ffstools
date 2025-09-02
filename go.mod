@@ -5,24 +5,24 @@ go 1.24.0
 require (
 	github.com/creachadair/atomicfile v0.3.8
 	github.com/creachadair/badgerstore v0.10.2
-	github.com/creachadair/bitcaskstore v0.0.0-20250825181259-6c7089805394
-	github.com/creachadair/boltstore v0.0.0-20250825181318-29dbef66a3c2
-	github.com/creachadair/buntdbstore v0.0.0-20250825181347-6260e9a32a38
+	github.com/creachadair/bitcaskstore v0.0.0-20250901153213-80bbd4d267ed
+	github.com/creachadair/boltstore v0.0.0-20250901153213-e105a9601d15
+	github.com/creachadair/buntdbstore v0.0.0-20250901153214-c07cc42497ea
 	github.com/creachadair/chirp v0.1.0
-	github.com/creachadair/chirpstore v0.0.0-20250825180916-2083b715f832
+	github.com/creachadair/chirpstore v0.0.0-20250901153213-ea3ee2664879
 	github.com/creachadair/command v0.2.0
 	github.com/creachadair/ffs v0.14.3
-	github.com/creachadair/ffuse v0.0.0-20250817183804-fa22300af37a
+	github.com/creachadair/ffuse v0.0.0-20250901153214-6f3e3038733a
 	github.com/creachadair/flax v0.0.5
-	github.com/creachadair/gcsstore v0.0.0-20250825181209-96b02858717e
+	github.com/creachadair/gcsstore v0.0.0-20250901153213-bdc580ecd82c
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.5
-	github.com/creachadair/leveldbstore v0.0.0-20250825181338-2a784a440e2b
+	github.com/creachadair/leveldbstore v0.0.0-20250901153213-f75dc07aa7d5
 	github.com/creachadair/mds v0.25.2
-	github.com/creachadair/pebblestore v0.0.0-20250825181018-fc5518ac1c9e
-	github.com/creachadair/rosedbstore v0.0.0-20250825181408-df27a2e9f0da
-	github.com/creachadair/s3store v0.0.0-20250825181119-79336d2dcc58
-	github.com/creachadair/sqlitestore v0.0.0-20250825181054-5aa44f359e59
+	github.com/creachadair/pebblestore v0.0.0-20250901153213-232d8324838d
+	github.com/creachadair/rosedbstore v0.0.0-20250901153213-09f5ef7ba043
+	github.com/creachadair/s3store v0.0.0-20250901153214-0b9314bb85be
+	github.com/creachadair/sqlitestore v0.0.0-20250901153214-d2a2014a6b6d
 	github.com/creachadair/taskgroup v0.14.0
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.8.0
@@ -48,23 +48,23 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.53.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.38.2 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.38.3 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.31.4 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.8 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.5 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.5 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.5 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.31.6 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.10 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.6 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.5 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.8.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.87.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.28.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.34.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.38.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.8.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.87.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.29.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.34.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.38.2 // indirect
 	github.com/aws/smithy-go v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
@@ -129,14 +129,14 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.etcd.io/bbolt v1.4.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/contrib/detectors/gcp v1.37.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0 // indirect
-	go.opentelemetry.io/otel v1.37.0 // indirect
-	go.opentelemetry.io/otel/metric v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
-	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	go.opentelemetry.io/contrib/detectors/gcp v1.38.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
+	go.opentelemetry.io/otel v1.38.0 // indirect
+	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.27.0 // indirect
@@ -154,7 +154,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
 	google.golang.org/grpc v1.75.0 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
-	modernc.org/libc v1.66.7 // indirect
+	modernc.org/libc v1.66.8 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.38.2 // indirect
