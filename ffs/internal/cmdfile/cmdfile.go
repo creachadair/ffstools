@@ -683,13 +683,18 @@ func runFileCheck(env *command.Env, origins ...string) error {
 
 			// If this file came from a root pointer, and the root has an index,
 			// verify that we can load the index data successfully.
+			//
+			// If we do have an index, we will also verify that all the reachable
+			// file and data blobs are recorded there.
+			checkIndex := func(string) bool { return true } // fail open
 			if of.Root != nil && of.Root.IndexKey != "" {
-				_, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey)
+				idx, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey)
 				if err != nil {
 					fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
 					nerrs++
 				} else {
 					fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
+					checkIndex = idx.Has
 				}
 			}
 
@@ -700,6 +705,12 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					fmt.Printf("* error %q: %v\n", e.Path, e.Err)
 					nerrs++
 					return e.Err
+				}
+
+				fkey := e.File.Key()
+				if !checkIndex(fkey) {
+					fmt.Printf("* index: missing file %s\n", config.FormatKey(fkey))
+					nerrs++
 				}
 
 				// Count each occurrence of a file and its data blocks even if we've already seen it.
@@ -714,7 +725,13 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					return nil // data blocks already checked
 				}
 
-				done.Add(e.File.Key())
+				done.Add(fkey)
+				for _, dk := range e.File.Data().Keys() {
+					if !checkIndex(dk) {
+						fmt.Printf("* index: missing data %s\n", config.FormatKey(dk))
+						nerrs++
+					}
+				}
 				have, err := s.Files().Has(env.Context(), e.File.Data().Keys()...)
 				if err != nil {
 					fmt.Printf("* check data %q: %v", e.Path, err)
