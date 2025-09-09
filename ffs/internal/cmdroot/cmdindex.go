@@ -29,12 +29,15 @@ import (
 )
 
 var indexFlags struct {
-	Force bool `flag:"f,Force reindexing"`
+	Force   bool `flag:"f,Force reindexing"`
+	Discard bool `flag:"discard,Discard cached index if present"`
 }
 
 func runIndex(env *command.Env) error {
 	if len(env.Args) == 0 {
 		return env.Usagef("missing required <root-key>")
+	} else if indexFlags.Force && indexFlags.Discard {
+		return env.Usagef("the --discard and --force flags are mutually exclusive")
 	}
 
 	cfg := env.Config.(*config.Settings)
@@ -48,10 +51,25 @@ func runIndex(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			if rp.IndexKey != "" && !indexFlags.Force {
-				fmt.Fprintf(env, "Root %q is already indexed\n", key)
+			if rp.IndexKey != "" {
+				if indexFlags.Discard {
+					rp.IndexKey = ""
+					if err := rp.Save(env.Context(), key, true); err != nil {
+						return fmt.Errorf("saving root: %w", err)
+					}
+					fmt.Fprintf(env, "Removed cached index for %q\n", key)
+					continue
+				} else if !indexFlags.Force {
+					fmt.Fprintf(env, "Root %q is already indexed\n", key)
+					continue
+				}
+
+				// Reaching here, we are asked to compute a new index.
+			} else if indexFlags.Discard {
+				fmt.Fprintf(env, "Root %q has no cached index (OK)\n", key)
 				continue
 			}
+
 			fp, err := rp.File(env.Context(), s.Files())
 			if err != nil {
 				return err
