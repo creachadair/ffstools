@@ -180,8 +180,8 @@ github.com/creachadair/chirpstore v0.0.0-20250911185717-42bf169f452b h1:Yus8GmXH
 github.com/creachadair/chirpstore v0.0.0-20250911185717-42bf169f452b/go.mod h1:VhEssNgi/Gpkf3XMClxON7C6yacigzLlG+iFVYLbxMk=
 github.com/creachadair/command v0.2.0 h1:qTA9cMMhZePAxFoNdnk6F6nn94s1qPndIg9hJbqI9cA=
 github.com/creachadair/command v0.2.0/go.mod h1:j+Ar+uYnFsHpkMeV9kGj6lJ45y9u2xqtg8FYy6cm+0o=
-github.com/creachadair/ffs v0.14.3 h1:gdNa7Cuy0jPPt4JXsY8YUnV/77sYElyypJMNpmU7g+8=
-github.com/creachadair/ffs v0.14.3/go.mod h1:9d77tXXYtbwZUBJUnQ6KIPcwTXSseQuHDX4ibRDWd2Y=
+github.com/creachadair/ffs v0.14.4 h1:p7CRNlDTsVOf7HGxHevGC8wa82ZlVBHaQfFNVA6j5AM=
+github.com/creachadair/ffs v0.14.4/go.mod h1:QkwScDEy9rkHfvdjOlC7eEqSg2K/8Hpz0hC0Yvvwm0E=
 github.com/creachadair/ffuse v0.0.0-20250902165535-45841c3f07d9 h1:ayWTC+/Z0s0tiex0O2z1+MxTod2tqL0SPkv9qj6scus=
 github.com/creachadair/ffuse v0.0.0-20250902165535-45841c3f07d9/go.mod h1:jqztU7ppYbYZoGe5ODmooTgE6gYs0nEwGEi3Ejs3Id0=
 github.com/creachadair/flax v0.0.5 h1:zt+CRuXQASxwQ68e9GHAOnEgAU29nF0zYMHOCrL5wzE=
@@ -196,8 +196,8 @@ github.com/creachadair/leveldbstore v0.0.0-20250911185855-a587b678843b h1:+aYPfa
 github.com/creachadair/leveldbstore v0.0.0-20250911185855-a587b678843b/go.mod h1:7BG9OOSbGdgqU/sBAa0YAV5Km0wfrxZKgyY7oO0j2XE=
 github.com/creachadair/mds v0.25.4 h1:rUQqf9ihePG8fhppXohLSY+AdOljU4oYyWVDhWiWhyE=
 github.com/creachadair/mds v0.25.4/go.mod h1:4hatI3hRM+qhzuAmqPRFvaBM8mONkS7nsLxkcuTYUIs=
-github.com/creachadair/msync v0.5.6 h1:nRvdyfVNNeMndcYDb+Ui8tSeefYXTUI1G7zPzosld6Q=
-github.com/creachadair/msync v0.5.6/go.mod h1:cHf8G0YBAfVk619K3RT7UARb8n6HAOCj0SZf4oUNkyM=
+github.com/creachadair/msync v0.6.0 h1:6Tk/MoEgDFedtrv0fg3nF1rioECHmvSFga/NL4yyVYk=
+github.com/creachadair/msync v0.6.0/go.mod h1:uho9VrgiCfqaphvtJkYZbdeEpNcm7dyukMg+1LL2c7Q=
 github.com/creachadair/pebblestore v0.0.0-20250911185741-57ee5da7e3d6 h1:K3Gg1La5Q+f72APVdaljbSIAU67NN5uUPN04T/o8PIQ=
 github.com/creachadair/pebblestore v0.0.0-20250911185741-57ee5da7e3d6/go.mod h1:qNHBj3ZU/xW7StlsDJ5NIC60B1noAUQjRJqRSJr9jV4=
 github.com/creachadair/rosedbstore v0.0.0-20250911185911-28ee478ddff9 h1:Ya3OkCEpI+wwNcLLLqjEt3RhHc1E/X7V0O8SZAyq0rE=
