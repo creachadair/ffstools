@@ -8,21 +8,21 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20250911185811-3ffe3a7be96f
 	github.com/creachadair/boltstore v0.0.0-20250911185831-992dba1c035a
 	github.com/creachadair/buntdbstore v0.0.0-20250911185903-8e4d47a144f8
-	github.com/creachadair/chirp v0.1.0
+	github.com/creachadair/chirp v0.1.1
 	github.com/creachadair/chirpstore v0.0.0-20250911185717-42bf169f452b
 	github.com/creachadair/command v0.2.0
 	github.com/creachadair/ffs v0.14.4
-	github.com/creachadair/ffuse v0.0.0-20250902165535-45841c3f07d9
+	github.com/creachadair/ffuse v0.0.0-20250919154405-a1513edd6089
 	github.com/creachadair/flax v0.0.5
-	github.com/creachadair/gcsstore v0.0.0-20250902165719-a7b03069d6cb
+	github.com/creachadair/gcsstore v0.0.0-20250919154549-427c33083520
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.5
 	github.com/creachadair/leveldbstore v0.0.0-20250911185855-a587b678843b
 	github.com/creachadair/mds v0.25.4
 	github.com/creachadair/pebblestore v0.0.0-20250911185741-57ee5da7e3d6
 	github.com/creachadair/rosedbstore v0.0.0-20250911185911-28ee478ddff9
-	github.com/creachadair/s3store v0.0.0-20250908221949-6ff03fefc32c
-	github.com/creachadair/sqlitestore v0.0.0-20250908222016-f9f054da6db2
+	github.com/creachadair/s3store v0.0.0-20250919154512-b2877dfc5315
+	github.com/creachadair/sqlitestore v0.0.0-20250919154455-0b4abfd2330d
 	github.com/creachadair/taskgroup v0.14.0
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.8.0
