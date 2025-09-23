@@ -35,11 +35,12 @@ import (
 )
 
 var syncFlags struct {
-	Target   string `flag:"to,Target store (required)"`
-	Verbose  bool   `flag:"v,Enable verbose logging"`
-	VVerbose bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
-	NoIndex  bool   `flag:"no-index,Do not use cached indices"`
-	NoRoot   bool   `flag:"no-root,Do not copy referenced root pointers"`
+	Target     string `flag:"to,Target store (required)"`
+	Verbose    bool   `flag:"v,Enable verbose logging"`
+	VVerbose   bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
+	NoIndex    bool   `flag:"no-index,Do not use cached indices"`
+	NoRoot     bool   `flag:"no-root,Do not copy referenced root pointers"`
+	RootPrefix string `flag:"root-prefix,Prefix target root names with this text"`
 }
 
 func debug(msg string, args ...any) {
@@ -166,6 +167,8 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			for key, tag := range worklist.All() {
 				if ctx.Err() != nil {
 					break
+				} else if key == "" {
+					continue
 				}
 
 				run(func() error {
@@ -177,7 +180,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 					switch tag {
 					case scanlib.Root:
 						debug("- copying root %q", key)
-						return copyBlob(ctx, src.Roots(), tgt.Roots(), key, true)
+						return moveBlob(ctx, src.Roots(), tgt.Roots(), key, syncFlags.RootPrefix+key, true)
 					case scanlib.File:
 						debug("- copying file %s", config.FormatKey(key))
 						return copyBlob(ctx, src.Sync(), tgt.Sync(), key, false)
@@ -197,15 +200,16 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 }
 
 func copyBlob(ctx context.Context, src, tgt blob.KV, key string, replace bool) error {
-	if key == "" {
-		return nil
-	}
-	bits, err := src.Get(ctx, key)
+	return moveBlob(ctx, src, tgt, key, key, replace)
+}
+
+func moveBlob(ctx context.Context, src, tgt blob.KV, oldKey, newKey string, replace bool) error {
+	bits, err := src.Get(ctx, oldKey)
 	if err != nil {
 		return err
 	}
 	err = tgt.Put(ctx, blob.PutOptions{
-		Key:     key,
+		Key:     newKey,
 		Data:    bits,
 		Replace: replace,
 	})
