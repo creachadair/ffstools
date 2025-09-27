@@ -179,10 +179,11 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run:      command.Adapt(runFindKeys),
 		},
 		{
-			Name:  "fsck",
-			Usage: fileCmdUsage,
-			Help:  "Check file tree integrity.",
-			Run:   command.Adapt(runFileCheck),
+			Name:     "fsck",
+			Usage:    fileCmdUsage,
+			Help:     "Check file tree integrity.",
+			SetFlags: command.Flags(flax.MustBind, &fsckFlags),
+			Run:      command.Adapt(runFileCheck),
 		},
 	},
 }
@@ -662,6 +663,10 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 	})
 }
 
+var fsckFlags struct {
+	DataSize bool `flag:"data-size,Compute the aggregate sizes of data blocks (WARNING: expensive)"`
+}
+
 func runFileCheck(env *command.Env, origins ...string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
@@ -677,9 +682,11 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}
 
 			start := time.Now()
+			dataSize := make(map[string]int64)
 			var done mapset.Set[string]
 			var uniq mapset.Set[string]
 			var nfile, ndata, nlost, nerrs int
+			var totalDataBytes int64
 
 			// If this file came from a root pointer, and the root has an index,
 			// verify that we can load the index data successfully.
@@ -715,9 +722,29 @@ func runFileCheck(env *command.Env, origins ...string) error {
 
 				// Count each occurrence of a file and its data blocks even if we've already seen it.
 				nfile++
-				want := mapset.New(e.File.Data().Keys()...)
+				fd := e.File.Data()
+
+				want := mapset.New(fd.Keys()...)
 				uniq.AddAll(want)
-				ndata += e.File.Data().Len()
+				ndata += fd.Len()
+
+				// If we are asked to compute data size, read each data blob we
+				// have not seen before and cache its size.
+				if fsckFlags.DataSize {
+					for dk := range want {
+						sz, ok := dataSize[dk]
+						if !ok {
+							bits, err := s.Files().Get(env.Context(), dk)
+							if err != nil {
+								fmt.Printf("* data: read %s: %v\n", config.FormatKey(dk), err)
+								continue
+							}
+							sz = int64(len(bits))
+							dataSize[dk] = sz
+						}
+						totalDataBytes += sz
+					}
+				}
 
 				// If (and only if) this is the first time we've seen this file,
 				// make sure its data blocks are stored.
@@ -726,28 +753,39 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				}
 
 				done.Add(fkey)
-				for _, dk := range e.File.Data().Keys() {
+				for dk := range want {
 					if !checkIndex(dk) {
 						fmt.Printf("* index: missing data %s\n", config.FormatKey(dk))
 						nerrs++
 					}
 				}
-				have, err := s.Files().Has(env.Context(), e.File.Data().Keys()...)
-				if err != nil {
-					fmt.Printf("* check data %q: %v", e.Path, err)
-					nerrs++
-					return nil
-				}
-				want.RemoveAll(have)
-				if !want.IsEmpty() {
-					for m := range want {
-						fmt.Printf("* data missing %q %s\n", e.Path, config.FormatKey(m))
-						nlost++
+
+				// Check that all the data block keys are at least nominally
+				// present in the store.  We don't need to do this if --data-size
+				// is set, however, because we've already fetched them all in that
+				// case in order to determine their size.
+				if !fsckFlags.DataSize {
+					have, err := s.Files().Has(env.Context(), fd.Keys()...)
+					if err != nil {
+						fmt.Printf("* check data %q: %v", e.Path, err)
+						nerrs++
+						return nil
+					}
+					want.RemoveAll(have)
+					if !want.IsEmpty() {
+						for m := range want {
+							fmt.Printf("* data missing %q %s\n", e.Path, config.FormatKey(m))
+							nlost++
+						}
 					}
 				}
 				return nil
 			}); err != nil {
 				return err
+			}
+			var totalUniqueDataBytes int64
+			for _, v := range dataSize {
+				totalUniqueDataBytes += v
 			}
 			totalUnique := done.Len() + uniq.Len()
 			if of.Root != nil {
@@ -755,6 +793,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				if of.Root.IndexKey != "" {
 					totalUnique++ // the index
 				}
+			}
+			if fsckFlags.DataSize {
+				fmt.Printf("- total data bytes: %d (%d unique)\n", totalDataBytes, totalUniqueDataBytes)
 			}
 			fmt.Printf("%s: %d objects: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
 				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
