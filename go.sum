@@ -180,10 +180,10 @@ github.com/creachadair/chirpstore v0.0.0-20250922044702-c39386a51f3c h1:nAN9r+hZ
 github.com/creachadair/chirpstore v0.0.0-20250922044702-c39386a51f3c/go.mod h1:tsFgYiVkIWKNokCYlLHEXqhJOg6AIPc7CcMkqIooYyg=
 github.com/creachadair/command v0.2.0 h1:qTA9cMMhZePAxFoNdnk6F6nn94s1qPndIg9hJbqI9cA=
 github.com/creachadair/command v0.2.0/go.mod h1:j+Ar+uYnFsHpkMeV9kGj6lJ45y9u2xqtg8FYy6cm+0o=
-github.com/creachadair/ffs v0.14.4 h1:p7CRNlDTsVOf7HGxHevGC8wa82ZlVBHaQfFNVA6j5AM=
-github.com/creachadair/ffs v0.14.4/go.mod h1:QkwScDEy9rkHfvdjOlC7eEqSg2K/8Hpz0hC0Yvvwm0E=
-github.com/creachadair/ffuse v0.0.0-20250919154405-a1513edd6089 h1:xgvw6YDBEUp5qPKT4IlgzWU4KcbqvkOz8uSNv1GQCPo=
-github.com/creachadair/ffuse v0.0.0-20250919154405-a1513edd6089/go.mod h1:Vj7tjue86NzkZCqzUPOTjnEnAjtji5u3rgIizTYKRCg=
+github.com/creachadair/ffs v0.14.5 h1:yKGYe8Wk19Gi/j+R13wi+Elouv1g7dBbjSAz4W547OY=
+github.com/creachadair/ffs v0.14.5/go.mod h1:QkwScDEy9rkHfvdjOlC7eEqSg2K/8Hpz0hC0Yvvwm0E=
+github.com/creachadair/ffuse v0.0.0-20251002035115-8167e59574fb h1:YZC8ysfs+ORpvMPyQeNgOYx6vF5jqjFCkUXlwlX4atw=
+github.com/creachadair/ffuse v0.0.0-20251002035115-8167e59574fb/go.mod h1:22HLu7f03HvVo5IKIIrAvgpcsF3dmPXQuTfWzwtGdE0=
 github.com/creachadair/flax v0.0.5 h1:zt+CRuXQASxwQ68e9GHAOnEgAU29nF0zYMHOCrL5wzE=
 github.com/creachadair/flax v0.0.5/go.mod h1:F1PML0JZLXSNDMNiRGK2yjm5f+L9QCHchyHBldFymj8=
 github.com/creachadair/gcsstore v0.0.0-20250919154549-427c33083520 h1:CRIodxJHmDGJEtvg/pLh/G7N8N6fKrqD4DILS34XUA8=
