@@ -78,6 +78,13 @@ a file may be specified in the following formats:
 			Run:      runList,
 		},
 		{
+			Name:  "hash",
+			Usage: fileCmdUsage,
+			Help:  "Print a cryptographic digest of file contents.",
+
+			Run: runHash,
+		},
+		{
 			Name:  "read",
 			Usage: fileCmdUsage,
 			Help:  "Read the binary contents of a file object",
@@ -216,6 +223,32 @@ func runShow(env *command.Env) error {
 					"storageKey": []byte(of.FileKey),
 					"node":       msg.Value.(*wiretype.Object_Node).Node,
 				}))
+			}
+		}
+		return nil
+	})
+}
+
+func runHash(env *command.Env) error {
+	if len(env.Args) == 0 {
+		return env.Usagef("missing required origin/path")
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		for _, arg := range env.Args {
+			if arg == "" {
+				return env.Usagef("origin may not be empty")
+			}
+			of, err := filetree.OpenPath(env.Context(), s, arg)
+			if err != nil {
+				return err
+			}
+			fd := of.File.Data()
+			fmt.Print(config.FormatKey(string(fd.Hash())))
+			if len(env.Args) > 1 {
+				fmt.Printf("\t%s\n", arg)
+			} else {
+				fmt.Println()
 			}
 		}
 		return nil
