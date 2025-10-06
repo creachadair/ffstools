@@ -26,46 +26,74 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/flax"
 )
+
+const webUsage = `<address> <root-key>[/path]
+<address> @<file-key>[/path]`
 
 var Command = &command.C{
 	Name: "web",
-	Usage: `<address> <root-key>[/path]
-<address> @<file-key>[/path]`,
+	Help: "Export a view of a filesystem via HTTP.",
 
-	Help: `Export a read-only view of a filesystem via HTTP.
+	Commands: []*command.C{
+		{
+			Name:  "view",
+			Usage: webUsage,
+			Help: `Export a read-only view of a filesystem via HTTP.
 
 Run an HTTP server at the specified address that serves the
 contents of an FFS file tree. The service runs until the program
 is terminated by a signal.`,
 
-	Run: command.Adapt(func(env *command.Env, address, rootKey string) error {
-		cfg := env.Config.(*config.Settings)
-		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-			pi, err := filetree.OpenPath(env.Context(), s, rootKey)
-			if err != nil {
-				return err
-			}
-			fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, config.FormatKey(pi.FileKey))
+			Run: command.Adapt(func(env *command.Env, address, rootKey string) error {
+				cfg := env.Config.(*config.Settings)
+				return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+					pi, err := filetree.OpenPath(env.Context(), s, rootKey)
+					if err != nil {
+						return err
+					}
+					fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, config.FormatKey(pi.FileKey))
 
-			fs := fpath.NewFS(env.Context(), pi.File)
-			srv := &http.Server{
-				Addr:    address,
-				Handler: http.FileServerFS(fs),
-			}
-			go func() {
-				<-env.Context().Done()
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-				srv.Shutdown(ctx)
-			}()
-			if strings.HasPrefix(address, ":") {
-				address = "localhost" + address
-			}
-			fmt.Fprintf(env, "Serving at http://%s/\n", address)
-			srv.ListenAndServe()
-			fmt.Fprintln(env, "Server exited")
-			return nil
-		})
-	}),
+					fs := fpath.NewFS(env.Context(), pi.File)
+					srv := &http.Server{
+						Addr:    address,
+						Handler: http.FileServerFS(fs),
+					}
+					go func() {
+						<-env.Context().Done()
+						ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+						defer cancel()
+						srv.Shutdown(ctx)
+					}()
+					if strings.HasPrefix(address, ":") {
+						address = "localhost" + address
+					}
+					fmt.Fprintf(env, "Serving at http://%s/\n", address)
+					srv.ListenAndServe()
+					fmt.Fprintln(env, "Server exited")
+					return nil
+				})
+			}),
+		},
+		{
+			Name:  "dav",
+			Usage: webUsage,
+			Help: `Export a filesystem via WebDAV.
+
+Run an HTTP server at the specified address that serves the contents
+of an FFS file tree via WebDAV. The service runs until the program is
+terminated by a signal.
+
+The address must have the form [host]:port[/path]. If the host is omitted
+the service runs on localhost; if the path is omitted it serves at "/".
+
+Because WebDAV does not support owner/group identity, files and directories
+created by the DAV client will be attributed to the UID and GID of the ffs
+process itself.`,
+
+			SetFlags: command.Flags(flax.MustBind, &davFlags),
+			Run:      command.Adapt(runWebDAV),
+		},
+	},
 }
