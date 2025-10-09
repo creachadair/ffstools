@@ -87,17 +87,17 @@ The following storage backends are currently supported by default:
 
 The following storage backends can be enabled by building with the specified tags:
 
-| Type/Tag | Description | Implementation                                                    | Notes                                      |
-|----------|-------------|-------------------------------------------------------------------|--------------------------------------------|
-| badger   | BadgerDB    | [docs](https://godoc.org/github.com/dgraph-io/badger/v4)          | LSM, fast, directory                       |
-| bitcask  | Bitcask     | [docs](https://godoc.org/git.mills.io/prologic/bitcask)           | LSM, directory                             |
-| bolt     | BoltDB      | [docs](https://godoc.org/go.etcd.io/bbolt)                        | B-tree, single-file, slow writes           |
-| buntdb   | BuntDB      | [docs](https://godoc.org/github.com/tidwall/buntdb)               | Log-structured, single-file                |
-| gcs      | GCS         | [docs](https://godoc.org/cloud.google.com/go/storage)             | No local storage; requires GCP credentials |
-| leveldb  | LevelDB     | [docs](https://godoc.org/github.com/syndtr/goleveldb/leveldb)     | LSM, directory, not fast                   |
-| pebble   | PebbleDB    | [docs](https://godoc.org/github.com/cockroachdb/pebble)           | LSM, directory; RocksDB layout             |
-| rosedb   | RoseDB      | [docs](https://godoc.org/github.com/rosedblabs/rosedb/v2)         | LSM, multiple files, Bitcask layout        |
-| s3       | Amazon S3   | [docs](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3) | No local storage; requires AWS credentials |
-| sqlite   | SQLite3     | [docs](https://godoc.org/modernc.org/sqlite)                      | SQL, single-file                           |
+| Type/Tag | Description          | Implementation                                                    | Notes                                      |
+|----------|----------------------|-------------------------------------------------------------------|--------------------------------------------|
+| badger   | BadgerDB             | [docs](https://godoc.org/github.com/dgraph-io/badger/v4)          | LSM, fast, directory layout                |
+| bitcask  | Bitcask              | [docs](https://godoc.org/git.mills.io/prologic/bitcask)           | LSM, directory layout                      |
+| bolt     | BoltDB               | [docs](https://godoc.org/go.etcd.io/bbolt)                        | B-tree, single-file, slow writes           |
+| buntdb   | BuntDB               | [docs](https://godoc.org/github.com/tidwall/buntdb)               | Log-structured, single-file                |
+| gcs      | Google Cloud Storage | [docs](https://godoc.org/cloud.google.com/go/storage)             | No local storage; requires GCP credentials |
+| leveldb  | LevelDB              | [docs](https://godoc.org/github.com/syndtr/goleveldb/leveldb)     | LSM, directory, not fast                   |
+| pebble   | PebbleDB             | [docs](https://godoc.org/github.com/cockroachdb/pebble)           | LSM, directory; RocksDB layout             |
+| rosedb   | RoseDB               | [docs](https://godoc.org/github.com/rosedblabs/rosedb/v2)         | LSM, multiple files, Bitcask layout        |
+| s3       | Amazon S3            | [docs](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3) | No local storage; requires AWS credentials |
+| sqlite   | SQLite3              | [docs](https://godoc.org/modernc.org/sqlite)                      | SQL, single-file                           |
 
 For local storage, I generally use BadgerDB unless I want a single file, in which case I currently prefer BuntDB.
