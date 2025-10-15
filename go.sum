@@ -174,8 +174,8 @@ github.com/creachadair/boltstore v0.0.0-20250928153953-5389725dd7b4 h1:o/L9gxhld
 github.com/creachadair/boltstore v0.0.0-20250928153953-5389725dd7b4/go.mod h1:obMZt8IoVHjP/wW0R4iPmGXZwdf2A6/PVl/yPFACjJw=
 github.com/creachadair/buntdbstore v0.0.0-20250928154026-8cfce7bab1ec h1:H6vlX4mBLaAJNAFodGuFst/ujgSupmQRspUvxOJfBBc=
 github.com/creachadair/buntdbstore v0.0.0-20250928154026-8cfce7bab1ec/go.mod h1:7HCPx6nPDLj3Q12VTn9FiccAJnPXopoPNAp94+Pr3CE=
-github.com/creachadair/chirp v0.1.2 h1:tMOCiEnvVzED6UCbLPNzdSE/oPylbA+h/46/u6Jm0Gk=
-github.com/creachadair/chirp v0.1.2/go.mod h1:MYUNOAUwUfoeZqaFh2RACb9vHtj7NKzEPSdtfa97EXA=
+github.com/creachadair/chirp v0.2.0 h1:q21fP29xxHZOI8p6GquKx4oRhSgc80+20BVj8KBp08o=
+github.com/creachadair/chirp v0.2.0/go.mod h1:+6CkJy3qabGtzZZAGE5sjcQutv8/NPPogIBBkP33ts0=
 github.com/creachadair/chirpstore v0.0.0-20250922044702-c39386a51f3c h1:nAN9r+hZLh7S6Zd8to+IphhnWgDlFDKpXLUyccoJHCc=
 github.com/creachadair/chirpstore v0.0.0-20250922044702-c39386a51f3c/go.mod h1:tsFgYiVkIWKNokCYlLHEXqhJOg6AIPc7CcMkqIooYyg=
 github.com/creachadair/command v0.2.0 h1:qTA9cMMhZePAxFoNdnk6F6nn94s1qPndIg9hJbqI9cA=
@@ -206,8 +206,8 @@ github.com/creachadair/s3store v0.0.0-20250919154512-b2877dfc5315 h1:mo1Riis77Tu
 github.com/creachadair/s3store v0.0.0-20250919154512-b2877dfc5315/go.mod h1:RVViqSAHicWEm9YOHDgloQiQ+72egaDUGisvfixGlAk=
 github.com/creachadair/sqlitestore v0.0.0-20250919154455-0b4abfd2330d h1:r9Y24kXhaEUjCo2S1sQQ9nlsujBRkM9bSWUBzZS0ZPE=
 github.com/creachadair/sqlitestore v0.0.0-20250919154455-0b4abfd2330d/go.mod h1:OFlCjdj+SOSXoAjXp3uVrCs8swleWdbu83XAGGSyYUI=
-github.com/creachadair/taskgroup v0.14.0 h1:qInsb1fYzsWR4CRDzmFj4tquBJqt3W+gNr/svOIHjCs=
-github.com/creachadair/taskgroup v0.14.0/go.mod h1:MaMD1JcizKLm2c6vqovMrROslgu/oFAiS5INgr89pk8=
+github.com/creachadair/taskgroup v0.14.1 h1:kwdkOF3ija+jkrPb5YHByzTjeSpVpGD0SwiKTLTFSsw=
+github.com/creachadair/taskgroup v0.14.1/go.mod h1:MaMD1JcizKLm2c6vqovMrROslgu/oFAiS5INgr89pk8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
