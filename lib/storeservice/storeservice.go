@@ -84,7 +84,7 @@ type Service struct {
 	buffer     blob.StoreCloser
 	cacheBytes int
 	loop       *taskgroup.Single[error]
-	stop       func()
+	stop       context.CancelFunc
 	logf       func(string, ...any)
 	bufSize    func() int64
 }
@@ -180,21 +180,68 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}
 
-	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
-	svc.Register(s.root)
-
 	lst, err := net.Listen(chirp.SplitAddress(s.addr))
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
 	s.logf("[chirp] service: %q", s.addr)
 
-	s.loop = taskgroup.Go(func() error {
-		defer lst.Close()
-		return peers.Loop(ctx, peers.NetAccepter(lst), s.root)
-	})
-	s.stop = func() { lst.Close() }
+	sctx, cancel := context.WithCancel(ctx)
+	s.loop = taskgroup.Go(s.serve(sctx, store, lst))
+	s.stop = cancel
 	return nil
+}
+
+func (s *Service) serve(ctx context.Context, store blob.Store, lst net.Listener) func() error {
+	acc := peers.NetAccepter(lst)
+	var g taskgroup.Group
+
+	return func() (err error) {
+		defer func() {
+			lst.Close()
+
+			gerr := g.Wait()
+			if err == nil {
+				err = gerr
+			}
+		}()
+
+		for {
+			ch, err := acc.Accept(ctx)
+			if errors.Is(err, net.ErrClosed) {
+				return nil
+			} else if err != nil {
+				return fmt.Errorf("accept: %w", err)
+			}
+
+			peer := s.root.Clone()
+			_, store, err := s.checkCaller(ctx, ch)
+			if err != nil {
+				s.logf("reject: %v", err)
+				peer.Handle("", reportErrorHandler(err))
+			} else {
+				svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
+				svc.Register(peer)
+			}
+			peer.Start(ch)
+			stop := context.AfterFunc(ctx, func() { peer.Stop() })
+			g.Go(func() error {
+				defer stop()
+				return peer.Wait()
+			})
+		}
+	}
+}
+
+// reportErrorHandler returns a [chirp.Handler] that reports the specified
+// error to all calls from the remote peer.
+func reportErrorHandler(err error) chirp.Handler {
+	return func(context.Context, *chirp.Request) ([]byte, error) { return nil, err }
+}
+
+func (s *Service) checkCaller(ctx context.Context, ch chirp.Channel) (string, blob.Store, error) {
+	// TODO(creachadair): Assign a starting store based on the caller identity.
+	return "", s.store, nil
 }
 
 // BufferLen reports the total number of keys in the buffer store.
