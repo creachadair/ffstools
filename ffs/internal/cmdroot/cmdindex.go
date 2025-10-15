@@ -42,10 +42,6 @@ func runIndex(env *command.Env) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		n, err := s.Files().Len(env.Context())
-		if err != nil {
-			return err
-		}
 		for _, key := range env.Args {
 			rp, err := root.Open(env.Context(), s.Roots(), key)
 			if err != nil {
@@ -77,24 +73,26 @@ func runIndex(env *command.Env) error {
 
 			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, config.FormatKey(rp.FileKey))
 			scanned := mapset.New[string]()
-			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
 			start := time.Now()
 			if err := fp.Scan(env.Context(), func(si file.ScanItem) bool {
 				key := si.Key()
 				if scanned.Has(key) {
-					return false // don't re-index repeats of the same file
+					return false // don't re-scan repeats of the same file
 				}
 				scanned.Add(key)
-				idx.Add(key)
-				for _, dkey := range si.Data().Keys() {
-					idx.Add(dkey)
-				}
+				scanned.Add(si.Data().Keys()...)
 				return true
 			}); err != nil {
 				return fmt.Errorf("scanning %q: %w", key, err)
 			}
 			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
-				idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
+				len(scanned), time.Since(start).Truncate(10*time.Millisecond))
+
+			// Now that we know the size of the set, pack the keys into the index.
+			idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
+			for key := range scanned {
+				idx.Add(key)
+			}
 
 			rp.IndexKey, err = wiretype.Save(env.Context(), s.Files(), &wiretype.Object{
 				Value: &wiretype.Object_Index{Index: index.Encode(idx)},
