@@ -8,7 +8,7 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20250928153933-79e1f84674ab
 	github.com/creachadair/boltstore v0.0.0-20250928153953-5389725dd7b4
 	github.com/creachadair/buntdbstore v0.0.0-20250928154026-8cfce7bab1ec
-	github.com/creachadair/chirp v0.1.2
+	github.com/creachadair/chirp v0.2.0
 	github.com/creachadair/chirpstore v0.0.0-20250922044702-c39386a51f3c
 	github.com/creachadair/command v0.2.0
 	github.com/creachadair/ffs v0.14.5
@@ -23,7 +23,7 @@ require (
 	github.com/creachadair/rosedbstore v0.0.0-20250928154033-dec13425a761
 	github.com/creachadair/s3store v0.0.0-20250919154512-b2877dfc5315
 	github.com/creachadair/sqlitestore v0.0.0-20250919154455-0b4abfd2330d
-	github.com/creachadair/taskgroup v0.14.0
+	github.com/creachadair/taskgroup v0.14.1
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.8.0
 	github.com/klauspost/compress v1.18.0
