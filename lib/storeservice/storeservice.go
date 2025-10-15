@@ -215,7 +215,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, lst net.Listener)
 			}
 
 			peer := s.root.Clone()
-			_, store, err := s.checkCaller(ctx, ch)
+			_, store, err := s.checkCaller(ctx, store, ch)
 			if err != nil {
 				s.logf("reject: %v", err)
 				peer.Handle("", reportErrorHandler(err))
@@ -239,9 +239,9 @@ func reportErrorHandler(err error) chirp.Handler {
 	return func(context.Context, *chirp.Request) ([]byte, error) { return nil, err }
 }
 
-func (s *Service) checkCaller(ctx context.Context, ch chirp.Channel) (string, blob.Store, error) {
+func (s *Service) checkCaller(ctx context.Context, store blob.Store, ch chirp.Channel) (string, blob.Store, error) {
 	// TODO(creachadair): Assign a starting store based on the caller identity.
-	return "", s.store, nil
+	return "", store, nil
 }
 
 // BufferLen reports the total number of keys in the buffer store.
