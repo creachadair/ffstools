@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -28,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/flax"
@@ -160,7 +162,28 @@ func runList(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			if listFlags.Long {
+			if listFlags.JSON {
+				var st index.Stats
+
+				// For "long" JSON, include details about the index, if there is one.
+				if listFlags.Long && rp.IndexKey != "" {
+					idx, err := config.LoadIndex(env.Context(), s.Files(), rp.IndexKey)
+					if err != nil {
+						log.Printf("WARNING: loading index for %q: %v (continuing)", key, err)
+					} else {
+						st = idx.Stats()
+					}
+				}
+				data, _ := json.Marshal(struct {
+					S  string `json:"storageKey"`
+					D  string `json:"description,omitzero"`
+					F  []byte `json:"fileKey,omitzero"`
+					X  []byte `json:"indexKey,omitzero"`
+					IK int    `json:"numKeys,omitzero"`
+					IF int    `json:"indexBits,omitzero"`
+				}{key, rp.Description, []byte(rp.FileKey), []byte(rp.IndexKey), st.NumKeys, st.FilterBits})
+				fmt.Println(string(data))
+			} else if listFlags.Long {
 				fmt.Fprint(w, key, "\t")
 				if rp.IndexKey == "" {
 					fmt.Fprint(w, "[-]")
@@ -172,14 +195,6 @@ func runList(env *command.Env) error {
 					fmt.Fprint(w, "\t", rp.Description)
 				}
 				fmt.Fprintln(w)
-			} else {
-				data, _ := json.Marshal(struct {
-					S string `json:"storageKey"`
-					D string `json:"description,omitempty"`
-					F []byte `json:"fileKey,omitempty"`
-					X []byte `json:"indexKey,omitempty"`
-				}{key, rp.Description, []byte(rp.FileKey), []byte(rp.IndexKey)})
-				fmt.Println(string(data))
 			}
 		}
 		return nil
