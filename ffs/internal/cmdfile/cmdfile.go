@@ -505,29 +505,28 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		}
 		stat := tf.File.Stat()
 		if mod.clear {
-			stat.Clear()
-			stat = tf.File.Stat()
+			stat = stat.Clear()
 		}
 		if mod.perms != nil {
-			stat.Mode = (stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms)
+			stat = stat.WithMode((stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms))
 		}
 		if mod.ftype != nil {
-			stat.Mode = (stat.Mode &^ fs.ModeType) | *mod.ftype
+			stat = stat.WithMode((stat.Mode &^ fs.ModeType) | *mod.ftype)
 		}
 		if mod.modTime != nil {
-			stat.ModTime = *mod.modTime
+			stat = stat.WithModTime(*mod.modTime)
 		}
 		if mod.uid != nil {
-			stat.OwnerID = *mod.uid
+			stat = stat.WithOwnerID(*mod.uid)
 		}
 		if mod.gid != nil {
-			stat.GroupID = *mod.gid
+			stat = stat.WithGroupID(*mod.gid)
 		}
 		if mod.owner != nil {
-			stat.OwnerName = *mod.owner
+			stat = stat.WithOwnerName(*mod.owner)
 		}
 		if mod.group != nil {
-			stat.GroupName = *mod.group
+			stat = stat.WithGroupName(*mod.group)
 		}
 		if mod.persist != nil {
 			stat.Persist(*mod.persist)

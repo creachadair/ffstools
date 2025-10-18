@@ -216,9 +216,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		}
 	}
 	if len(files) != 0 || len(dirs) != 0 {
-		ds := d.Stat()
-		ds.ModTime = fi.ModTime()
-		ds.Update()
+		d.Stat().WithModTime(fi.ModTime()).Update()
 	}
 	return d, nil
 }
