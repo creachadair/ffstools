@@ -101,7 +101,6 @@ store without roots.
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
-				idx.Add(key)
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
@@ -132,14 +131,20 @@ store without roots.
 
 				dprintf(env, "Scanning data reachable from %q (%s)...\n",
 					config.PrintableKey(key), config.FormatKey(rp.FileKey))
-				scanned := mapset.New[string]()
+
+				// Avoid re-scanning repeats of the same file. But note: We do not
+				// want to use the index for this, as it is possible it may have a
+				// false positive. In that case we would incorrectly skip the file,
+				// so we want a true set.
+				scannedFiles := mapset.New[string]()
+
 				start := time.Now()
 				if err := rf.Scan(env.Context(), func(si file.ScanItem) bool {
 					key := si.Key()
-					if scanned.Has(key) {
-						return false // don't re-index repeats of the same file
+					if scannedFiles.Has(key) {
+						return false // already scanned
 					}
-					scanned.Add(key)
+					scannedFiles.Add(key)
 					idx.Add(key)
 					for _, dkey := range si.Data().Keys() {
 						idx.Add(dkey)
