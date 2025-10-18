@@ -39,18 +39,15 @@ import (
 )
 
 var gcFlags struct {
-	Force        bool          `flag:"force,Force collection on empty root list (DANGER)"`
-	Limit        time.Duration `flag:"limit,Time limit for sweep phase (0=unlimited)"`
-	Tasks        int           `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
-	RequireIndex bool          `flag:"require-index,Report an error if a root does not have an index"`
-	Verbose      bool          `flag:"v,Enable verbose logging"`
+	Force        bool `flag:"force,Force collection on empty root list (DANGER)"`
+	Tasks        int  `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
+	RequireIndex bool `flag:"require-index,Report an error if a root does not have an index"`
+	Verbose      bool `flag:"v,Enable verbose logging"`
 
 	// The expensive part of a GC is deleting the keys, which in cloud storage
 	// are often heavily rate-limited. We want to proceed concurrently to the
 	// extent practical, but there are diminishing returns.
 }
-
-var errSweepLimit = errors.New("sweep limit reached")
 
 var Command = &command.C{
 	Name: "gc",
@@ -170,13 +167,7 @@ store without roots.
 			// Sweep phase: Remove objects not indexed.
 			ctx, cancel := context.WithCancelCause(env.Context())
 			defer cancel(nil)
-			if gcFlags.Limit > 0 {
-				t := time.AfterFunc(gcFlags.Limit, func() { cancel(errSweepLimit) })
-				defer t.Stop()
-				fmt.Fprintf(env, "Begin sweep over %d objects (limit %v)\n", n, gcFlags.Limit)
-			} else {
-				fmt.Fprintf(env, "Begin sweep over %d objects\n", n)
-			}
+			fmt.Fprintf(env, "Begin sweep over %d objects\n", n)
 
 			g, run := taskgroup.New(cancel).Limit(gcFlags.Tasks)
 
@@ -225,11 +216,7 @@ store without roots.
 				pb.Stop()
 				fmt.Fprintln(env, " *")
 				if serr != nil {
-					if errors.Is(context.Cause(ctx), errSweepLimit) {
-						fmt.Fprintln(env, "(sweep limit reached)")
-					} else {
-						return fmt.Errorf("sweeping failed: %w", serr)
-					}
+					return fmt.Errorf("sweeping failed: %w", serr)
 				}
 			}
 			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
