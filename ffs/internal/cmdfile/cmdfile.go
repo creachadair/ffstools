@@ -726,15 +726,16 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			// If we do have an index, we will also verify that all the reachable
 			// file and data blobs are recorded there.
 			checkIndex := func(string) bool { return true } // fail open
-			if of.Root != nil && of.Root.IndexKey != "" {
-				idx, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey)
-				if err != nil {
-					fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
-					nerrs++
-				} else {
-					fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
-					checkIndex = idx.Has
-				}
+			if of.Root == nil {
+				// no root is invoolved
+			} else if of.Root.IndexKey == "" {
+				fmt.Printf("- root %q is not indexed (OK)\n", of.RootKey)
+			} else if idx, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey); err != nil {
+				fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
+				nerrs++
+			} else {
+				fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
+				checkIndex = idx.Has
 			}
 
 			// Verify that all reachable files are loadable, and that their data
