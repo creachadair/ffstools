@@ -42,6 +42,7 @@ var gcFlags struct {
 	Force        bool `flag:"force,Force collection on empty root list (DANGER)"`
 	Tasks        int  `flag:"nw,default=64,PRIVATE:Number of concurrent sweep tasks"`
 	RequireIndex bool `flag:"require-index,Report an error if a root does not have an index"`
+	DataSize     bool `flag:"data-size,Report the total size of data blocks collected"`
 	Verbose      bool `flag:"v,Enable verbose logging"`
 
 	// The expensive part of a GC is deleting the keys, which in cloud storage
@@ -172,7 +173,7 @@ store without roots.
 			g, run := taskgroup.New(cancel).Limit(gcFlags.Tasks)
 
 			start := time.Now()
-			var numKeep, numDrop atomic.Int64
+			var numKeep, numDrop, dataSize atomic.Int64
 
 			// Sweep phase 1: Collect all the keys eligible for deletion.
 			var toDrop mapset.Set[string]
@@ -200,6 +201,13 @@ store without roots.
 					}
 					run.Go(func() error {
 						pb.Add(1)
+						if gcFlags.DataSize {
+							data, err := s.Files().Get(ctx, key)
+							if err != nil {
+								log.Printf("WARNING: size key %s: %v", config.FormatKey(key), err)
+							}
+							dataSize.Add(int64(len(data)))
+						}
 						err := s.Files().Delete(ctx, key)
 						if err == nil || blob.IsKeyNotFound(err) {
 							pb.SetMeta(numDrop.Add(1))
@@ -219,8 +227,12 @@ store without roots.
 					return fmt.Errorf("sweeping failed: %w", serr)
 				}
 			}
-			fmt.Fprintf(env, "GC complete: keep %d, drop %d [%v elapsed]\n",
-				numKeep.Load(), numDrop.Load(), time.Since(start).Truncate(10*time.Millisecond))
+			var sizeTag string
+			if gcFlags.DataSize {
+				sizeTag = fmt.Sprintf(", %d bytes recovered", dataSize.Load())
+			}
+			fmt.Fprintf(env, "GC complete: keep %d, drop %d%s [%v elapsed]\n",
+				numKeep.Load(), numDrop.Load(), sizeTag, time.Since(start).Truncate(10*time.Millisecond))
 			return nil
 		})
 	}),
