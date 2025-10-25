@@ -828,7 +828,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				}
 			}
 			if fsckFlags.DataSize {
-				fmt.Printf("- total data bytes: %d (%d unique)\n", totalDataBytes, totalUniqueDataBytes)
+				fmt.Printf("- total data size: %d bytes, %d unique (%.1f%%)\n", totalDataBytes, totalUniqueDataBytes,
+					100*(float64(totalUniqueDataBytes)/float64(totalDataBytes)))
 			}
 			fmt.Printf("%s: %d objects: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
 				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
