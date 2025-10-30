@@ -194,8 +194,8 @@ github.com/creachadair/keyfile v0.8.5 h1:WmFuchIe5XdQ/1OiIZnEOxQWa2C2IzdCwtyI7cz
 github.com/creachadair/keyfile v0.8.5/go.mod h1:sIAjxoNHC4jcP8WhoPV9K8sepTW+dEqRunxJTQMXbgs=
 github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726 h1:M7nl50bUFzIcU/mCOn4Lj/EDhKPabofzaZF3GW6ENp4=
 github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726/go.mod h1:GsGzaXRP9FfJp/DFoda2w0isS/+d+CCtSqmskgGH1Pc=
-github.com/creachadair/mds v0.25.6 h1:l1MkbdJmhqXTpm92VWYTb0/s0wsiZSKKc/VKU0lf2bA=
-github.com/creachadair/mds v0.25.6/go.mod h1:4hatI3hRM+qhzuAmqPRFvaBM8mONkS7nsLxkcuTYUIs=
+github.com/creachadair/mds v0.25.8 h1:lTlPBN6wS3OGKYEON6kOVl3sEWz/uJtV6x+qWJ0y6A0=
+github.com/creachadair/mds v0.25.8/go.mod h1:4hatI3hRM+qhzuAmqPRFvaBM8mONkS7nsLxkcuTYUIs=
 github.com/creachadair/msync v0.6.0 h1:6Tk/MoEgDFedtrv0fg3nF1rioECHmvSFga/NL4yyVYk=
 github.com/creachadair/msync v0.6.0/go.mod h1:uho9VrgiCfqaphvtJkYZbdeEpNcm7dyukMg+1LL2c7Q=
 github.com/creachadair/pebblestore v0.0.0-20251014184720-a07f710afbb0 h1:3UQmLxu8muR3+jcblukc+mZFLA6GX1fR73YX7cAPKXc=
@@ -204,8 +204,8 @@ github.com/creachadair/rosedbstore v0.0.0-20251014184856-afa1d7c7b20a h1:3yZHWUz
 github.com/creachadair/rosedbstore v0.0.0-20251014184856-afa1d7c7b20a/go.mod h1:ESbrhcKN4Cv9YER9Yc2G3nPck1pXdK3Gx5VPYmcMs/U=
 github.com/creachadair/s3store v0.0.0-20251006151431-1877a2d78717 h1:OfGb35R7eRRfiBKNrhlKI/hK2qKxUIk3yf33o22KULw=
 github.com/creachadair/s3store v0.0.0-20251006151431-1877a2d78717/go.mod h1:wVJuJi2+86MX8tem6d6Zg/Tv07Ab2i0fGsmZBRVYfR8=
-github.com/creachadair/sqlitestore v0.0.0-20251006151416-faf69591e50f h1:I9SxLyeYRF3KKeJnSvIOGu5MPVCt1ahVB2hbwfi9zsw=
-github.com/creachadair/sqlitestore v0.0.0-20251006151416-faf69591e50f/go.mod h1:x2utCqSwxJIQq6jolm7OvwxnOvoN0x2hOKyYAiCZX6o=
+github.com/creachadair/sqlitestore v0.0.0-20251030020820-33d4117db644 h1:0IZRC72mwVWJ4IFUEDqcXxN+yTlXXIB2JvMbA7OWiF0=
+github.com/creachadair/sqlitestore v0.0.0-20251030020820-33d4117db644/go.mod h1:yD2dQ5WFPAKGhiNB38LHO8lEsyZQdoqXm8a3G3w7rDE=
 github.com/creachadair/taskgroup v0.14.1 h1:kwdkOF3ija+jkrPb5YHByzTjeSpVpGD0SwiKTLTFSsw=
 github.com/creachadair/taskgroup v0.14.1/go.mod h1:MaMD1JcizKLm2c6vqovMrROslgu/oFAiS5INgr89pk8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -652,8 +652,8 @@ golang.org/x/exp v0.0.0-20200119233911-0405dc783f0a/go.mod h1:2RIsYlXP63K8oxa1u0
 golang.org/x/exp v0.0.0-20200207192155-f17229e696bd/go.mod h1:J/WKrq2StrnmMY6+EHIKF9dgMWnmCNThgcyBT1FY9mM=
 golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6/go.mod h1:3jZMyOhIsHpP37uCMkUooju7aAi5cS1Q23tOzKc+0MU=
 golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85/go.mod h1:4M0jN8W1tt0AVLNr8HDosyJCDCDuyL9N9+3m7wDWgKw=
-golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b h1:18qgiDvlvH7kk8Ioa8Ov+K6xCi0GMvmGfGW0sgd/SYA=
-golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b/go.mod h1:j/pmGrbnkbPtQfxEe5D0VQhZC6qKbfKifgD0oM7sR70=
+golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 h1:mgKeJMpvi0yx/sU5GsxQ7p6s2wtOnGAHZWCHUM4KGzY=
+golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546/go.mod h1:j/pmGrbnkbPtQfxEe5D0VQhZC6qKbfKifgD0oM7sR70=
 golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 h1:VI4qDpTkfFaCXEPrbojidLgVQhj2x4nzTccG0hjaLlU=
 golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394/go.mod h1:LKZHyeOpPuZcMgxeHjJp4p5yvxrCX1xDvH10zYHhjjQ=
 golang.org/x/image v0.0.0-20190227222117-0694c2d4d067/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=

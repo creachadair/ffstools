@@ -18,11 +18,11 @@ require (
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.5
 	github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726
-	github.com/creachadair/mds v0.25.6
+	github.com/creachadair/mds v0.25.8
 	github.com/creachadair/pebblestore v0.0.0-20251014184720-a07f710afbb0
 	github.com/creachadair/rosedbstore v0.0.0-20251014184856-afa1d7c7b20a
 	github.com/creachadair/s3store v0.0.0-20251006151431-1877a2d78717
-	github.com/creachadair/sqlitestore v0.0.0-20251006151416-faf69591e50f
+	github.com/creachadair/sqlitestore v0.0.0-20251030020820-33d4117db644
 	github.com/creachadair/taskgroup v0.14.1
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.8.0
@@ -138,7 +138,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
-	golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b // indirect
+	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
