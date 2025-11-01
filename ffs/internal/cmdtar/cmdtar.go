@@ -17,7 +17,6 @@ package cmdtar
 import (
 	"archive/tar"
 	"bufio"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -25,6 +24,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
@@ -32,6 +32,7 @@ import (
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/value"
 	"github.com/klauspost/compress/zstd"
 )
 
@@ -40,6 +41,7 @@ var tarFlags struct {
 	Compress bool   `flag:"compress,Compress output with zstd"`
 	Root     string `flag:"root,Prefix all tar paths with this directory name"`
 	XAttr    bool   `flag:"xattr,Include extended attributes"`
+	Verbose  bool   `flag:"v,Enable verbose logging"`
 }
 
 var Command = &command.C{
@@ -105,7 +107,7 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 
 		tw := tar.NewWriter(w)
 		mc = append(mc, tw.Close)
-		return addFile(env.Context(), tw, of.File, tarFlags.Root)
+		return addFile(env, tw, of.File, tarFlags.Root)
 	})
 }
 
@@ -122,25 +124,27 @@ func (m mcloser) Close() error {
 }
 
 // addFile is a demi-clone of [tar.Writer.AddFS], but with less OS-specific nonsense.
-func addFile(ctx context.Context, tw *tar.Writer, root *file.File, prefix string) error {
-	return fpath.Walk(ctx, root, func(e fpath.Entry) error {
-		if ctx.Err() != nil {
-			return ctx.Err()
+func addFile(env *command.Env, tw *tar.Writer, root *file.File, prefix string) error {
+	return fpath.Walk(env.Context(), root, func(e fpath.Entry) error {
+		if err := env.Context().Err(); err != nil {
+			return err
 		} else if e.Err != nil {
 			return e.Err
 		} else if e.File == root {
 			return nil // skip
 		}
 		fi := e.File.FileInfo()
+		dprintf(env, "a %s", path.Join(prefix, e.Path))
 
 		// If this is a symlink, read the "file" contents out as the target.
 		var linkTarget string
 		if fi.Mode().Type() == fs.ModeSymlink {
-			link, err := io.ReadAll(e.File.Cursor(ctx))
+			link, err := io.ReadAll(e.File.Cursor(env.Context()))
 			if err != nil {
 				return fmt.Errorf("read symlink: %w", err)
 			}
 			linkTarget = string(link)
+			dprintf(env, "  link to %q", linkTarget)
 		}
 
 		// This does a bunch of nonsense we don't care about, but it handles the
@@ -167,6 +171,7 @@ func addFile(ctx context.Context, tw *tar.Writer, root *file.File, prefix string
 
 		// If there are extended attributes, and we were asked to preserve them, do.
 		if xa := e.File.XAttr(); xa.Len() != 0 && tarFlags.XAttr {
+			dprintf(env, "  + %d extended attribute%s", xa.Len(), value.Cond(xa.Len() == 1, "", "s"))
 			m := make(map[string]string)
 			for _, name := range xa.Names() {
 				m[name] = xa.Get(name)
@@ -178,7 +183,7 @@ func addFile(ctx context.Context, tw *tar.Writer, root *file.File, prefix string
 			return err
 		}
 		if fi.Mode().IsRegular() {
-			_, err := io.Copy(tw, e.File.Cursor(ctx))
+			_, err := io.Copy(tw, e.File.Cursor(env.Context()))
 			return err
 		}
 		return nil
@@ -192,3 +197,12 @@ type lyingFileInfo struct{ fs.FileInfo }
 
 func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
+
+func dprintf(w io.Writer, msg string, args ...any) {
+	if tarFlags.Verbose {
+		if !strings.HasSuffix(msg, "\n") {
+			msg += "\n"
+		}
+		fmt.Fprintf(w, msg, args...)
+	}
+}
