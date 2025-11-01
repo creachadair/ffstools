@@ -26,7 +26,7 @@ require (
 	github.com/creachadair/taskgroup v0.14.1
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.8.0
-	github.com/klauspost/compress v1.18.0
+	github.com/klauspost/compress v1.18.1
 	github.com/pkg/xattr v0.4.12
 	golang.org/x/crypto v0.43.0
 	google.golang.org/protobuf v1.36.10

@@ -36,6 +36,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdstatus"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage"
 	"github.com/creachadair/ffstools/ffs/internal/cmdsync"
+	"github.com/creachadair/ffstools/ffs/internal/cmdtar"
 	"github.com/creachadair/ffstools/ffs/internal/cmdweb"
 )
 
@@ -87,6 +88,7 @@ help [<command>]`,
 			cmdfile.Command,
 			cmdput.Command,
 			cmdexport.Command,
+			cmdtar.Command,
 			cmdsync.Command,
 			cmdscan.Command,
 			cmdmount.Command,
