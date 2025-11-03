@@ -50,7 +50,7 @@ func runIndex(env *command.Env) error {
 			if rp.IndexKey != "" {
 				if indexFlags.Discard {
 					rp.IndexKey = ""
-					if err := rp.Save(env.Context(), key, true); err != nil {
+					if err := rp.Save(env.Context(), key); err != nil {
 						return fmt.Errorf("saving root: %w", err)
 					}
 					fmt.Fprintf(env, "Removed cached index for %q\n", key)
@@ -100,7 +100,7 @@ func runIndex(env *command.Env) error {
 			if err != nil {
 				return fmt.Errorf("saving index: %w", err)
 			}
-			if err := rp.Save(env.Context(), key, true); err != nil {
+			if err := rp.Save(env.Context(), key); err != nil {
 				return err
 			}
 		}

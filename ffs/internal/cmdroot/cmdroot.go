@@ -226,6 +226,15 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		if !createFlags.Replace {
+			r, err := s.Roots().Has(env.Context(), name)
+			if err != nil {
+				return err
+			} else if r.Has(name) {
+				return fmt.Errorf("root %q already exists", name)
+			}
+		}
+
 		var fk string
 		var err error
 
@@ -265,7 +274,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		return root.New(s.Roots(), &root.Options{
 			Description: createFlags.Desc,
 			FileKey:     fk,
-		}).Save(env.Context(), name, createFlags.Replace)
+		}).Save(env.Context(), name)
 	})
 }
 
@@ -281,7 +290,17 @@ func runCopy(env *command.Env, src, dst string) error {
 		return fmt.Errorf("target %q has the same name as the source", na.Args[0])
 	}
 	defer na.Close()
-	if err := na.Root.Save(na.Context, na.Args[0], copyFlags.Replace); err != nil {
+
+	if !copyFlags.Replace {
+		r, err := na.Store.Roots().Has(na.Context, dst)
+		if err != nil {
+			return err
+		} else if r.Has(dst) {
+			return fmt.Errorf("root %q: already exists", dst)
+		}
+	}
+
+	if err := na.Root.Save(na.Context, na.Args[0]); err != nil {
 		return err
 	} else if env.Command.Name == "rename" {
 		return na.Store.Roots().Delete(na.Context, na.Key)
@@ -314,7 +333,7 @@ func runEditDesc(env *command.Env, target string, rest ...string) error {
 	}
 	defer na.Close()
 	na.Root.Description = strings.Join(na.Args, " ")
-	return na.Root.Save(na.Context, na.Key, true)
+	return na.Root.Save(na.Context, na.Key)
 }
 
 func runEditFile(env *command.Env, root, target string) error {
@@ -340,7 +359,7 @@ func runEditFile(env *command.Env, root, target string) error {
 		na.Root.IndexKey = "" // invalidate the index
 	}
 	na.Root.FileKey = key
-	return na.Root.Save(na.Context, na.Key, true)
+	return na.Root.Save(na.Context, na.Key)
 }
 
 type rootArgs struct {

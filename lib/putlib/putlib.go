@@ -289,7 +289,7 @@ func SetPath(ctx context.Context, s filetree.Store, path string, tf *file.File) 
 			of.Root.IndexKey = "" // invalidate the index, the key changed
 		}
 		of.Root.FileKey = key
-		return key, of.Root.Save(ctx, of.RootKey, true) // replace
+		return key, of.Root.Save(ctx, of.RootKey)
 	}
 
 	// Otherwise, we're hooking something below another object.
