@@ -16,7 +16,6 @@
 package cmdroot
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -292,7 +291,7 @@ func runCopy(env *command.Env, src, dst string) error {
 	defer na.Close()
 
 	if !copyFlags.Replace {
-		r, err := na.Store.Roots().Has(na.Context, dst)
+		r, err := na.Store.Roots().Has(env.Context(), dst)
 		if err != nil {
 			return err
 		} else if r.Has(dst) {
@@ -300,10 +299,10 @@ func runCopy(env *command.Env, src, dst string) error {
 		}
 	}
 
-	if err := na.Root.Save(na.Context, na.Args[0]); err != nil {
+	if err := na.Root.Save(env.Context(), na.Args[0]); err != nil {
 		return err
 	} else if env.Command.Name == "rename" {
-		return na.Store.Roots().Delete(na.Context, na.Key)
+		return na.Store.Roots().Delete(env.Context(), na.Key)
 	}
 	return nil
 }
@@ -333,7 +332,7 @@ func runEditDesc(env *command.Env, target string, rest ...string) error {
 	}
 	defer na.Close()
 	na.Root.Description = strings.Join(na.Args, " ")
-	return na.Root.Save(na.Context, na.Key)
+	return na.Root.Save(env.Context(), na.Key)
 }
 
 func runEditFile(env *command.Env, root, target string) error {
@@ -351,7 +350,7 @@ func runEditFile(env *command.Env, root, target string) error {
 	}
 	if err != nil {
 		return err
-	} else if _, err := file.Open(na.Context, na.Store.Files(), key); err != nil {
+	} else if _, err := file.Open(env.Context(), na.Store.Files(), key); err != nil {
 		return err
 	}
 
@@ -359,16 +358,15 @@ func runEditFile(env *command.Env, root, target string) error {
 		na.Root.IndexKey = "" // invalidate the index
 	}
 	na.Root.FileKey = key
-	return na.Root.Save(na.Context, na.Key)
+	return na.Root.Save(env.Context(), na.Key)
 }
 
 type rootArgs struct {
-	Context context.Context
-	Key     string
-	Args    []string
-	Root    *root.Root
-	Store   filetree.Store
-	Close   func()
+	Key   string
+	Args  []string
+	Root  *root.Root
+	Store filetree.Store
+	Close func()
 }
 
 func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
@@ -387,11 +385,10 @@ func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
 		return nil, err
 	}
 	return &rootArgs{
-		Context: env.Context(),
-		Key:     key,
-		Args:    args[1:],
-		Root:    rp,
-		Store:   bs,
-		Close:   func() { bs.Close(env.Context()) },
+		Key:   key,
+		Args:  args[1:],
+		Root:  rp,
+		Store: bs,
+		Close: func() { bs.Close(env.Context()) },
 	}, nil
 }
