@@ -52,10 +52,8 @@ type Config struct {
 	// Compress, if true, enables zstd compression on the store.
 	Compress bool
 
-	// EncryptionKey, if non-empty, is used as an encryption key to wrap the
-	// store. Blobs are encrypted using a chacha20-poly1305 AEAD.
-	// A valid key must be 32 bytes in length, or New will panic.
-	EncryptionKey []byte
+	// Keyring, if present, is used to encrypt the store.
+	Keyring encrypted.Keyring
 
 	// CacheSizeBytes, if positive, wraps the store in a memory cache of the
 	// specified size. If zero or negative, no cache is enabled.
@@ -107,12 +105,8 @@ func New(config Config) *Service {
 	if config.ReadOnly {
 		store = roStore{config.Store}
 	}
-	if len(config.EncryptionKey) != 0 {
-		aead, err := chacha20poly1305.NewX([]byte(config.EncryptionKey))
-		if err != nil {
-			panic(fmt.Sprintf("create cipher context: %v", err))
-		}
-		store = encoded.New(store, encrypted.New(aead, nil))
+	if config.Keyring != nil {
+		store = encoded.New(store, encrypted.New(chacha20poly1305.NewX, config.Keyring))
 	}
 
 	// N.B. Compression, if enabled, needs to happen before encryption, since

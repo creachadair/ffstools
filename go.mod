@@ -17,8 +17,9 @@ require (
 	github.com/creachadair/gcsstore v0.0.0-20251006151507-3b464df313fd
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyfile v0.8.5
+	github.com/creachadair/keyring v0.0.0-20251103184525-4993b3f8e31b
 	github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726
-	github.com/creachadair/mds v0.25.8
+	github.com/creachadair/mds v0.25.10
 	github.com/creachadair/pebblestore v0.0.0-20251014184720-a07f710afbb0
 	github.com/creachadair/rosedbstore v0.0.0-20251014184856-afa1d7c7b20a
 	github.com/creachadair/s3store v0.0.0-20251006151431-1877a2d78717
@@ -170,3 +171,5 @@ retract (
 )
 
 tool honnef.co/go/tools/staticcheck
+
+replace github.com/creachadair/ffs => ../ffs

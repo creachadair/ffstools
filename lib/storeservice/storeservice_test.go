@@ -15,7 +15,6 @@
 package storeservice_test
 
 import (
-	"bytes"
 	"context"
 	"net"
 	"path/filepath"
@@ -27,6 +26,7 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/ffstools/lib/storeservice"
+	"github.com/creachadair/keyring"
 	"github.com/fortytw2/leaktest"
 )
 
@@ -34,12 +34,19 @@ func TestService(t *testing.T) {
 	defer leaktest.Check(t)()
 
 	store := memstore.New(nil)
+	kr, err := keyring.New(keyring.Config{
+		AccessKey:  make([]byte, keyring.AccessKeyLen),
+		InitialKey: []byte("00000000000000000000000000000000"),
+	})
+	if err != nil {
+		t.Fatalf("New keyring: %v", err)
+	}
 
 	srv := storeservice.New(storeservice.Config{
 		Address:        filepath.Join(t.TempDir(), "srv.sock"),
 		Store:          store,
 		CacheSizeBytes: 4096,
-		EncryptionKey:  bytes.Repeat([]byte("0"), 32),
+		Keyring:        kr,
 		Logf:           t.Logf,
 	})
 	defer srv.Stop()
