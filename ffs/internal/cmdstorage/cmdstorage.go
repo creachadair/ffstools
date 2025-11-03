@@ -107,7 +107,7 @@ func runStorage(env *command.Env) error {
 	if err != nil {
 		return err
 	}
-	encryptionKey, err := getEncryptionKey(flags.KeyFile)
+	keys, err := getEncryptionKey(flags.KeyFile)
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func runStorage(env *command.Env) error {
 		Store:          bs,
 		Buffer:         buf,
 		Compress:       flags.Compress,
-		EncryptionKey:  encryptionKey,
+		Keyring:        keys,
 		CacheSizeBytes: flags.CacheSize << 20,
 		MethodPrefix:   rs.Prefix,
 		ReadOnly:       flags.ReadOnly,

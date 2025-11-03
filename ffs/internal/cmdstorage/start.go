@@ -15,6 +15,7 @@
 package cmdstorage
 
 import (
+	"bytes"
 	"cmp"
 	"context"
 	"expvar"
@@ -25,11 +26,13 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/codecs/encrypted"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyfile"
+	"github.com/creachadair/keyring"
 )
 
 func openStore(ctx context.Context, store config.StoreSpec) (bs, buf blob.StoreCloser, oerr error) {
@@ -97,7 +100,7 @@ func newServerMetrics(ctx context.Context, spec string, srv *storeservice.Servic
 	return mx
 }
 
-func getEncryptionKey(keyFile string) ([]byte, error) {
+func getEncryptionKey(keyFile string) (encrypted.Keyring, error) {
 	if keyFile == "" {
 		return nil, nil // no key, no error
 	}
@@ -105,13 +108,12 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read key file: %w", err)
 	}
-	kf, err := keyfile.Parse(data)
-	if err != nil {
-		if len(data) == 32 { // chacha20 key length
-			return data, nil
-		}
-		return nil, fmt.Errorf("invalid key file: %w", err)
+	if len(data) == 32 { // chacha20poly1305 key length
+		return keyring.SingleKeyView(data), nil
 	}
+
+	// Reaching here, either the input must be a keyfile.File, or a keyring.Ring.
+	// Either way we need a passphrase to unlock it.
 	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
 	if !ok {
 		pp, err = getpass.Prompt("Passphrase: ")
@@ -119,7 +121,20 @@ func getEncryptionKey(keyFile string) ([]byte, error) {
 			return nil, fmt.Errorf("read passphrase: %w", err)
 		}
 	}
-	return kf.Get(pp)
+
+	if kf, err := keyfile.Parse(data); err == nil {
+		key, err := kf.Get(pp)
+		if err != nil {
+			return nil, err
+		}
+		return keyring.SingleKeyView(key), nil
+	}
+
+	kr, err := keyring.Read(bytes.NewReader(data), keyring.PassphraseKey(pp))
+	if err != nil {
+		return nil, fmt.Errorf("read keyring: %w", err)
+	}
+	return kr.View(), nil
 }
 
 func closeOnError(c blob.Closer, errp *error) func() {
