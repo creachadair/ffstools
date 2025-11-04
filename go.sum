@@ -180,8 +180,8 @@ github.com/creachadair/chirpstore v0.0.0-20251009162917-9ab166522af5 h1:EoV6W56E
 github.com/creachadair/chirpstore v0.0.0-20251009162917-9ab166522af5/go.mod h1:q6HT9IyV13kbeXMKbkqA4Q0Nz13NTNdCZvXNMltLwqo=
 github.com/creachadair/command v0.2.0 h1:qTA9cMMhZePAxFoNdnk6F6nn94s1qPndIg9hJbqI9cA=
 github.com/creachadair/command v0.2.0/go.mod h1:j+Ar+uYnFsHpkMeV9kGj6lJ45y9u2xqtg8FYy6cm+0o=
-github.com/creachadair/ffs v0.16.0 h1:MkcpIPSjUi1Yly5E7XGPj3R28uWCsspH46ek1dpb8k8=
-github.com/creachadair/ffs v0.16.0/go.mod h1:1urguc8IbMXvrneU/qFC4uzK1ZndwSc04MmXBS5M6Pw=
+github.com/creachadair/ffs v0.16.1 h1:VciymcPuzlFBc3rCd4zfJzvGYjyJPgvHF5x+3kil52I=
+github.com/creachadair/ffs v0.16.1/go.mod h1:NMkbPpkhbbIjyistaN/wCA5PqMwGZYfu/oWZ5+IMrNk=
 github.com/creachadair/ffuse v0.0.0-20251016041107-ac1a5f0ad8c2 h1:MTcBtp+ZoSydYFNFl9FD2d2Hjv9RVacMsFfceokIuvg=
 github.com/creachadair/ffuse v0.0.0-20251016041107-ac1a5f0ad8c2/go.mod h1:udZVDoJDxOSaVTkxBfd1VePHTBk3uJc/zSvngm9MBAw=
 github.com/creachadair/flax v0.0.5 h1:zt+CRuXQASxwQ68e9GHAOnEgAU29nF0zYMHOCrL5wzE=
@@ -190,8 +190,8 @@ github.com/creachadair/gcsstore v0.0.0-20251006151507-3b464df313fd h1:WUfMoyZtmN
 github.com/creachadair/gcsstore v0.0.0-20251006151507-3b464df313fd/go.mod h1:/YaUA3AxfdZoE40cV+jm6m4TJsouzinn+Cj/40EdJ0Y=
 github.com/creachadair/getpass v0.3.0 h1:phkNCSJK3E7z00K61fJN6FVeK7QVB544TfMwrv4wHCg=
 github.com/creachadair/getpass v0.3.0/go.mod h1:uP4qBITSjhKDM0aiWxxkKXo4CbF289NQeqJYKUJPlzk=
-github.com/creachadair/keyring v0.0.0-20251104153245-b7e9b712b792 h1:DFNfY6n8yqmyGqkpomSVEjeGCBJPAFfKk+C0CPw5xYk=
-github.com/creachadair/keyring v0.0.0-20251104153245-b7e9b712b792/go.mod h1:xa9bt9iF3vUf+LY6wAk0bebf/tZm6AGooMPnP0CJyBk=
+github.com/creachadair/keyring v0.1.0 h1:JjbCehJRin1M6ATNI//HcA9l+P+GkaMn+8fPkjF614c=
+github.com/creachadair/keyring v0.1.0/go.mod h1:xa9bt9iF3vUf+LY6wAk0bebf/tZm6AGooMPnP0CJyBk=
 github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726 h1:M7nl50bUFzIcU/mCOn4Lj/EDhKPabofzaZF3GW6ENp4=
 github.com/creachadair/leveldbstore v0.0.0-20251014184839-a38e6b0d5726/go.mod h1:GsGzaXRP9FfJp/DFoda2w0isS/+d+CCtSqmskgGH1Pc=
 github.com/creachadair/mds v0.25.10 h1:9k9JB35D1xhOCFl0liBhagBBp8fWWkKZrA7UXsfoHtA=
