@@ -58,11 +58,20 @@ func New(w io.Writer, max int64) *Bar {
 func (b *Bar) Start() *Bar { b.pulse.Reset(time.Second); return b }
 
 // Stop stops rendering the status line for b.
-func (b *Bar) Stop() { b.cancel(); <-b.done }
+func (b *Bar) Stop() {
+	if b == nil {
+		return
+	}
+	b.cancel()
+	<-b.done
+}
 
 // Set sets the current value of the bar to v. If v exceeds the current
 // maximum, the bar length is extended.
 func (b *Bar) Set(v int64) {
+	if b == nil {
+		return
+	}
 	b.μ.Lock()
 	defer b.μ.Unlock()
 	if v != b.cur {
@@ -75,6 +84,9 @@ func (b *Bar) Set(v int64) {
 
 // SetMeta sets the current value of the meta-counter.
 func (b *Bar) SetMeta(v int64) {
+	if b == nil {
+		return
+	}
 	b.μ.Lock()
 	defer b.μ.Unlock()
 	b.meta = v
@@ -84,6 +96,9 @@ func (b *Bar) SetMeta(v int64) {
 // the resulting value is less than zero it is pinned to zero. If the resulting
 // value exceeds the current maximum the bar length is extended.
 func (b *Bar) Add(v int64) {
+	if b == nil {
+		return
+	}
 	b.μ.Lock()
 	defer b.μ.Unlock()
 	b.cur += v
