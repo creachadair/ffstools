@@ -20,7 +20,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -34,7 +36,8 @@ import (
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/getpass"
-	"github.com/creachadair/keyfile"
+	"github.com/creachadair/keyring"
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 var flags struct {
@@ -77,13 +80,16 @@ With --cache, the server provides a memory cache over the primary store.
 
 With --key, the store is opened with chacha20-poly1305 encryption.
 The contents of the --key file are used as the cipher key.
-If the file has the format of http://godoc.org/github.com/creachadair/keyfile,
-it is unlocked using a passphrase, from the FFS_PASSPHRASE environment or
-prompted at the terminal. Otherwise its contents are used verbatim.
+If the file is in the [keyring] format, it is unlocked with a passphrase.
+The passphrase is read from the FFS_PASSPHRASE environment or prompted at
+the terminal. Otherwise if it is exactly 32 bytes (the size of a
+chacha20-poly1305 key) its contents are used verbatim.
 
 Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores
-that are remote and slow (e.g., cloud storage).`,
+that are remote and slow (e.g., cloud storage).
+
+[keyring]: http://godoc.org/github.com/creachadair/keyring`,
 		strings.Join(registry.Stores.Names(), ", ")),
 
 	SetFlags: command.Flags(flax.MustBind, &flags),
@@ -174,8 +180,9 @@ func runStorage(env *command.Env) error {
 }
 
 func runKeyGen(env *command.Env, keyFile string) error {
-	const keyBytes = 32 // suitable for AES-256 and chacha20poly1305.
-
+	if _, err := os.Stat(keyFile); err == nil {
+		return fmt.Errorf("key file %q already exists", keyFile)
+	}
 	pp, err := getpass.Prompt("Passphrase: ")
 	if err != nil {
 		return err
@@ -185,11 +192,20 @@ func runKeyGen(env *command.Env, keyFile string) error {
 	} else if cf != pp {
 		return errors.New("passphrases do not match")
 	}
-	kf := keyfile.New()
-	if _, err := kf.Random(pp, keyBytes); err != nil {
-		return fmt.Errorf("generate key: %w", err)
+	const keyBytes = chacha20poly1305.KeySize
+	accessKey, accessKeySalt := keyring.AccessKeyFromPassphrase(pp)
+	kr, err := keyring.New(keyring.Config{
+		InitialKey:    keyring.RandomKey(keyBytes),
+		AccessKey:     accessKey,
+		AccessKeySalt: accessKeySalt,
+	})
+	if err != nil {
+		return err
 	}
-	if err := atomicfile.WriteData(keyFile, kf.Encode(), 0600); err != nil {
+	if err := atomicfile.Tx(keyFile, 0600, func(w io.Writer) error {
+		_, err := kr.WriteTo(w)
+		return err
+	}); err != nil {
 		return fmt.Errorf("write key file: %w", err)
 	}
 	fmt.Fprintf(env, "Wrote a new %d-byte key to %q\n", keyBytes, keyFile)

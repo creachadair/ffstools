@@ -31,7 +31,6 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
-	"github.com/creachadair/keyfile"
 	"github.com/creachadair/keyring"
 )
 
@@ -112,22 +111,14 @@ func getEncryptionKey(keyFile string) (encrypted.Keyring, error) {
 		return keyring.SingleKeyView(data), nil
 	}
 
-	// Reaching here, either the input must be a keyfile.File, or a keyring.Ring.
-	// Either way we need a passphrase to unlock it.
+	// Reaching here, either the input must be a keyring.Ring.
+	// We need a passphrase to unlock it.
 	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
 	if !ok {
 		pp, err = getpass.Prompt("Passphrase: ")
 		if err != nil {
 			return nil, fmt.Errorf("read passphrase: %w", err)
 		}
-	}
-
-	if kf, err := keyfile.Parse(data); err == nil {
-		key, err := kf.Get(pp)
-		if err != nil {
-			return nil, err
-		}
-		return keyring.SingleKeyView(key), nil
 	}
 
 	kr, err := keyring.Read(bytes.NewReader(data), keyring.PassphraseKey(pp))
