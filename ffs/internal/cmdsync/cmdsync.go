@@ -29,6 +29,7 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/pbar"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/taskgroup"
@@ -156,6 +157,11 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			dprintf(env, "Key scan processed %d spans, found %d missing keys\n", nspan, nmiss)
 			fmt.Fprintf(env, "Have %d objects to copy\n", worklist.Len())
 
+			var pb *pbar.Bar
+			if worklist.Len() > 1000 {
+				pb = pbar.New(env, int64(worklist.Len())).Start()
+			}
+
 			// Copy all remaining objects.
 			start := time.Now()
 			var nb int64
@@ -172,6 +178,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				}
 
 				run(func() error {
+					pb.Add(1)
 					if tag == scanlib.Root && syncFlags.NoRoot {
 						dprintf(env, "NOTE: Skipping root %q [--no-root]\n", key)
 						return nil
@@ -192,6 +199,10 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				})
 			}
 			cerr := g.Wait()
+			if pb != nil {
+				pb.Stop()
+				fmt.Fprintln(env, " *")
+			}
 			fmt.Fprintf(env, "Copied %d objects [%v elapsed]\n",
 				nb, time.Since(start).Truncate(10*time.Millisecond))
 			return cerr
