@@ -174,13 +174,18 @@ func runList(env *command.Env) error {
 					}
 				}
 				data, _ := json.Marshal(struct {
-					S  string `json:"storageKey"`
+					S  string `json:"storageKey"` // should always be present
 					D  string `json:"description,omitzero"`
-					F  []byte `json:"fileKey,omitzero"`
-					X  []byte `json:"indexKey,omitzero"`
+					F  []byte `json:"fileKey"` // should always be present
+					X  []byte `json:"indexKey,omitempty"`
+					C  []byte `json:"chainKey,omitempty"`
 					IK int    `json:"numKeys,omitzero"`
 					IF int    `json:"indexBits,omitzero"`
-				}{key, rp.Description, []byte(rp.FileKey), []byte(rp.IndexKey), st.NumKeys, st.FilterBits})
+				}{
+					S: key, D: rp.Description, F: []byte(rp.FileKey),
+					X: []byte(rp.IndexKey), C: []byte(rp.ChainKey),
+					IK: st.NumKeys, IF: st.FilterBits,
+				})
 				fmt.Println(string(data))
 			} else if listFlags.Long {
 				fmt.Fprint(w, key, "\t")
