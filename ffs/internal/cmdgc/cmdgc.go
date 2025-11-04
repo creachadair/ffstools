@@ -222,7 +222,6 @@ store without roots.
 				// Clean up and report.
 				serr := g.Wait()
 				pb.Stop()
-				fmt.Fprintln(env, " *")
 				if serr != nil {
 					return fmt.Errorf("sweeping failed: %w", serr)
 				}

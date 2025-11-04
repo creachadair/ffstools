@@ -64,6 +64,7 @@ func (b *Bar) Stop() {
 	}
 	b.cancel()
 	<-b.done
+	fmt.Fprintln(b.w, " *")
 }
 
 // Set sets the current value of the bar to v. If v exceeds the current

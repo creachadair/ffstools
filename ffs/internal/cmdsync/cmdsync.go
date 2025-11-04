@@ -199,10 +199,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				})
 			}
 			cerr := g.Wait()
-			if pb != nil {
-				pb.Stop()
-				fmt.Fprintln(env, " *")
-			}
+			pb.Stop()
 			fmt.Fprintf(env, "Copied %d objects [%v elapsed]\n",
 				nb, time.Since(start).Truncate(10*time.Millisecond))
 			return cerr
