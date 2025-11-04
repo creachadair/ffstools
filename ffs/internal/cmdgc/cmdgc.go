@@ -194,7 +194,10 @@ store without roots.
 
 				// Sweep phase 2: Delete all the eligible keys. This will be the bulk
 				// of the work, for stores with expensive backends (e.g., cloud storage).
-				pb := pbar.New(env, int64(toDrop.Len())).Start()
+				var pb *pbar.Bar
+				if toDrop.Len() > 500 {
+					pb = pbar.New(env, int64(toDrop.Len())).Start()
+				}
 				for key := range toDrop {
 					if ctx.Err() != nil {
 						break
