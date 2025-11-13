@@ -82,6 +82,9 @@ func runExport(env *command.Env, originPath string) error {
 		defer cancel()
 		g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())
 
+		// We have to update directory timestamps after their contents are
+		// unpacked, otherwise the results are overwritten.
+		dirs := make(map[string]*file.File)
 		g.Go(func() error {
 			return fpath.Walk(cctx, of.File, func(e fpath.Entry) error {
 				if err := cctx.Err(); err != nil {
@@ -89,15 +92,27 @@ func runExport(env *command.Env, originPath string) error {
 				}
 
 				opath := filepath.Join(exportFlags.Target, filepath.FromSlash(e.Path))
-				if !e.File.Stat().Mode.IsDir() {
+				if fs := e.File.Stat(); !fs.Mode.IsDir() {
 					start(func() error {
 						return exportFile(cctx, e.File, opath)
 					})
 					return nil
+				} else if !exportFlags.NoStat && fs.Persistent() {
+					dirs[opath] = e.File
 				}
 				return exportFile(cctx, e.File, opath)
 			})
 		})
+		if err := g.Wait(); err != nil {
+			return err
+		}
+		for path, dir := range dirs {
+			start(func() error {
+				stat := dir.Stat()
+				logPrintf("+ update dir %q set mtime %v", path, stat.ModTime.Format(time.RFC3339))
+				return os.Chtimes(path, stat.ModTime, stat.ModTime)
+			})
+		}
 		return g.Wait()
 	})
 }
@@ -138,16 +153,16 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 	// Restore permissions and modification times, if requested and available.
 	if !exportFlags.NoStat && f.Stat().Persistent() && !link {
 		stat := f.Stat()
-		logPrintf("- set mode %v, mtime %v",
-			stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
+		logPrintf("- set mode %v, mtime %v", stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
 
 		if err := os.Chmod(path, stat.Mode); err != nil {
 			return fmt.Errorf("setting permissions: %w", err)
 		}
-		if err := os.Chtimes(path, stat.ModTime, stat.ModTime); err != nil {
-			return fmt.Errorf("setting modtime: %w", err)
+		if !mode.IsDir() {
+			if err := os.Chtimes(path, stat.ModTime, stat.ModTime); err != nil {
+				return fmt.Errorf("setting modtime: %w", err)
+			}
 		}
-
 		// TODO(creachadair): Maybe set owner/group?
 	}
 
