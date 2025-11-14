@@ -26,6 +26,7 @@ import (
 
 	// Subcommands.
 	"github.com/creachadair/ffstools/ffs/internal/cmdblob"
+	"github.com/creachadair/ffstools/ffs/internal/cmddebug"
 	"github.com/creachadair/ffstools/ffs/internal/cmdexport"
 	"github.com/creachadair/ffstools/ffs/internal/cmdfile"
 	"github.com/creachadair/ffstools/ffs/internal/cmdgc"
@@ -97,6 +98,7 @@ help [<command>]`,
 			cmdstorage.Command,
 			cmdweb.Command,
 			cmdstatus.Command,
+			cmddebug.Command,
 			command.HelpCommand([]command.HelpTopic{{
 				Name: "environment",
 				Help: `Environment variables supported by ffs.
