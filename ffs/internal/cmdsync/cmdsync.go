@@ -183,7 +183,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 						dprintf(env, "NOTE: Skipping root %q [--no-root]\n", key)
 						return nil
 					}
-					defer atomic.AddInt64(&nb, 1)
+					defer func() { pb.SetMeta(atomic.AddInt64(&nb, 1)) }()
 					switch tag {
 					case scanlib.Root:
 						debug("- copying root %q", key)
