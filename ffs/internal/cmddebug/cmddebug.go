@@ -100,8 +100,8 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 						return fmt.Errorf("save root: %w", err)
 					}
 				}
-				fmt.Printf("src %s\n", config.FormatKey(pi.File.Key()))
-				fmt.Printf("dst %s\n", config.FormatKey(rfKey))
+				fmt.Printf("src: %s\n", config.FormatKey(pi.File.Key()))
+				fmt.Printf("dst: %s\n", config.FormatKey(rfKey))
 			}
 			return nil
 		})
