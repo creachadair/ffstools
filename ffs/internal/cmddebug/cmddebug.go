@@ -25,7 +25,9 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/cache"
 	"github.com/creachadair/mds/value"
+	"github.com/creachadair/taskgroup"
 )
 
 var Command = &command.C{
@@ -74,10 +76,16 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 				}
 
 				fmt.Fprintf(env, "Rewriting %q...\n", arg)
-				rf, err := rewriteRecursive(env.Context(), pi.File, tgt, make(map[string]*file.File))
+				c := cache.New(cache.LRU[string, *file.File](1 << 20))
+				rf, err := rewriteRecursive(env.Context(), pi.File, tgt, c)
 				if err != nil {
 					return err
 				}
+				rfKey, err := rf.Flush(env.Context())
+				if err != nil {
+					return err
+				}
+
 				if pi.Root != nil && pi.File == pi.Base {
 					if pi.Root.IndexKey != "" {
 						fmt.Fprintf(env, "WARNING: Root index %s not copied, it must be re-generated\n",
@@ -92,14 +100,16 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 						return fmt.Errorf("save root: %w", err)
 					}
 				}
+				fmt.Printf("src %s\n", config.FormatKey(pi.File.Key()))
+				fmt.Printf("dst %s\n", config.FormatKey(rfKey))
 			}
 			return nil
 		})
 	})
 }
 
-func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, seen map[string]*file.File) (*file.File, error) {
-	if sf, ok := seen[f.Key()]; ok {
+func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, seen *cache.Cache[string, *file.File]) (*file.File, error) {
+	if sf, ok := seen.Get(f.Key()); ok {
 		return sf, nil
 	}
 	nf := file.New(tgt.Files(), &file.NewOptions{
@@ -107,16 +117,30 @@ func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, see
 		Stat:        value.Ptr(f.Stat()),
 		PersistStat: f.Stat().Persistent(),
 	})
+	var g taskgroup.Group
 	for _, kid := range f.Child().Names() {
 		kf, err := f.Open(ctx, kid)
 		if err != nil {
 			return nil, fmt.Errorf("open child: %w", err)
 		}
-		rkf, err := rewriteRecursive(ctx, kf, tgt, seen)
-		if err != nil {
-			return nil, fmt.Errorf("rewrite child: %w", err)
+		if kf.Child().Len() == 0 {
+			g.Go(func() error {
+				rkf, err := rewriteRecursive(ctx, kf, tgt, seen)
+				if err != nil {
+					return err
+				}
+				nf.Child().Set(kid, rkf)
+				return nil
+			})
+		} else if rkf, err := rewriteRecursive(ctx, kf, tgt, seen); err != nil {
+			g.Wait()
+			return nil, err
+		} else {
+			nf.Child().Set(kid, rkf)
 		}
-		nf.Child().Set(kid, rkf)
+	}
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 	if d := f.Data(); d.Size() > 0 {
 		if err := nf.SetData(ctx, f.Cursor(ctx)); err != nil {
@@ -132,11 +156,6 @@ func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, see
 
 	// Note: Updating the children touches the file, so reset the modtime.
 	nf.Stat().WithModTime(f.Stat().ModTime).Update()
-
-	kfKey, err := nf.Flush(ctx)
-	if err != nil {
-		return nil, err
-	}
-	seen[kfKey] = nf
+	seen.Put(f.Key(), nf) // N.B. original file key, not the new one
 	return nf, nil
 }

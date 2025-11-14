@@ -162,6 +162,7 @@ require (
 )
 
 retract (
+	v0.16.2 // incorrect rewrite caching
 	v0.11.17 // broken attempt to work around OTEL damage
 	v0.10.10 // early return bug in "ffs gc" mark
 	[v0.10.8, v0.10.9] // output bug in "ffs root list"
