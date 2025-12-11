@@ -18,8 +18,11 @@ package cmddebug
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
@@ -51,6 +54,12 @@ root is also copied to the target.`,
 
 			SetFlags: command.Flags(flax.MustBind, &rewriteFlags),
 			Run:      command.Adapt(runRewrite),
+		},
+		{
+			Name:  "file-hash",
+			Usage: `path ...`,
+			Help:  "Compute the content hash of files in the local filesystem.",
+			Run:   command.Adapt(runFileHash),
 		},
 	},
 }
@@ -158,4 +167,29 @@ func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, see
 	nf.Stat().WithModTime(f.Stat().ModTime).Update()
 	seen.Put(f.Key(), nf) // N.B. original file key, not the new one
 	return nf, nil
+}
+
+func runFileHash(env *command.Env, paths ...string) error {
+	kv := memstore.NewKV()
+	for _, path := range paths {
+		kv.Clear()
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+
+		cas := blob.CASFromKV(kv)
+		cf := file.New(cas, nil)
+		err = cf.SetData(env.Context(), f)
+		f.Close()
+		if err != nil {
+			return fmt.Errorf("set data: %w", err)
+		}
+		h := cf.Data().Hash()
+		if len(paths) != 1 {
+			fmt.Print(path, "\t")
+		}
+		fmt.Println(config.FormatKey(string(h)))
+	}
+	return nil
 }
