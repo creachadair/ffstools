@@ -63,7 +63,7 @@ input path is allowed.`,
 
 func runPut(env *command.Env, srcPath string, rest []string) error {
 	if putFlags.Target != "" && len(rest) != 0 {
-		return env.Usagef("only one path is allowed when -target is set")
+		return env.Usagef("only one path is allowed when --into is set")
 	}
 
 	cfg := env.Config.(*config.Settings)
