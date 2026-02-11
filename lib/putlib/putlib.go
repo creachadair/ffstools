@@ -186,7 +186,6 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		defer cancel()
 		g, start := taskgroup.New(cancel).Limit(64)
 		for _, e := range files {
-			e := e
 			start(func() error {
 				if c.Verbose {
 					log.Printf("file: %s (%d bytes)", e.name, e.fi.Size())
