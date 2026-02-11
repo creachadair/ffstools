@@ -112,8 +112,8 @@ func makePattern(raw string) string {
 }
 
 func trimPrefix(s, pfx string) (bool, string) {
-	if strings.HasPrefix(s, pfx) {
-		return true, strings.TrimPrefix(s, pfx)
+	if after, ok := strings.CutPrefix(s, pfx); ok {
+		return true, after
 	}
 	return false, s
 }
