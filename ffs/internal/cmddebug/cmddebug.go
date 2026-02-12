@@ -85,7 +85,7 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 				}
 
 				fmt.Fprintf(env, "Rewriting %q...\n", arg)
-				c := cache.New(cache.LRU[string, *file.File](1 << 20))
+				c := cache.New(cache.LRU[string, *file.File]().WithLimit(1 << 20))
 				rf, err := rewriteRecursive(env.Context(), pi.File, tgt, c)
 				if err != nil {
 					return err
