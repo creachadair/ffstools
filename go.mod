@@ -8,8 +8,8 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20260114182015-a2d9ed2dcd57
 	github.com/creachadair/boltstore v0.0.0-20260124202056-aa73264a218d
 	github.com/creachadair/buntdbstore v0.0.0-20260124202034-6da96b0e4b05
-	github.com/creachadair/chirp v0.3.0
-	github.com/creachadair/chirpstore v0.0.0-20260129075346-7dd1ee87f6d8
+	github.com/creachadair/chirp v0.3.3
+	github.com/creachadair/chirpstore v0.0.0-20260212014658-c09bfe42254c
 	github.com/creachadair/command v0.2.0
 	github.com/creachadair/ffs v0.17.3
 	github.com/creachadair/ffuse v0.0.0-20260126020607-ac051623ea0d
@@ -28,7 +28,7 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.9.0
 	github.com/klauspost/compress v1.18.3
 	github.com/pkg/xattr v0.4.12
-	golang.org/x/crypto v0.47.0
+	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.49.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
@@ -145,9 +145,9 @@ require (
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/term v0.39.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/api v0.263.0 // indirect
