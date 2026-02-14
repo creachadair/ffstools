@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"strings"
 	"text/tabwriter"
 
@@ -127,32 +126,17 @@ var listFlags struct {
 	JSON bool `flag:"json,Format output as JSON"`
 }
 
-func matchAny(key string, globs []string) bool {
-	for _, glob := range globs {
-		if ok, _ := path.Match(glob, key); ok {
-			return true
-		}
-	}
-	return len(globs) == 0
-}
-
 func runList(env *command.Env) error {
-	glob := env.Args
-	if len(glob) == 0 {
-		glob = append(glob, "*")
-	}
-
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		w := tabwriter.NewWriter(os.Stdout, 4, 2, 1, ' ', 0)
 		defer w.Flush()
 
-		for key, err := range s.Roots().List(env.Context(), "") {
+		for key, err := range config.ListMatchingRoots(env.Context(), s, env.Args...) {
 			if err != nil {
 				return err
-			} else if !matchAny(key, glob) {
-				continue
-			} else if !listFlags.Long && !listFlags.JSON {
+			}
+			if !listFlags.Long && !listFlags.JSON {
 				fmt.Println(key)
 				continue
 			}

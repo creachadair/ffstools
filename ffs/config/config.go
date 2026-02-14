@@ -22,9 +22,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"iter"
 	"log"
 	"net"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -279,6 +281,35 @@ func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error
 	}
 
 	return index.Decode(ridx)
+}
+
+// ListMatchingRoots iterates over the list of root keys in s matching the
+// specified queries. Each query is either a literal root key, or a glob as
+// supported by [path.Match]. If no queries are provided, all available roots
+// are reported.
+func ListMatchingRoots(ctx context.Context, s filetree.Store, queries ...string) iter.Seq2[string, error] {
+	matchAny := func(candidate string) bool {
+		for _, q := range queries {
+			if ok, _ := path.Match(q, candidate); ok {
+				return true
+			}
+		}
+		return len(queries) == 0
+	}
+	return func(yield func(string, error) bool) {
+		for key, err := range s.Roots().List(ctx, "") {
+			if err != nil {
+				yield("", err)
+				return
+			}
+			if !matchAny(key) {
+				continue
+			}
+			if !yield(key, nil) {
+				return
+			}
+		}
+	}
 }
 
 // Duration is a wrapper around [time.Duration] that encodes as a string in JSON.
