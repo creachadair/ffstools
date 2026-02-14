@@ -42,7 +42,10 @@ func runIndex(env *command.Env) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		for _, key := range env.Args {
+		for key, err := range config.ListMatchingRoots(env.Context(), s, env.Args...) {
+			if err != nil {
+				return err
+			}
 			rp, err := root.Open(env.Context(), s.Roots(), key)
 			if err != nil {
 				return err
