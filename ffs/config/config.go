@@ -177,7 +177,7 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	}
 	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
 	if s.EnableDebugLogging {
-		peer.LogPackets(func(pkt *chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
+		peer.LogPackets(func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
 	bs := chirpstore.NewStore(peer, &chirpstore.StoreOptions{
 		MethodPrefix: spec.Prefix,
