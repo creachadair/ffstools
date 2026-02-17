@@ -312,6 +312,30 @@ func ListMatchingRoots(ctx context.Context, s filetree.Store, queries ...string)
 	}
 }
 
+// UniquePrefixKey reports the unique key in kv beginning with prefix.  If no
+// such key exists, it reports [blob.ErrKeyNotFound]. If multiple keys match
+// the prefix, it reports the first match along with [blob.ErrKeyExists].
+func UniquePrefixKey(ctx context.Context, kv blob.KVCore, prefix string) (string, error) {
+	var firstKey string
+	var found bool
+
+	for key, err := range kv.List(ctx, prefix) {
+		if err != nil {
+			return "", err
+		} else if !strings.HasPrefix(key, prefix) {
+			break
+		} else if found {
+			return firstKey, blob.ErrKeyExists
+		}
+		firstKey = key
+		found = true
+	}
+	if found {
+		return firstKey, nil
+	}
+	return "", blob.ErrKeyNotFound
+}
+
 // Duration is a wrapper around [time.Duration] that encodes as a string in JSON.
 type Duration time.Duration
 
