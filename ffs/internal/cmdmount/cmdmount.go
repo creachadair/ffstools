@@ -39,8 +39,8 @@ var Command = &command.C{
 	Help: `Mount a file tree as a FUSE filesystem.
 
 Mount a FUSE filesystem at the specified <mount-path> hosting the contents
-of the specified FFS file. By default, the mounted filesystem is writable.
-With --read-only, the filesystem is instead mounted as read-only.
+of the specified FFS file. By default, the mounted filesystem is read-only.
+With --writable, the filesystem is mounted as modifiable.
 
 If the file is based on a root key, then changes made while the filesystem
 is mounted are flushed back to that root upon exit. If the --auto-flush flag
@@ -54,7 +54,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 `,
 
 	SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&svc.ReadOnly, "read-only", false, "Mount the filesystem as read-only")
+		fs.BoolVar(&svc.Writable, "writable", false, "Mount the filesystem as writable")
 		fs.BoolVar(&svc.DebugLog, "debug-fuse", false, "PRIVATE:Enable FUSE debug logging (warning: prolific)")
 		fs.DurationVar(&svc.AutoFlush, "auto-flush", 0, "Automatically flush the root at this interval")
 		fs.BoolVar(&svc.Verbose, "v", false, "Enable verbose logging")
@@ -78,7 +78,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			fmt.Printf("mount: %s\n", config.FormatKey(svc.Path.FileKey))
 
 			// If the filesystem is read-only, we can run without follow-up.
-			if svc.ReadOnly {
+			if !svc.Writable {
 				return svc.Run(ctx)
 			}
 
