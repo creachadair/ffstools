@@ -18,6 +18,7 @@ package cmddebug
 import (
 	"context"
 	"fmt"
+	"iter"
 	"os"
 
 	"github.com/creachadair/command"
@@ -60,6 +61,12 @@ root is also copied to the target.`,
 			Usage: `path ...`,
 			Help:  "Compute the content hash of files in the local filesystem.",
 			Run:   command.Adapt(runFileHash),
+		},
+		{
+			Name:  "file-split",
+			Usage: "path ...",
+			Help:  "Show the splits of the specified file content into blocks.",
+			Run:   command.Adapt(runFileSplit),
 		},
 	},
 }
@@ -191,5 +198,41 @@ func runFileHash(env *command.Env, paths ...string) error {
 		}
 		fmt.Println(config.FormatKey(string(h)))
 	}
+	return nil
+}
+
+func runFileSplit(env *command.Env, paths ...string) error {
+	for _, path := range paths {
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		fmt.Println("#", path)
+		cas := blob.CASFromKV(new(logKV))
+		cf := file.New(cas, nil)
+		err = cf.SetData(env.Context(), f)
+		f.Close()
+		if err != nil {
+			return fmt.Errorf("split data: %w", err)
+		}
+	}
+	return nil
+}
+
+type logKV struct{ pos int64 }
+
+func (*logKV) Get(context.Context, string) ([]byte, error)         { return nil, blob.ErrKeyNotFound }
+func (*logKV) Has(context.Context, ...string) (blob.KeySet, error) { return nil, nil }
+func (*logKV) Delete(context.Context, string) error                { return blob.ErrKeyNotFound }
+func (*logKV) Len(context.Context) (int64, error)                  { return 0, nil }
+
+func (*logKV) List(context.Context, string) iter.Seq2[string, error] {
+	return func(_ func(string, error) bool) {}
+}
+
+func (kv *logKV) Put(_ context.Context, opts blob.PutOptions) error {
+	n := int64(len(opts.Data))
+	fmt.Printf("%d %d %s\n", kv.pos, n, config.FormatKey(opts.Key))
+	kv.pos += n
 	return nil
 }
