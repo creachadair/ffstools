@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/filetree"
@@ -67,16 +68,24 @@ the filesystem is automatically unmounted when the subprocess exits.
 		if !svc.Exec && len(cmdArgs) != 0 {
 			return env.Usagef("extra arguments after command: %q", cmdArgs)
 		}
-		if createdMount, err := createMountPath(mountPath); err != nil {
-			return fmt.Errorf("create mountpoint: %w", err)
-		} else if createdMount {
-			// Make a best-effort to clean up the mount point we created.
-			// It's not the end of the world if this fails, but log it.
-			defer func() {
-				if err := os.Remove(mountPath); err != nil {
-					log.Printf("WARNING: Removing mount point: %v", err)
-				}
-			}()
+
+		// MacFUSE manages creating mount points for us, but Linux FUSE does not.
+		// We could try to create the path opportunistically, but the MacFUSE
+		// extension has special rights in /Volumes, where mountpoints usually
+		// live, which the user will not. So, only do this for non-Darwin GOOS.
+		if runtime.GOOS != "darwin" {
+			if createdMount, err := createMountPath(mountPath); err != nil {
+				return fmt.Errorf("create mountpoint: %w", err)
+			} else if createdMount {
+				// If we successfully created a new mount directory, make a
+				// best-effort to clean up the mount point we created.
+				// It's not the end of the world if this fails, but log it.
+				defer func() {
+					if err := os.Remove(mountPath); err != nil {
+						log.Printf("WARNING: Removing mount point: %v", err)
+					}
+				}()
+			}
 		}
 
 		cfg := env.Config.(*config.Settings)
