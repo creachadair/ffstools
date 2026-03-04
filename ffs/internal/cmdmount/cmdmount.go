@@ -19,9 +19,12 @@ package cmdmount
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"runtime"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/filetree"
@@ -65,6 +68,26 @@ the filesystem is automatically unmounted when the subprocess exits.
 		if !svc.Exec && len(cmdArgs) != 0 {
 			return env.Usagef("extra arguments after command: %q", cmdArgs)
 		}
+
+		// MacFUSE manages creating mount points for us, but Linux FUSE does not.
+		// We could try to create the path opportunistically, but the MacFUSE
+		// extension has special rights in /Volumes, where mountpoints usually
+		// live, which the user will not. So, only do this for non-Darwin GOOS.
+		if runtime.GOOS != "darwin" {
+			if createdMount, err := createMountPath(mountPath); err != nil {
+				return fmt.Errorf("create mountpoint: %w", err)
+			} else if createdMount {
+				// If we successfully created a new mount directory, make a
+				// best-effort to clean up the mount point we created.
+				// It's not the end of the world if this fails, but log it.
+				defer func() {
+					if err := os.Remove(mountPath); err != nil {
+						log.Printf("WARNING: Removing mount point: %v", err)
+					}
+				}()
+			}
+		}
+
 		cfg := env.Config.(*config.Settings)
 		return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 			svc.MountPath = mountPath
@@ -106,4 +129,21 @@ the filesystem is automatically unmounted when the subprocess exits.
 			return nil
 		})
 	}),
+}
+
+func createMountPath(path string) (created bool, _ error) {
+	err := os.Mkdir(path, 0700)
+	if errors.Is(err, os.ErrExist) {
+		// We did not succeed in creating it, but if the error was because the
+		// path already existed as a directory that's OK.
+		if fi, err := os.Lstat(path); err == nil && fi.IsDir() {
+			return true, nil
+		}
+		return false, err
+	} else if err != nil {
+		return false, err
+	}
+
+	// Reaching here, we succeeded in creating a new directory.
+	return true, nil
 }
