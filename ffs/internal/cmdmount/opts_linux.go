@@ -3,6 +3,7 @@
 package cmdmount
 
 import (
+	"os"
 	"time"
 
 	"github.com/creachadair/mds/value"
@@ -23,4 +24,7 @@ var fuseOptions = fs.Options{
 	},
 	EntryTimeout: value.Ptr(time.Second),
 	AttrTimeout:  value.Ptr(time.Second),
+
+	UID: uint32(max(os.Getuid(), 0)),
+	GID: uint32(max(os.Getgid(), 0)),
 }
