@@ -19,7 +19,6 @@ package cmdmount
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -132,18 +131,13 @@ the filesystem is automatically unmounted when the subprocess exits.
 }
 
 func createMountPath(path string) (created bool, _ error) {
-	err := os.Mkdir(path, 0700)
-	if errors.Is(err, os.ErrExist) {
-		// We did not succeed in creating it, but if the error was because the
-		// path already existed as a directory that's OK.
-		if fi, err := os.Lstat(path); err == nil && fi.IsDir() {
-			return true, nil
-		}
-		return false, err
-	} else if err != nil {
-		return false, err
+	merr := os.Mkdir(path, 0700)
+	if merr == nil {
+		return true, nil // successfully created, OK
 	}
-
-	// Reaching here, we succeeded in creating a new directory.
-	return true, nil
+	fi, serr := os.Lstat(path)
+	if serr == nil && fi.IsDir() {
+		return false, nil // not created, but OK
+	}
+	return false, merr // not created
 }
