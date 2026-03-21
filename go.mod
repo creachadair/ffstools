@@ -14,14 +14,14 @@ require (
 	github.com/creachadair/ffs v0.17.5
 	github.com/creachadair/ffuse v0.0.0-20260316155316-258b341ef652
 	github.com/creachadair/flax v0.0.5
-	github.com/creachadair/gcsstore v0.0.0-20260316155146-bf04b7ee0d6e
+	github.com/creachadair/gcsstore v0.0.0-20260321173342-4faa0530c145
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyring v0.2.3
 	github.com/creachadair/leveldbstore v0.0.0-20260316155248-747732de49be
 	github.com/creachadair/mds v0.26.1
 	github.com/creachadair/pebblestore v0.0.0-20260305154149-b71622d237f7
 	github.com/creachadair/rosedbstore v0.0.0-20260316155257-0df57580dfc4
-	github.com/creachadair/s3store v0.0.0-20260305154108-9171616f7275
+	github.com/creachadair/s3store v0.0.0-20260321172550-849d3e652360
 	github.com/creachadair/sqlitestore v0.0.0-20260305154049-1dfbc45563f0
 	github.com/creachadair/taskgroup v0.14.2
 	github.com/fortytw2/leaktest v1.3.0

@@ -188,8 +188,8 @@ github.com/creachadair/ffuse v0.0.0-20260316155316-258b341ef652 h1:LY/G/6aKZk1T/
 github.com/creachadair/ffuse v0.0.0-20260316155316-258b341ef652/go.mod h1:jppvCO1F0uN6UpfQhgAY+OSiBlxyAris9BfPQwhurKw=
 github.com/creachadair/flax v0.0.5 h1:zt+CRuXQASxwQ68e9GHAOnEgAU29nF0zYMHOCrL5wzE=
 github.com/creachadair/flax v0.0.5/go.mod h1:F1PML0JZLXSNDMNiRGK2yjm5f+L9QCHchyHBldFymj8=
-github.com/creachadair/gcsstore v0.0.0-20260316155146-bf04b7ee0d6e h1:J3VDdCHzDrLS/acf3IgT30QpweVViV9zMtoTZu/7n9A=
-github.com/creachadair/gcsstore v0.0.0-20260316155146-bf04b7ee0d6e/go.mod h1:69XBFgWcEIyMNP2RukaWVQndt9SdjSjaOAT6jaz77Dw=
+github.com/creachadair/gcsstore v0.0.0-20260321173342-4faa0530c145 h1:VyEOTku0Q2g7R3hP6L+hN0SIvp5RmSgu5ENNWANgGe8=
+github.com/creachadair/gcsstore v0.0.0-20260321173342-4faa0530c145/go.mod h1:69XBFgWcEIyMNP2RukaWVQndt9SdjSjaOAT6jaz77Dw=
 github.com/creachadair/getpass v0.3.0 h1:phkNCSJK3E7z00K61fJN6FVeK7QVB544TfMwrv4wHCg=
 github.com/creachadair/getpass v0.3.0/go.mod h1:uP4qBITSjhKDM0aiWxxkKXo4CbF289NQeqJYKUJPlzk=
 github.com/creachadair/keyring v0.2.3 h1:HzVCsoSWvtf3a45XhOUEqG3N2/rnkMYQIM+PxzeuD0M=
@@ -204,8 +204,8 @@ github.com/creachadair/pebblestore v0.0.0-20260305154149-b71622d237f7 h1:d12IZAV
 github.com/creachadair/pebblestore v0.0.0-20260305154149-b71622d237f7/go.mod h1:H3oYx5GyUFzZJC1b4PpTnlySYq8gZpnnHgQEonIToA8=
 github.com/creachadair/rosedbstore v0.0.0-20260316155257-0df57580dfc4 h1:dHB8taAXxC10JeojatrN18fcRcIUtEEUkpcpWxMWwbw=
 github.com/creachadair/rosedbstore v0.0.0-20260316155257-0df57580dfc4/go.mod h1:P0Nfk575/3QfU2tjhTzWrWWBAzyb56RnwflFzw+ZeLo=
-github.com/creachadair/s3store v0.0.0-20260305154108-9171616f7275 h1:Bydj0Kpxz9JY3r9JidNl2NuIwUnMbd2JIg7nWJV4w+g=
-github.com/creachadair/s3store v0.0.0-20260305154108-9171616f7275/go.mod h1:MoW6PuJqNoI+r+C+2b0BNlA2WPhw+WaMrBb1Qzx4P+g=
+github.com/creachadair/s3store v0.0.0-20260321172550-849d3e652360 h1:pqeOtHV0axnFdWK7gS5sR6kNzuSkmX+6JJiTjWw5o+U=
+github.com/creachadair/s3store v0.0.0-20260321172550-849d3e652360/go.mod h1:MoW6PuJqNoI+r+C+2b0BNlA2WPhw+WaMrBb1Qzx4P+g=
 github.com/creachadair/sqlitestore v0.0.0-20260305154049-1dfbc45563f0 h1:r+Q8dsnl1k8sMxnJO8uvo8qKeR63b746v14O+oU+Efo=
 github.com/creachadair/sqlitestore v0.0.0-20260305154049-1dfbc45563f0/go.mod h1:vEPgYNKESIdKQubXLsZQRQAf/m86oHLaKg4fAZTTN5A=
 github.com/creachadair/taskgroup v0.14.2 h1:vPHw50VFJ98Eb+h3S1RYRejK3DE0xpGCXb2ZFtHfFeA=
