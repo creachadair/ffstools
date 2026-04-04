@@ -187,6 +187,12 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run:      command.Adapt(runFindKeys),
 		},
 		{
+			Name:  "list-paths",
+			Usage: "<root-key>/<path>\n@<origin-key>/<path>",
+			Help:  "List all the paths recursively in a file tree.",
+			Run:   command.Adapt(runListPaths),
+		},
+		{
 			Name:     "fsck",
 			Usage:    fileCmdUsage,
 			Help:     "Check file tree integrity.",
@@ -701,6 +707,23 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 			return nil
 		}
 		return werr
+	})
+}
+
+func runListPaths(env *command.Env, pathSpec string) error {
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		of, err := filetree.OpenPath(env.Context(), s, pathSpec)
+		if err != nil {
+			return err
+		}
+		return fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
+			if e.Err != nil {
+				return e.Err
+			}
+			fmt.Println(path.Join(of.Path, e.Path))
+			return nil
+		})
 	})
 }
 
