@@ -104,10 +104,14 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 		if err != nil {
 			return err
 		}
+		tdir := tarFlags.Root
+		if tdir == "" && strings.Contains(originPath, "/") {
+			tdir = path.Base(originPath)
+		}
 
 		tw := tar.NewWriter(w)
 		mc = append(mc, tw.Close)
-		return addFile(env, tw, of.File, tarFlags.Root)
+		return addFile(env, tw, of.File, tdir)
 	})
 }
 
