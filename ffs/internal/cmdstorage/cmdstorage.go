@@ -104,6 +104,9 @@ that are remote and slow (e.g., cloud storage).
 }
 
 func runStorage(env *command.Env) error {
+	if !isStoreFlagSet(env) {
+		return env.Usagef("the --store flag must be set")
+	}
 	s := env.Config.(*config.Settings)
 	rs := s.ResolveSpec(s.DefaultStore)
 	if rs.Spec == "" {
@@ -223,4 +226,11 @@ func getListenAddr(env *command.Env) (string, error) {
 		return "", fmt.Errorf("no service address for %q", target)
 	}
 	return spec.Address, nil
+}
+
+func isStoreFlagSet(env *command.Env) bool {
+	for env.Parent != nil {
+		env = env.Parent
+	}
+	return env.IsFlagSet("store")
 }
