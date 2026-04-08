@@ -38,6 +38,7 @@ import (
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
+	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/putlib"
 	"github.com/creachadair/ffstools/lib/scanlib"
@@ -206,6 +207,13 @@ If the origin is from a root, the root is updated with the changes.`,
 			Help:     `Scan blobs reachable from the specified file trees.`,
 			SetFlags: command.Flags(flax.MustBind, &scanFlags),
 			Run:      command.Adapt(runScan),
+		},
+		{
+			Name: "index",
+			Usage: `@<file-key>[/path/...] ...
+<root-keyL[/path/...] ...`,
+			Help: "Compute an index of blobs reachable from the specified file trees.",
+			Run:  command.Adapt(runIndex),
 		},
 	},
 }
@@ -1022,6 +1030,50 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 				}
 			}
 		}
+		return nil
+	})
+}
+
+func runIndex(env *command.Env, sourceKeys ...string) error {
+	if len(sourceKeys) == 0 {
+		return env.Usagef("no source keys specified")
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
+		scanned := mapset.New[string]()
+		start := time.Now()
+
+		for _, spec := range sourceKeys {
+			of, err := filetree.OpenPath(env.Context(), src, spec)
+			if err != nil {
+				return err
+			}
+			if err := of.File.Scan(env.Context(), func(si file.ScanItem) bool {
+				key := si.Key()
+				if scanned.Has(key) {
+					return false // don't re-scan repeats of the same file
+				}
+				scanned.Add(key)
+				scanned.Add(si.Data().Keys()...)
+				return true
+			}); err != nil {
+				return fmt.Errorf("scanning %q: %w", spec, err)
+			}
+		}
+		fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
+			len(scanned), time.Since(start).Truncate(10*time.Millisecond))
+
+		idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
+		for key := range scanned {
+			idx.Add(key)
+		}
+		ikey, err := wiretype.Save(env.Context(), src.Files(), &wiretype.Object{
+			Value: &wiretype.Object_Index{Index: index.Encode(idx)},
+		})
+		if err != nil {
+			return fmt.Errorf("saving index: %w", err)
+		}
+		fmt.Println(config.FormatKey(ikey))
 		return nil
 	})
 }
