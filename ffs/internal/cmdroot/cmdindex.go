@@ -15,10 +15,12 @@
 package cmdroot
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/file/wiretype"
@@ -75,38 +77,48 @@ func runIndex(env *command.Env) error {
 			}
 
 			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, config.FormatKey(rp.FileKey))
-			scanned := mapset.New[string]()
 			start := time.Now()
-			if err := fp.Scan(env.Context(), func(si file.ScanItem) bool {
-				key := si.Key()
-				if scanned.Has(key) {
-					return false // don't re-scan repeats of the same file
-				}
-				scanned.Add(key)
-				scanned.Add(si.Data().Keys()...)
-				return true
-			}); err != nil {
-				return fmt.Errorf("scanning %q: %w", key, err)
+			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s.Files(), fp)
+			if err != nil {
+				return fmt.Errorf("constructing index: %w", err)
 			}
 			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
-				len(scanned), time.Since(start).Truncate(10*time.Millisecond))
+				numKeys, time.Since(start).Truncate(10*time.Millisecond))
 
-			// Now that we know the size of the set, pack the keys into the index.
-			idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
-			for key := range scanned {
-				idx.Add(key)
-			}
-
-			rp.IndexKey, err = wiretype.Save(env.Context(), s.Files(), &wiretype.Object{
-				Value: &wiretype.Object_Index{Index: index.Encode(idx)},
-			})
-			if err != nil {
-				return fmt.Errorf("saving index: %w", err)
-			}
+			rp.IndexKey = ikey
 			if err := rp.Save(env.Context(), key); err != nil {
 				return err
 			}
 		}
 		return nil
 	})
+}
+
+func computeAndSaveIndex(ctx context.Context, cas blob.CAS, fp *file.File) (string, int, error) {
+	var scanned mapset.Set[string]
+	if err := fp.Scan(ctx, func(si file.ScanItem) bool {
+		key := si.Key()
+		if scanned.Has(key) {
+			return false // don't re-scan repeats of the same file
+		}
+		scanned.Add(key)
+		scanned.Add(si.Data().Keys()...)
+		return true
+	}); err != nil {
+		return "", 0, fmt.Errorf("scanning %s: %w", config.FormatKey(fp.Key()), err)
+	}
+
+	// Now that we know the size of the set, pack the keys into the index.
+	idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
+	for key := range scanned {
+		idx.Add(key)
+	}
+
+	ikey, err := wiretype.Save(ctx, cas, &wiretype.Object{
+		Value: &wiretype.Object_Index{Index: index.Encode(idx)},
+	})
+	if err != nil {
+		return "", 0, fmt.Errorf("saving index: %w", err)
+	}
+	return ikey, len(scanned), nil
 }

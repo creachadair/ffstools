@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
@@ -200,6 +201,7 @@ var createFlags struct {
 	Desc    string `flag:"desc,Set the human-readable description"`
 	Ref     bool   `flag:"ref,Treat the target as a root/path or file/path"`
 	Put     bool   `flag:"put,Treat the target as a local filesystem path to copy"`
+	Index   bool   `flag:"index,Create a blob index for the contents of the new root"`
 }
 
 func runCreate(env *command.Env, name string, rest ...string) error {
@@ -261,13 +263,29 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		}
 		if err != nil {
 			return err
-		} else if _, err := file.Open(env.Context(), s.Files(), fk); err != nil {
+		}
+		tf, err := file.Open(env.Context(), s.Files(), fk)
+		if err != nil {
 			return err
+		}
+
+		var indexKey string
+		if createFlags.Index {
+			fmt.Fprintf(env, "Scanning data reachable from %s...\n", config.FormatKey(fk))
+			start := time.Now()
+			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s.Files(), tf)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(env, "Finished scnaning %d objects [%v elapsed]\n",
+				numKeys, time.Since(start).Truncate(10*time.Millisecond))
+			indexKey = ikey
 		}
 
 		return root.New(s.Roots(), &root.Options{
 			Description: createFlags.Desc,
 			FileKey:     fk,
+			IndexKey:    indexKey, // may be empty
 		}).Save(env.Context(), name)
 	})
 }
