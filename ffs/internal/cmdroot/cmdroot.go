@@ -273,7 +273,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		if createFlags.Index {
 			fmt.Fprintf(env, "Scanning data reachable from %s...\n", config.FormatKey(fk))
 			start := time.Now()
-			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s.Files(), tf)
+			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s, tf)
 			if err != nil {
 				return err
 			}

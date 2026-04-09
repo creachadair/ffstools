@@ -20,10 +20,8 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
-	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
@@ -78,7 +76,7 @@ func runIndex(env *command.Env) error {
 
 			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, config.FormatKey(rp.FileKey))
 			start := time.Now()
-			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s.Files(), fp)
+			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s, fp)
 			if err != nil {
 				return fmt.Errorf("constructing index: %w", err)
 			}
@@ -94,7 +92,7 @@ func runIndex(env *command.Env) error {
 	})
 }
 
-func computeAndSaveIndex(ctx context.Context, cas blob.CAS, fp *file.File) (string, int, error) {
+func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (string, int, error) {
 	var scanned mapset.Set[string]
 	if err := fp.Scan(ctx, func(si file.ScanItem) bool {
 		key := si.Key()
@@ -113,10 +111,7 @@ func computeAndSaveIndex(ctx context.Context, cas blob.CAS, fp *file.File) (stri
 	for key := range scanned {
 		idx.Add(key)
 	}
-
-	ikey, err := wiretype.Save(ctx, cas, &wiretype.Object{
-		Value: &wiretype.Object_Index{Index: index.Encode(idx)},
-	})
+	ikey, err := s.SaveIndex(ctx, idx)
 	if err != nil {
 		return "", 0, fmt.Errorf("saving index: %w", err)
 	}

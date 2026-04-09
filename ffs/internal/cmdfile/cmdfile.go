@@ -1067,9 +1067,7 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 		for key := range scanned {
 			idx.Add(key)
 		}
-		ikey, err := wiretype.Save(env.Context(), src.Files(), &wiretype.Object{
-			Value: &wiretype.Object_Index{Index: index.Encode(idx)},
-		})
+		ikey, err := src.SaveIndex(env.Context(), idx)
 		if err != nil {
 			return fmt.Errorf("saving index: %w", err)
 		}
