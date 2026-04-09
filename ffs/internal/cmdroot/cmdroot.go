@@ -238,7 +238,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 		case "file-key":
 			fk, err = filetree.ParseKey(rest[0])
 		case "ref":
-			tf, terr := filetree.OpenPath(env.Context(), s, rest[0])
+			tf, terr := s.OpenPath(env.Context(), rest[0])
 			if terr != nil {
 				return terr
 			}

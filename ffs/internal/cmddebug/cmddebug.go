@@ -86,7 +86,7 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 			fmt.Fprintf(env, "Target store: %q\n", rewriteFlags.Target)
 
 			for _, arg := range sourceKeys {
-				pi, err := filetree.OpenPath(env.Context(), src, arg)
+				pi, err := src.OpenPath(env.Context(), arg)
 				if err != nil {
 					return err
 				}

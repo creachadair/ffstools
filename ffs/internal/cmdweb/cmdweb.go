@@ -49,7 +49,7 @@ is terminated by a signal.`,
 			Run: command.Adapt(func(env *command.Env, address, rootKey string) error {
 				cfg := env.Config.(*config.Settings)
 				return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-					pi, err := filetree.OpenPath(env.Context(), s, rootKey)
+					pi, err := s.OpenPath(env.Context(), rootKey)
 					if err != nil {
 						return err
 					}

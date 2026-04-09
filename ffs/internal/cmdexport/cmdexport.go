@@ -74,7 +74,7 @@ func runExport(env *command.Env, originPath string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		of, err := filetree.OpenPath(env.Context(), s, originPath)
+		of, err := s.OpenPath(env.Context(), originPath)
 		if err != nil {
 			return err
 		}

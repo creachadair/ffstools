@@ -111,7 +111,7 @@ func runPut(env *command.Env, srcPath string, rest []string) error {
 func checkTarget(env *command.Env, s filetree.Store, target string) error {
 	if target != "" {
 		root, _ := filetree.SplitPath(target)
-		_, err := filetree.OpenPath(env.Context(), s, root)
+		_, err := s.OpenPath(env.Context(), root)
 		if err != nil {
 			return fmt.Errorf("target %q: %w", target, err)
 		}

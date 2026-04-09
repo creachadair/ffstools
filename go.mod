@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirp v0.4.3
 	github.com/creachadair/chirpstore v0.0.0-20260403201027-cbc4c71afaff
 	github.com/creachadair/command v0.2.2
-	github.com/creachadair/ffs v0.17.7
+	github.com/creachadair/ffs v0.17.8
 	github.com/creachadair/ffuse v0.0.0-20260330165835-b0f81634cb83
 	github.com/creachadair/flax v0.0.5
 	github.com/creachadair/gcsstore v0.0.0-20260402145742-1b05b527c746
@@ -145,7 +145,7 @@ require (
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/term v0.41.0 // indirect
 	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/time v0.15.0 // indirect

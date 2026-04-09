@@ -267,7 +267,7 @@ func SetPath(ctx context.Context, s filetree.Store, path string, tf *file.File) 
 		orest = "" // setting root
 	}
 
-	of, err := filetree.OpenPath(ctx, s, obase) // N.B. No path; see below
+	of, err := s.OpenPath(ctx, obase) // N.B. No path; see below
 	if err != nil {
 		return "", err
 	}

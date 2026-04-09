@@ -85,7 +85,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			worklist := scanlib.NewScanner(src.Files())
 			var indices []*index.Index
 			for _, elt := range sourceKeys {
-				of, err := filetree.OpenPath(env.Context(), src, elt)
+				of, err := src.OpenPath(env.Context(), elt)
 				if err != nil {
 					return err
 				}
