@@ -107,12 +107,6 @@ If a <file-key> is specified, it must already exist in the store.`,
 			Run: command.Adapt(runEditFile),
 		},
 		{
-			Name:  "set-index",
-			Usage: "<name> <index-key>",
-			Help:  "Edit the index key of the given root.",
-			Run:   command.Adapt(runEditIndex),
-		},
-		{
 			Name:  "index",
 			Usage: "<root-key> ...",
 			Help: `
@@ -372,32 +366,6 @@ func runEditFile(env *command.Env, root, target string) error {
 	}
 	na.Root.FileKey = key
 	return na.Root.Save(env.Context(), na.Key)
-}
-
-func runEditIndex(env *command.Env, rootName, target string) error {
-	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		rp, err := root.Open(env.Context(), s.Roots(), rootName)
-		if err != nil {
-			return err
-		}
-		ikey, err := filetree.ParseKey(target)
-		if err != nil {
-			return err
-		}
-		if _, err := s.LoadIndex(env.Context(), ikey); err != nil {
-			return err
-		}
-		if rp.IndexKey != "" {
-			fmt.Printf("old-index: %s\n", config.FormatKey(rp.IndexKey))
-		}
-		rp.IndexKey = ikey
-		if err := rp.Save(env.Context(), rootName); err != nil {
-			return err
-		}
-		fmt.Printf("new-index: %s\n", config.FormatKey(rp.IndexKey))
-		return nil
-	})
 }
 
 type rootArgs struct {
