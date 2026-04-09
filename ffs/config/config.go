@@ -34,9 +34,7 @@ import (
 	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffs/index"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -267,20 +265,6 @@ func ToJSON(msg any) string {
 		return "null"
 	}
 	return buf.String()
-}
-
-// LoadIndex loads the contents of an index blob.
-func LoadIndex(ctx context.Context, s blob.CAS, key string) (*index.Index, error) {
-	var obj wiretype.Object
-	if err := wiretype.Load(ctx, s, key, &obj); err != nil {
-		return nil, fmt.Errorf("loading index: %w", err)
-	}
-	ridx := obj.GetIndex()
-	if ridx == nil {
-		return nil, fmt.Errorf("no index in %s", FormatKey(key))
-	}
-
-	return index.Decode(ridx)
 }
 
 // ListMatchingRoots iterates over the list of root keys in s matching the

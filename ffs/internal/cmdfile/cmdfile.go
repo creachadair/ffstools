@@ -770,7 +770,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				// no root is invoolved
 			} else if of.Root.IndexKey == "" {
 				fmt.Printf("- root %q is not indexed (OK)\n", of.RootKey)
-			} else if idx, err := config.LoadIndex(env.Context(), s.Files(), of.Root.IndexKey); err != nil {
+			} else if idx, err := s.LoadIndex(env.Context(), of.Root.IndexKey); err != nil {
 				fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
 				nerrs++
 			} else {

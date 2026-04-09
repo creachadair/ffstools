@@ -157,7 +157,7 @@ func runList(env *command.Env) error {
 
 				// For "long" JSON, include details about the index, if there is one.
 				if listFlags.Long && rp.IndexKey != "" {
-					idx, err := config.LoadIndex(env.Context(), s.Files(), rp.IndexKey)
+					idx, err := s.LoadIndex(env.Context(), rp.IndexKey)
 					if err != nil {
 						log.Printf("WARNING: loading index for %q: %v (continuing)", key, err)
 					} else {
@@ -385,7 +385,7 @@ func runEditIndex(env *command.Env, rootName, target string) error {
 		if err != nil {
 			return err
 		}
-		if _, err := config.LoadIndex(env.Context(), s.Files(), ikey); err != nil {
+		if _, err := s.LoadIndex(env.Context(), ikey); err != nil {
 			return err
 		}
 		if rp.IndexKey != "" {

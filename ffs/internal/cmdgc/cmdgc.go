@@ -102,7 +102,7 @@ store without roots.
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
-					rpi, err := config.LoadIndex(env.Context(), s.Files(), rp.IndexKey)
+					rpi, err := s.LoadIndex(env.Context(), rp.IndexKey)
 					if err != nil {
 						return err
 					}

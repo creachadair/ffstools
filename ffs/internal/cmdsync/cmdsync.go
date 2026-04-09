@@ -93,7 +93,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
 					if of.Root.IndexKey != "" && !syncFlags.NoIndex {
-						idx, err := config.LoadIndex(env.Context(), src.Files(), of.Root.IndexKey)
+						idx, err := src.LoadIndex(env.Context(), of.Root.IndexKey)
 						if err != nil {
 							return err
 						}
