@@ -181,7 +181,11 @@ func runList(env *command.Env) error {
 				}
 				fmt.Fprint(w, "\t", config.PrintableKey(rp.FileKey))
 				if rp.Description != "" {
-					fmt.Fprint(w, "\t", rp.Description)
+					d, _, ok := strings.Cut(rp.Description, "\n")
+					if ok {
+						d += " (...)"
+					}
+					fmt.Fprint(w, "\t", d)
 				}
 				fmt.Fprintln(w)
 			}
