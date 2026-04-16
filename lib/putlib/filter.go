@@ -27,13 +27,12 @@ import (
 
 // Filter is a collection of path filters used to control what parts of a file
 // tree get copied by "put" operations. Each line of a filter file specifies a
-// glob matching a filename. By default, all files are included, and any file
+// glob matching file paths. By default, all files are included, and any path
 // matching a rule is filtered out.
 //
-// Each directory is checked for a filter file, which governs paths under that
-// directory. If a rule is prefixed with "!", a match of that rule inverts the
-// sense of the parent directory for that path, including if it was filtered
-// and vice versa.
+// Each directory may specify its own filter, which governs paths under that
+// directory. If a rule is prefixed with "!", a match of that rule overrides an
+// exclusion, either from the directory itself or a parent filters.
 type Filter struct {
 	Base string
 	Rule []Rule
@@ -44,7 +43,7 @@ type Filter struct {
 // A Rule is a single filter rule.
 type Rule struct {
 	*regexp.Regexp      // the compiled glob expression
-	Negate         bool // whether this rule negates a parent match
+	Negate         bool // if true, override a previous exclusion
 }
 
 // LoadFile loads a list of path filters from a file.
@@ -77,22 +76,36 @@ func (f *Filter) LoadFile(name string) (*Filter, error) {
 	return sub, nil
 }
 
-// Match reports whether path should be excluded.
-func (f *Filter) Match(path string) bool {
+// Exclude reports whether path should be excluded.
+func (f *Filter) Exclude(path string) bool {
 	if f == nil {
 		return false
 	}
 	adj, _ := filepath.Rel(f.Base, path)
+
+	// Within a rule set, exclusions may be overruled by negations.
+	// For example, given rules:
+	//
+	//     foo/*
+	//     !foo/bar
+	//
+	// the first rule excludes everything in foo/, but the second rule excepts
+	// foo/bar, so we have to check all the rules before making a decision.
+	// A path is excluded if it matches any non-negated rules and no negated
+	// rules.
+	exclude := f.up.Exclude(path)
 	for _, elt := range f.Rule {
 		if elt.MatchString(adj) {
-			// If this is a negative match, it reverses the previous judgement.
 			if elt.Negate {
-				return !f.up.Match(path)
+				// A negated rule match overrules any previous exclusion judgement,
+				// either from the parent (above) or another rule in this filter.
+				return false
+			} else {
+				exclude = true
 			}
-			return true
 		}
 	}
-	return f.up.Match(path)
+	return exclude
 }
 
 func parseFilter(base string, data []byte) (*Filter, error) {

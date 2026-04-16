@@ -147,7 +147,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	var files, dirs []*entry
 	for _, elt := range elts {
 		sub := filepath.Join(st.path, elt.Name())
-		if filt.Match(sub) {
+		if filt.Exclude(sub) {
 			if c.Verbose {
 				log.Printf("skip (filtered): %s", sub)
 			}
