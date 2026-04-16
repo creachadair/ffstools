@@ -1,4 +1,18 @@
-package config
+// Copyright 2022 Michael J. Fromberger. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package putlib
 
 import (
 	"bytes"
@@ -33,11 +47,11 @@ type Rule struct {
 	Negate         bool // whether this rule negates a parent match
 }
 
-// Load loads a list of path filters from a file.
+// LoadFile loads a list of path filters from a file.
 //
 // Blank lines and lines beginning with "#" are ignored.  Otherwise, each line
 // gives a path glob that the filter should match.
-func (f *Filter) Load(name string) (*Filter, error) {
+func (f *Filter) LoadFile(name string) (*Filter, error) {
 	path, base := name, ""
 	if f != nil {
 		base = f.Base

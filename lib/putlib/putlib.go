@@ -32,7 +32,6 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
-	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
 )
@@ -51,7 +50,7 @@ type state struct {
 	s      blob.CAS
 	path   string
 	fi     fs.FileInfo
-	filter *config.Filter
+	filter *Filter
 }
 
 // PutFile puts a single file or symlink into the store.
@@ -133,7 +132,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	for _, elt := range elts {
 		if elt.Name() == c.FilterName {
 			sub := filepath.Join(st.path, elt.Name())
-			nf, err := filt.Load(sub)
+			nf, err := filt.LoadFile(sub)
 			if err != nil {
 				return nil, fmt.Errorf("loading filter: %w", err)
 			} else if c.Verbose {
