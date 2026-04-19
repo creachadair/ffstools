@@ -18,7 +18,6 @@ package cmdfile
 import (
 	"bufio"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -188,10 +187,11 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run:      command.Adapt(runFindKeys),
 		},
 		{
-			Name:  "list-paths",
-			Usage: "<root-key>/<path>\n@<origin-key>/<path>",
-			Help:  "List all the paths recursively in a file tree.",
-			Run:   command.Adapt(runListPaths),
+			Name:     "list-paths",
+			Usage:    "<root-key>/<path>\n@<origin-key>/<path>",
+			Help:     "List all the paths recursively in a file tree.",
+			SetFlags: command.Flags(flax.MustBind, &listPathsFlags),
+			Run:      command.Adapt(runListPaths),
 		},
 		{
 			Name:     "fsck",
@@ -330,7 +330,7 @@ func runList(env *command.Env) error {
 func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) error {
 	if !listFlags.Long && !listFlags.JSON {
 		if listFlags.Key {
-			fmt.Print(base64.StdEncoding.EncodeToString([]byte(of.Key())) + "\t")
+			fmt.Print(config.FormatKey(of.Key()), "\t")
 		}
 		fmt.Println(name)
 		return nil
@@ -382,7 +382,7 @@ func listFormat(f *file.File, name, target string) string {
 		}
 	}
 	if listFlags.Key {
-		skey = base64.StdEncoding.EncodeToString([]byte(f.Key())) + "\t"
+		skey = config.FormatKey(f.Key()) + "\t"
 	}
 
 	return fmt.Sprintf("%s%s%s\t%3d\t%s\t%s\v%9d\t%s\t%s%s\f",
@@ -718,6 +718,11 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 	})
 }
 
+var listPathsFlags struct {
+	Full bool `flag:"full,List full paths including the origin"`
+	Key  bool `flag:"key,Include storage keys"`
+}
+
 func runListPaths(env *command.Env, pathSpec string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
@@ -729,7 +734,14 @@ func runListPaths(env *command.Env, pathSpec string) error {
 			if e.Err != nil {
 				return e.Err
 			}
-			fmt.Println(path.Join(of.Path, e.Path))
+			if listPathsFlags.Key {
+				fmt.Print(config.FormatKey(e.File.Key()), "\t")
+			}
+			if listPathsFlags.Full {
+				fmt.Println(path.Join(of.Path, e.Path))
+			} else {
+				fmt.Println(e.Path)
+			}
 			return nil
 		})
 	})
