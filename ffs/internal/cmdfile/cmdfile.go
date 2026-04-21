@@ -739,7 +739,8 @@ func runListPaths(env *command.Env, pathSpec string) error {
 			}
 			if listPathsFlags.Full {
 				fmt.Println(path.Join(of.Path, e.Path))
-			} else {
+			} else if e.Path != "" || listPathsFlags.Key {
+				// Don't print the empty root path unless we are also printing a key.
 				fmt.Println(e.Path)
 			}
 			return nil
