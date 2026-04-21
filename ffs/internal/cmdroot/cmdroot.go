@@ -275,7 +275,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(env, "Finished scnaning %d objects [%v elapsed]\n",
+			fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
 				numKeys, time.Since(start).Truncate(10*time.Millisecond))
 			indexKey = ikey
 		}
