@@ -96,10 +96,11 @@ that are remote and slow (e.g., cloud storage).
 	Run:      command.Adapt(runStorage),
 
 	Commands: []*command.C{{
-		Name:  "keygen",
-		Usage: "<key-file>",
-		Help:  "Generate a random encryption key into the specified file.",
-		Run:   command.Adapt(runKeyGen),
+		Name:     "keygen",
+		Usage:    "<key-file>",
+		Help:     "Generate a random encryption key into the specified file.",
+		SetFlags: command.Flags(flax.MustBind, &keyGenFlags),
+		Run:      command.Adapt(runKeyGen),
 	}},
 }
 
@@ -182,10 +183,27 @@ func runStorage(env *command.Env) error {
 	return srv.Wait()
 }
 
+var keyGenFlags struct {
+	Bare bool `flag:"bare,Generate a bare key, not stored in a keyring (UNSAFE)"`
+}
+
 func runKeyGen(env *command.Env, keyFile string) error {
 	if _, err := os.Stat(keyFile); err == nil {
 		return fmt.Errorf("key file %q already exists", keyFile)
 	}
+
+	const keyBytes = chacha20poly1305.KeySize
+	if keyGenFlags.Bare {
+		if err := atomicfile.Tx(keyFile, 0600, func(w io.Writer) error {
+			_, err := w.Write(keyring.RandomKey(keyBytes))
+			return err
+		}); err != nil {
+			return fmt.Errorf("write key file: %w", err)
+		}
+		fmt.Fprintf(env, "Wrote an unencrypted %d-byte key to %q\n", keyBytes, keyFile)
+		return nil
+	}
+
 	pp, err := getpass.Prompt("Passphrase: ")
 	if err != nil {
 		return err
@@ -195,7 +213,7 @@ func runKeyGen(env *command.Env, keyFile string) error {
 	} else if cf != pp {
 		return errors.New("passphrases do not match")
 	}
-	const keyBytes = chacha20poly1305.KeySize
+
 	accessKey, accessKeySalt := keyring.AccessKeyFromPassphrase(pp)
 	kr, err := keyring.New(keyring.Config{
 		InitialKey:    keyring.RandomKey(keyBytes),
@@ -209,9 +227,9 @@ func runKeyGen(env *command.Env, keyFile string) error {
 		_, err := kr.WriteTo(w)
 		return err
 	}); err != nil {
-		return fmt.Errorf("write key file: %w", err)
+		return fmt.Errorf("write keyring: %w", err)
 	}
-	fmt.Fprintf(env, "Wrote a new %d-byte key to %q\n", keyBytes, keyFile)
+	fmt.Fprintf(env, "Wrote a new %d-byte keyring to %q\n", keyBytes, keyFile)
 	return nil
 }
 
