@@ -103,7 +103,8 @@ help [<command>]`,
 
 FFS_CONFIG     : Configuration file path (default: ` + config.DefaultPath + `)
 FFS_DEBUG      : If true, enable debug logging (warning: noisy)
-FFS_PASSPHRASE : If set, contains the passphrase for a --key file
+FFS_GETPASS    : if set, a command to execute to prompt for a passphrase
+FFS_PASSPHRASE : If set, contains the passphrase for a --key file (overrides FFS_GETPASS)
 FFS_PREFIX     : Storage service method name prefix (overrides config; overridden by --prefix)
 FFS_STORE      : Storage service address (overrides config; overridden by --store)
 FFS_SUBSTORE   : Substore name to use (overrides config; overridden by --substore)

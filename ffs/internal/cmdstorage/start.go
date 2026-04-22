@@ -18,10 +18,14 @@ import (
 	"bytes"
 	"cmp"
 	"context"
+	"errors"
 	"expvar"
 	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/creachadair/command"
@@ -32,6 +36,7 @@ import (
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
 	"github.com/creachadair/keyring"
+	"github.com/creachadair/mds/shell"
 )
 
 func openStore(ctx context.Context, store config.StoreSpec) (bs, buf blob.StoreCloser, oerr error) {
@@ -113,12 +118,9 @@ func getEncryptionKey(keyFile string) (encrypted.Keyring, error) {
 
 	// Reaching here, either the input must be a keyring.Ring.
 	// We need a passphrase to unlock it.
-	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
-	if !ok {
-		pp, err = getpass.Prompt("Passphrase: ")
-		if err != nil {
-			return nil, fmt.Errorf("read passphrase: %w", err)
-		}
+	pp, err := getPassphrase(filepath.Base(keyFile))
+	if err != nil {
+		return nil, fmt.Errorf("read passphrase: %w", err)
 	}
 
 	kr, err := keyring.Read(bytes.NewReader(data), keyring.PassphraseKey(pp))
@@ -139,4 +141,26 @@ func closeOnError(c blob.Closer, errp *error) func() {
 type subCloser struct {
 	blob.Store
 	blob.Closer
+}
+
+func getPassphrase(target string) (string, error) {
+	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
+	if ok {
+		return pp, nil
+	}
+
+	gp, ok := os.LookupEnv("FFS_GETPASS")
+	if ok {
+		words, ok := shell.Split(strings.ReplaceAll(gp, "{target}", target))
+		if !ok || len(words) == 0 {
+			return "", errors.New("invalid passphrase prompt command-line")
+		}
+		data, err := exec.Command(words[0], words[1:]...).Output()
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(string(data)), nil
+	}
+
+	return getpass.Prompt(fmt.Sprintf("Passphrase for %q: ", target))
 }
