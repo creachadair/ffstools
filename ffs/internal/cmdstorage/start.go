@@ -89,7 +89,7 @@ func newServerMetrics(ctx context.Context, spec string, srv *storeservice.Servic
 		v := new(expvar.Map)
 		v.Set("go_version", expvarString(vi.Toolchain))
 		v.Set("package", expvarString(vi.ImportPath))
-		v.Set("revision", expvarString(cmp.Or(vi.Commit, vi.Version, "[unknown]")))
+		v.Set("version", expvarString(cmp.Or(vi.Commit, vi.Version, "[unknown]")))
 		v.Set("modified", expvarBool(vi.Modified))
 		if !vi.Time.IsZero() {
 			v.Set("build_time", expvarString(vi.Time.Format(time.RFC3339)))
