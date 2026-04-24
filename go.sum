@@ -180,10 +180,10 @@ github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148 h1:OxFff2Ex
 github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148/go.mod h1:lY7BBphs5ghrkfnWmkAfxXRn/hFW6t1/pIKI+q9bxVg=
 github.com/creachadair/command v0.2.2 h1:4RGsUhqFf1imFC+vMWOOCiQdncThCdcdMJp0JNCjxxc=
 github.com/creachadair/command v0.2.2/go.mod h1:Z6Zp6CSJcnaWWR4wHgdqzODnFdxFJAaa/DrcVkeUu3E=
-github.com/creachadair/ffs v0.17.8 h1:qib9zxaz1kIeLo3FrluRFUuWoYso1GllY9AKL+QkJKQ=
-github.com/creachadair/ffs v0.17.8/go.mod h1:f3Cq1DdFIQMPanN1Xl4APxTmxmyQS0uEVGQc90B7hro=
-github.com/creachadair/ffuse v0.0.0-20260420035702-1b13060e529e h1:jPhlndDeog5dH/qb7WPX/E6MneK0TavQCE78F/IGBXo=
-github.com/creachadair/ffuse v0.0.0-20260420035702-1b13060e529e/go.mod h1:WDQUc96rJsJgQHyCS3bRoBpjSSfuuV0A3p9zAcDsa1w=
+github.com/creachadair/ffs v0.17.9 h1:Gzodagx91zirfLfAaLnA/T7voY6dQ5U/4/TjSmoFkb4=
+github.com/creachadair/ffs v0.17.9/go.mod h1:f3Cq1DdFIQMPanN1Xl4APxTmxmyQS0uEVGQc90B7hro=
+github.com/creachadair/ffuse v0.0.0-20260424145001-f236967f9277 h1:dCHZH79e0LTNKnDTDzTXqIhIgAIH8R1rQVRdch3wiQ4=
+github.com/creachadair/ffuse v0.0.0-20260424145001-f236967f9277/go.mod h1:oDVYHvwWijjnuAD+m9QqdHykeKmaSkHChGqFLALbWtE=
 github.com/creachadair/flax v0.0.5 h1:zt+CRuXQASxwQ68e9GHAOnEgAU29nF0zYMHOCrL5wzE=
 github.com/creachadair/flax v0.0.5/go.mod h1:F1PML0JZLXSNDMNiRGK2yjm5f+L9QCHchyHBldFymj8=
 github.com/creachadair/gcsstore v0.0.0-20260418162311-40d98b7d4eab h1:8v07QxzeIfcyhZ8Oke1pfgCL9VvVf7zmWzi7seJvyBQ=
@@ -366,8 +366,8 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.0.0/go.mod h1:FiyG127CGDf3tlThmg
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
-github.com/hanwen/go-fuse/v2 v2.9.0 h1:0AOGUkHtbOVeyGLr0tXupiid1Vg7QB7M6YUcdmVdC58=
-github.com/hanwen/go-fuse/v2 v2.9.0/go.mod h1:yE6D2PqWwm3CbYRxFXV9xUd8Md5d6NG0WBs5spCswmI=
+github.com/hanwen/go-fuse/v2 v2.10.1 h1:QAqZuc9+aBtTou+OPruU/hkYQYCkgPtQd2QaepHkTTs=
+github.com/hanwen/go-fuse/v2 v2.10.1/go.mod h1:aU7NkGYZUmuJrZapoI3mEcNve7PZTySUOLBuch/vR6U=
 github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
 github.com/hashicorp/consul/sdk v0.1.1/go.mod h1:VKf9jXwCTEY1QZP2MOLRhb5i/I/ssyNV1vwHyQBF0x8=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
