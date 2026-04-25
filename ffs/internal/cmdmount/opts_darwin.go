@@ -12,7 +12,7 @@ import (
 
 var fuseOptions = fs.Options{
 	MountOptions: fuse.MountOptions{
-		Options: []string{"volname=FFS", "noappledouble", "noubc"},
+		Options: []string{"volname=FFS", "noappledouble"},
 		FsName:  "ffs",
 		Name:    "ffs",
 	},
