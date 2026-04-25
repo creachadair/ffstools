@@ -199,6 +199,9 @@ func (s *Service) Start(ctx context.Context) error {
 }
 
 func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepter) func() error {
+	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
+	svc.Register(s.root)
+
 	var g taskgroup.Group
 	return func() (err error) {
 		defer func() {
@@ -219,16 +222,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepte
 				return fmt.Errorf("accept: %w", err)
 			}
 
-			peer := s.root.Clone()
-			_, store, err := s.checkCaller(ctx, store, ch)
-			if err != nil {
-				s.logf("reject: %v", err)
-				peer.Handle("", reportErrorHandler(err))
-			} else {
-				svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
-				svc.Register(peer)
-			}
-			peer.Start(ch)
+			peer := s.root.Clone().Start(ch)
 			stop := context.AfterFunc(ctx, func() { peer.Stop() })
 			g.Go(func() error {
 				defer stop()
@@ -236,17 +230,6 @@ func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepte
 			})
 		}
 	}
-}
-
-// reportErrorHandler returns a [chirp.Handler] that reports the specified
-// error to all calls from the remote peer.
-func reportErrorHandler(err error) chirp.Handler {
-	return func(context.Context, *chirp.Request) ([]byte, error) { return nil, err }
-}
-
-func (s *Service) checkCaller(ctx context.Context, store blob.Store, ch chirp.Channel) (string, blob.Store, error) {
-	// TODO(creachadair): Assign a starting store based on the caller identity.
-	return "", store, nil
 }
 
 // BufferLen reports the total number of keys in the buffer store.
