@@ -39,8 +39,13 @@ import (
 // The Address and Store fields are required.
 type Config struct {
 	// Address is the address at which the service listens for connections.
-	// This must be non-empty.
+	// This must be non-empty unless Accepter is set.
 	Address string
+
+	// Accepter, if non-nil, is used to accept client connections.
+	// If it is set, the Address field is ignored.
+	// If it is nil, the Address field must be non-empty.
+	Accepter peers.Accepter
 
 	// Store is the storage exported by the service.
 	// This must be non-nil.
@@ -78,6 +83,7 @@ type Config struct {
 type Service struct {
 	root       *chirp.Peer
 	addr       string
+	accepter   peers.Accepter
 	prefix     string
 	store      blob.StoreCloser
 	buffer     blob.StoreCloser
@@ -93,8 +99,8 @@ type Service struct {
 // The caller must call [Service.Start] to start the service.
 func New(config Config) *Service {
 	switch {
-	case config.Address == "":
-		panic("missing required listen address")
+	case config.Address == "" && config.Accepter == nil:
+		panic("missing required listen address or accepter")
 	case config.Store == nil:
 		panic("missing required store")
 	}
@@ -127,6 +133,7 @@ func New(config Config) *Service {
 	return &Service{
 		root:       chirp.NewPeer(),
 		addr:       config.Address,
+		accepter:   config.Accepter,
 		prefix:     config.MethodPrefix,
 		store:      store,
 		buffer:     config.Buffer,
@@ -175,23 +182,27 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}
 
-	lst, err := net.Listen(chirp.SplitAddress(s.addr))
-	if err != nil {
-		return fmt.Errorf("listen: %w", err)
+	acc := s.accepter
+	if acc == nil {
+		lst, err := net.Listen(chirp.SplitAddress(s.addr))
+		if err != nil {
+			return fmt.Errorf("listen: %w", err)
+		}
+		s.logf("[chirp] service: %q", s.addr)
+		acc = peers.NetAccepter(lst)
 	}
-	s.logf("[chirp] service: %q", s.addr)
 
 	sctx, cancel := context.WithCancel(ctx)
-	s.loop = taskgroup.Go(s.serve(sctx, store, peers.NetAccepter(lst)))
+	s.loop = taskgroup.Go(s.serve(sctx, store, acc))
 	s.stop = cancel
 	return nil
 }
 
-func (s *Service) serve(ctx context.Context, store blob.Store, lst peers.Accepter) func() error {
+func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepter) func() error {
 	var g taskgroup.Group
 	return func() (err error) {
 		defer func() {
-			if c, ok := lst.(io.Closer); ok {
+			if c, ok := acc.(io.Closer); ok {
 				c.Close()
 			}
 			gerr := g.Wait()
@@ -201,7 +212,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, lst peers.Accepte
 		}()
 
 		for {
-			ch, err := lst.Accept(ctx)
+			ch, err := acc.Accept(ctx)
 			if errors.Is(err, net.ErrClosed) {
 				return nil
 			} else if err != nil {
