@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 
 	"github.com/creachadair/chirp"
@@ -181,19 +182,18 @@ func (s *Service) Start(ctx context.Context) error {
 	s.logf("[chirp] service: %q", s.addr)
 
 	sctx, cancel := context.WithCancel(ctx)
-	s.loop = taskgroup.Go(s.serve(sctx, store, lst))
+	s.loop = taskgroup.Go(s.serve(sctx, store, peers.NetAccepter(lst)))
 	s.stop = cancel
 	return nil
 }
 
-func (s *Service) serve(ctx context.Context, store blob.Store, lst net.Listener) func() error {
-	acc := peers.NetAccepter(lst)
+func (s *Service) serve(ctx context.Context, store blob.Store, lst peers.Accepter) func() error {
 	var g taskgroup.Group
-
 	return func() (err error) {
 		defer func() {
-			lst.Close()
-
+			if c, ok := lst.(io.Closer); ok {
+				c.Close()
+			}
 			gerr := g.Wait()
 			if err == nil {
 				err = gerr
@@ -201,7 +201,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, lst net.Listener)
 		}()
 
 		for {
-			ch, err := acc.Accept(ctx)
+			ch, err := lst.Accept(ctx)
 			if errors.Is(err, net.ErrClosed) {
 				return nil
 			} else if err != nil {
