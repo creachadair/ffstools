@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 
 	"github.com/creachadair/chirp"
@@ -42,10 +41,10 @@ type Config struct {
 	// This must be non-empty unless Accepter is set.
 	Address string
 
-	// Accepter, if non-nil, is used to accept client connections.
+	// Accept, if non-nil, is used to accept client connections.
 	// If it is set, the Address field is ignored.
 	// If it is nil, the Address field must be non-empty.
-	Accepter peers.Accepter
+	Accept func(context.Context) (chirp.Channel, error)
 
 	// Store is the storage exported by the service.
 	// This must be non-nil.
@@ -83,7 +82,7 @@ type Config struct {
 type Service struct {
 	root       *chirp.Peer
 	addr       string
-	accepter   peers.Accepter
+	accept     acceptFunc
 	prefix     string
 	store      blob.StoreCloser
 	buffer     blob.StoreCloser
@@ -99,8 +98,8 @@ type Service struct {
 // The caller must call [Service.Start] to start the service.
 func New(config Config) *Service {
 	switch {
-	case config.Address == "" && config.Accepter == nil:
-		panic("missing required listen address or accepter")
+	case config.Address == "" && config.Accept == nil:
+		panic("missing required listen address or accept function")
 	case config.Store == nil:
 		panic("missing required store")
 	}
@@ -133,7 +132,7 @@ func New(config Config) *Service {
 	return &Service{
 		root:       chirp.NewPeer(),
 		addr:       config.Address,
-		accepter:   config.Accepter,
+		accept:     config.Accept,
 		prefix:     config.MethodPrefix,
 		store:      store,
 		buffer:     config.Buffer,
@@ -182,14 +181,14 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}
 
-	acc := s.accepter
+	acc := s.accept
 	if acc == nil {
 		lst, err := net.Listen(chirp.SplitAddress(s.addr))
 		if err != nil {
 			return fmt.Errorf("listen: %w", err)
 		}
 		s.logf("[chirp] service: %q", s.addr)
-		acc = peers.NetAccepter(lst)
+		acc = peers.NetAccepter(lst).Accept
 	}
 
 	sctx, cancel := context.WithCancel(ctx)
@@ -198,16 +197,15 @@ func (s *Service) Start(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepter) func() error {
+type acceptFunc func(context.Context) (chirp.Channel, error)
+
+func (s *Service) serve(ctx context.Context, store blob.Store, accept acceptFunc) func() error {
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
 	svc.Register(s.root)
 
 	var g taskgroup.Group
 	return func() (err error) {
 		defer func() {
-			if c, ok := acc.(io.Closer); ok {
-				c.Close()
-			}
 			gerr := g.Wait()
 			if err == nil {
 				err = gerr
@@ -215,7 +213,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepte
 		}()
 
 		for {
-			ch, err := acc.Accept(ctx)
+			ch, err := accept(ctx)
 			if errors.Is(err, net.ErrClosed) {
 				return nil
 			} else if err != nil {

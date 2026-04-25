@@ -25,6 +25,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
+	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/keyring"
 	"github.com/fortytw2/leaktest"
@@ -90,4 +91,40 @@ func TestService(t *testing.T) {
 	if err := srv.Wait(); err != nil {
 		t.Errorf("Service wait: unexpected error: %v", err)
 	}
+}
+
+func TestPipe(t *testing.T) {
+	defer leaktest.Check(t)()
+
+	conns := make(chan chirp.Channel)
+	srv := storeservice.New(storeservice.Config{
+		Store: memstore.New(nil),
+		Logf:  t.Logf,
+
+		Accept: func(ctx context.Context) (chirp.Channel, error) {
+			select {
+			case ch := <-conns:
+				return ch, nil
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			}
+		},
+	})
+	defer srv.Stop()
+
+	if err := srv.Start(t.Context()); err != nil {
+		t.Fatalf("Start serice: %v", err)
+	}
+
+	// Connect a pipe to the store service, and verify we can talk over it from
+	// the client side. Under the covers this is the same test as above, but
+	// with pipes instead of sockets.
+	ch, r, w, err := pipestore.Connect()
+	if err != nil {
+		t.Fatalf("Connect pipes: %v", err)
+	}
+	conns <- ch
+
+	cli := pipestore.New(r, w)
+	storetest.Run(t, cli)
 }
