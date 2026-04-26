@@ -10,7 +10,7 @@ require (
 	github.com/creachadair/buntdbstore v0.0.0-20260420151133-42abfbce470f
 	github.com/creachadair/chirp v0.4.4
 	github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148
-	github.com/creachadair/command v0.2.2
+	github.com/creachadair/command v0.2.4
 	github.com/creachadair/ffs v0.17.9
 	github.com/creachadair/ffuse v0.0.0-20260424145001-f236967f9277
 	github.com/creachadair/flax v0.0.5

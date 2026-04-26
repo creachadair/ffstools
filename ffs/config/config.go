@@ -21,11 +21,13 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"iter"
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -34,6 +36,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/mds/mstr"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -165,15 +168,11 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	if s.EnableDebugLogging {
 		lg.Printf("dial %q", spec.Address)
 	}
-	var d net.Dialer
-	if s.DialTimeout > 0 {
-		d.Timeout = time.Duration(s.DialTimeout)
-	}
-	conn, err := d.Dial(chirp.SplitAddress(spec.Address))
+	ch, err := s.dialAddress(ctx, spec)
 	if err != nil {
 		return filetree.Store{}, fmt.Errorf("dialing store: %w", err)
 	}
-	peer := chirp.NewPeer().Start(channel.IO(conn, conn))
+	peer := chirp.NewPeer().Start(ch)
 	if s.EnableDebugLogging {
 		peer.LogPackets(func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
@@ -184,11 +183,49 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	if spec.Substore != "" {
 		sub, err = bs.Sub(ctx, spec.Substore)
 		if err != nil {
-			conn.Close()
+			peer.Stop()
 			return filetree.Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
 		}
 	}
 	return filetree.NewStore(ctx, sub)
+}
+
+func (s *Settings) dialAddress(ctx context.Context, spec StoreSpec) (chirp.Channel, error) {
+	fds, ok := strings.CutPrefix(spec.Address, "_pipe:")
+	if ok {
+		return s.dialPipe(ctx, fds)
+	}
+	var d net.Dialer
+	if s.DialTimeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, s.DialTimeout.Duration())
+		defer cancel()
+	}
+	net, addr := chirp.SplitAddress(spec.Address)
+	conn, err := d.DialContext(ctx, net, addr)
+	if err != nil {
+		return nil, fmt.Errorf("dialing store: %w", err)
+	}
+	return channel.IO(conn, conn), nil
+}
+
+func (s *Settings) dialPipe(ctx context.Context, fds string) (chirp.Channel, error) {
+	parts := strings.Split(fds, ":")
+	if len(parts) != 2 {
+		return nil, errors.New("invalid pipe address")
+	}
+	rfd, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid read pipe: %w", err)
+	}
+	wfd, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid write pipe: %w", err)
+	}
+	return pipestore.NewChannel(
+		os.NewFile(uintptr(rfd), "read-pipe"),
+		os.NewFile(uintptr(wfd), "write-pipe"),
+	), nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
