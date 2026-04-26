@@ -16,15 +16,14 @@ package storeservice_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/channel"
+	"github.com/creachadair/chirp/peers"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
-	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/keyring"
 	"github.com/creachadair/mds/mnet"
@@ -100,48 +99,30 @@ func TestService(t *testing.T) {
 	}
 }
 
-func TestPipe(t *testing.T) {
+func TestAccept(t *testing.T) {
 	defer leaktest.Check(t)()
 
-	conns := make(chan chirp.Channel)
+	conns := make(peers.AcceptChan)
 	srv := storeservice.New(storeservice.Config{
-		Store: memstore.New(nil),
-		Logf:  t.Logf,
-
-		// In this configuration we do not provide an Address, to exercise that
-		// the Accept hook gets called and used without complaint.
-		//
-		// For the purpose of the test, we will manually hand channels to the
-		// service via the conns channel declared above.
-		Accept: func(ctx context.Context) (chirp.Channel, error) {
-			select {
-			case ch := <-conns:
-				return ch, nil
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-		},
+		Accept: conns.Accept,
+		Store:  memstore.New(nil),
+		Logf:   t.Logf,
 	})
 	defer srv.Stop()
-
 	if err := srv.Start(t.Context()); err != nil {
-		t.Fatalf("Start serice: %v", err)
+		t.Fatalf("Start service: %v", err)
 	}
 
-	// Connect a pipe to the store service, and verify we can talk over it from
-	// the client side. Under the covers this is the same test as above, but
-	// with pipes instead of sockets. Do it multiple times (consecutively) to
-	// make sure the service can handle that.
-	for i := range 2 {
-		t.Run(fmt.Sprintf("Connect-%d", i+1), func(t *testing.T) {
-			ch, r, w, err := pipestore.Connect()
-			if err != nil {
-				t.Fatalf("Connect pipes [#%d]: %v", i+1, err)
-			}
-			conns <- ch
+	// Run twice to verify that the accept hook continues to work.
+	for range 2 {
+		cc, sc := channel.Direct()
+		conns <- sc
 
-			cli := pipestore.New(r, w)
-			storetest.Run(t, cli)
-		})
+		cli := chirpstore.NewStore(chirp.NewPeer().Start(cc), nil)
+		storetest.Run(t, cli)
+
+		if err := cli.Close(t.Context()); err != nil {
+			t.Errorf("Store close: unexpected error: %v", err)
+		}
 	}
 }

@@ -174,8 +174,8 @@ github.com/creachadair/boltstore v0.0.0-20260418162332-b9f0e040c268 h1:sMn9H1cb8
 github.com/creachadair/boltstore v0.0.0-20260418162332-b9f0e040c268/go.mod h1:GkaDGWBNlFnwe6LC0qsN6LnEjGbnQaaLoY9tty3UaFo=
 github.com/creachadair/buntdbstore v0.0.0-20260420151133-42abfbce470f h1:z0L2ZAoHAn8XrblDgi9twlYAnYudC1iGQqF1DG1Idic=
 github.com/creachadair/buntdbstore v0.0.0-20260420151133-42abfbce470f/go.mod h1:dngOOl81romMmAmPIec5igom8ASQfLtqbJzPWJsRbkk=
-github.com/creachadair/chirp v0.4.3 h1:Ousl4pL0orrLPb1oT03MHj3fxUDZ6Vd8kzq8gp9ZHsk=
-github.com/creachadair/chirp v0.4.3/go.mod h1:8TFKyYuuzp1pWlyaYM6lElfxMe0gPUSlMwZBYGmRDFc=
+github.com/creachadair/chirp v0.4.4 h1:9gBfXhRG3qSBlffgW1VR8lNDyBOXOCLIMpfVsE1tt8E=
+github.com/creachadair/chirp v0.4.4/go.mod h1:iybcWH75AptU01zbMcuWLt4VJp9mhvMEIxmrmprdpJc=
 github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148 h1:OxFff2ExsX6iRfJzC8/yVokPCM6ZbuOqZc2QV9uWeaE=
 github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148/go.mod h1:lY7BBphs5ghrkfnWmkAfxXRn/hFW6t1/pIKI+q9bxVg=
 github.com/creachadair/command v0.2.2 h1:4RGsUhqFf1imFC+vMWOOCiQdncThCdcdMJp0JNCjxxc=
