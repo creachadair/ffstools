@@ -18,7 +18,7 @@ require (
 	github.com/creachadair/getpass v0.3.0
 	github.com/creachadair/keyring v0.2.4
 	github.com/creachadair/leveldbstore v0.0.0-20260418162357-d84a0aed25af
-	github.com/creachadair/mds v0.27.1
+	github.com/creachadair/mds v0.27.2
 	github.com/creachadair/pebblestore v0.0.0-20260407161224-9ae5740e2ac7
 	github.com/creachadair/rosedbstore v0.0.0-20260418162405-622ee572734b
 	github.com/creachadair/s3store v0.0.0-20260409195411-1038996e3ba4

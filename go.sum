@@ -194,8 +194,8 @@ github.com/creachadair/keyring v0.2.4 h1:fOFTHlPTrZ0TV9/i+b40yXloT7eIxNdVBir9itN
 github.com/creachadair/keyring v0.2.4/go.mod h1:zq9DS+JzMeItTZ7OsH5HOAnS2/x01+aFWlv3PDc8jpE=
 github.com/creachadair/leveldbstore v0.0.0-20260418162357-d84a0aed25af h1:ynC38SeW3WjgvuvFZMX4zEC9TY7UHyYYGVm9KbI2IqQ=
 github.com/creachadair/leveldbstore v0.0.0-20260418162357-d84a0aed25af/go.mod h1:hQ7H9TA+5ffT4n+k2IdLbddlQh07ONh2PWquVnDG/h8=
-github.com/creachadair/mds v0.27.1 h1:GlO1tPbrsaoafkF6mz7dFutkGXAtIfQLI450u0ypqwA=
-github.com/creachadair/mds v0.27.1/go.mod h1:dMBTCSy3iS3dwh4Rb1zxeZz2d7K8+N24GCTsayWtQRI=
+github.com/creachadair/mds v0.27.2 h1:gcBoJ/MjboX7mmy8cE+EWTydCqUR/DKRibfRltohKVc=
+github.com/creachadair/mds v0.27.2/go.mod h1:dMBTCSy3iS3dwh4Rb1zxeZz2d7K8+N24GCTsayWtQRI=
 github.com/creachadair/msync v0.8.3 h1:7XtEy9LSx6yOIgiApfGJcAmgwH/mBYGFtRXi1VtfvB0=
 github.com/creachadair/msync v0.8.3/go.mod h1:LzxqD9kfIl/O3DczkwOgJplLPqwrTbIhINlf9bHIsEY=
 github.com/creachadair/pebblestore v0.0.0-20260407161224-9ae5740e2ac7 h1:yRIikGbUTwu8L0WkojbWybxHF1NFLaJFGPgFYJx65ic=
