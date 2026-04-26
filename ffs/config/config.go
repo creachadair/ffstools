@@ -210,17 +210,17 @@ func (s *Settings) dialAddress(ctx context.Context, spec StoreSpec) (chirp.Chann
 }
 
 func (s *Settings) dialPipe(ctx context.Context, fds string) (chirp.Channel, error) {
-	parts := strings.Split(fds, ":")
-	if len(parts) != 2 {
+	pr, pw, ok := strings.Cut(fds, ":")
+	if !ok {
 		return nil, errors.New("invalid pipe address")
 	}
-	rfd, err := strconv.ParseInt(parts[0], 10, 64)
+	rfd, err := strconv.ParseInt(pr, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("invalid read pipe: %w", err)
+		return nil, fmt.Errorf("invalid read descriptor: %w", err)
 	}
-	wfd, err := strconv.ParseInt(parts[1], 10, 64)
+	wfd, err := strconv.ParseInt(pw, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("invalid write pipe: %w", err)
+		return nil, fmt.Errorf("invalid write descriptor: %w", err)
 	}
 	return pipestore.NewChannel(
 		os.NewFile(uintptr(rfd), "read-pipe"),
