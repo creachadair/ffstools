@@ -26,7 +26,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -35,6 +34,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/mds/mstr"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -269,18 +269,22 @@ func ToJSON(msg any) string {
 
 // ListMatchingRoots iterates over the list of root keys in s matching the
 // specified queries. Each query is either a literal root key, or a glob as
-// supported by [path.Match]. If no queries are provided, all available roots
-// are reported.
+// supported by [mstr.Match]. If no queries are provided, all available roots
+// are reported. The iterator reports an error if queries are provided and
+// there are no matching roots.
 func ListMatchingRoots(ctx context.Context, s filetree.Store, queries ...string) iter.Seq2[string, error] {
 	matchAny := func(candidate string) bool {
 		for _, q := range queries {
-			if ok, _ := path.Match(q, candidate); ok {
+			if mstr.Match(candidate, q) {
 				return true
 			}
 		}
 		return len(queries) == 0
 	}
 	return func(yield func(string, error) bool) {
+		// Keep track of whether we found any matching roots so we can report a
+		// diagnostic if the caller provided filters that didn't match anything.
+		var foundAny bool
 		for key, err := range s.Roots().List(ctx, "") {
 			if err != nil {
 				yield("", err)
@@ -289,9 +293,14 @@ func ListMatchingRoots(ctx context.Context, s filetree.Store, queries ...string)
 			if !matchAny(key) {
 				continue
 			}
+
+			foundAny = true
 			if !yield(key, nil) {
 				return
 			}
+		}
+		if !foundAny && len(queries) != 0 {
+			yield("", fmt.Errorf("no roots matching %q", queries))
 		}
 	}
 }
