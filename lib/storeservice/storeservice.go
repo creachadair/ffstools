@@ -224,7 +224,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, accept acceptFunc
 
 		for {
 			ch, err := accept(ctx)
-			if errors.Is(err, net.ErrClosed) {
+			if errors.Is(err, net.ErrClosed) || errors.Is(err, context.Canceled) {
 				return nil
 			} else if err != nil {
 				return fmt.Errorf("accept: %w", err)

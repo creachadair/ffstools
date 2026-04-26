@@ -23,16 +23,20 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/creachadair/atomicfile"
+	"github.com/creachadair/chirp"
+	"github.com/creachadair/chirp/peers"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
+	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/getpass"
@@ -47,6 +51,7 @@ var flags struct {
 	CacheSize  int    `flag:"cache,Memory cache size in MiB (0 means no cache)"`
 	Compress   bool   `flag:"compress,Enable zstd compression of blob data"`
 	ReadOnly   bool   `flag:"read-only,Disallow modification of the store"`
+	Exec       bool   `flag:"exec,Execute a command, then stop the storage service and exit"`
 }
 
 var Command = &command.C{
@@ -89,11 +94,32 @@ Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores
 that are remote and slow (e.g., cloud storage).
 
+If --exec is set, the remaining non-flag arguments are used as the name
+and arguments of a command to execute as a subprocess. In this mode, the
+storage server exits once the subprocess exits. If --listen is set, the
+service listens at that address in the usual way; otherwise it exports
+the service via a pipe rather than a network address. In either case,
+the server sets the FFS_STORE environment variable to the target address.
+
+When serving over a pipe, the address format is:
+
+   _pipe:<r>:<w>
+
+where <r> is the read descriptor ID and <w> the write descriptor ID.
+
 [keyring]: http://godoc.org/github.com/creachadair/keyring`,
 		strings.Join(registry.Stores.Names(), ", ")),
 
 	SetFlags: command.Flags(flax.MustBind, &flags),
-	Run:      command.Adapt(runStorage),
+
+	// Disable flag merging for this subcommand, so that we will not pluck
+	// arguments from the arguments of the nested subcommand.
+	CustomFlags: true,
+	Init: func(env *command.Env) error {
+		return env.MergeFlags(false).ParseFlags()
+	},
+
+	Run: command.Adapt(runStorage),
 
 	Commands: []*command.C{{
 		Name:     "keygen",
@@ -104,8 +130,13 @@ that are remote and slow (e.g., cloud storage).
 	}},
 }
 
-func runStorage(env *command.Env) error {
-	if !isStoreFlagSet(env) {
+func runStorage(env *command.Env, execArgs []string) error {
+	switch {
+	case flags.Exec && len(execArgs) == 0:
+		return env.Usagef("missing exec command")
+	case !flags.Exec && len(execArgs) != 0:
+		return env.Usagef("extra arguments after command: %q", execArgs)
+	case !isStoreFlagSet(env):
 		return env.Usagef("the --store flag must be set")
 	}
 	s := env.Config.(*config.Settings)
@@ -160,8 +191,14 @@ func runStorage(env *command.Env) error {
 	sctx, cancel := signal.NotifyContext(env.Context(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	srv := storeservice.New(storeservice.Config{
+	sub, err := maybeInitSubprocess(sctx, listenAddr, execArgs)
+	if err != nil {
+		return err
+	}
+
+	cfg := storeservice.Config{
 		Address:        listenAddr,
+		Accept:         sub.Accept,
 		Store:          bs,
 		Buffer:         buf,
 		Compress:       flags.Compress,
@@ -170,17 +207,104 @@ func runStorage(env *command.Env) error {
 		MethodPrefix:   rs.Prefix,
 		ReadOnly:       flags.ReadOnly,
 		Logf:           log.Printf,
-	})
+	}
+
+	srv := storeservice.New(cfg)
 	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, srv))
 
+	// Now we are ready to start the storage service....
 	if err := srv.Start(sctx); err != nil {
+		cancel()
 		return fmt.Errorf("start server: %w", err)
 	}
-	go func() {
-		<-sctx.Done()
-		log.Print("Received signal, closing listener")
-	}()
+	if err := sub.Start(); err != nil {
+		cancel()
+		return fmt.Errorf("start subprocess: %w", err)
+	}
+
+	select {
+	case <-sctx.Done():
+		log.Print("Received signal, stopping storage service")
+	case err := <-sub.Errc: // never ready unless there is a subprocess
+		if err != nil {
+			log.Printf("Error from subprocess: %v", err)
+		}
+		cancel()
+	}
 	return srv.Wait()
+}
+
+type subprocess struct {
+	// For the caller.
+	Name   string                                       // for display purposes
+	Errc   chan error                                   // from exec.Cmd.Wait
+	Accept func(context.Context) (chirp.Channel, error) // if using a pipe
+
+	// Internal plumbing.
+	cmd   *exec.Cmd
+	conns peers.AcceptChan
+	sc    chirp.Channel
+}
+
+// maybeInitSubprocess checks whether we have a subprocess to execute. If so,
+// the Errc field of the result will be non-nil so it can report an error in
+// the select below. If not, Errc will remain nil, and thus we will wait only
+// for the service itself.
+func maybeInitSubprocess(ctx context.Context, listenAddr string, execArgs []string) (subprocess, error) {
+	if !flags.Exec {
+		return subprocess{}, nil
+	}
+
+	name, rest := execArgs[0], execArgs[1:]
+	cmd := exec.CommandContext(ctx, name, rest...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	errc := make(chan error, 1)
+	sub := subprocess{Name: name, Errc: errc, cmd: cmd}
+	if listenAddr != "" {
+		cmd.Env = append(os.Environ(), "FFS_STORE="+listenAddr)
+	} else {
+		// Construct a pipe.
+		sc, cr, cw, err := pipestore.Connect()
+		if err != nil {
+			return subprocess{}, fmt.Errorf("connect subprocess: %w", err)
+		}
+		sub.conns = make(peers.AcceptChan)
+		sub.sc = sc
+		sub.Accept = sub.conns.Accept
+
+		// Tell the subprocess about the service. Note that we do not use the
+		// descriptor IDs from r and w directly, since they will change after
+		// exec.  Go promises the extra files will be numbered from 3.
+		cmd.Env = append(os.Environ(), "FFS_STORE=_pipe:3:4")
+		cmd.ExtraFiles = []*os.File{cr, cw}
+	}
+	return sub, nil
+}
+
+func (s subprocess) Start() error {
+	if s.cmd == nil {
+		return nil // nothing to do
+	}
+
+	log.Printf("Starting subprocess %q", s.Name)
+	if err := s.cmd.Start(); err != nil {
+		return fmt.Errorf("start subprocess: %w", err)
+	}
+	// These are owned by the child process now, close our dups.
+	for _, f := range s.cmd.ExtraFiles {
+		f.Close()
+	}
+	if s.conns != nil {
+		s.conns <- s.sc
+	}
+	go func() {
+		defer close(s.Errc)
+		s.Errc <- s.cmd.Wait()
+	}()
+	return nil
 }
 
 var keyGenFlags struct {
@@ -235,8 +359,12 @@ func runKeyGen(env *command.Env, keyFile string) error {
 
 func getListenAddr(env *command.Env) (string, error) {
 	s := env.Config.(*config.Settings)
-	if flags.ListenAddr == "" && !strings.HasPrefix(s.DefaultStore, "@") {
-		return "", env.Usagef("you must provide a non-empty --listen address")
+	if flags.ListenAddr == "" {
+		if flags.Exec {
+			return "", nil // use a pipe
+		} else if !strings.HasPrefix(s.DefaultStore, "@") {
+			return "", env.Usagef("you must provide a non-empty --listen address")
+		}
 	}
 	target := cmp.Or(flags.ListenAddr, s.DefaultStore)
 	spec := s.ResolveAddress(target)
