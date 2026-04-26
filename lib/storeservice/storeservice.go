@@ -41,15 +41,6 @@ type Config struct {
 	// This must be non-empty unless Accept is set.
 	Address string
 
-	// Listen, if non-nil, is used to construct a net.Listener for connections.
-	// If nil, net.Listen is used.
-	Listen func(net, addr string) (net.Listener, error)
-
-	// Accept, if non-nil, is used to accept client connections.
-	// If it is set, the Address and Listen values are ignored.
-	// If it is nil, the Address field must be non-empty.
-	Accept func(context.Context) (chirp.Channel, error)
-
 	// Store is the storage exported by the service.
 	// This must be non-nil.
 	Store blob.StoreCloser
@@ -79,6 +70,15 @@ type Config struct {
 	// Logf, if set, is used to write text debug logs.
 	// If nil, logs are discarded.
 	Logf func(string, ...any)
+
+	// Listen, if non-nil, is used to construct a net.Listener for connections.
+	// If nil, net.Listen is used.
+	Listen func(net, addr string) (net.Listener, error)
+
+	// Accept, if non-nil, is used to accept client connections.
+	// If it is set, the Address and Listen values are ignored.
+	// If it is nil, the Address field must be non-empty.
+	Accept func(context.Context) (chirp.Channel, error)
 }
 
 // Service manages a running server, accepting connections and delegating them
