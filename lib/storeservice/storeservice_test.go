@@ -16,8 +16,7 @@ package storeservice_test
 
 import (
 	"context"
-	"net"
-	"path/filepath"
+	"fmt"
 	"testing"
 
 	"github.com/creachadair/chirp"
@@ -28,6 +27,7 @@ import (
 	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/keyring"
+	"github.com/creachadair/mds/mnet"
 	"github.com/fortytw2/leaktest"
 )
 
@@ -43,8 +43,10 @@ func TestService(t *testing.T) {
 		t.Fatalf("New keyring: %v", err)
 	}
 
+	network := mnet.New(t.Name())
 	srv := storeservice.New(storeservice.Config{
-		Address:        filepath.Join(t.TempDir(), "srv.sock"),
+		Address:        "virtual:service",
+		Listen:         network.Listen,
 		Store:          store,
 		CacheSizeBytes: 4096,
 		Keyring:        kr,
@@ -61,7 +63,8 @@ func TestService(t *testing.T) {
 
 	runTest := func(t *testing.T) {
 		t.Helper()
-		conn, err := net.Dial(chirp.SplitAddress(srv.Address()))
+
+		conn, err := network.Dial(chirp.SplitAddress(srv.Address()))
 		if err != nil {
 			t.Fatalf("Dial service: %v", err)
 		}
@@ -78,6 +81,8 @@ func TestService(t *testing.T) {
 	}
 	t.Run("Check", runTest)
 
+	// Stop and restart the service, and verify that it still works as
+	// configured after a restart.
 	if err := srv.Stop(); err != nil {
 		t.Errorf("Service stop: unexpected error: %v", err)
 	}
@@ -87,6 +92,8 @@ func TestService(t *testing.T) {
 	}
 	t.Run("Recheck", runTest)
 
+	// Check that when its governing context ends, the service stops cleanly and
+	// does not report an error.
 	cancel()
 	if err := srv.Wait(); err != nil {
 		t.Errorf("Service wait: unexpected error: %v", err)
@@ -101,6 +108,11 @@ func TestPipe(t *testing.T) {
 		Store: memstore.New(nil),
 		Logf:  t.Logf,
 
+		// In this configuration we do not provide an Address, to exercise that
+		// the Accept hook gets called and used without complaint.
+		//
+		// For the purpose of the test, we will manually hand channels to the
+		// service via the conns channel declared above.
 		Accept: func(ctx context.Context) (chirp.Channel, error) {
 			select {
 			case ch := <-conns:
@@ -118,13 +130,18 @@ func TestPipe(t *testing.T) {
 
 	// Connect a pipe to the store service, and verify we can talk over it from
 	// the client side. Under the covers this is the same test as above, but
-	// with pipes instead of sockets.
-	ch, r, w, err := pipestore.Connect()
-	if err != nil {
-		t.Fatalf("Connect pipes: %v", err)
-	}
-	conns <- ch
+	// with pipes instead of sockets. Do it multiple times (consecutively) to
+	// make sure the service can handle that.
+	for i := range 2 {
+		t.Run(fmt.Sprintf("Connect-%d", i+1), func(t *testing.T) {
+			ch, r, w, err := pipestore.Connect()
+			if err != nil {
+				t.Fatalf("Connect pipes [#%d]: %v", i+1, err)
+			}
+			conns <- ch
 
-	cli := pipestore.New(r, w)
-	storetest.Run(t, cli)
+			cli := pipestore.New(r, w)
+			storetest.Run(t, cli)
+		})
+	}
 }

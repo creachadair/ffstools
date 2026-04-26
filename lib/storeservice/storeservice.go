@@ -38,11 +38,15 @@ import (
 // The Address and Store fields are required.
 type Config struct {
 	// Address is the address at which the service listens for connections.
-	// This must be non-empty unless Accepter is set.
+	// This must be non-empty unless Accept is set.
 	Address string
 
+	// Listen, if non-nil, is used to construct a net.Listener for connections.
+	// If nil, net.Listen is used.
+	Listen func(net, addr string) (net.Listener, error)
+
 	// Accept, if non-nil, is used to accept client connections.
-	// If it is set, the Address field is ignored.
+	// If it is set, the Address and Listen values are ignored.
 	// If it is nil, the Address field must be non-empty.
 	Accept func(context.Context) (chirp.Channel, error)
 
@@ -82,6 +86,7 @@ type Config struct {
 type Service struct {
 	root       *chirp.Peer
 	addr       string
+	listen     func(net, addr string) (net.Listener, error)
 	accept     acceptFunc
 	prefix     string
 	store      blob.StoreCloser
@@ -129,9 +134,14 @@ func New(config Config) *Service {
 		store = cachestore.New(store, config.CacheSizeBytes)
 	}
 
+	listen := config.Listen
+	if listen == nil {
+		listen = net.Listen
+	}
 	return &Service{
 		root:       chirp.NewPeer(),
 		addr:       config.Address,
+		listen:     listen,
 		accept:     config.Accept,
 		prefix:     config.MethodPrefix,
 		store:      store,
@@ -183,7 +193,7 @@ func (s *Service) Start(ctx context.Context) error {
 
 	acc := s.accept
 	if acc == nil {
-		lst, err := net.Listen(chirp.SplitAddress(s.addr))
+		lst, err := s.listen(chirp.SplitAddress(s.addr))
 		if err != nil {
 			return fmt.Errorf("listen: %w", err)
 		}
