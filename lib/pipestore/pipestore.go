@@ -1,5 +1,4 @@
-// Package pipestore implements an interface to a [blob.Store] that communicates
-// via Chirp v0 (using [chirpstore]) over a pair of pipes.
+// Package pipestore implements a [chirp.Channel] using a pair of pipes.
 package pipestore
 
 import (
