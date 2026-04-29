@@ -32,48 +32,45 @@ See also https://github.com/creachadair/ffs.
 Install `ffs` as noted above, then:
 
 ```bash
-# Start up a storage server using local files as storage.
-export FFS_STORE=/tmp/test.db.sock
-ffs storage -store file:test.db -listen "$FFS_STORE" &
-while [[ ! -e "$FFS_STORE" ]] ; do sleep 1 ; done
+# Start up a storage server using local files as storage, and run a
+# shell with the server addressed via the FFS_STORE environment.
+# THe storage server stops after the shell exits.
+ffs storage --store file:test.db --exec bash -s <<EOF
+  # Create a root pointer to anchor some data.
+  ffs root create example --desc 'Example root pointer'
 
-# Create a root pointer to anchor some data.
-ffs root create example --desc 'Example root pointer'
+  # Create some files to put into storage.
+  mkdir -p files/sub
+  echo "This is my file." > files/sub/f1.txt
+  echo "Many others are like it" > files/sub/f2.txt
+  echo "But this one is mine." > files/f3.txt
 
-# Create some files to put into storage.
-mkdir -p files/sub
-echo "This is my file." > files/sub/f1.txt
-echo "Many others are like it" > files/sub/f2.txt
-echo "But this one is mine." > files/f3.txt
+  # Copy the files directory into the store.
+  ffs put --into example/test1 files
 
-# Copy the files directory into the store.
-ffs put -into example/test1 files
+  # List the contents we just wrote...
+  ffs file list -long example/test1
+  ffs file list -long example/test1/sub
 
-# List the contents we just wrote...
-ffs file list -long example/test1
-ffs file list -long example/test1/sub
+  # Move some files around...
+  echo "That was your file." > files/sub/f1.txt
+  mv files/sub/f2.txt files/f4.txt
+  rm files/f3.txt
 
-# Move some files around...
-echo "That was your file." > files/sub/f1.txt
-mv files/sub/f2.txt files/f4.txt
-rm files/f3.txt
+  # Add another copy of the structure.
+  ffs put -into example/test2 files
 
-# Add another copy of the structure.
-ffs put -into example/test2 files
+  # List the revised contents...
+  ffs file list -long example/test1
+  ffs file list -long example/test2
+  ffs file list -long example/test2/sub
 
-# List the revised contents...
-ffs file list -long example/test1
-ffs file list -long example/test2
-ffs file list -long example/test2/sub
+  # List the stuff reachable from the root.
+  ffs file list -long -key example
 
-# List the stuff reachable from the root.
-ffs file list -long -key example
-
-# GC unreachable data in the store.
-ffs gc
-
-# Stop the storage server.
-kill %1 && wait
+  # GC unreachable data in the store.
+  ffs gc
+EOF
 ```
 
 ## Storage Backends
