@@ -16,6 +16,7 @@
 package cmdsync
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -36,7 +37,8 @@ import (
 )
 
 var syncFlags struct {
-	Target     string `flag:"to,Target store (required)"`
+	Target     string `flag:"to,Target store (required unless --from is set)"`
+	Source     string `flag:"from,Source store (required unless --to is set)"`
 	Verbose    bool   `flag:"v,Enable verbose logging"`
 	VVerbose   bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
 	NoIndex    bool   `flag:"no-index,Do not use cached indices"`
@@ -62,9 +64,16 @@ var Command = &command.C{
 <root-key>[/path/...] ...`,
 	Help: `Synchronize file trees between stores.
 
-Transfer all the objects reachable from the specified file or root
-paths into the given target store. By default, any roots mentioned
-are also copied to the target; use --no-root to skip this step.
+Transfer all the objects reachable from the specified file or root paths
+from one store into another. If --to=target is set, objects are copied
+from --store to the specified target; if --from=source is set, objects are
+copied from source to the --store. Exactly one of --to and --from must
+be set.
+
+By default, an argument that specifies a plain root name causes that root
+(and its index, if one exists) to be copied along with the files reachable
+from it. Use --no-root to skip copying the root and index, and only copy its
+file tree.
 `,
 
 	SetFlags: command.Flags(flax.MustBind, &syncFlags),
@@ -72,14 +81,22 @@ are also copied to the target; use --no-root to skip this step.
 }
 
 func runSync(env *command.Env, sourceKeys ...string) error {
-	if syncFlags.Target == "" {
-		return env.Usagef("missing -to target store")
+	if (syncFlags.Target == "") == (syncFlags.Source == "") {
+		return env.Usagef("exactly one of --from and --to must be set")
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
-		return cfg.WithStoreAddress(env.Context(), syncFlags.Target, func(tgt filetree.Store) error {
-			fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
+	otherSpec := cmp.Or(syncFlags.Target, syncFlags.Source)
+	return cfg.WithStore(env.Context(), func(main filetree.Store) error {
+		return cfg.WithStoreAddress(env.Context(), otherSpec, func(other filetree.Store) error {
+			var src, tgt filetree.Store
+			if syncFlags.Target != "" {
+				fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
+				src, tgt = main, other
+			} else {
+				fmt.Fprintf(env, "Source store %q\n", syncFlags.Source)
+				src, tgt = other, main
+			}
 
 			// Find all the objects reachable from the specified starting points.
 			worklist := scanlib.NewScanner(src.Files())
