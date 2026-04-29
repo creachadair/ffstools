@@ -5,25 +5,25 @@ go 1.25.0
 require (
 	github.com/creachadair/atomicfile v0.4.1
 	github.com/creachadair/badgerstore v0.10.5
-	github.com/creachadair/bitcaskstore v0.0.0-20260407161234-937cd153147c
-	github.com/creachadair/boltstore v0.0.0-20260418162332-b9f0e040c268
-	github.com/creachadair/buntdbstore v0.0.0-20260420151133-42abfbce470f
+	github.com/creachadair/bitcaskstore v0.0.0-20260423173327-57c23ec2dcb0
+	github.com/creachadair/boltstore v0.0.0-20260423174052-8325b72af9ef
+	github.com/creachadair/buntdbstore v0.0.0-20260429154733-51006fb3e191
 	github.com/creachadair/chirp v0.4.4
 	github.com/creachadair/chirpstore v0.0.0-20260419191541-4264c6598148
 	github.com/creachadair/command v0.2.4
 	github.com/creachadair/ffs v0.17.9
-	github.com/creachadair/ffuse v0.0.0-20260424145001-f236967f9277
+	github.com/creachadair/ffuse v0.0.0-20260425163520-9a8c3d9e335c
 	github.com/creachadair/flax v0.0.5
-	github.com/creachadair/gcsstore v0.0.0-20260418162311-40d98b7d4eab
-	github.com/creachadair/getpass v0.3.0
+	github.com/creachadair/gcsstore v0.0.0-20260425060034-b35cb14cbb85
+	github.com/creachadair/getpass v0.3.2
 	github.com/creachadair/keyring v0.2.4
 	github.com/creachadair/leveldbstore v0.0.0-20260418162357-d84a0aed25af
 	github.com/creachadair/mds v0.27.2
-	github.com/creachadair/pebblestore v0.0.0-20260407161224-9ae5740e2ac7
+	github.com/creachadair/pebblestore v0.0.0-20260423173200-39e89e1d9e42
 	github.com/creachadair/rosedbstore v0.0.0-20260418162405-622ee572734b
-	github.com/creachadair/s3store v0.0.0-20260409195411-1038996e3ba4
-	github.com/creachadair/sqlitestore v0.0.0-20260407161121-702e938d5f83
-	github.com/creachadair/taskgroup v0.14.2
+	github.com/creachadair/s3store v0.0.0-20260423170400-74f6c4e135a4
+	github.com/creachadair/sqlitestore v0.0.0-20260423170340-0906d6f4f4d0
+	github.com/creachadair/taskgroup v0.14.3
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.10.1
 	github.com/klauspost/compress v1.18.5
@@ -61,7 +61,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.22 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.22 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.100.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/signin v1.0.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.30.16 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.20 // indirect
@@ -155,7 +155,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	honnef.co/go/tools v0.7.0 // indirect
-	modernc.org/libc v1.72.0 // indirect
+	modernc.org/libc v1.72.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.49.1 // indirect
