@@ -153,8 +153,8 @@ If the origin is from a root, the root is updated with the changes.`,
 		},
 		{
 			Name: "xattr",
-			Usage: `<root-key>/<path> <xattr-spec>
-@<origin-key>/<path> <xattr-spec>`,
+			Usage: `<xattr-spec> <root-key>/<path>...
+<xattr-spec> @<origin-key>/<path>...`,
 			Help: `Edit extended attributes of the specified path beneath the origin.
 
 The xattr spec is one of the following:
@@ -564,72 +564,77 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 	})
 }
 
-func runXAttr(env *command.Env, fileSpec, op string, args ...string) error {
-	if err := checkXAttrSpec(op, args); err != nil {
+func runXAttr(env *command.Env, op string, argsAndSpecs ...string) error {
+	args, specs, err := parseXAttrSpec(op, argsAndSpecs)
+	if err != nil {
 		return err
+	} else if len(specs) == 0 {
+		return env.Usagef("at least one origin/path is required")
 	}
+
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		of, err := s.OpenPath(env.Context(), fileSpec)
-		if err != nil {
-			return err
-		}
-		oldKey := of.BaseKey
-		xv := of.File.XAttr()
+		for _, fileSpec := range specs {
+			of, err := s.OpenPath(env.Context(), fileSpec)
+			if err != nil {
+				return err
+			}
+			oldKey := of.BaseKey
+			xv := of.File.XAttr()
 
-		switch op {
-		case "list":
-			if xv.Len() != 0 {
-				fmt.Println(strings.Join(xv.Names(), "\n"))
+			switch op {
+			case "list":
+				if xv.Len() != 0 {
+					fmt.Println(strings.Join(xv.Names(), "\n"))
+				}
+			case "clear":
+				if n := xv.Len(); n != 0 {
+					fmt.Fprintf(env, "removed %d xattr\n", n)
+				}
+				xv.Clear()
+			case "get":
+				if xv.Has(args[0]) {
+					fmt.Println(xv.Get(args[0]))
+				} else {
+					fmt.Fprintf(env, "xattr %q not found\n", args[0])
+				}
+			case "delete":
+				xv.Remove(args[0])
+			case "set":
+				xv.Set(args[0], args[1])
+			default:
+				panic("unknown xattr spec: " + op) // unreachable
 			}
-		case "clear":
-			if n := xv.Len(); n != 0 {
-				fmt.Fprintf(env, "removed %d xattr\n", n)
-			}
-			xv.Clear()
-		case "get":
-			if xv.Has(args[0]) {
-				fmt.Println(xv.Get(args[0]))
-			} else {
-				fmt.Fprintf(env, "xattr %q not found\n", args[0])
-			}
-		case "delete":
-			xv.Remove(args[0])
-		case "set":
-			xv.Set(args[0], args[1])
-		default:
-			panic("unknown xattr spec: " + op) // unreachable
-		}
 
-		key, err := of.Flush(env.Context())
-		if err != nil {
-			return err
-		}
-		if key != oldKey {
-			fmt.Printf("xattr: %s\n", config.FormatKey(key))
+			key, err := of.Flush(env.Context())
+			if err != nil {
+				return err
+			}
+			if key != oldKey {
+				fmt.Printf("xattr: %s\n", config.FormatKey(key))
+			}
 		}
 		return nil
 	})
 }
 
-func checkXAttrSpec(op string, args []string) error {
+func parseXAttrSpec(op string, args []string) (opArgs, specs []string, _ error) {
 	switch op {
 	case "list", "clear":
-		if len(args) != 0 {
-			return fmt.Errorf("extra args after %q", op)
-		}
+		return nil, args, nil // all operands are specs
 	case "get", "delete":
-		if len(args) != 1 {
-			return fmt.Errorf("wrong number of args for %q (got %d, want 1)", op, len(args))
+		if len(args) == 0 {
+			return nil, nil, fmt.Errorf("missing required operand for %q", op)
 		}
+		return args[:1], args[1:], nil
 	case "set":
-		if len(args) != 2 {
-			return fmt.Errorf("wrong number of args for %q (got %d, want 2)", op, len(args))
+		if len(args) < 2 {
+			return nil, nil, fmt.Errorf("wrong number of args for %q (got %d, want 2)", op, len(args))
 		}
+		return args[:2], args[2:], nil
 	default:
-		return fmt.Errorf("unknown xattr operation %q", op)
+		return nil, nil, fmt.Errorf("unknown xattr operation %q", op)
 	}
-	return nil
 }
 
 var resolveFlags struct {
