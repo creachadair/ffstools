@@ -89,7 +89,7 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 
 		tw := tar.NewWriter(w)
 		mc = append(mc, tw.Close)
-		return addFile(env, tw, of.File, tdir)
+		return addFileToTar(env, tw, of.File, tdir)
 	})
 }
 
@@ -106,7 +106,7 @@ func (m mcloser) Close() error {
 }
 
 // addFile is a demi-clone of [tar.Writer.AddFS], but with less OS-specific nonsense.
-func addFile(env *command.Env, tw *tar.Writer, root *file.File, prefix string) error {
+func addFileToTar(env *command.Env, tw *tar.Writer, root *file.File, prefix string) error {
 	return fpath.Walk(env.Context(), root, func(e fpath.Entry) error {
 		if err := env.Context().Err(); err != nil {
 			return err

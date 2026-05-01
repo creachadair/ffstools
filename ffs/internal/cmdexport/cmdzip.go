@@ -17,6 +17,7 @@ package cmdexport
 import (
 	"archive/zip"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path"
@@ -57,13 +58,8 @@ func runZipExport(env *command.Env, zipPath, originPath string) (retErr error) {
 			root.Child().Set(path.Base(originPath), of.File)
 		}
 
-		// TODO(creachadair): The AddFS method only supports plain files and
-		// directories.  It is possible to encode symlinks in the binary format,
-		// but I need to figure out how to express that, and it will probably
-		// require re-implementing AddFS manually.
-
 		zw := zip.NewWriter(f)
-		if err := zw.AddFS(fpath.NewFS(env.Context(), root)); err != nil {
+		if err := addFileToZip(env, zw, root); err != nil {
 			return fmt.Errorf("copy to archive: %w", err)
 		}
 		if err := zw.Close(); err != nil { // N.B. does not close f
@@ -71,4 +67,50 @@ func runZipExport(env *command.Env, zipPath, originPath string) (retErr error) {
 		}
 		return f.Close()
 	})
+}
+
+func addFileToZip(env *command.Env, zw *zip.Writer, root *file.File) error {
+	return fpath.Walk(env.Context(), root, func(e fpath.Entry) error {
+		if err := env.Context().Err(); err != nil {
+			return err
+		} else if e.Err != nil {
+			return e.Err
+		} else if e.File == root {
+			return nil // skip
+		}
+		fi := e.File.FileInfo()
+		fh, err := zip.FileInfoHeader(fi)
+		if err != nil {
+			return fmt.Errorf("file info %q: %w", e.Path, err)
+		}
+		fh.Name = e.Path
+		if fi.IsDir() {
+			fh.Name += "/"
+		}
+		fh.Method = zip.Deflate
+		h, err := zw.CreateHeader(fh)
+		if err != nil {
+			return fmt.Errorf("zip header %q: %w", e.Path, err)
+		}
+		if fi.IsDir() {
+			dprintf(env, "dir: %s", e.Path)
+			return nil
+		}
+		_, cerr := io.Copy(h, e.File.Cursor(env.Context()))
+		if cerr == nil {
+			dprintf(env, "+ %s: %s", fileType(fi), e.Path)
+		}
+		return cerr
+	})
+}
+
+func fileType(fi fs.FileInfo) string {
+	if fi.IsDir() {
+		return "dir"
+	} else if fi.Mode().IsRegular() {
+		return "file"
+	} else if fi.Mode()&fs.ModeSymlink != 0 {
+		return "link"
+	}
+	return "other"
 }

@@ -86,9 +86,7 @@ is compressed with zstd.`,
 Export a file tree to a ZIP archive.
 
 Recursively export the file indicated by the selected root or file storage key
-to a ZIP archive in the specified file, which is created if necessary.
-
-Note that the ZIP output cannot currently encode symbolic links.`,
+to a ZIP archive in the specified file, which is created if necessary.`,
 		SetFlags: command.Flags(flax.MustBind, &zipFlags),
 		Run:      command.Adapt(runZipExport),
 	}},
