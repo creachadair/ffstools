@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/creachadair/atomicfile"
@@ -124,13 +124,13 @@ func runExport(env *command.Env, originPath string) error {
 				opath := filepath.Join(exportFlags.Target, filepath.FromSlash(e.Path))
 				if fs := e.File.Stat(); !fs.Mode.IsDir() {
 					start(func() error {
-						return exportFile(cctx, e.File, opath)
+						return exportFile(cctx, env, e.File, opath)
 					})
 					return nil
 				} else if !exportFlags.NoStat && fs.Persistent() {
 					dirs[opath] = e.File
 				}
-				return exportFile(cctx, e.File, opath)
+				return exportFile(cctx, env, e.File, opath)
 			})
 		})
 		if err := g.Wait(); err != nil {
@@ -139,7 +139,7 @@ func runExport(env *command.Env, originPath string) error {
 		for path, dir := range dirs {
 			start(func() error {
 				stat := dir.Stat()
-				logPrintf("+ update dir %q set mtime %v", path, stat.ModTime.Format(time.RFC3339))
+				dprintf(env, "+ update dir %q set mtime %v", path, stat.ModTime.Format(time.RFC3339))
 				return os.Chtimes(path, stat.ModTime, stat.ModTime)
 			})
 		}
@@ -147,21 +147,21 @@ func runExport(env *command.Env, originPath string) error {
 	})
 }
 
-func exportFile(ctx context.Context, f *file.File, path string) error {
+func exportFile(ctx context.Context, env *command.Env, f *file.File, path string) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 	mode := f.Stat().Mode
 	var link bool
 	if mode.IsDir() {
-		logPrintf("create directory %q", path)
+		dprintf(env, "create directory %q", path)
 		if err := os.Mkdir(path, 0700); err != nil {
 			if !exportFlags.Update || !os.IsExist(err) {
 				return err
 			}
 		}
 	} else if mode.Type()&fs.ModeSymlink != 0 {
-		logPrintf("write symlink %q", path)
+		dprintf(env, "write symlink %q", path)
 		if err := linkFile(ctx, f, path); err != nil {
 			return err
 		}
@@ -177,13 +177,13 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 		if err != nil {
 			return err
 		}
-		logPrintf("write file %q (%d bytes)", path, nw)
+		dprintf(env, "write file %q (%d bytes)", path, nw)
 	}
 
 	// Restore permissions and modification times, if requested and available.
 	if !exportFlags.NoStat && f.Stat().Persistent() && !link {
 		stat := f.Stat()
-		logPrintf("- set mode %v, mtime %v", stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
+		dprintf(env, "- set mode %v, mtime %v", stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
 
 		if err := os.Chmod(path, stat.Mode); err != nil {
 			return fmt.Errorf("setting permissions: %w", err)
@@ -201,7 +201,7 @@ func exportFile(ctx context.Context, f *file.File, path string) error {
 		xa := f.XAttr()
 		for _, key := range xa.Names() {
 			val := xa.Get(key)
-			logPrintf("- set xattr %q (%d bytes)", key, len(val))
+			dprintf(env, "- set xattr %q (%d bytes)", key, len(val))
 			if xerr := xattr.LSet(path, key, []byte(val)); xerr != nil {
 				return fmt.Errorf("setting xattrs %q: %w", key, xerr)
 			}
@@ -223,8 +223,11 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 	return os.Symlink(string(target), path)
 }
 
-func logPrintf(msg string, args ...any) {
+func dprintf(w io.Writer, msg string, args ...any) {
 	if exportFlags.Verbose {
-		log.Printf(msg, args...)
+		if !strings.HasSuffix(msg, "\n") {
+			msg += "\n"
+		}
+		fmt.Fprintf(w, msg, args...)
 	}
 }

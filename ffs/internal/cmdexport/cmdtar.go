@@ -179,12 +179,3 @@ type lyingFileInfo struct{ fs.FileInfo }
 
 func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
-
-func dprintf(w io.Writer, msg string, args ...any) {
-	if exportFlags.Verbose {
-		if !strings.HasSuffix(msg, "\n") {
-			msg += "\n"
-		}
-		fmt.Fprintf(w, msg, args...)
-	}
-}
