@@ -46,10 +46,12 @@ var exportFlags struct {
 	Update  bool   `flag:"update,Update target path if it exists"`
 }
 
+const fileSpecUsage = `<root-key>[/path/...]
+@<file-key>[/path/...]`
+
 var Command = &command.C{
-	Name: "export",
-	Usage: `<root-key>[/path/...]
-@<file-key>[/path/...]`,
+	Name:  "export",
+	Usage: fileSpecUsage,
 	Help: `
 Export a file tree to the local filesystem.
 
@@ -60,6 +62,36 @@ Use --xattr to export extended attributes, if any are stored.`,
 
 	SetFlags: command.Flags(flax.MustBind, &exportFlags),
 	Run:      command.Adapt(runExport),
+
+	Commands: []*command.C{{
+		Name:  "tar",
+		Usage: fileSpecUsage,
+		Help: `
+Export a file tree to a tar archive.
+
+Recursively export the file indicated by the selected root or file storage key to
+a tar stream. If --to is set, the output is written to that file, which is created
+if necessary; otherwise the output is written to stdout.
+
+If --compress is true, or if the --to filename ends in ".zst" or ".zstd", the output
+is compressed with zstd.`,
+
+		SetFlags: command.Flags(flax.MustBind, &tarFlags),
+		Run:      command.Adapt(runTarExport),
+	}, {
+		Name: "zip",
+		Usage: `<zipfile> <root-key>[/path/...]
+<zipfile> @<file-key>[/path/...]`,
+		Help: `
+Export a file tree to a ZIP archive.
+
+Recursively export the file indicated by the selected root or file storage key
+to a ZIP archive in the specified file, which is created if necessary.
+
+Note that the ZIP output cannot currently encode symbolic links.`,
+		SetFlags: command.Flags(flax.MustBind, &zipFlags),
+		Run:      command.Adapt(runZipExport),
+	}},
 }
 
 func runExport(env *command.Env, originPath string) error {

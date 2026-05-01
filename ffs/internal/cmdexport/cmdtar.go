@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmdtar
+package cmdexport
 
 import (
 	"archive/tar"
@@ -31,35 +31,13 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/value"
 	"github.com/klauspost/compress/zstd"
 )
 
 var tarFlags struct {
-	Target   string `flag:"to,Export to this path"`
 	Compress bool   `flag:"compress,Compress output with zstd"`
 	Root     string `flag:"root,Prefix all tar paths with this directory name"`
-	XAttr    bool   `flag:"xattr,Include extended attributes"`
-	Verbose  bool   `flag:"v,Enable verbose logging"`
-}
-
-var Command = &command.C{
-	Name: "tar",
-	Usage: `<root-key>[/path/...]
-@<file-key>[/path/...]`,
-	Help: `
-Export a file tree to a tar archive.
-
-Recursively export the file indicated by the selected root or file storage key to
-a tar stream. If --to is set, the output is written to that file, which is created
-if necessary; otherwise the output is written to stdout.
-
-If --compress is true, or if the --to filename ends in ".zst" or ".zstd", the output
-is compressed with zstd.`,
-
-	SetFlags: command.Flags(flax.MustBind, &tarFlags),
-	Run:      command.Adapt(runTarExport),
 }
 
 func runTarExport(env *command.Env, originPath string) (retErr error) {
@@ -73,9 +51,9 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 
 	// Open the output file, either stdout or the named file.
 	var w io.Writer
-	if tarFlags.Target == "" {
+	if exportFlags.Target == "" {
 		w = os.Stdout
-	} else if f, err := os.OpenFile(tarFlags.Target, os.O_RDWR|os.O_EXCL|os.O_TRUNC|os.O_CREATE, 0700); err != nil {
+	} else if f, err := os.OpenFile(exportFlags.Target, os.O_RDWR|os.O_EXCL|os.O_TRUNC|os.O_CREATE, 0700); err != nil {
 		return fmt.Errorf("output: %w", err)
 	} else {
 		mc = append(mc, f.Close)
@@ -88,7 +66,7 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 	w = buf
 
 	// If enabled, stack a compressor.
-	ext := filepath.Ext(tarFlags.Target)
+	ext := filepath.Ext(exportFlags.Target)
 	if tarFlags.Compress || ext == ".zst" || ext == ".zstd" {
 		enc, err := zstd.NewWriter(w)
 		if err != nil {
@@ -174,7 +152,7 @@ func addFile(env *command.Env, tw *tar.Writer, root *file.File, prefix string) e
 		h.Gname = fs.GroupName
 
 		// If there are extended attributes, and we were asked to preserve them, do.
-		if xa := e.File.XAttr(); xa.Len() != 0 && tarFlags.XAttr {
+		if xa := e.File.XAttr(); xa.Len() != 0 && exportFlags.XAttr {
 			dprintf(env, "  + %d extended attribute%s", xa.Len(), value.Cond(xa.Len() == 1, "", "s"))
 			m := make(map[string]string)
 			for _, name := range xa.Names() {
@@ -203,7 +181,7 @@ func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
 
 func dprintf(w io.Writer, msg string, args ...any) {
-	if tarFlags.Verbose {
+	if exportFlags.Verbose {
 		if !strings.HasSuffix(msg, "\n") {
 			msg += "\n"
 		}
