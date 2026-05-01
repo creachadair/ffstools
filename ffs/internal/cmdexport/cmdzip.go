@@ -31,7 +31,7 @@ import (
 )
 
 var zipFlags struct {
-	Root string `flag:"root,Prefix all paths with this directory name"`
+	Root string `flag:"root,Prefix all output paths with this directory name"`
 }
 
 var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}

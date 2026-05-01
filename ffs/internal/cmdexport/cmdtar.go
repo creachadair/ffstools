@@ -37,7 +37,7 @@ import (
 
 var tarFlags struct {
 	Compress bool   `flag:"compress,Compress output with zstd"`
-	Root     string `flag:"root,Prefix all tar paths with this directory name"`
+	Root     string `flag:"root,Prefix all output paths with this directory name"`
 }
 
 func runTarExport(env *command.Env, originPath string) (retErr error) {
