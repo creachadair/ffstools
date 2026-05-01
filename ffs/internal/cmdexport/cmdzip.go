@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
@@ -50,6 +52,9 @@ func runZipExport(env *command.Env, zipPath, originPath string) (retErr error) {
 		if zipFlags.Root != "" {
 			root = of.File.New(&file.NewOptions{Stat: dirStat})
 			root.Child().Set(zipFlags.Root, of.File)
+		} else if strings.Contains(originPath, "/") {
+			root = of.File.New(&file.NewOptions{Stat: dirStat})
+			root.Child().Set(path.Base(originPath), of.File)
 		}
 
 		// TODO(creachadair): The AddFS method only supports plain files and
