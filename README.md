@@ -29,7 +29,7 @@ See also https://github.com/creachadair/ffs.
 
 ## Installation and Usage
 
-Install `ffs` as noted above, then:
+Install `ffs` as noted above, then the following example should work as-written:
 
 ```bash
 # Start up a storage server using local files as storage, and run a
@@ -71,6 +71,31 @@ ffs storage --store file:test.db --exec bash -s <<EOF
   # GC unreachable data in the store.
   ffs gc
 EOF
+```
+
+### Encryption
+
+The `ffs storage` subcommand supports encrypting the underlying store, using
+the `--key` flag, which accepts the path of a file containing the encryption
+key. In this mode, each object in the store is encrypted with an AEAD over
+ChaCha20poly1305.
+
+To generate a random keyring file, for example:
+
+```console
+% ffs storage keygen example.keyring
+Passphrase: ****
+(confirm) Passphrase: ****
+Wrote a new 32-byte keyring to "example.keyring"
+```
+
+This will prompt you to enter a passphrase to unlock the keyring, and
+initialize it with a randomly-generated key. You will be prompted again when
+starting up the store:
+
+```console
+% ffs storage --store file:test.db --listen db.sock --key example.keyring
+Passphrase for "example.keyring": ****
 ```
 
 ## Storage Backends
