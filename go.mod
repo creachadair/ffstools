@@ -21,7 +21,7 @@ require (
 	github.com/creachadair/mds v0.27.2
 	github.com/creachadair/pebblestore v0.0.0-20260423173200-39e89e1d9e42
 	github.com/creachadair/rosedbstore v0.0.0-20260418162405-622ee572734b
-	github.com/creachadair/s3store v0.0.0-20260423170400-74f6c4e135a4
+	github.com/creachadair/s3store v0.0.0-20260504223923-2373fc7c24f8
 	github.com/creachadair/sqlitestore v0.0.0-20260423170340-0906d6f4f4d0
 	github.com/creachadair/taskgroup v0.14.3
 	github.com/fortytw2/leaktest v1.3.0
