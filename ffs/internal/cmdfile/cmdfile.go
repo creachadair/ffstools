@@ -793,6 +793,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				nerrs++
 			} else {
 				fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
+				uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 				checkIndex = idx.Has
 			}
 
@@ -878,13 +879,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			for _, v := range dataSize {
 				totalUniqueDataBytes += v
 			}
-			totalUnique := done.Len() + uniq.Len()
-			if of.Root != nil {
-				totalUnique++ // the root
-				if of.Root.IndexKey != "" {
-					totalUnique++ // the index
-				}
-			}
+			totalUnique := done.Len() + uniq.Len() // N.B. unique includes the index, if there was one
 			if fsckFlags.DataSize {
 				fmt.Printf("- total data size: %d bytes, %d unique (%.1f%%)\n", totalDataBytes, totalUniqueDataBytes,
 					100*(float64(totalUniqueDataBytes)/float64(totalDataBytes)))
