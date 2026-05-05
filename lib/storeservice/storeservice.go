@@ -35,12 +35,8 @@ import (
 )
 
 // Config carries the settings for a [Service].
-// The Address and Store fields are required.
+// The Store fields are required.
 type Config struct {
-	// Address is the address at which the service listens for connections.
-	// This must be non-empty unless Accept is set.
-	Address string
-
 	// Store is the storage exported by the service.
 	// This must be non-nil.
 	Store blob.StoreCloser
@@ -70,24 +66,12 @@ type Config struct {
 	// Logf, if set, is used to write text debug logs.
 	// If nil, logs are discarded.
 	Logf func(string, ...any)
-
-	// Listen, if non-nil, is used to construct a net.Listener for connections.
-	// If nil, net.Listen is used.
-	Listen func(net, addr string) (net.Listener, error)
-
-	// Accept, if non-nil, is used to accept client connections.
-	// If it is set, the Address and Listen values are ignored.
-	// If it is nil, the Address field must be non-empty.
-	Accept func(context.Context) (chirp.Channel, error)
 }
 
 // Service manages a running server, accepting connections and delegating them
 // to a peer implementing the [chirpstore.Service] methods.
 type Service struct {
 	root       *chirp.Peer
-	addr       string
-	listen     func(net, addr string) (net.Listener, error)
-	accept     acceptFunc
 	prefix     string
 	store      blob.StoreCloser
 	buffer     blob.StoreCloser
@@ -103,8 +87,6 @@ type Service struct {
 // The caller must call [Service.Start] to start the service.
 func New(config Config) *Service {
 	switch {
-	case config.Address == "" && config.Accept == nil:
-		panic("missing required listen address or accept function")
 	case config.Store == nil:
 		panic("missing required store")
 	}
@@ -134,15 +116,8 @@ func New(config Config) *Service {
 		store = cachestore.New(store, config.CacheSizeBytes)
 	}
 
-	listen := config.Listen
-	if listen == nil {
-		listen = net.Listen
-	}
 	return &Service{
 		root:       chirp.NewPeer(),
-		addr:       config.Address,
-		listen:     listen,
-		accept:     config.Accept,
 		prefix:     config.MethodPrefix,
 		store:      store,
 		buffer:     config.Buffer,
@@ -156,17 +131,18 @@ func New(config Config) *Service {
 // affect existing connections.
 func (s *Service) Root() *chirp.Peer { return s.root }
 
-// Address returns the address for the service listener.
-func (s *Service) Address() string { return s.addr }
-
-// Start starts up the service loop for s. It will panic if s has already been
-// started; otherwise it reports whether startup succeeded.
-// Once started, s will run until ctx ends or [Service.Stop] is called.
-// Start does not block while the service runs; call [Service.Wait] to wait for
-// the service to shut down.
-func (s *Service) Start(ctx context.Context) error {
+// Start starts up the service loop for s, serving connections from acc, which
+// must be non-nil.  It will panic if s has already been started; otherwise it
+// reports whether startup succeeded.
+//
+// Once started, s will run until ctx ends or [Service.Stop] is called.  Start
+// does not block while the service runs; call [Service.Wait] to wait for the
+// service to shut down.
+func (s *Service) Start(ctx context.Context, acc peers.Accepter) error {
 	if s.loop != nil {
 		panic("service is already running")
+	} else if acc == nil {
+		panic("accepter is nil")
 	}
 
 	// If a buffer was enabled, set it up now, so that it runs with the context
@@ -191,18 +167,8 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}
 
-	acc := s.accept
-	if acc == nil {
-		lst, err := s.listen(chirp.SplitAddress(s.addr))
-		if err != nil {
-			return fmt.Errorf("listen: %w", err)
-		}
-		s.logf("[chirp] service: %q", s.addr)
-		acc = peers.NetAccepter(lst).Accept
-	}
-
 	sctx, cancel := context.WithCancel(ctx)
-	s.loop = taskgroup.Go(s.serve(sctx, store, acc))
+	s.loop = taskgroup.Go(s.serve(sctx, store, acc.Accept))
 	s.stop = cancel
 	return nil
 }

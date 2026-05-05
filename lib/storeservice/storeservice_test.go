@@ -43,9 +43,8 @@ func TestService(t *testing.T) {
 	}
 
 	network := mnet.New(t.Name())
+
 	srv := storeservice.New(storeservice.Config{
-		Address:        "virtual:service",
-		Listen:         network.Listen,
 		Store:          store,
 		CacheSizeBytes: 4096,
 		Keyring:        kr,
@@ -56,14 +55,15 @@ func TestService(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
-	if err := srv.Start(ctx); err != nil {
+	const serviceAddr = "service:12345"
+	if err := srv.Start(ctx, peers.NetAccepter(network.MustListen("tcp", serviceAddr))); err != nil {
 		t.Fatalf("Start service: %v", err)
 	}
 
 	runTest := func(t *testing.T) {
 		t.Helper()
 
-		conn, err := network.Dial(chirp.SplitAddress(srv.Address()))
+		conn, err := network.Dial(chirp.SplitAddress(serviceAddr))
 		if err != nil {
 			t.Fatalf("Dial service: %v", err)
 		}
@@ -86,7 +86,7 @@ func TestService(t *testing.T) {
 		t.Errorf("Service stop: unexpected error: %v", err)
 	}
 
-	if err := srv.Start(ctx); err != nil {
+	if err := srv.Start(ctx, peers.NetAccepter(network.MustListen("tcp", serviceAddr))); err != nil {
 		t.Fatalf("Restart service: %v", err)
 	}
 	t.Run("Recheck", runTest)
@@ -104,12 +104,11 @@ func TestAccept(t *testing.T) {
 
 	conns := make(peers.AcceptChan)
 	srv := storeservice.New(storeservice.Config{
-		Accept: conns.Accept,
-		Store:  memstore.New(nil),
-		Logf:   t.Logf,
+		Store: memstore.New(nil),
+		Logf:  t.Logf,
 	})
 	defer srv.Stop()
-	if err := srv.Start(t.Context()); err != nil {
+	if err := srv.Start(t.Context(), conns); err != nil {
 		t.Fatalf("Start service: %v", err)
 	}
 
