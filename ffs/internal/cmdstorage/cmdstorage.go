@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -196,9 +197,19 @@ func runStorage(env *command.Env, execArgs []string) error {
 		return err
 	}
 
+	// If the subprocess does not want a pipe, set up a regular listener to
+	// accept connections from the advertised address.
+	acc := sub.Pipe
+	if acc == nil {
+		lst, err := net.Listen(chirp.SplitAddress(listenAddr))
+		if err != nil {
+			return fmt.Errorf("listen: %w", err)
+		}
+		log.Printf("[chirp] service: %q", listenAddr)
+		acc = peers.NetAccepter(lst)
+	}
+
 	cfg := storeservice.Config{
-		Address:        listenAddr,
-		Accept:         sub.Accept,
 		Store:          bs,
 		Buffer:         buf,
 		Compress:       flags.Compress,
@@ -213,7 +224,7 @@ func runStorage(env *command.Env, execArgs []string) error {
 	srv.Root().Metrics().Set("blobd", newServerMetrics(sctx, rs.Spec, srv))
 
 	// Now we are ready to start the storage service....
-	if err := srv.Start(sctx); err != nil {
+	if err := srv.Start(sctx, acc); err != nil {
 		cancel()
 		return fmt.Errorf("start server: %w", err)
 	}
@@ -236,9 +247,9 @@ func runStorage(env *command.Env, execArgs []string) error {
 
 type subprocess struct {
 	// For the caller.
-	Name   string                                       // for display purposes
-	Errc   chan error                                   // from exec.Cmd.Wait
-	Accept func(context.Context) (chirp.Channel, error) // if using a pipe
+	Name string         // for display purposes
+	Errc chan error     // from exec.Cmd.Wait
+	Pipe peers.Accepter // if using a pipe
 
 	// Internal plumbing.
 	cmd   *exec.Cmd
@@ -273,7 +284,7 @@ func maybeInitSubprocess(ctx context.Context, listenAddr string, execArgs []stri
 		}
 		sub.conns = make(peers.AcceptChan)
 		sub.sc = sc
-		sub.Accept = sub.conns.Accept
+		sub.Pipe = sub.conns
 
 		// Tell the subprocess about the service. Note that we do not use the
 		// descriptor IDs from r and w directly, since they will change after
