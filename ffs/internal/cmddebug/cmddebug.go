@@ -57,10 +57,11 @@ root is also copied to the target.`,
 			Run:      command.Adapt(runRewrite),
 		},
 		{
-			Name:  "file-hash",
-			Usage: `path ...`,
-			Help:  "Compute the content hash of files in the local filesystem.",
-			Run:   command.Adapt(runFileHash),
+			Name:     "file-hash",
+			Usage:    `path ...`,
+			Help:     "Compute the content hash of files in the local filesystem.",
+			SetFlags: command.Flags(flax.MustBind, &fileHashFlags),
+			Run:      command.Adapt(runFileHash),
 		},
 		{
 			Name:  "file-split",
@@ -176,6 +177,10 @@ func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, see
 	return nf, nil
 }
 
+var fileHashFlags struct {
+	Verbose bool `flag:"v,Print verbose statistics"`
+}
+
 func runFileHash(env *command.Env, paths ...string) error {
 	kv := memstore.NewKV()
 	for _, path := range paths {
@@ -197,6 +202,14 @@ func runFileHash(env *command.Env, paths ...string) error {
 			fmt.Print(path, "\t")
 		}
 		fmt.Println(config.FormatKey(string(h)))
+		if fileHashFlags.Verbose {
+			all := kv.Snapshot(nil)
+			var totalBytes int
+			for _, v := range all {
+				totalBytes += len(v)
+			}
+			fmt.Fprintf(env, "- blocks: %d, total bytes: %d\n", len(all), totalBytes)
+		}
 	}
 	return nil
 }
