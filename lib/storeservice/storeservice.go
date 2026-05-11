@@ -168,14 +168,12 @@ func (s *Service) Start(ctx context.Context, acc peers.Accepter) error {
 	}
 
 	sctx, cancel := context.WithCancel(ctx)
-	s.loop = taskgroup.Go(s.serve(sctx, store, acc.Accept))
+	s.loop = taskgroup.Go(s.serve(sctx, store, acc))
 	s.stop = cancel
 	return nil
 }
 
-type acceptFunc func(context.Context) (chirp.Channel, error)
-
-func (s *Service) serve(ctx context.Context, store blob.Store, accept acceptFunc) func() error {
+func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepter) func() error {
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
 	svc.Register(s.root)
 
@@ -189,7 +187,7 @@ func (s *Service) serve(ctx context.Context, store blob.Store, accept acceptFunc
 		}()
 
 		for {
-			ch, err := accept(ctx)
+			ch, err := acc.Accept(ctx)
 			if errors.Is(err, net.ErrClosed) || errors.Is(err, context.Canceled) {
 				return nil
 			} else if err != nil {
