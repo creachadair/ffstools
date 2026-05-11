@@ -18,8 +18,6 @@ package storeservice
 import (
 	"context"
 	"errors"
-	"fmt"
-	"net"
 
 	"github.com/creachadair/chirp"
 	"github.com/creachadair/chirp/peers"
@@ -177,30 +175,12 @@ func (s *Service) serve(ctx context.Context, store blob.Store, acc peers.Accepte
 	svc := chirpstore.NewService(store, &chirpstore.ServiceOptions{Prefix: s.prefix})
 	svc.Register(s.root)
 
-	var g taskgroup.Group
-	return func() (err error) {
-		defer func() {
-			gerr := g.Wait()
-			if err == nil {
-				err = gerr
-			}
-		}()
-
-		for {
-			ch, err := acc.Accept(ctx)
-			if errors.Is(err, net.ErrClosed) || errors.Is(err, context.Canceled) {
-				return nil
-			} else if err != nil {
-				return fmt.Errorf("accept: %w", err)
-			}
-
-			peer := s.root.Clone().Start(ch)
-			stop := context.AfterFunc(ctx, func() { peer.Stop() })
-			g.Go(func() error {
-				defer stop()
-				return peer.Wait()
-			})
+	return func() error {
+		err := peers.Loop(ctx, acc, s.root.Clone)
+		if errors.Is(err, context.Canceled) {
+			return nil
 		}
+		return err
 	}
 }
 
