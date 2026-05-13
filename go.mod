@@ -5,21 +5,21 @@ go 1.25.0
 require (
 	github.com/creachadair/atomicfile v0.4.1
 	github.com/creachadair/badgerstore v0.10.5
-	github.com/creachadair/bitcaskstore v0.0.0-20260423173327-57c23ec2dcb0
-	github.com/creachadair/boltstore v0.0.0-20260423174052-8325b72af9ef
+	github.com/creachadair/bitcaskstore v0.0.0-20260512152024-a4040ebd5413
+	github.com/creachadair/boltstore v0.0.0-20260512152052-33643b560a6c
 	github.com/creachadair/buntdbstore v0.0.0-20260507160837-1f0065f1d370
 	github.com/creachadair/chirp v0.4.4
 	github.com/creachadair/chirpstore v0.0.0-20260506185945-2275600b76b1
-	github.com/creachadair/command v0.2.4
+	github.com/creachadair/command v0.2.5
 	github.com/creachadair/ffs v0.17.10
-	github.com/creachadair/ffuse v0.0.0-20260425163520-9a8c3d9e335c
+	github.com/creachadair/ffuse v0.0.0-20260512151953-8d8ad7d5f2c5
 	github.com/creachadair/flax v0.0.5
 	github.com/creachadair/gcsstore v0.0.0-20260505142144-7417eff7c6c5
 	github.com/creachadair/getpass v0.3.2
 	github.com/creachadair/keyring v0.2.4
 	github.com/creachadair/leveldbstore v0.0.0-20260506185937-0a5770befa91
 	github.com/creachadair/mds v0.28.0
-	github.com/creachadair/pebblestore v0.0.0-20260423173200-39e89e1d9e42
+	github.com/creachadair/pebblestore v0.0.0-20260512152016-d83472dad555
 	github.com/creachadair/rosedbstore v0.0.0-20260505142203-fe16d22aa5cc
 	github.com/creachadair/s3store v0.0.0-20260512033358-359d3d87c31f
 	github.com/creachadair/sqlitestore v0.0.0-20260510164718-721b6de5c5b7
