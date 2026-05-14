@@ -17,6 +17,7 @@ package cmddebug
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"iter"
 	"os"
@@ -76,6 +77,12 @@ root is also copied to the target.`,
 			Help:     `Render a view the specified objects as JSON.`,
 			SetFlags: command.Flags(flax.MustBind, &showObjectFlags),
 			Run:      command.Adapt(runShowObject),
+		},
+		{
+			Name:     "command-info",
+			Help:     "Dump the command structure as JSON.",
+			SetFlags: command.Flags(flax.MustBind, &commandInfoFlags),
+			Run:      command.Adapt(runCommandInfo),
 		},
 	},
 }
@@ -314,4 +321,17 @@ func runShowObject(env *command.Env, storageKeys ...string) error {
 		}
 		return nil
 	})
+}
+
+var commandInfoFlags struct {
+	All bool `flag:"a,Include unlisted commands and private flags"`
+}
+
+func runCommandInfo(env *command.Env) error {
+	cur := env
+	for cur.Parent != nil {
+		cur = cur.Parent
+	}
+	opts := value.Cond(commandInfoFlags.All, command.IncludeAll, command.IncludeCommands)
+	return json.NewEncoder(os.Stdout).Encode(cur.Command.Info(opts))
 }
