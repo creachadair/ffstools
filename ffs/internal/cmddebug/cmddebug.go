@@ -26,6 +26,7 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
+	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
@@ -68,6 +69,13 @@ root is also copied to the target.`,
 			Usage: "path ...",
 			Help:  "Show the splits of the specified file content into blocks.",
 			Run:   command.Adapt(runFileSplit),
+		},
+		{
+			Name:     "show-object",
+			Usage:    "<storage-key>...",
+			Help:     `Render a view the specified objects as JSON.`,
+			SetFlags: command.Flags(flax.MustBind, &showObjectFlags),
+			Run:      command.Adapt(runShowObject),
 		},
 	},
 }
@@ -248,4 +256,62 @@ func (kv *logKV) Put(_ context.Context, opts blob.PutOptions) error {
 	fmt.Printf("%d %d %s\n", kv.pos, n, config.FormatKey(opts.Key))
 	kv.pos += n
 	return nil
+}
+
+var showObjectFlags struct {
+	Root bool `flag:"root,View objects in the root KV"`
+}
+
+func runShowObject(env *command.Env, storageKeys ...string) error {
+	if len(storageKeys) == 0 {
+		return env.Usagef("no storage keys provided")
+	}
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
+		var kv blob.KV
+		if showObjectFlags.Root {
+			kv = src.Roots()
+		} else {
+			kv = src.Sync()
+		}
+		for _, sk := range storageKeys {
+			var key string
+			if showObjectFlags.Root {
+				key = sk
+			} else if pk, err := filetree.ParseKey(sk); err != nil {
+				return err
+			} else {
+				key = pk
+			}
+
+			var obj wiretype.Object
+			if err := wiretype.Load(env.Context(), kv, key, &obj); err != nil {
+				data, err := kv.Get(env.Context(), key)
+				if err != nil {
+					return err
+				}
+				fmt.Println(config.ToJSON(map[string]any{
+					"storageKey": []byte(key),
+					"data":       data,
+				}))
+				return nil
+			}
+
+			out := map[string]any{
+				"storageKey": []byte(key),
+			}
+			switch t := obj.Value.(type) {
+			case *wiretype.Object_Node:
+				out["node"] = t.Node
+			case *wiretype.Object_Root:
+				out["root"] = t.Root
+			case *wiretype.Object_Index:
+				out["index"] = t.Index
+			default:
+				return fmt.Errorf("unknown object type %T for %q", obj.Value, config.FormatKey(key))
+			}
+			fmt.Println(config.ToJSON(out))
+		}
+		return nil
+	})
 }
