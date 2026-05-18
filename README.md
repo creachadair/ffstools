@@ -35,7 +35,7 @@ Install `ffs` as noted above, then the following example should work as-written:
 # Start up a storage server using local files as storage, and run a
 # shell with the server addressed via the FFS_STORE environment.
 # THe storage server stops after the shell exits.
-ffs storage --store file:test.db --exec bash -s <<EOF
+ffs storage --store file:test.db --listen demo.sock --exec bash -s <<EOF
   # Create a root pointer to anchor some data.
   ffs root create example --desc 'Example root pointer'
 
