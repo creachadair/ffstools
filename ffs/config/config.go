@@ -170,7 +170,7 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	}
 	ch, err := s.dialAddress(ctx, spec)
 	if err != nil {
-		return filetree.Store{}, fmt.Errorf("dialing store: %w", err)
+		return filetree.Store{}, err
 	}
 	peer := chirp.NewPeer().Start(ch)
 	if s.EnableDebugLogging {
