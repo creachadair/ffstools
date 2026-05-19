@@ -23,7 +23,7 @@ require (
 	github.com/creachadair/rosedbstore v0.0.0-20260505142203-fe16d22aa5cc
 	github.com/creachadair/s3store v0.0.0-20260512033358-359d3d87c31f
 	github.com/creachadair/sqlitestore v0.0.0-20260510164718-721b6de5c5b7
-	github.com/creachadair/taskgroup v0.14.3
+	github.com/creachadair/taskgroup v0.14.4
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.10.1
 	github.com/klauspost/compress v1.18.6
