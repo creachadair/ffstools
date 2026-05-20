@@ -32,12 +32,12 @@ import (
 
 	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/chirp"
+	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirp/peers"
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
-	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/getpass"
@@ -278,7 +278,7 @@ func maybeInitSubprocess(ctx context.Context, listenAddr string, execArgs []stri
 		cmd.Env = append(os.Environ(), "FFS_STORE="+listenAddr)
 	} else {
 		// Construct a pipe.
-		sc, cr, cw, err := pipestore.Connect()
+		sc, cc, err := channel.Pipe()
 		if err != nil {
 			return subprocess{}, fmt.Errorf("connect subprocess: %w", err)
 		}
@@ -289,6 +289,7 @@ func maybeInitSubprocess(ctx context.Context, listenAddr string, execArgs []stri
 		// Tell the subprocess about the service. Note that we do not use the
 		// descriptor IDs from r and w directly, since they will change after
 		// exec.  Go promises the extra files will be numbered from 3.
+		cr, cw := cc.Files()
 		cmd.Env = append(os.Environ(), "FFS_STORE=_pipe:3:4")
 		cmd.ExtraFiles = []*os.File{cr, cw}
 	}

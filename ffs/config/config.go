@@ -36,7 +36,6 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffstools/lib/pipestore"
 	"github.com/creachadair/mds/mstr"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -222,7 +221,7 @@ func (s *Settings) dialPipe(ctx context.Context, fds string) (chirp.Channel, err
 	if err != nil {
 		return nil, fmt.Errorf("invalid write descriptor: %w", err)
 	}
-	return pipestore.NewChannel(
+	return channel.ConnectPipe(
 		os.NewFile(uintptr(rfd), "read-pipe"),
 		os.NewFile(uintptr(wfd), "write-pipe"),
 	), nil
