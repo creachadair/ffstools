@@ -4,9 +4,7 @@ package cmdmount
 
 import (
 	"os"
-	"time"
 
-	"github.com/creachadair/mds/value"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
 )
@@ -22,8 +20,11 @@ var fuseOptions = fs.Options{
 		FsName: "ffs",
 		Name:   "ffs",
 	},
-	EntryTimeout: value.Ptr(time.Second),
-	AttrTimeout:  value.Ptr(time.Second),
+
+	// TODO(creachadair): For some reason, populating entry and attribute
+	// timeouts results in stat information being reported a zero values after
+	// an initial read. This probably means there' something else I am doing
+	// wrong, but in the meantime not setting these seems to mitigate it.
 
 	UID: uint32(max(os.Getuid(), 0)),
 	GID: uint32(max(os.Getgid(), 0)),
