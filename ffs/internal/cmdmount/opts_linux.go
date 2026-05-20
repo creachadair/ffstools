@@ -22,8 +22,8 @@ var fuseOptions = fs.Options{
 	},
 
 	// TODO(creachadair): For some reason, populating entry and attribute
-	// timeouts results in stat information being reported a zero values after
-	// an initial read. This probably means there' something else I am doing
+	// timeouts results in stat information being reported as zero values after
+	// an initial read. This probably means there's something else I am doing
 	// wrong, but in the meantime not setting these seems to mitigate it.
 
 	UID: uint32(max(os.Getuid(), 0)),
