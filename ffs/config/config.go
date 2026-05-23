@@ -221,6 +221,11 @@ func (s *Settings) dialPipe(ctx context.Context, fds string) (chirp.Channel, err
 	if err != nil {
 		return nil, fmt.Errorf("invalid write descriptor: %w", err)
 	}
+	if !isDescriptorValid(uintptr(rfd)) {
+		return nil, fmt.Errorf("invalid read fd %d", rfd)
+	} else if !isDescriptorValid(uintptr(wfd)) {
+		return nil, fmt.Errorf("invalid write fd %d", wfd)
+	}
 	return channel.ConnectPipe(
 		os.NewFile(uintptr(rfd), "read-pipe"),
 		os.NewFile(uintptr(wfd), "write-pipe"),
