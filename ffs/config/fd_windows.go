@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build !windows
+//go:build windows
 
 package config
 
-import "golang.org/x/sys/unix"
+func isDescriptorValid(fd uintptr) bool { return true }
 
-// isDescriptorValid reports whether the specified file descriptor is valid.
-func isDescriptorValid(fd uintptr) bool {
-	v, err := unix.FcntlInt(fd, unix.F_GETFD, 0)
-	return err == nil && v >= 0
-}
+// TODO(creachadair): Is there a better way to do this on Windows?
+// I'm sure the win32 API has something.
