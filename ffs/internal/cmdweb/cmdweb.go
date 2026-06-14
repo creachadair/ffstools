@@ -90,7 +90,7 @@ the service runs on localhost; if the path is omitted it serves at "/".
 
 Because WebDAV does not support owner/group identity, files and directories
 created by the DAV client will be attributed to the UID and GID of the ffs
-process itself.`,
+process itself. Use the --uid and --gid flags to override this.`,
 
 			SetFlags: command.Flags(flax.MustBind, &davFlags),
 			Run:      command.Adapt(runWebDAV),

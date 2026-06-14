@@ -23,9 +23,14 @@ import (
 var _ webdav.FileSystem = davFS{}
 var _ webdav.File = davFile{}
 
-var davFlags struct {
+var davFlags = struct {
 	Writable bool `flag:"writable,Export a writable filesystem"`
+	UID      int  `flag:"uid,default=*,UID to advertise for files"`
+	GID      int  `flag:"gid,default=*,GID to advertise for files"`
 	Verbose  bool `flag:"v,Enable verbose logging"`
+}{
+	UID: os.Getuid(),
+	GID: os.Getgid(),
 }
 
 func runWebDAV(env *command.Env, address, rootKey string) error {
@@ -119,8 +124,8 @@ func (d davFS) Mkdir(ctx context.Context, name string, perm os.FileMode) (err er
 			Name: path.Base(clean),
 			Stat: &file.Stat{
 				Mode:    fs.ModeDir | perm,
-				OwnerID: os.Getuid(),
-				GroupID: os.Getgid(),
+				OwnerID: davFlags.UID,
+				GroupID: davFlags.GID,
 			},
 			PersistStat: d.pi.File.Stat().Persistent(),
 		}),
@@ -170,8 +175,8 @@ func (d davFS) OpenFile(ctx context.Context, name string, flag int, perm os.File
 			Name: base,
 			Stat: &file.Stat{
 				Mode:    perm,
-				OwnerID: os.Getuid(),
-				GroupID: os.Getgid(),
+				OwnerID: davFlags.UID,
+				GroupID: davFlags.GID,
 			},
 			PersistStat: dst.Stat().Persistent(),
 		})
