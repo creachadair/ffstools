@@ -16,6 +16,7 @@
 package cmddebug
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -88,18 +89,27 @@ root is also copied to the target.`,
 }
 
 var rewriteFlags struct {
-	Target string `flag:"to,Target store (required)"`
+	Target string `flag:"to,Target store (required unless --from is set)"`
+	Source string `flag:"from,Source store (required unless --to is set)"`
 }
 
 func runRewrite(env *command.Env, sourceKeys ...string) error {
-	if rewriteFlags.Target == "" {
-		return env.Usagef("mussing --to target store")
+	if (rewriteFlags.Target == "") == (rewriteFlags.Source == "") {
+		return env.Usagef("exactly one of --from and --to must be set")
 	}
 
 	cfg := env.Config.(*config.Settings)
-	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
-		return cfg.WithStoreAddress(env.Context(), rewriteFlags.Target, func(tgt filetree.Store) error {
-			fmt.Fprintf(env, "Target store: %q\n", rewriteFlags.Target)
+	otherSpec := cmp.Or(rewriteFlags.Target, rewriteFlags.Source)
+	return cfg.WithStore(env.Context(), func(main filetree.Store) error {
+		return cfg.WithStoreAddress(env.Context(), otherSpec, func(other filetree.Store) error {
+			var src, tgt filetree.Store
+			if rewriteFlags.Target != "" {
+				fmt.Fprintf(env, "Target store: %q\n", rewriteFlags.Target)
+				src, tgt = main, other
+			} else {
+				fmt.Fprintf(env, "Source store: %q\n", rewriteFlags.Source)
+				src, tgt = other, main
+			}
 
 			for _, arg := range sourceKeys {
 				pi, err := src.OpenPath(env.Context(), arg)
