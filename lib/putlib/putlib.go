@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -33,7 +32,6 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/taskgroup"
-	"github.com/pkg/xattr"
 )
 
 var Default = Config{FilterName: ".ffsignore"}
@@ -44,6 +42,19 @@ type Config struct {
 	XAttr      bool   // capture extended attributes
 	NoStat     bool   // do not capture stat metadata
 	FilterName string // name of filter file to read
+
+	// A filesystem implementation to read from, or nil.
+	// If it is nil, the config uses the standard library's [os] package.
+	// It may optionally also implement [fs.ReadLinkFS] if symlinks are supported.
+	// It may optionally also implement [XAttrFS] if extended attributes are supported.
+	FS fs.ReadDirFS
+}
+
+func (c Config) getFS() fs.ReadDirFS {
+	if c.FS == nil {
+		return osFS{}
+	}
+	return c.FS
 }
 
 type state struct {
@@ -51,24 +62,25 @@ type state struct {
 	path   string
 	fi     fs.FileInfo
 	filter *Filter
+	fs     fs.FS
 }
 
 // PutFile puts a single file or symlink into the store.
 func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
-	return c.putFile(ctx, state{s: s, path: path, fi: fi})
+	return c.putFile(ctx, state{s: s, path: path, fi: fi, fs: c.getFS()})
 }
 
 func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
 	f := file.New(st.s, c.fileInfoToOptions(st.fi))
 
-	// Extended attributes (if -xattr is set)
-	if err := c.addExtAttrs(st.path, f); err != nil {
+	// Extended attributes (if --xattr is set)
+	if err := c.addExtAttrs(st, f); err != nil {
 		return nil, err
 	}
 
 	if st.fi.Mode().IsRegular() {
 		// Copy file contents.
-		in, err := os.Open(st.path)
+		in, err := st.fs.Open(st.path)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +91,7 @@ func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
 		}
 	} else if st.fi.Mode()&fs.ModeSymlink != 0 {
 		// Write symbolic link target as file content.
-		tgt, err := os.Readlink(st.path)
+		tgt, err := fs.ReadLink(st.fs, st.path)
 		if err != nil {
 			return nil, err
 		} else if err := f.SetData(ctx, strings.NewReader(tgt)); err != nil {
@@ -92,11 +104,11 @@ func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
 // PutPath puts a single file, directory, or symlink into the store.  If path
 // names a plain file or symlink, it calls PutFile.
 func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
-	return c.putPath(ctx, state{s: s, path: path})
+	return c.putPath(ctx, state{s: s, path: path, fs: c.getFS()})
 }
 
 func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
-	fi, err := os.Lstat(st.path)
+	fi, err := fs.Lstat(st.fs, st.path)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +122,12 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	d := file.New(st.s, c.fileInfoToOptions(fi))
 
 	// Extended attributes (if -xattr is set)
-	if err := c.addExtAttrs(st.path, d); err != nil {
+	if err := c.addExtAttrs(st, d); err != nil {
 		return nil, err
 	}
 
 	// Children
-	elts, err := os.ReadDir(st.path)
+	elts, err := fs.ReadDir(st.fs, st.path)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +209,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 					}
 				}
 				kid, err := c.putFile(ctx, state{
-					s: st.s, path: e.sub, fi: e.fi, filter: filt,
+					s: st.s, path: e.sub, fi: e.fi, filter: filt, fs: c.getFS(),
 				})
 				if err != nil {
 					return err
@@ -219,17 +231,21 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	return d, nil
 }
 
-func (c Config) addExtAttrs(path string, f *file.File) error {
+func (c Config) addExtAttrs(st state, f *file.File) error {
 	if !c.XAttr {
 		return nil
 	}
-	names, err := xattr.LList(path)
+	xfs, ok := st.fs.(XAttrFS)
+	if !ok {
+		return nil // no extended attribute support
+	}
+	names, err := xfs.ListXAttr(st.path)
 	if err != nil {
 		return fmt.Errorf("listing xattr: %w", err)
 	}
 	xa := f.XAttr()
 	for _, name := range names {
-		data, err := xattr.LGet(path, name)
+		data, err := xfs.GetXAttr(st.path, name)
 		if err != nil {
 			return fmt.Errorf("get xattr %q: %w", name, err)
 		}
@@ -259,7 +275,7 @@ func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
 // target file. It returns the storage key of the resulting updated object.
 //
 // If path has only a root-key, the base file of that root is replaced.
-// If path has only a file-keyi, it is an error.
+// If path has only a file-key (and no subpath), it is an error.
 func SetPath(ctx context.Context, s filetree.Store, path string, tf *file.File) (string, error) {
 	obase, orest := filetree.SplitPath(path)
 	if orest == "." {
