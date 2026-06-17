@@ -8,8 +8,8 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20260528154922-ee7d00c201d7
 	github.com/creachadair/boltstore v0.0.0-20260529185322-2634259a6e77
 	github.com/creachadair/buntdbstore v0.0.0-20260524161604-bd520bf597a3
-	github.com/creachadair/chirp v0.4.6
-	github.com/creachadair/chirpstore v0.0.0-20260524161557-36647ecb8df9
+	github.com/creachadair/chirp v0.4.8
+	github.com/creachadair/chirpstore v0.0.0-20260617044440-83e3fc7eb8bf
 	github.com/creachadair/command v0.2.6
 	github.com/creachadair/ffs v0.17.11
 	github.com/creachadair/ffuse v0.0.0-20260528154853-d8c1430e5b09
@@ -18,7 +18,7 @@ require (
 	github.com/creachadair/getpass v0.3.2
 	github.com/creachadair/keyring v0.2.4
 	github.com/creachadair/leveldbstore v0.0.0-20260523154349-39e3a1792c0a
-	github.com/creachadair/mds v0.28.1
+	github.com/creachadair/mds v0.29.0
 	github.com/creachadair/pebblestore v0.0.0-20260528154914-3173b760fcde
 	github.com/creachadair/rosedbstore v0.0.0-20260523154326-079e4d92bc69
 	github.com/creachadair/s3store v0.0.0-20260526235428-dff0e50daa9d
