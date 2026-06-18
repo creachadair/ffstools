@@ -8,8 +8,8 @@ require (
 	github.com/creachadair/bitcaskstore v0.0.0-20260528154922-ee7d00c201d7
 	github.com/creachadair/boltstore v0.0.0-20260529185322-2634259a6e77
 	github.com/creachadair/buntdbstore v0.0.0-20260611024658-2054c868377e
-	github.com/creachadair/chirp v0.4.8
-	github.com/creachadair/chirpstore v0.0.0-20260617044440-83e3fc7eb8bf
+	github.com/creachadair/chirp v0.4.9
+	github.com/creachadair/chirpstore v0.0.0-20260618010532-de6b1a85b778
 	github.com/creachadair/command v0.2.6
 	github.com/creachadair/ffs v0.17.11
 	github.com/creachadair/ffuse v0.0.0-20260528154853-d8c1430e5b09
