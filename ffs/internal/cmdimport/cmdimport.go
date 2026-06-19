@@ -219,6 +219,10 @@ func tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file
 			GroupName: h.Gname,
 		},
 	})
+	//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
+	for name, value := range h.Xattrs {
+		nf.XAttr().Set(name, value)
+	}
 	if !fi.IsDir() {
 		if err := nf.SetData(ctx, r); err != nil {
 			return nil, fmt.Errorf("set file data: %w", err)
