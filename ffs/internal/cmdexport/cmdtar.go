@@ -40,7 +40,7 @@ var tarFlags struct {
 	Root     string `flag:"root,Prefix all output paths with this directory name"`
 }
 
-func runTarExport(env *command.Env, originPath string) (retErr error) {
+func runTarExport(env *command.Env, originPath string, rest ...string) (retErr error) {
 	var mc mcloser
 	defer func() {
 		err := mc.Close()
@@ -75,21 +75,25 @@ func runTarExport(env *command.Env, originPath string) (retErr error) {
 		mc = append(mc, enc.Close)
 		w = enc
 	}
+	tw := tar.NewWriter(w)
+	mc = append(mc, tw.Close)
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		of, err := s.OpenPath(env.Context(), originPath)
-		if err != nil {
-			return err
+		for _, originPath := range env.Args {
+			of, err := s.OpenPath(env.Context(), originPath)
+			if err != nil {
+				return err
+			}
+			tdir := tarFlags.Root
+			if strings.Contains(originPath, "/") {
+				tdir = path.Join(tdir, path.Base(originPath))
+			}
+			if err := addFileToTar(env, tw, of.File, tdir); err != nil {
+				return fmt.Errorf("export %q: %w", originPath, err)
+			}
 		}
-		tdir := tarFlags.Root
-		if tdir == "" && strings.Contains(originPath, "/") {
-			tdir = path.Base(originPath)
-		}
-
-		tw := tar.NewWriter(w)
-		mc = append(mc, tw.Close)
-		return addFileToTar(env, tw, of.File, tdir)
+		return nil
 	})
 }
 

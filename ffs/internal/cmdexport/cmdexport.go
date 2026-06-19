@@ -46,12 +46,9 @@ var exportFlags struct {
 	Update  bool   `flag:"update,Update target path if it exists"`
 }
 
-const fileSpecUsage = `<root-key>[/path/...]
-@<file-key>[/path/...]`
-
 var Command = &command.C{
 	Name:  "export",
-	Usage: fileSpecUsage,
+	Usage: "<root-key>[/path/...]\n@<file-key>[/path/...]",
 	Help: `
 Export a file tree to the local filesystem.
 
@@ -65,11 +62,11 @@ Use --xattr to export extended attributes, if any are stored.`,
 
 	Commands: []*command.C{{
 		Name:  "tar",
-		Usage: fileSpecUsage,
+		Usage: "<root-key>[/path/...] ...\n@<file-key>[/path/...] ...",
 		Help: `
-Export a file tree to a tar archive.
+Export file trees to a tar archive.
 
-Recursively export the file indicated by the selected root or file storage key to
+Recursively export the files indicated by the selected root or file storage keys to
 a tar stream. If --to is set, the output is written to that file, which is created
 if necessary; otherwise the output is written to stdout.
 
