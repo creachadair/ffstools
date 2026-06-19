@@ -92,6 +92,8 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 				Stat: &file.Stat{
 					Mode:    fs.ModeDir | 0755,
 					ModTime: time.Now(),
+					OwnerID: os.Getuid(),
+					GroupID: os.Getgid(),
 				},
 				PersistStat: true,
 			})
@@ -110,7 +112,11 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 					return err
 				}
 				path := strings.TrimSuffix(h.Name, "/") // directory names end in "/"
-				if _, err := fpath.Set(env.Context(), root, path, &fpath.SetOptions{File: hf}); err != nil {
+				if _, err := fpath.Set(env.Context(), root, path, &fpath.SetOptions{
+					Create:  true,
+					SetStat: setDirStat,
+					File:    hf,
+				}); err != nil {
 					c.Close()
 					return fmt.Errorf("set %q: %w", path, err)
 				}
@@ -283,6 +289,13 @@ func openZIP(path string) (*zip.Reader, io.Closer, error) {
 		return nil, nil, fmt.Errorf("input %q: %w", path, err)
 	}
 	return zr, f, nil
+}
+
+func setDirStat(s *file.Stat) {
+	s.Mode = fs.ModeDir | 0755
+	s.OwnerID = os.Getuid()
+	s.GroupID = os.Getgid()
+	s.ModTime = time.Now()
 }
 
 func logPrintf(msg string, args ...any) {
