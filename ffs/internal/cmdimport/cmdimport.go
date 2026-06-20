@@ -20,6 +20,7 @@ import (
 	"archive/zip"
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -45,15 +46,33 @@ With --into, the resulting file tree is stored under the specified path
 of the form <root-key>/<path> or @<file-key>/<path>. In this form, only
 one input path is allowed.`
 
+var putConfig putlib.Config
+
 var importFlags struct {
-	Target  string `flag:"into,Store the resulting object under this root/path or file/path"`
-	Verbose bool   `flag:"v,Enable verbose logging"`
+	Target string `flag:"into,Store the resulting object under this root/path or file/path"`
 }
 
 var Command = &command.C{
-	Name:     "import",
-	Help:     `Import one or more file trees from archives.`,
-	SetFlags: command.Flags(flax.MustBind, &importFlags),
+	Name: "import",
+	Help: `Import one or more file trees from archives.
+
+Recursively copy each specified path from the local filesystem to the
+store, and print the storage key. By default, file and directory stat
+info are recorded; use --nostat to disable this. Use --xattr to capture
+extended attributes.
+
+Symbolic links are captured, but devices, sockets, FIFO, and other
+special files are skipped.` + intoHelp,
+
+	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
+		fs.BoolVar(&putConfig.NoStat, "nostat", false, "Omit file and directory stat")
+		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
+		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
+		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
+		flax.MustBind(fs, &importFlags)
+	},
+	Run: command.Adapt(runImport),
+
 	Commands: []*command.C{{
 		Name:  "tar",
 		Usage: "<path> ...",
@@ -70,6 +89,53 @@ Use "-" for the path to read an (uncompressed) archive from stdin.` + intoHelp,
 	}},
 }
 
+func runImport(env *command.Env, srcPath string, rest []string) error {
+	if importFlags.Target != "" && len(rest) != 0 {
+		return env.Usagef("only one path is allowed when --into is set")
+	}
+
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		if err := checkTarget(env, s, importFlags.Target); err != nil {
+			return err
+		}
+		keys := make([]string, len(env.Args))
+		for i, path := range env.Args {
+			if putConfig.Verbose {
+				log.Printf("begin put: %s", path)
+			}
+			f, err := putConfig.PutPath(env.Context(), s.Files(), path)
+			if err != nil {
+				return err
+			}
+			key, err := f.Flush(env.Context())
+			if err != nil {
+				return err
+			}
+			keys[i] = key
+			if putConfig.Verbose {
+				log.Printf("done put: %s (%s)", path, config.FormatKey(key))
+			}
+		}
+		for _, key := range keys {
+			fmt.Printf("put: %s\n", config.FormatKey(key))
+		}
+
+		if importFlags.Target != "" {
+			tf, err := file.Open(env.Context(), s.Files(), keys[0])
+			if err != nil {
+				return err
+			}
+			key, err := putlib.SetPath(env.Context(), s, importFlags.Target, tf)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("set: %s\n", config.FormatKey(key))
+		}
+		return nil
+	})
+}
+
 func runImportTar(env *command.Env, srcPath string, rest []string) error {
 	if importFlags.Target != "" && len(rest) != 0 {
 		return env.Usagef("only one path is allowed when --into is set")
@@ -77,6 +143,9 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		if err := checkTarget(env, s, importFlags.Target); err != nil {
+			return err
+		}
 		var lastRoot *file.File
 		for _, path := range env.Args {
 			tf, c, err := openTar(path)
@@ -152,6 +221,9 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		if err := checkTarget(env, s, importFlags.Target); err != nil {
+			return err
+		}
 		var lastRoot *file.File
 		for _, path := range env.Args {
 			zf, c, err := openZIP(path)
@@ -219,9 +291,11 @@ func tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file
 			GroupName: h.Gname,
 		},
 	})
-	//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
-	for name, value := range h.Xattrs {
-		nf.XAttr().Set(name, value)
+	if putConfig.XAttr {
+		//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
+		for name, value := range h.Xattrs {
+			nf.XAttr().Set(name, value)
+		}
 	}
 	if !fi.IsDir() {
 		if err := nf.SetData(ctx, r); err != nil {
@@ -303,7 +377,18 @@ func setDirStat(s *file.Stat) {
 }
 
 func logPrintf(msg string, args ...any) {
-	if importFlags.Verbose {
+	if putConfig.Verbose {
 		log.Printf(msg, args...)
 	}
+}
+
+func checkTarget(env *command.Env, s filetree.Store, target string) error {
+	if target != "" {
+		root, _ := filetree.SplitPath(target)
+		_, err := s.OpenPath(env.Context(), root)
+		if err != nil {
+			return fmt.Errorf("target %q: %w", target, err)
+		}
+	}
+	return nil
 }
