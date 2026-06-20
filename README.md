@@ -39,14 +39,14 @@ ffs storage --store file:test.db --listen demo.sock --exec bash -s <<EOF
   # Create a root pointer to anchor some data.
   ffs root create example --desc 'Example root pointer'
 
-  # Create some files to put into storage.
+  # Create some files to import into storage.
   mkdir -p files/sub
   echo "This is my file." > files/sub/f1.txt
   echo "Many others are like it" > files/sub/f2.txt
   echo "But this one is mine." > files/f3.txt
 
   # Copy the files directory into the store.
-  ffs put --into example/test1 files
+  ffs import --into example/test1 files
 
   # List the contents we just wrote...
   ffs file list -long example/test1
@@ -58,7 +58,7 @@ ffs storage --store file:test.db --listen demo.sock --exec bash -s <<EOF
   rm files/f3.txt
 
   # Add another copy of the structure.
-  ffs put -into example/test2 files
+  ffs import -into example/test2 files
 
   # List the revised contents...
   ffs file list -long example/test1
