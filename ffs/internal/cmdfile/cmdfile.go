@@ -242,9 +242,14 @@ func runShow(env *command.Env) error {
 				bits, _ := wiretype.ToBinary(msg)
 				os.Stdout.Write(bits)
 			} else {
-				fmt.Println(config.ToJSON(map[string]any{
-					"storageKey": []byte(of.FileKey),
-					"node":       msg.Value.(*wiretype.Object_Node).Node,
+				fmt.Println(config.ToJSON(struct {
+					S []byte `json:"storageKey"`
+					N any    `json:"node"`
+					H []byte `json:"dataHash,omitempty"`
+				}{
+					S: []byte(of.FileKey),
+					H: of.File.Data().Hash(),
+					N: msg.Value.(*wiretype.Object_Node).Node,
 				}))
 			}
 		}
