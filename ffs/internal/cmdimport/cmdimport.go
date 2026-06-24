@@ -53,7 +53,8 @@ var importFlags struct {
 }
 
 var Command = &command.C{
-	Name: "import",
+	Name:  "import",
+	Usage: "[flags] <local-path> ...\n[flags] <subcommand> ...",
 	Help: `Import one or more file trees from archives.
 
 Recursively copy each specified path from the local filesystem to the
@@ -75,7 +76,7 @@ special files are skipped.` + intoHelp,
 
 	Commands: []*command.C{{
 		Name:  "tar",
-		Usage: "<path> ...",
+		Usage: "<tar-file-path> ...",
 		Help: `Import file trees from Unix tape archive (tar) files.
 
 Paths ending in ".zst" or ".zstd" are automatically decompressed.
@@ -83,7 +84,7 @@ Use "-" for the path to read an (uncompressed) archive from stdin.` + intoHelp,
 		Run: command.Adapt(runImportTar),
 	}, {
 		Name:  "zip",
-		Usage: "<path> ...",
+		Usage: "<zip-file-path> ...",
 		Help:  `Import file trees from ZIP archive files.` + intoHelp,
 		Run:   command.Adapt(runImportZIP),
 	}},
