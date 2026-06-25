@@ -37,7 +37,7 @@ var zipFlags struct {
 var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}
 
 func runZipExport(env *command.Env, zipPath, originPath string) (retErr error) {
-	f, err := os.OpenFile(zipPath, os.O_RDWR|os.O_EXCL|os.O_TRUNC|os.O_CREATE, 0600)
+	f, err := os.OpenFile(zipPath, openFlags(), 0600)
 	if err != nil {
 		return fmt.Errorf("output: %w", err)
 	}

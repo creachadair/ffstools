@@ -53,7 +53,7 @@ func runTarExport(env *command.Env, originPath string, rest ...string) (retErr e
 	var w io.Writer
 	if exportFlags.Target == "" {
 		w = os.Stdout
-	} else if f, err := os.OpenFile(exportFlags.Target, os.O_RDWR|os.O_EXCL|os.O_TRUNC|os.O_CREATE, 0700); err != nil {
+	} else if f, err := os.OpenFile(exportFlags.Target, openFlags(), 0700); err != nil {
 		return fmt.Errorf("output: %w", err)
 	} else {
 		mc = append(mc, f.Close)

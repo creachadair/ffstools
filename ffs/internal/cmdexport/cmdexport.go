@@ -68,7 +68,8 @@ Export file trees to a tar archive.
 
 Recursively export the files indicated by the selected root or file storage keys to
 a tar stream. If --to is set, the output is written to that file, which is created
-if necessary; otherwise the output is written to stdout.
+if necessary; otherwise the output is written to stdout. Unless --update is set,
+the specified file name must not already exist.
 
 If --compress is true, or if the --to filename ends in ".zst" or ".zstd", the output
 is compressed with zstd.`,
@@ -83,7 +84,8 @@ is compressed with zstd.`,
 Export a file tree to a ZIP archive.
 
 Recursively export the file indicated by the selected root or file storage key
-to a ZIP archive in the specified file, which is created if necessary.`,
+to a ZIP archive in the specified file, which is created if necessary.
+Unless --update is set, the specified ZIP file name must not already exist.`,
 		SetFlags: command.Flags(flax.MustBind, &zipFlags),
 		Run:      command.Adapt(runZipExport),
 	}},
@@ -227,4 +229,12 @@ func dprintf(w io.Writer, msg string, args ...any) {
 		}
 		fmt.Fprintf(w, msg, args...)
 	}
+}
+
+func openFlags() int {
+	const base = os.O_RDWR | os.O_TRUNC | os.O_CREATE
+	if exportFlags.Update {
+		return base
+	}
+	return base | os.O_EXCL
 }
