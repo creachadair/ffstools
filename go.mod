@@ -9,7 +9,7 @@ require (
 	github.com/creachadair/boltstore v0.0.0-20260529185322-2634259a6e77
 	github.com/creachadair/buntdbstore v0.0.0-20260611024658-2054c868377e
 	github.com/creachadair/chirp v0.4.9
-	github.com/creachadair/chirpstore v0.0.0-20260626173137-a3a091e0f67d
+	github.com/creachadair/chirpstore v0.0.0-20260626180833-3eb3be1b3ba7
 	github.com/creachadair/command v0.2.6
 	github.com/creachadair/ffs v0.17.14
 	github.com/creachadair/ffuse v0.0.0-20260528154853-d8c1430e5b09

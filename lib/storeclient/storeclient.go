@@ -24,7 +24,7 @@
 //		   Substore: "foo",
 //		}
 //
-//	   s, err := a.Connect(context.Background())
+//	   s, err := a.Connect(context.Background(), nil)
 //
 // The context passed to [Address.Connect] is only used to dial and esablish
 // the store client. Once the client is created, the caller is responsible for
@@ -44,7 +44,6 @@ import (
 	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/filetree"
 )
 
 // Address is the representation of a store address.
@@ -106,23 +105,24 @@ func (a Address) dialPipe(ctx context.Context) (chirp.Channel, error) {
 	), nil
 }
 
-// Connect connects to the spefied address and returns a [filetree.Store].
-// The provided context governs only the connection and initialization of the
-// store, and not its lifecycle once created.
-func (a Address) Connect(ctx context.Context) (filetree.Store, error) {
+// Connect connects to the specfied address and returns a [blob.Store]
+// constructed using the provided options.  The provided context governs only
+// the connection and initialization of the store, and not its lifecycle once
+// created.
+func (a Address) Connect(ctx context.Context, opts *chirpstore.StoreOptions) (blob.Store, error) {
 	ch, err := a.Dial(ctx)
 	if err != nil {
-		return filetree.Store{}, err
+		return nil, err
 	}
 	peer := chirp.NewPeer().Start(ch)
-	bs := chirpstore.NewStore(peer, nil) // TODO(creachadair): Prefix support
-	var sub blob.Store = bs
+	cs := chirpstore.NewStore(peer, opts)
+	var out blob.Store = cs
 	if a.Substore != "" {
-		sub, err = bs.Sub(ctx, a.Substore)
+		out, err = cs.Sub(ctx, a.Substore)
 		if err != nil {
 			peer.Stop()
-			return filetree.Store{}, fmt.Errorf("open substore %q: %w", a.Substore, err)
+			return nil, fmt.Errorf("open substore %q: %w", a.Substore, err)
 		}
 	}
-	return filetree.NewStore(ctx, sub)
+	return out, nil
 }

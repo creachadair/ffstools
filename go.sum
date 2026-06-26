@@ -176,8 +176,8 @@ github.com/creachadair/buntdbstore v0.0.0-20260611024658-2054c868377e h1:AmfzjdG
 github.com/creachadair/buntdbstore v0.0.0-20260611024658-2054c868377e/go.mod h1:GpKfpuAOnqSHqVqduuq2ls8WXs0LrxPeB7r3Mw5ek/I=
 github.com/creachadair/chirp v0.4.9 h1:EWrcyrqzSoeP90p9xmYxmlF30x3dlzeXFFXBg2fM7Fs=
 github.com/creachadair/chirp v0.4.9/go.mod h1:PQwQxFDFaUkegRckml5r+RqwEtfMC3NxRkk9ddeJkgU=
-github.com/creachadair/chirpstore v0.0.0-20260626173137-a3a091e0f67d h1:UVMCZkFI8n/VSGCNbFv7HX/4FyB584liu7mBc7SVZIE=
-github.com/creachadair/chirpstore v0.0.0-20260626173137-a3a091e0f67d/go.mod h1:gxJqOKgn3VXkC3UTOfJz3RekXrw1tGa029k6Te7QO8M=
+github.com/creachadair/chirpstore v0.0.0-20260626180833-3eb3be1b3ba7 h1:unqy6L0yZRynA36pGIr9Fogl4ej2q6rQxbDlVOb3RbM=
+github.com/creachadair/chirpstore v0.0.0-20260626180833-3eb3be1b3ba7/go.mod h1:gxJqOKgn3VXkC3UTOfJz3RekXrw1tGa029k6Te7QO8M=
 github.com/creachadair/command v0.2.6 h1:+d4xUSZza5nqRVVsVRf5jDbix/0uKxVqFrc30F4uyRI=
 github.com/creachadair/command v0.2.6/go.mod h1:HWvS3zEpVakKlNXxT/j1U8tNoDaY7By7ORYQ+m1ha2U=
 github.com/creachadair/ffs v0.17.14 h1:WsE0mZDHoxDVhmorssv3RKMyuLPUjKCSA0sJyy7X85I=

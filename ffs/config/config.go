@@ -163,24 +163,22 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	a := storeclient.ParseAddress(spec.Address)
 	a.Substore = spec.Substore
 
-	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
+	var opts chirpstore.StoreOptions
 	if s.EnableDebugLogging {
+		lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 		lg.Printf("dial %q", spec.Address)
+		opts.PacketLogger = func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) }
 	}
 	if s.DialTimeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, s.DialTimeout.Duration())
 		defer cancel()
 	}
-	st, err := a.Connect(ctx)
+	st, err := a.Connect(ctx, &opts)
 	if err != nil {
 		return filetree.Store{}, err
 	}
-	if s.EnableDebugLogging {
-		peer := st.Base().(chirpstore.Store).Peer()
-		peer.LogPackets(func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
-	}
-	return st, nil
+	return filetree.NewStore(ctx, st)
 }
 
 // WithStore calls f with a store opened from the configuration. The store is
