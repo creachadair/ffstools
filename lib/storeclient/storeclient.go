@@ -118,11 +118,19 @@ func (a Address) Connect(ctx context.Context, opts *chirpstore.StoreOptions) (bl
 	cs := chirpstore.NewStore(peer, opts)
 	var out blob.Store = cs
 	if a.Substore != "" {
-		out, err = cs.Sub(ctx, a.Substore)
+		sub, err := cs.Sub(ctx, a.Substore)
 		if err != nil {
 			peer.Stop()
 			return nil, fmt.Errorf("open substore %q: %w", a.Substore, err)
 		}
+		out = subCloser{Store: sub, close: cs.Close}
 	}
 	return out, nil
 }
+
+type subCloser struct {
+	blob.Store
+	close func(context.Context) error
+}
+
+func (s subCloser) Close(ctx context.Context) error { return s.close(ctx) }
