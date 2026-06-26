@@ -21,21 +21,18 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"iter"
 	"log"
-	"net"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/creachadair/chirp"
-	"github.com/creachadair/chirp/channel"
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffstools/lib/storeclient"
 	"github.com/creachadair/mds/mstr"
 	yaml "gopkg.in/yaml.v3"
 )
@@ -163,73 +160,27 @@ func (s *Settings) OpenStore(ctx context.Context) (filetree.Store, error) {
 // openStoreAddress connects to the store service at addr.  The caller is
 // responsible for closing the store when it is no longer needed.
 func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetree.Store, error) {
+	a := storeclient.ParseAddress(spec.Address)
+	a.Substore = spec.Substore
+
 	lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 	if s.EnableDebugLogging {
 		lg.Printf("dial %q", spec.Address)
 	}
-	ch, err := s.dialAddress(ctx, spec)
-	if err != nil {
-		return filetree.Store{}, err
-	}
-	peer := chirp.NewPeer().Start(ch)
-	if s.EnableDebugLogging {
-		peer.LogPackets(func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
-	}
-	bs := chirpstore.NewStore(peer, &chirpstore.StoreOptions{
-		MethodPrefix: spec.Prefix,
-	})
-	var sub blob.Store = bs
-	if spec.Substore != "" {
-		sub, err = bs.Sub(ctx, spec.Substore)
-		if err != nil {
-			peer.Stop()
-			return filetree.Store{}, fmt.Errorf("open substore %q: %w", s.Substore, err)
-		}
-	}
-	return filetree.NewStore(ctx, sub)
-}
-
-func (s *Settings) dialAddress(ctx context.Context, spec StoreSpec) (chirp.Channel, error) {
-	fds, ok := strings.CutPrefix(spec.Address, "_pipe:")
-	if ok {
-		return s.dialPipe(ctx, fds)
-	}
-	var d net.Dialer
 	if s.DialTimeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, s.DialTimeout.Duration())
 		defer cancel()
 	}
-	net, addr := chirp.SplitAddress(spec.Address)
-	conn, err := d.DialContext(ctx, net, addr)
+	st, err := a.Connect(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("dialing store: %w", err)
+		return filetree.Store{}, err
 	}
-	return channel.IO(conn, conn), nil
-}
-
-func (s *Settings) dialPipe(ctx context.Context, fds string) (chirp.Channel, error) {
-	pr, pw, ok := strings.Cut(fds, ":")
-	if !ok {
-		return nil, errors.New("invalid pipe address")
+	if s.EnableDebugLogging {
+		peer := st.Base().(chirpstore.Store).Peer()
+		peer.LogPackets(func(pkt chirp.Packet, dir chirp.PacketDir) { lg.Printf("%s %v", dir, pkt) })
 	}
-	rfd, err := strconv.ParseInt(pr, 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid read descriptor: %w", err)
-	}
-	wfd, err := strconv.ParseInt(pw, 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid write descriptor: %w", err)
-	}
-	if !isDescriptorValid(uintptr(rfd)) {
-		return nil, fmt.Errorf("invalid read fd %d", rfd)
-	} else if !isDescriptorValid(uintptr(wfd)) {
-		return nil, fmt.Errorf("invalid write fd %d", wfd)
-	}
-	return channel.ConnectPipe(
-		os.NewFile(uintptr(rfd), "read-pipe"),
-		os.NewFile(uintptr(wfd), "write-pipe"),
-	), nil
+	return st, nil
 }
 
 // WithStore calls f with a store opened from the configuration. The store is

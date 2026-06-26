@@ -9,9 +9,9 @@ require (
 	github.com/creachadair/boltstore v0.0.0-20260529185322-2634259a6e77
 	github.com/creachadair/buntdbstore v0.0.0-20260611024658-2054c868377e
 	github.com/creachadair/chirp v0.4.9
-	github.com/creachadair/chirpstore v0.0.0-20260618010532-de6b1a85b778
+	github.com/creachadair/chirpstore v0.0.0-20260626173137-a3a091e0f67d
 	github.com/creachadair/command v0.2.6
-	github.com/creachadair/ffs v0.17.11
+	github.com/creachadair/ffs v0.17.14
 	github.com/creachadair/ffuse v0.0.0-20260528154853-d8c1430e5b09
 	github.com/creachadair/flax v0.0.6
 	github.com/creachadair/gcsstore v0.0.0-20260608155612-d1c2235450a9
@@ -78,7 +78,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.5 // indirect
 	github.com/cockroachdb/redact v1.1.8 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
-	github.com/creachadair/msync v0.8.4 // indirect
+	github.com/creachadair/msync v0.9.0 // indirect
 	github.com/dgraph-io/badger/v4 v4.9.1 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
