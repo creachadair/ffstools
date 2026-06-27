@@ -181,6 +181,8 @@ func (c ffsCache) Put(ctx context.Context, req gocache.Object) (diskPath string,
 	data, err := io.ReadAll(req.Body)
 	if err != nil {
 		return "", err
+	} else if int64(len(data)) != req.Size {
+		return "", fmt.Errorf("size mismatch: got %d bytes, want %d", len(data), req.Size)
 	}
 
 	req.Body = bytes.NewReader(data)
