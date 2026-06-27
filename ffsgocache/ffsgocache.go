@@ -190,6 +190,14 @@ func (c ffsCache) Put(ctx context.Context, req gocache.Object) (diskPath string,
 	if err != nil {
 		return "", err
 	}
+
+	// Special case: Do not bother storing zero-length outputs in the backing store.
+	// Such outputs are fairly common, and it's cheaper to let the toolchain recompute
+	// them than to store and fetch them. We'll still store them in the local cache.
+	if len(data) == 0 {
+		return diskPath, nil
+	}
+
 	c.start.Go(func() error {
 		fp := c.root.New(&file.NewOptions{
 			// Save the modification time to report back on Get, and since we are
