@@ -20,12 +20,14 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/pbar"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/taskgroup"
 )
@@ -94,9 +96,20 @@ func runMirror(env *command.Env) error {
 				defer cancel()
 				g, run := taskgroup.New(cancel).Limit(64)
 
+				var pb *pbar.Bar
+				n, err := src.Files().Len(ctx)
+				if err != nil {
+					return err
+				}
+				if n > 1000 {
+					pb = pbar.New(env, n).Start()
+					fmt.Fprintf(env, "Scanning %d objects...\n", n)
+				}
+
 				start := time.Now()
-				var numBatches, numBlobs int
-				err := forEachChunk(src.Sync().List(ctx, ""), 512, func(keys []string) error {
+				var numBatches, numBlobs, numCopied int64
+
+				if err := forEachChunk(src.Sync().List(ctx, ""), 512, func(keys []string) error {
 					if ctx.Err() != nil {
 						return ctx.Err()
 					}
@@ -107,20 +120,21 @@ func runMirror(env *command.Env) error {
 					numBatches++
 					for key := range need {
 						run(func() error {
+							defer func() { pb.SetMeta(atomic.AddInt64(&numCopied, 1)) }()
 							return copyBlob(env.Context(), src.Sync(), tgt.Sync(), key, true)
 						})
-						numBlobs++
 					}
-					numBlobs += len(need)
+					pb.Add(int64(len(keys)))
+					numBlobs += int64(len(need))
 					return nil
-				})
-				if err != nil {
-					return err
-				} else if err := g.Wait(); err != nil {
+				}); err != nil {
 					return err
 				}
-				fmt.Fprintf(env, "Copied %d objects (%d batches, %v elapsed)\n",
-					numBlobs, numBatches, time.Since(start).Truncate(time.Millisecond))
+				cerr := g.Wait()
+				pb.Stop()
+				fmt.Fprintf(env, "Copied %d objects (%d batches, %d objects, %v elapsed)\n",
+					numBlobs, numBatches, n, time.Since(start).Truncate(time.Millisecond))
+				return cerr
 			}
 			return nil
 		})
