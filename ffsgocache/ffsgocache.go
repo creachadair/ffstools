@@ -33,13 +33,16 @@ import (
 	"github.com/creachadair/taskgroup"
 )
 
-var flags struct {
+var flags = struct {
 	CacheDir     string `flag:"cache-dir,default=$FFS_GO_CACHE,Cache directory (required)"`
 	Store        string `flag:"store,default=$FFS_GO_STORE,Address of storage service (required)"`
 	RootName     string `flag:"root,default=$FFS_GO_ROOTNAME,Name of cache root (required)"`
+	Tasks        int    `flag:"nw,default=*,PRIVATE:Number of concurrent upload tasks"`
 	NoUpdate     bool   `flag:"no-update,Do not update the cache root at exit"`
 	PrintMetrics bool   `flag:"m,Print summary metrics to stderr at exit"`
 	Verbose      bool   `flag:"v,Enable verbose logging"`
+}{
+	Tasks: runtime.NumCPU(),
 }
 
 func main() {
@@ -110,14 +113,14 @@ func runCache(env *command.Env) error {
 	// Maintain a limited pool of goroutines for writing data back to the store.
 	g, start := taskgroup.New(func(err error) {
 		log.Printf("WARNING: writeback error: %v", err)
-	}).Limit(runtime.NumCPU())
+	}).Limit(flags.Tasks)
 	defer g.Wait()
 
 	fc := ffsCache{dir: cd, root: fp, start: start}
 	gc := &gocache.Server{
 		Get:         fc.Get,
 		Put:         fc.Put,
-		MaxRequests: runtime.NumCPU(),
+		MaxRequests: flags.Tasks,
 		Logf:        value.Cond(flags.Verbose, log.Printf, nil),
 	}
 	if err := gc.Run(env.Context(), os.Stdin, os.Stdout); err != nil {
