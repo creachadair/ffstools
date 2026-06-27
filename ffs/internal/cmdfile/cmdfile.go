@@ -312,7 +312,7 @@ func runList(env *command.Env) error {
 			name := path.Base(pi.Path)
 
 			// List contents of directories unless -d is set.
-			if of.Stat().Mode.IsDir() && !listFlags.DirOnly {
+			if (of.Child().Len() != 0 || of.Stat().Mode.IsDir()) && !listFlags.DirOnly {
 				for _, kid := range of.Child().Names() {
 					cf, err := of.Open(env.Context(), kid)
 					if err != nil {
