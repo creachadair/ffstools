@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"iter"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -81,6 +83,7 @@ root is also copied to the target.`,
 		},
 		{
 			Name:     "command-info",
+			Usage:    "[subcommand ... [--flag]]",
 			Help:     "Dump the command structure as JSON.",
 			SetFlags: command.Flags(flax.MustBind, &commandInfoFlags),
 			Run:      command.Adapt(runCommandInfo),
@@ -337,11 +340,34 @@ var commandInfoFlags struct {
 	All bool `flag:"a,Include unlisted commands and private flags"`
 }
 
-func runCommandInfo(env *command.Env) error {
+func runCommandInfo(env *command.Env, args []string) error {
 	cur := env
 	for cur.Parent != nil {
 		cur = cur.Parent
 	}
 	opts := value.Cond(commandInfoFlags.All, command.IncludeAll, command.IncludeCommands)
-	return json.NewEncoder(os.Stdout).Encode(cur.Command.Info(opts))
+	info := cur.Command.Info(opts)
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "-") {
+			if i+1 < len(args) {
+				return fmt.Errorf("extra arguments after flag %q: %q", arg, args[i+1:])
+			}
+			clean := strings.TrimLeft(arg, "-")
+			pos := slices.IndexFunc(info.Flags, func(f command.FlagInfo) bool {
+				return f.Name == clean
+			})
+			if pos < 0 {
+				return fmt.Errorf("command %q has no flag %q", info.Name, arg)
+			}
+			return json.NewEncoder(os.Stdout).Encode(info.Flags[pos])
+		}
+		pos := slices.IndexFunc(info.Commands, func(c *command.CInfo) bool {
+			return c.Name == arg
+		})
+		if pos < 0 {
+			return fmt.Errorf("command %q has no subcommand %q", info.Name, arg)
+		}
+		info = info.Commands[pos]
+	}
+	return json.NewEncoder(os.Stdout).Encode(info)
 }
