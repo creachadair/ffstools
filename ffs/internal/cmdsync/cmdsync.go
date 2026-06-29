@@ -37,13 +37,14 @@ import (
 )
 
 var syncFlags struct {
-	Target     string `flag:"to,Target store (required unless --from is set)"`
-	Source     string `flag:"from,Source store (required unless --to is set)"`
-	Verbose    bool   `flag:"v,Enable verbose logging"`
-	VVerbose   bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
-	NoIndex    bool   `flag:"no-index,Do not use cached indices"`
-	NoRoot     bool   `flag:"no-root,Do not copy referenced root pointers"`
-	RootPrefix string `flag:"root-prefix,Prefix target root names with this text"`
+	Target       string `flag:"to,Target store (required unless --from is set)"`
+	Source       string `flag:"from,Source store (required unless --to is set)"`
+	Verbose      bool   `flag:"v,Enable verbose logging"`
+	VVerbose     bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
+	NoIndex      bool   `flag:"no-index,Do not use cached indices"`
+	NoRoot       bool   `flag:"no-root,Do not copy referenced root pointers"`
+	RootPrefix   string `flag:"root-prefix,Prefix target root names with this text"`
+	RequireIndex bool   `flag:"require-index,Report an error if a specified root does not have an index"`
 }
 
 func debug(msg string, args ...any) {
@@ -109,7 +110,9 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 
 				scanStart := time.Now()
 				if of.Root != nil && of.Base == of.File {
-					if of.Root.IndexKey != "" && !syncFlags.NoIndex {
+					if syncFlags.RequireIndex && of.Root.IndexKey == "" {
+						return fmt.Errorf("missing required index for %q", elt)
+					} else if of.Root.IndexKey != "" && !syncFlags.NoIndex {
 						idx, err := src.LoadIndex(env.Context(), of.Root.IndexKey)
 						if err != nil {
 							return err
