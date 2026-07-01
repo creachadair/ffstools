@@ -16,6 +16,7 @@ package cmdexport
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -36,36 +37,45 @@ var zipFlags struct {
 
 var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}
 
-func runZipExport(env *command.Env, zipPath, originPath string) (retErr error) {
-	f, err := os.OpenFile(zipPath, openFlags(), 0600)
+func runZipExport(env *command.Env, originPaths ...string) (retErr error) {
+	if exportFlags.Target == "" {
+		return env.Usagef("missing required --to path")
+	}
+	f, err := os.OpenFile(exportFlags.Target, openFlags(), 0600)
 	if err != nil {
 		return fmt.Errorf("output: %w", err)
 	}
 	defer f.Close()
+	zw := zip.NewWriter(f)
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		of, err := s.OpenPath(env.Context(), originPath)
-		if err != nil {
-			return err
+		for _, originPath := range originPaths {
+			of, err := s.OpenPath(env.Context(), originPath)
+			if err != nil {
+				return err
+			}
+			root := of.File
+			if strings.Contains(originPath, "/") || zipFlags.Root != "" {
+				p := path.Join(zipFlags.Root, path.Base(originPath))
+				root = of.File.New(&file.NewOptions{Stat: dirStat})
+				if _, err := fpath.Set(env.Context(), root, p, &fpath.SetOptions{
+					Create:  true,
+					SetStat: func(s *file.Stat) { s.Mode = fs.ModeDir | 0755 },
+					File:    of.File,
+				}); err != nil {
+					return err
+				}
+			}
+			if werr := addFileToZip(env, zw, root); werr != nil {
+				zw.Close()
+				return fmt.Errorf("copy to archive: %w", werr)
+			}
 		}
-		root := of.File
-		if zipFlags.Root != "" {
-			root = of.File.New(&file.NewOptions{Stat: dirStat})
-			root.Child().Set(zipFlags.Root, of.File)
-		} else if strings.Contains(originPath, "/") {
-			root = of.File.New(&file.NewOptions{Stat: dirStat})
-			root.Child().Set(path.Base(originPath), of.File)
-		}
-
-		zw := zip.NewWriter(f)
-		if err := addFileToZip(env, zw, root); err != nil {
-			return fmt.Errorf("copy to archive: %w", err)
-		}
-		if err := zw.Close(); err != nil { // N.B. does not close f
+		if err := errors.Join(zw.Close(), f.Close()); err != nil {
 			return fmt.Errorf("finalize archive: %w", err)
 		}
-		return f.Close()
+		return nil
 	})
 }
 

@@ -78,10 +78,10 @@ is compressed with zstd.`,
 		Run:      command.Adapt(runTarExport),
 	}, {
 		Name: "zip",
-		Usage: `<zipfile> <root-key>[/path/...]
-<zipfile> @<file-key>[/path/...]`,
+		Usage: `--to <zipfile> <root-key>[/path/...] ...
+--to <zipfile> @<file-key>[/path/...] ...`,
 		Help: `
-Export a file tree to a ZIP archive.
+Export file trees to a ZIP archive.
 
 Recursively export the file indicated by the selected root or file storage key
 to a ZIP archive in the specified file, which is created if necessary.
