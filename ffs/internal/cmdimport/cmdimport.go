@@ -18,22 +18,17 @@ package cmdimport
 import (
 	"archive/tar"
 	"archive/zip"
-	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/flax"
@@ -155,49 +150,12 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 			}
 			logPrintf("begin import tar %q", path)
 
-			// Since the contents of a tar may not all be under the same
-			// directory, create a root directory to contain them all, so each
-			// import has its own file tree.
-			root := file.New(s.Files(), &file.NewOptions{
-				Stat: &file.Stat{
-					Mode:    fs.ModeDir | 0755,
-					ModTime: time.Now(),
-					OwnerID: os.Getuid(),
-					GroupID: os.Getgid(),
-				},
-				PersistStat: true,
-			})
-			for {
-				h, err := tf.Next()
-				if errors.Is(err, io.EOF) {
-					c.Close()
-					break
-				} else if err != nil {
-					c.Close()
-					return fmt.Errorf("input %q: %w", path, err)
-				}
-				hf, err := tarHeaderToFile(env.Context(), h, tf, root)
-				if err != nil {
-					c.Close()
-					return err
-				}
-				path := strings.TrimSuffix(h.Name, "/") // directory names end in "/"
-				if _, err := fpath.Set(env.Context(), root, path, &fpath.SetOptions{
-					Create:  true,
-					SetStat: setDirStat,
-					File:    hf,
-				}); err != nil {
-					c.Close()
-					return fmt.Errorf("set %q: %w", path, err)
-				}
-				logPrintf("+ imported %s %q", hf.Stat().Mode, path)
-			}
+			root, err := putConfig.ImportTar(env.Context(), s.Files(), tf)
 			c.Close()
-			key, err := root.Flush(env.Context())
 			if err != nil {
-				return err
+				return fmt.Errorf("input %q: %w", path, err)
 			}
-			fmt.Printf("import: %s\n", config.FormatKey(key))
+			fmt.Printf("import: %s\n", config.FormatKey(root.Key()))
 			lastRoot = root
 		}
 
@@ -256,33 +214,6 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 	})
 }
 
-func tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file.File) (*file.File, error) {
-	fi := h.FileInfo()
-	nf := root.New(&file.NewOptions{
-		Name: fi.Name(),
-		Stat: &file.Stat{
-			Mode:      fi.Mode(),
-			ModTime:   fi.ModTime(),
-			OwnerID:   h.Uid,
-			OwnerName: h.Uname,
-			GroupID:   h.Gid,
-			GroupName: h.Gname,
-		},
-	})
-	if putConfig.IncludeXAttr {
-		//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
-		for name, value := range h.Xattrs {
-			nf.XAttr().Set(name, value)
-		}
-	}
-	if !fi.IsDir() {
-		if err := nf.SetData(ctx, r); err != nil {
-			return nil, fmt.Errorf("set file data: %w", err)
-		}
-	}
-	return nf, nil
-}
-
 func openTar(path string) (*tar.Reader, io.Closer, error) {
 	var r io.Reader
 	var c io.Closer
@@ -321,13 +252,6 @@ func openZIP(path string) (*zip.Reader, io.Closer, error) {
 		return nil, nil, fmt.Errorf("input %q: %w", path, err)
 	}
 	return zr, f, nil
-}
-
-func setDirStat(s *file.Stat) {
-	s.Mode = fs.ModeDir | 0755
-	s.OwnerID = os.Getuid()
-	s.GroupID = os.Getgid()
-	s.ModTime = time.Now()
 }
 
 func logPrintf(msg string, args ...any) {
