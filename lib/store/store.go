@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 
@@ -61,10 +62,7 @@ func (r Registry) Open(ctx context.Context, addr string) (blob.StoreCloser, erro
 // Names returns a slice of the names of the storage implementations in r.
 // The slice is sorted.
 func (r Registry) Names() []string {
-	out := make([]string, 0, len(r))
-	for name := range r {
-		out = append(out, name)
-	}
+	out := slices.AppendSeq(make([]string, 0, len(r)), maps.Keys(r))
 	slices.Sort(out)
 	return out
 }
