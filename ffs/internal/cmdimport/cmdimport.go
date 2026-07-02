@@ -105,7 +105,7 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			if putConfig.Verbose {
 				log.Printf("begin put: %s", path)
 			}
-			f, err := putConfig.PutPath(env.Context(), s.Files(), path)
+			f, err := putConfig.ImportPath(env.Context(), s.Files(), path)
 			if err != nil {
 				return err
 			}

@@ -65,12 +65,12 @@ type state struct {
 	fs     fs.FS
 }
 
-// PutFile puts a single file or symlink into the store.
-func (c Config) PutFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
-	return c.putFile(ctx, state{s: s, path: path, fi: fi, fs: c.getFS()})
+// ImportFile imports a single regular file or symlink into the store.
+func (c Config) ImportFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
+	return c.importFile(ctx, state{s: s, path: path, fi: fi, fs: c.getFS()})
 }
 
-func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
+func (c Config) importFile(ctx context.Context, st state) (*file.File, error) {
 	f := file.New(st.s, c.fileInfoToOptions(st.fi))
 
 	// Extended attributes (if --xattr is set)
@@ -101,13 +101,13 @@ func (c Config) putFile(ctx context.Context, st state) (*file.File, error) {
 	return f, nil
 }
 
-// PutPath puts a single file, directory, or symlink into the store.  If path
-// names a plain file or symlink, it calls PutFile.
-func (c Config) PutPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
-	return c.putPath(ctx, state{s: s, path: path, fs: c.getFS()})
+// ImportPath imports a single file, directory, or symlink into the store.
+// If path names a plain file or symlink, it calls [Config.ImportFile].
+func (c Config) ImportPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
+	return c.importPath(ctx, state{s: s, path: path, fs: c.getFS()})
 }
 
-func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
+func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
 	fi, err := fs.Lstat(st.fs, st.path)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 	if !fi.IsDir() {
 		// Non-directory files, symlinks, etc.
 		st.fi = fi
-		return c.putFile(ctx, st)
+		return c.importFile(ctx, st)
 	}
 
 	// Directory
@@ -184,7 +184,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 		cp := st
 		cp.path, cp.filter = e.sub, filt
 
-		kid, err := c.putPath(ctx, cp)
+		kid, err := c.importPath(ctx, cp)
 		if err != nil {
 			return nil, err
 		}
@@ -208,7 +208,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 						}()
 					}
 				}
-				kid, err := c.putFile(ctx, state{
+				kid, err := c.importFile(ctx, state{
 					s: st.s, path: e.sub, fi: e.fi, filter: filt, fs: c.getFS(),
 				})
 				if err != nil {

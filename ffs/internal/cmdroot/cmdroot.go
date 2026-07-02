@@ -242,7 +242,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fk = tf.File.Key()
 		case "put":
-			tf, terr := importlib.Default.PutPath(env.Context(), s.Files(), rest[0])
+			tf, terr := importlib.Default.ImportPath(env.Context(), s.Files(), rest[0])
 			if terr != nil {
 				return terr
 			}
