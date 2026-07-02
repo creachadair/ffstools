@@ -122,7 +122,7 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return err
 			}
-			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, tf)
+			key, err := s.SetPath(env.Context(), importFlags.Target, tf)
 			if err != nil {
 				return err
 			}
@@ -163,7 +163,7 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 		// (because we checked that at the top) and lastRoot is its root (or else
 		// we would not have gotten here).
 		if importFlags.Target != "" {
-			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
+			key, err := s.SetPath(env.Context(), importFlags.Target, lastRoot)
 			if err != nil {
 				return err
 			}
@@ -204,7 +204,7 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 		// (because we checked that at the top) and lastRoot is its root (or else
 		// we would not have gotten here).
 		if importFlags.Target != "" {
-			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
+			key, err := s.SetPath(env.Context(), importFlags.Target, lastRoot)
 			if err != nil {
 				return err
 			}
