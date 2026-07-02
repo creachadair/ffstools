@@ -66,8 +66,8 @@ Symbolic links are captured, but devices, sockets, FIFO, and other
 special files are skipped.` + intoHelp,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
-		fs.BoolVar(&putConfig.NoStat, "nostat", false, "Omit file and directory stat")
-		fs.BoolVar(&putConfig.XAttr, "xattr", false, "Capture extended attributes")
+		fs.BoolVar(&putConfig.OmitStat, "nostat", false, "Omit file and directory stat")
+		fs.BoolVar(&putConfig.IncludeXAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
 		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
 		flax.MustBind(fs, &importFlags)
@@ -292,7 +292,7 @@ func tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file
 			GroupName: h.Gname,
 		},
 	})
-	if putConfig.XAttr {
+	if putConfig.IncludeXAttr {
 		//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
 		for name, value := range h.Xattrs {
 			nf.XAttr().Set(name, value)

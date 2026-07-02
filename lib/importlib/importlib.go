@@ -38,10 +38,10 @@ var Default = Config{FilterName: ".ffsignore"}
 
 // Config carries settings for storing files into an FFS store.
 type Config struct {
-	Verbose    bool   // emit diagnostic output
-	XAttr      bool   // capture extended attributes
-	NoStat     bool   // do not capture stat metadata
-	FilterName string // name of filter file to read
+	Verbose      bool   // emit diagnostic output
+	IncludeXAttr bool   // capture extended attributes
+	OmitStat     bool   // do not capture stat metadata
+	FilterName   string // name of filter file to read
 
 	// A filesystem implementation to read from, or nil.
 	// If it is nil, the config uses the standard library's [os] package.
@@ -232,7 +232,7 @@ func (c Config) putPath(ctx context.Context, st state) (*file.File, error) {
 }
 
 func (c Config) addExtAttrs(st state, f *file.File) error {
-	if !c.XAttr {
+	if !c.IncludeXAttr {
 		return nil
 	}
 	xfs, ok := st.fs.(XAttrFS)
@@ -255,7 +255,7 @@ func (c Config) addExtAttrs(st state, f *file.File) error {
 }
 
 func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
-	if c.NoStat {
+	if c.OmitStat {
 		return &file.NewOptions{Name: fi.Name()} // PersistStat == false
 	}
 	owner, group := ownerAndGroup(fi)
