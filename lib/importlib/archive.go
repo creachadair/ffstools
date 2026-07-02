@@ -15,9 +15,12 @@
 package importlib
 
 import (
+	"archive/tar"
 	"archive/zip"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"strings"
@@ -81,4 +84,81 @@ func zipHeaderToFile(ctx context.Context, f *zip.File, root *file.File) (*file.F
 		return nf, nf.SetData(ctx, rc)
 	}
 	return nf, nil
+}
+
+// ImportTar imports the complete contents of tr into a new file tree in s, and
+// returns the root of that tree. On success, the resulting root is flushed to
+// storage, so its [File.Key] method will report the storage key.
+func (c Config) ImportTar(ctx context.Context, s blob.CAS, tr *tar.Reader) (*file.File, error) {
+	// Since the contents of a tar may not all be under the same
+	// directory, create a root directory to contain them all, so each
+	// import has its own file tree.
+	root := file.New(s, &file.NewOptions{
+		Stat: &file.Stat{
+			Mode:    fs.ModeDir | 0755,
+			ModTime: time.Now(),
+			OwnerID: os.Getuid(),
+			GroupID: os.Getgid(),
+		},
+		PersistStat: !c.OmitStat,
+	})
+	for {
+		h, err := tr.Next()
+		if errors.Is(err, io.EOF) {
+			break // OK, the archive is ended
+		} else if err != nil {
+			return nil, err
+		}
+		hf, err := c.tarHeaderToFile(ctx, h, tr, root)
+		if err != nil {
+			return nil, err
+		}
+		path := strings.TrimSuffix(h.Name, "/") // directory names end in "/"
+		if _, err := fpath.Set(ctx, root, path, &fpath.SetOptions{
+			Create:  true,
+			SetStat: setDirStat,
+			File:    hf,
+		}); err != nil {
+			return nil, fmt.Errorf("set %q: %w", path, err)
+		}
+		c.logPrintf("+ imported %s %q", hf.Stat().Mode, path)
+	}
+	if _, err := root.Flush(ctx); err != nil {
+		return nil, err
+	}
+	return root, nil
+}
+
+func (c Config) tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file.File) (*file.File, error) {
+	fi := h.FileInfo()
+	nf := root.New(&file.NewOptions{
+		Name: fi.Name(),
+		Stat: &file.Stat{
+			Mode:      fi.Mode(),
+			ModTime:   fi.ModTime(),
+			OwnerID:   h.Uid,
+			OwnerName: h.Uname,
+			GroupID:   h.Gid,
+			GroupName: h.Gname,
+		},
+	})
+	if c.IncludeXAttr {
+		//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
+		for name, value := range h.Xattrs {
+			nf.XAttr().Set(name, value)
+		}
+	}
+	if !fi.IsDir() {
+		if err := nf.SetData(ctx, r); err != nil {
+			return nil, fmt.Errorf("set file data: %w", err)
+		}
+	}
+	return nf, nil
+}
+
+func setDirStat(s *file.Stat) {
+	s.Mode = fs.ModeDir | 0755
+	s.OwnerID = os.Getuid()
+	s.GroupID = os.Getgid()
+	s.ModTime = time.Now()
 }
