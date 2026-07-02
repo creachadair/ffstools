@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/creachadair/command"
@@ -101,8 +102,8 @@ type mcloser []func() error
 
 func (m mcloser) Close() error {
 	var errs []error
-	for i := len(m) - 1; i >= 0; i-- {
-		if err := m[i](); err != nil {
+	for _, close := range slices.Backward(m) {
+		if err := close(); err != nil {
 			errs = append(errs, err)
 		}
 	}
