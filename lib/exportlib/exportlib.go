@@ -7,6 +7,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -195,9 +196,13 @@ type lyingFileInfo struct{ fs.FileInfo }
 func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
 
-// ExportToOS recursively exports the contents of tree into the specified
-// outputPath in the native filesystem.
-func (c Config) ExportToOS(ctx context.Context, tree *filetree.PathInfo, outputPath string) error {
+// ExportToOS recursively exports the contents of tree into the specified root
+// in the native filesystem. It will report an error if c.Root == "".
+func (c Config) ExportToOS(ctx context.Context, tree *filetree.PathInfo) error {
+	outputPath := c.Root
+	if outputPath == "" {
+		return errors.New("empty output path not allowed")
+	}
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())
