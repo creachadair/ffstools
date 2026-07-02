@@ -20,19 +20,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"slices"
-	"strings"
 
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/mds/value"
 	"github.com/klauspost/compress/zstd"
 )
 
@@ -81,16 +75,13 @@ func runTarExport(env *command.Env, originPath string, rest ...string) (retErr e
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		ec := exportConfig(env, tarFlags.Root)
 		for _, originPath := range env.Args {
 			of, err := s.OpenPath(env.Context(), originPath)
 			if err != nil {
 				return err
 			}
-			tdir := tarFlags.Root
-			if strings.Contains(originPath, "/") {
-				tdir = path.Join(tdir, path.Base(originPath))
-			}
-			if err := addFileToTar(env, tw, of.File, tdir); err != nil {
+			if err := ec.FileToTar(env.Context(), of, tw); err != nil {
 				return fmt.Errorf("export %q: %w", originPath, err)
 			}
 		}
@@ -109,78 +100,3 @@ func (m mcloser) Close() error {
 	}
 	return errors.Join(errs...)
 }
-
-// addFile is a demi-clone of [tar.Writer.AddFS], but with less OS-specific nonsense.
-func addFileToTar(env *command.Env, tw *tar.Writer, root *file.File, prefix string) error {
-	return fpath.Walk(env.Context(), root, func(e fpath.Entry) error {
-		if err := env.Context().Err(); err != nil {
-			return err
-		} else if e.Err != nil {
-			return e.Err
-		} else if e.File == root {
-			return nil // skip
-		}
-		fi := e.File.FileInfo()
-		dprintf(env, "a %s", path.Join(prefix, e.Path))
-
-		// If this is a symlink, read the "file" contents out as the target.
-		var linkTarget string
-		if fi.Mode().Type() == fs.ModeSymlink {
-			link, err := io.ReadAll(e.File.Cursor(env.Context()))
-			if err != nil {
-				return fmt.Errorf("read symlink: %w", err)
-			}
-			linkTarget = string(link)
-			dprintf(env, "  link to %q", linkTarget)
-		}
-
-		// This does a bunch of nonsense we don't care about, but it handles the
-		// ustar-specific encoding of file type bits that would be annoying to copy.
-		// We'll adjust some of the results before writing the header, see below.
-		h, err := tar.FileInfoHeader(lyingFileInfo{fi}, linkTarget)
-		if err != nil {
-			return err
-		}
-
-		// Replace the base name with the full path, including the prefix (if any).
-		h.Name = path.Join(prefix, e.Path)
-		if fi.Mode().IsDir() {
-			h.Name += "/" // suffix directories with "/"
-		}
-
-		// Populate the owner and group IDs, as otherwise they will default to 0
-		// and that makes the tar annoying to read when unpacked.
-		fs := e.File.Stat()
-		h.Uid = fs.OwnerID
-		h.Uname = fs.OwnerName
-		h.Gid = fs.GroupID
-		h.Gname = fs.GroupName
-
-		// If there are extended attributes, and we were asked to preserve them, do.
-		if xa := e.File.XAttr(); xa.Len() != 0 && exportFlags.XAttr {
-			dprintf(env, "  + %d extended attribute%s", xa.Len(), value.Cond(xa.Len() == 1, "", "s"))
-			m := make(map[string]string)
-			for _, name := range xa.Names() {
-				m[name] = xa.Get(name)
-			}
-			//lint:ignore SA1019 This field is supposedly deprecated, but Go 1 protects us.
-			h.Xattrs = m
-		}
-		if err := tw.WriteHeader(h); err != nil {
-			return err
-		}
-		if fi.Mode().IsRegular() {
-			_, err := io.Copy(tw, e.File.Cursor(env.Context()))
-			return err
-		}
-		return nil
-	})
-}
-
-// lyingFileInfo pretends to implement the [tar.FileInfoNames] interface so
-// that the header constructor won't try to do name lookups on the system.
-// But it just reports empty names, since we can fill those ourselves.
-type lyingFileInfo struct{ fs.FileInfo }
-
-func (lyingFileInfo) Uname() (string, error) { return "", nil }
-func (lyingFileInfo) Gname() (string, error) { return "", nil }

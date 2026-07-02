@@ -224,7 +224,7 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 }
 
 func exportConfig(env *command.Env, root string) exportlib.Config {
-	ec := exportlib.Config{Root: root}
+	ec := exportlib.Config{Root: root, IncludeXAttr: exportFlags.XAttr}
 	if exportFlags.Verbose {
 		ec.DebugOutput = env
 	}
