@@ -28,6 +28,7 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -139,17 +140,18 @@ func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
 
 	// Precheck for filter rules.
 	filt := st.filter
-	for _, elt := range elts {
-		if elt.Name() == c.FilterName {
+	if c.FilterName != "" {
+		elt, ok := slice.Find(elts, func(e fs.DirEntry) bool {
+			return e.Name() == c.FilterName
+		})
+		if ok {
 			sub := filepath.Join(st.path, elt.Name())
 			nf, err := filt.LoadFile(sub)
 			if err != nil {
 				return nil, fmt.Errorf("loading filter: %w", err)
-			} else if c.Verbose {
-				log.Printf("load filter rules: %s", sub)
 			}
+			c.logPrintf("load filter rules: %s", sub)
 			filt = nf
-			break
 		}
 	}
 
@@ -158,9 +160,7 @@ func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
 	for _, elt := range elts {
 		sub := filepath.Join(st.path, elt.Name())
 		if filt.Exclude(sub) {
-			if c.Verbose {
-				log.Printf("skip (filtered): %s", sub)
-			}
+			c.logPrintf("skip (filtered): %s", sub)
 			continue
 		} else if elt.IsDir() {
 			dirs = append(dirs, &entry{sub: sub, name: elt.Name()})
@@ -172,9 +172,7 @@ func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
 			files = append(files, &entry{sub: sub, name: elt.Name(), fi: fi})
 		}
 	}
-	if c.Verbose {
-		log.Printf("dir: %s (%d files, %d dirs)", st.path, len(files), len(dirs))
-	}
+	c.logPrintf("dir: %s (%d files, %d dirs)", st.path, len(files), len(dirs))
 
 	// Process subdirectories serially. We do this so that the recurrence does
 	// not explode concurrency.
