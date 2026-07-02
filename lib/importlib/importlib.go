@@ -19,7 +19,6 @@ package importlib
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"io/fs"
 	"log"
@@ -29,8 +28,6 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
-	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -275,55 +272,4 @@ func (c Config) fileInfoToOptions(fi fs.FileInfo) *file.NewOptions {
 		},
 		PersistStat: true,
 	}
-}
-
-// SetPath sets the specified root-key/path or file-key/path to the given
-// target file. It returns the storage key of the resulting updated object.
-//
-// If path has only a root-key, the base file of that root is replaced.
-// If path has only a file-key (and no subpath), it is an error.
-func SetPath(ctx context.Context, s filetree.Store, path string, tf *file.File) (string, error) {
-	obase, orest := filetree.SplitPath(path)
-	if orest == "." {
-		orest = "" // setting root
-	}
-
-	of, err := s.OpenPath(ctx, obase) // N.B. No path; see below
-	if err != nil {
-		return "", err
-	}
-
-	// If orest == "", we are being asked to the target file of a root.
-	if orest == "" {
-		// If we don't have a root, we can't do anything.
-		if of.Root == nil {
-			return "", errors.New("cannot set the root of a file-key")
-		}
-
-		// Otherwise, flush the file and update the root.
-		key, err := tf.Flush(ctx)
-		if err != nil {
-			return "", err
-		}
-		if key != of.Root.FileKey {
-			of.Root.IndexKey = "" // invalidate the index, the key changed
-		}
-		of.Root.FileKey = key
-		return key, of.Root.Save(ctx, of.RootKey)
-	}
-
-	// Otherwise, we're hooking something below another object.
-	if _, err := fpath.Set(ctx, of.Base, orest, &fpath.SetOptions{
-		Create: true,
-		SetStat: func(st *file.Stat) {
-			if st.Mode == 0 {
-				st.Mode = fs.ModeDir | 0755
-			}
-		},
-		File: tf,
-	}); err != nil {
-		return "", err
-	}
-
-	return of.Flush(ctx)
 }
