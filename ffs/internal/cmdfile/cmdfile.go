@@ -39,7 +39,7 @@ import (
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/lib/putlib"
+	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
@@ -478,7 +478,7 @@ func runSet(env *command.Env, originPath, target string) error {
 		if err != nil {
 			return err
 		}
-		key, err := putlib.SetPath(env.Context(), s, originPath, tf.File)
+		key, err := importlib.SetPath(env.Context(), s, originPath, tf.File)
 		if err != nil {
 			return err
 		}

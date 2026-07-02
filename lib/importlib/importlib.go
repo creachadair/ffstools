@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package putlib implements common plumbing for copying file trees from a
+// Package import implements common plumbing for copying file trees from a
 // local filesystem into FFS representation.
-package putlib
+package importlib
 
 import (
 	"bufio"

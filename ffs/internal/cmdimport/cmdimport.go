@@ -35,7 +35,7 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/lib/putlib"
+	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/flax"
 	"github.com/klauspost/compress/zstd"
 )
@@ -46,7 +46,7 @@ With --into, the resulting file tree is stored under the specified path
 of the form <root-key>/<path> or @<file-key>/<path>. In this form, only
 one input path is allowed.`
 
-var putConfig putlib.Config
+var putConfig importlib.Config
 
 var importFlags struct {
 	Target string `flag:"into,Store the resulting object under this root/path or file/path"`
@@ -127,7 +127,7 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return err
 			}
-			key, err := putlib.SetPath(env.Context(), s, importFlags.Target, tf)
+			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, tf)
 			if err != nil {
 				return err
 			}
@@ -205,7 +205,7 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 		// (because we checked that at the top) and lastRoot is its root (or else
 		// we would not have gotten here).
 		if importFlags.Target != "" {
-			key, err := putlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
+			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
 			if err != nil {
 				return err
 			}
@@ -269,7 +269,7 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 		// (because we checked that at the top) and lastRoot is its root (or else
 		// we would not have gotten here).
 		if importFlags.Target != "" {
-			key, err := putlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
+			key, err := importlib.SetPath(env.Context(), s, importFlags.Target, lastRoot)
 			if err != nil {
 				return err
 			}

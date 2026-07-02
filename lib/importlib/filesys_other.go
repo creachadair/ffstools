@@ -1,6 +1,6 @@
 //go:build !windows
 
-package putlib
+package importlib
 
 import (
 	"io/fs"

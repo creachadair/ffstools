@@ -1,4 +1,4 @@
-package putlib
+package importlib
 
 import "io/fs"
 

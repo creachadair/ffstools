@@ -30,7 +30,7 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/ffstools/lib/putlib"
+	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/flax"
 )
 
@@ -242,7 +242,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			}
 			fk = tf.File.Key()
 		case "put":
-			tf, terr := putlib.Default.PutPath(env.Context(), s.Files(), rest[0])
+			tf, terr := importlib.Default.PutPath(env.Context(), s.Files(), rest[0])
 			if terr != nil {
 				return terr
 			}
