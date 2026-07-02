@@ -5,17 +5,25 @@ package exportlib
 import (
 	"archive/tar"
 	"archive/zip"
+	"bufio"
 	"context"
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	"path"
+	"path/filepath"
+	"runtime"
 	"strings"
+	"time"
 
+	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/mds/value"
+	"github.com/creachadair/taskgroup"
+	"github.com/pkg/xattr"
 )
 
 var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}
@@ -25,6 +33,8 @@ var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}
 type Config struct {
 	Root         string    // prefix output paths with this directory
 	IncludeXAttr bool      // include extended attributes, if possible
+	OmitStat     bool      // omit permissions and modification times
+	Update       bool      // update or replace existing targets
 	DebugOutput  io.Writer // write detailed debug output here
 }
 
@@ -37,7 +47,7 @@ func (c Config) dprintf(msg string, args ...any) {
 	}
 }
 
-// FileToZIP recursively exports the complete contents of tree into zw.
+// FileToZIP recursively exports the contents of tree into zw.
 func (c Config) FileToZIP(ctx context.Context, tree *filetree.PathInfo, zw *zip.Writer) error {
 	root := tree.File
 	if strings.Contains(tree.Path, "/") || c.Root != "" {
@@ -184,3 +194,120 @@ type lyingFileInfo struct{ fs.FileInfo }
 
 func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
+
+// FileToOS recursively exports the contents of tree into the specified
+// outputPath in the native filesystem.
+func (c Config) FileToOS(ctx context.Context, tree *filetree.PathInfo, outputPath string) error {
+	cctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())
+
+	// We have to update directory timestamps after their contents are
+	// unpacked, otherwise the results are overwritten.
+	dirs := make(map[string]*file.File)
+	g.Go(func() error {
+		return fpath.Walk(cctx, tree.File, func(e fpath.Entry) error {
+			if err := cctx.Err(); err != nil {
+				return err
+			}
+
+			opath := filepath.Join(outputPath, filepath.FromSlash(e.Path))
+			if fs := e.File.Stat(); !fs.Mode.IsDir() {
+				start(func() error {
+					return c.exportFile(cctx, e.File, opath)
+				})
+				return nil
+			} else if !c.OmitStat && fs.Persistent() {
+				dirs[opath] = e.File
+			}
+			return c.exportFile(cctx, e.File, opath)
+		})
+	})
+	if err := g.Wait(); err != nil {
+		return err
+	}
+	for path, dir := range dirs {
+		start(func() error {
+			stat := dir.Stat()
+			c.dprintf("+ update dir %q set mtime %v", path, stat.ModTime.Format(time.RFC3339))
+			return os.Chtimes(path, stat.ModTime, stat.ModTime)
+		})
+	}
+	return g.Wait()
+}
+
+func (c Config) exportFile(ctx context.Context, f *file.File, path string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	mode := f.Stat().Mode
+	var link bool
+	if mode.IsDir() {
+		c.dprintf("create directory %q", path)
+		if err := os.Mkdir(path, 0700); err != nil {
+			if !c.Update || !os.IsExist(err) {
+				return err
+			}
+		}
+	} else if mode.Type()&fs.ModeSymlink != 0 {
+		c.dprintf("write symlink %q", path)
+		if err := linkFile(ctx, f, path); err != nil {
+			return err
+		}
+		link = true
+	} else {
+		if !c.Update {
+			_, err := os.Lstat(path)
+			if err == nil {
+				return fmt.Errorf("file %q exists", path)
+			}
+		}
+		nw, err := copyFile(ctx, f, path)
+		if err != nil {
+			return err
+		}
+		c.dprintf("write file %q (%d bytes)", path, nw)
+	}
+
+	// Restore permissions and modification times, if requested and available.
+	if !c.OmitStat && f.Stat().Persistent() && !link {
+		stat := f.Stat()
+		c.dprintf("- set mode %v, mtime %v", stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
+
+		if err := os.Chmod(path, stat.Mode); err != nil {
+			return fmt.Errorf("setting permissions: %w", err)
+		}
+		if !mode.IsDir() {
+			if err := os.Chtimes(path, stat.ModTime, stat.ModTime); err != nil {
+				return fmt.Errorf("setting modtime: %w", err)
+			}
+		}
+		// TODO(creachadair): Maybe set owner/group?
+	}
+
+	// Restore extended attributes if requested.
+	if c.IncludeXAttr {
+		xa := f.XAttr()
+		for _, key := range xa.Names() {
+			val := xa.Get(key)
+			c.dprintf("- set xattr %q (%d bytes)", key, len(val))
+			if xerr := xattr.LSet(path, key, []byte(val)); xerr != nil {
+				return fmt.Errorf("setting xattrs %q: %w", key, xerr)
+			}
+		}
+	}
+	return nil
+}
+
+func copyFile(ctx context.Context, f *file.File, path string) (int64, error) {
+	r := bufio.NewReaderSize(f.Cursor(ctx), 1<<20)
+	return atomicfile.WriteAll(path, r, 0600)
+}
+
+func linkFile(ctx context.Context, f *file.File, path string) error {
+	target, err := io.ReadAll(f.Cursor(ctx))
+	if err != nil {
+		return fmt.Errorf("reading link target: %w", err)
+	}
+	return os.Symlink(string(target), path)
+}
