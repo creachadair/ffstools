@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package import implements common plumbing for copying file trees from a
+// Package importlib implements common plumbing for copying file trees from a
 // local filesystem into FFS representation.
 package importlib
 
@@ -55,6 +55,12 @@ func (c Config) getFS() fs.ReadDirFS {
 		return osFS{}
 	}
 	return c.FS
+}
+
+func (c Config) logPrintf(msg string, args ...any) {
+	if c.Verbose {
+		log.Printf(msg, args...)
+	}
 }
 
 type state struct {
