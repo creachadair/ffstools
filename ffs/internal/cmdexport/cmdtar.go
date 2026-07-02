@@ -81,7 +81,7 @@ func runTarExport(env *command.Env, originPath string, rest ...string) (retErr e
 			if err != nil {
 				return err
 			}
-			if err := ec.FileToTar(env.Context(), of, tw); err != nil {
+			if err := ec.ExportToTar(env.Context(), of, tw); err != nil {
 				return fmt.Errorf("export %q: %w", originPath, err)
 			}
 		}

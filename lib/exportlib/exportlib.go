@@ -47,8 +47,8 @@ func (c Config) dprintf(msg string, args ...any) {
 	}
 }
 
-// FileToZIP recursively exports the contents of tree into zw.
-func (c Config) FileToZIP(ctx context.Context, tree *filetree.PathInfo, zw *zip.Writer) error {
+// ExportToZIP recursively exports the contents of tree into zw.
+func (c Config) ExportToZIP(ctx context.Context, tree *filetree.PathInfo, zw *zip.Writer) error {
 	root := tree.File
 	if strings.Contains(tree.Path, "/") || c.Root != "" {
 		p := path.Join(c.Root, path.Base(tree.Path))
@@ -113,8 +113,8 @@ func fileType(fi fs.FileInfo) string {
 	return "other"
 }
 
-// FileToTar recursively exports the contents of tree to tw.
-func (c Config) FileToTar(ctx context.Context, tree *filetree.PathInfo, tw *tar.Writer) error {
+// ExportToTar recursively exports the contents of tree to tw.
+func (c Config) ExportToTar(ctx context.Context, tree *filetree.PathInfo, tw *tar.Writer) error {
 	tdir := c.Root
 	if strings.Contains(tree.Path, "/") {
 		tdir = path.Join(tdir, path.Base(tree.Path))
@@ -195,9 +195,9 @@ type lyingFileInfo struct{ fs.FileInfo }
 func (lyingFileInfo) Uname() (string, error) { return "", nil }
 func (lyingFileInfo) Gname() (string, error) { return "", nil }
 
-// FileToOS recursively exports the contents of tree into the specified
+// ExportToOS recursively exports the contents of tree into the specified
 // outputPath in the native filesystem.
-func (c Config) FileToOS(ctx context.Context, tree *filetree.PathInfo, outputPath string) error {
+func (c Config) ExportToOS(ctx context.Context, tree *filetree.PathInfo, outputPath string) error {
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())

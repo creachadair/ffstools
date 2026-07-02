@@ -96,7 +96,7 @@ func runExport(env *command.Env, originPath string) error {
 			return err
 		}
 		ec := exportConfig(env, "") // root is not used here
-		return ec.FileToOS(env.Context(), of, exportFlags.Target)
+		return ec.ExportToOS(env.Context(), of, exportFlags.Target)
 	})
 }
 

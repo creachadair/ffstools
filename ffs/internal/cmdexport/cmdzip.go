@@ -48,7 +48,7 @@ func runZipExport(env *command.Env, originPaths ...string) (retErr error) {
 			if err != nil {
 				return err
 			}
-			if werr := ec.FileToZIP(env.Context(), of, zw); werr != nil {
+			if werr := ec.ExportToZIP(env.Context(), of, zw); werr != nil {
 				zw.Close()
 				return fmt.Errorf("copy to archive: %w", err)
 			}
