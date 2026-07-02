@@ -68,11 +68,6 @@ type state struct {
 	fs     fs.FS
 }
 
-// ImportFile imports a single regular file or symlink into the store.
-func (c Config) ImportFile(ctx context.Context, s blob.CAS, path string, fi fs.FileInfo) (*file.File, error) {
-	return c.importFile(ctx, state{s: s, path: path, fi: fi, fs: c.getFS()})
-}
-
 func (c Config) importFile(ctx context.Context, st state) (*file.File, error) {
 	f := file.New(st.s, c.fileInfoToOptions(st.fi))
 
@@ -105,7 +100,7 @@ func (c Config) importFile(ctx context.Context, st state) (*file.File, error) {
 }
 
 // ImportPath imports a single file, directory, or symlink into the store.
-// If path names a plain file or symlink, it calls [Config.ImportFile].
+// If path names a directory, its contents are imported recursively.
 func (c Config) ImportPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
 	return c.importPath(ctx, state{s: s, path: path, fs: c.getFS()})
 }
