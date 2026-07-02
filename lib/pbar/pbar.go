@@ -12,13 +12,15 @@ import (
 	"time"
 )
 
-// A Bar is a progress indicator. Method of a Bar are safe for concurrent use
+// A Bar is a progress indicator. A nil *Bar is ready for use, but
+// ignores its input and does nothing.
+// The update methods of a Bar (Add, Set, SetMeta) are safe for concurrent use
 // by multiple goroutines.
 type Bar struct {
 	w      io.Writer
 	cancel context.CancelFunc
-	pulse  *time.Ticker
 	done   chan struct{}
+	pulse  *time.Ticker
 
 	μ        sync.Mutex
 	cur, max int64
@@ -28,16 +30,18 @@ type Bar struct {
 // New contructs a new Bar with the given maximum value that writes a status
 // line periodically to w. Call Start to begin updating the progress line, and
 // Stop to stop it.
-func New(w io.Writer, max int64) *Bar {
-	ctx, cancel := context.WithCancel(context.Background())
-	b := &Bar{
-		w:      w,
-		cancel: cancel,
-		pulse:  time.NewTicker(time.Second),
-		done:   make(chan struct{}),
-		max:    max,
+func New(w io.Writer, max int64) *Bar { return &Bar{w: w, max: max} }
+
+// Start begins rendering the status line for b. It returns b to permit
+// chaining. If b == nil, it does nothing without error.
+func (b *Bar) Start() *Bar {
+	if b == nil || b.done != nil {
+		return b // cannot start, or already running
 	}
-	b.pulse.Stop()
+	ctx, cancel := context.WithCancel(context.Background())
+	b.done = make(chan struct{})
+	b.cancel = cancel
+	b.pulse = time.NewTicker(time.Second)
 	go func() {
 		defer b.pulse.Stop()
 		defer close(b.done)
@@ -47,6 +51,7 @@ func New(w io.Writer, max int64) *Bar {
 				b.repaint()
 			case <-ctx.Done():
 				b.repaint()
+				fmt.Fprintln(b.w, " *")
 				return
 			}
 		}
@@ -54,17 +59,14 @@ func New(w io.Writer, max int64) *Bar {
 	return b
 }
 
-// Start begins rendering the status line for b.
-func (b *Bar) Start() *Bar { b.pulse.Reset(time.Second); return b }
-
 // Stop stops rendering the status line for b.
+// If b == nil, it does nothing without error.
 func (b *Bar) Stop() {
 	if b == nil {
 		return
 	}
 	b.cancel()
 	<-b.done
-	fmt.Fprintln(b.w, " *")
 }
 
 // Set sets the current value of the bar to v. If v exceeds the current
