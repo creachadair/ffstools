@@ -233,35 +233,12 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 			}
 			log.Printf("begin import zip: %q", path)
 
-			// Since the contents of a ZIP may not all be under the same
-			// directory, create a root directory to contain them all, so each
-			// import has its own file tree.
-			root := file.New(s.Files(), &file.NewOptions{
-				Stat: &file.Stat{
-					Mode:    fs.ModeDir | 0755,
-					ModTime: time.Now(),
-				},
-				PersistStat: true,
-			})
-			for _, entry := range zf.File {
-				hf, err := zipHeaderToFile(env.Context(), entry, root)
-				if err != nil {
-					c.Close()
-					return err
-				}
-				path := strings.TrimSuffix(entry.Name, "/") // directory names end in "/"
-				if _, err := fpath.Set(env.Context(), root, path, &fpath.SetOptions{File: hf}); err != nil {
-					c.Close()
-					return fmt.Errorf("set %q: %w", path, err)
-				}
-				logPrintf("+ imported %s %q", hf.Stat().Mode, path)
-			}
-			c.Close()
-			key, err := root.Flush(env.Context())
+			root, err := putConfig.ImportZIP(env.Context(), s.Files(), zf)
 			if err != nil {
+				c.Close()
 				return err
 			}
-			fmt.Printf("import: %s\n", config.FormatKey(key))
+			fmt.Printf("import: %s\n", config.FormatKey(root.Key()))
 			lastRoot = root
 		}
 
@@ -302,30 +279,6 @@ func tarHeaderToFile(ctx context.Context, h *tar.Header, r io.Reader, root *file
 		if err := nf.SetData(ctx, r); err != nil {
 			return nil, fmt.Errorf("set file data: %w", err)
 		}
-	}
-	return nf, nil
-}
-
-func zipHeaderToFile(ctx context.Context, f *zip.File, root *file.File) (*file.File, error) {
-	fi := f.FileInfo()
-	nf := root.New(&file.NewOptions{
-		Name: fi.Name(),
-		Stat: &file.Stat{
-			Mode:    fi.Mode(),
-			ModTime: fi.ModTime(),
-
-			// ZIP files do not record owner/group IDs or names, so use the ambient.
-			OwnerID: os.Getuid(),
-			GroupID: os.Getgid(),
-		},
-	})
-	if !fi.IsDir() {
-		rc, err := f.Open()
-		if err != nil {
-			return nil, fmt.Errorf("read contents: %w", err)
-		}
-		defer rc.Close()
-		return nf, nf.SetData(ctx, rc)
 	}
 	return nf, nil
 }
