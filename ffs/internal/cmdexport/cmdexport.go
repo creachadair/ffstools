@@ -33,6 +33,7 @@ import (
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/exportlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/taskgroup"
 	"github.com/pkg/xattr"
@@ -220,6 +221,14 @@ func linkFile(ctx context.Context, f *file.File, path string) error {
 		return fmt.Errorf("reading link target: %w", err)
 	}
 	return os.Symlink(string(target), path)
+}
+
+func exportConfig(env *command.Env, root string) exportlib.Config {
+	ec := exportlib.Config{Root: root}
+	if exportFlags.Verbose {
+		ec.DebugOutput = env
+	}
+	return ec
 }
 
 func dprintf(w io.Writer, msg string, args ...any) {
