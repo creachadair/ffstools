@@ -16,27 +16,14 @@
 package cmdexport
 
 import (
-	"bufio"
-	"context"
-	"fmt"
-	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
-	"time"
 
-	"github.com/creachadair/atomicfile"
 	"github.com/creachadair/command"
-	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/exportlib"
 	"github.com/creachadair/flax"
-	"github.com/creachadair/taskgroup"
-	"github.com/pkg/xattr"
 )
 
 var exportFlags struct {
@@ -108,136 +95,22 @@ func runExport(env *command.Env, originPath string) error {
 		if err != nil {
 			return err
 		}
-		cctx, cancel := context.WithCancel(env.Context())
-		defer cancel()
-		g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())
-
-		// We have to update directory timestamps after their contents are
-		// unpacked, otherwise the results are overwritten.
-		dirs := make(map[string]*file.File)
-		g.Go(func() error {
-			return fpath.Walk(cctx, of.File, func(e fpath.Entry) error {
-				if err := cctx.Err(); err != nil {
-					return err
-				}
-
-				opath := filepath.Join(exportFlags.Target, filepath.FromSlash(e.Path))
-				if fs := e.File.Stat(); !fs.Mode.IsDir() {
-					start(func() error {
-						return exportFile(cctx, env, e.File, opath)
-					})
-					return nil
-				} else if !exportFlags.NoStat && fs.Persistent() {
-					dirs[opath] = e.File
-				}
-				return exportFile(cctx, env, e.File, opath)
-			})
-		})
-		if err := g.Wait(); err != nil {
-			return err
-		}
-		for path, dir := range dirs {
-			start(func() error {
-				stat := dir.Stat()
-				dprintf(env, "+ update dir %q set mtime %v", path, stat.ModTime.Format(time.RFC3339))
-				return os.Chtimes(path, stat.ModTime, stat.ModTime)
-			})
-		}
-		return g.Wait()
+		ec := exportConfig(env, "") // root is not used here
+		return ec.FileToOS(env.Context(), of, exportFlags.Target)
 	})
 }
 
-func exportFile(ctx context.Context, env *command.Env, f *file.File, path string) error {
-	if err := ctx.Err(); err != nil {
-		return err
-	}
-	mode := f.Stat().Mode
-	var link bool
-	if mode.IsDir() {
-		dprintf(env, "create directory %q", path)
-		if err := os.Mkdir(path, 0700); err != nil {
-			if !exportFlags.Update || !os.IsExist(err) {
-				return err
-			}
-		}
-	} else if mode.Type()&fs.ModeSymlink != 0 {
-		dprintf(env, "write symlink %q", path)
-		if err := linkFile(ctx, f, path); err != nil {
-			return err
-		}
-		link = true
-	} else {
-		if !exportFlags.Update {
-			_, err := os.Lstat(path)
-			if err == nil {
-				return fmt.Errorf("file %q exists", path)
-			}
-		}
-		nw, err := copyFile(ctx, f, path)
-		if err != nil {
-			return err
-		}
-		dprintf(env, "write file %q (%d bytes)", path, nw)
-	}
-
-	// Restore permissions and modification times, if requested and available.
-	if !exportFlags.NoStat && f.Stat().Persistent() && !link {
-		stat := f.Stat()
-		dprintf(env, "- set mode %v, mtime %v", stat.Mode.Perm(), stat.ModTime.Format(time.RFC3339))
-
-		if err := os.Chmod(path, stat.Mode); err != nil {
-			return fmt.Errorf("setting permissions: %w", err)
-		}
-		if !mode.IsDir() {
-			if err := os.Chtimes(path, stat.ModTime, stat.ModTime); err != nil {
-				return fmt.Errorf("setting modtime: %w", err)
-			}
-		}
-		// TODO(creachadair): Maybe set owner/group?
-	}
-
-	// Restore extended attributes if requested.
-	if exportFlags.XAttr {
-		xa := f.XAttr()
-		for _, key := range xa.Names() {
-			val := xa.Get(key)
-			dprintf(env, "- set xattr %q (%d bytes)", key, len(val))
-			if xerr := xattr.LSet(path, key, []byte(val)); xerr != nil {
-				return fmt.Errorf("setting xattrs %q: %w", key, xerr)
-			}
-		}
-	}
-	return nil
-}
-
-func copyFile(ctx context.Context, f *file.File, path string) (int64, error) {
-	r := bufio.NewReaderSize(f.Cursor(ctx), 1<<20)
-	return atomicfile.WriteAll(path, r, 0600)
-}
-
-func linkFile(ctx context.Context, f *file.File, path string) error {
-	target, err := io.ReadAll(f.Cursor(ctx))
-	if err != nil {
-		return fmt.Errorf("reading link target: %w", err)
-	}
-	return os.Symlink(string(target), path)
-}
-
 func exportConfig(env *command.Env, root string) exportlib.Config {
-	ec := exportlib.Config{Root: root, IncludeXAttr: exportFlags.XAttr}
+	ec := exportlib.Config{
+		Root:         root,
+		IncludeXAttr: exportFlags.XAttr,
+		OmitStat:     exportFlags.NoStat,
+		Update:       exportFlags.Update,
+	}
 	if exportFlags.Verbose {
 		ec.DebugOutput = env
 	}
 	return ec
-}
-
-func dprintf(w io.Writer, msg string, args ...any) {
-	if exportFlags.Verbose {
-		if !strings.HasSuffix(msg, "\n") {
-			msg += "\n"
-		}
-		fmt.Fprintf(w, msg, args...)
-	}
 }
 
 func openFlags() int {
