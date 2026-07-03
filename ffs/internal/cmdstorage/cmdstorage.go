@@ -278,7 +278,7 @@ func maybeInitSubprocess(ctx context.Context, listenAddr string, execArgs []stri
 		cmd.Env = append(os.Environ(), "FFS_STORE="+listenAddr)
 	} else {
 		// Construct a pipe.
-		sc, cc, err := channel.Pipe()
+		sc, cc, err := channel.NewPipe()
 		if err != nil {
 			return subprocess{}, fmt.Errorf("connect subprocess: %w", err)
 		}
