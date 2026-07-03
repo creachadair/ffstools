@@ -53,7 +53,20 @@ type Address struct {
 	Substore string // the name of the substore to reference
 }
 
-// ParseAddress parses s into an [Address].
+// ParseAddress parses s into an [Address]. The format of s is one of:
+//
+//	path/to/socket[+substore]
+//	host:port[+substore]
+//
+// The network type is assigned to "tcp" or "unix" heuristically by
+// [chirp.SplitAddress].
+//
+// In addition, s may indicate a pair of file descriptors connected to a pipe,
+// using the syntax
+//
+//	_pipe:<rfd>:<wfd>
+//
+// In this format, the Network type is "pipe".
 func ParseAddress(s string) Address {
 	spec, substore := s, ""
 	if i := strings.LastIndex(s, "+"); i >= 0 {
