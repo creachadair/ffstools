@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store_test
+package registry_test
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
-	"github.com/creachadair/ffstools/lib/store"
+	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 )
 
 var errBadAddress = errors.New("bad memstore address")
@@ -34,11 +34,11 @@ func newMemStore(_ context.Context, addr string) (blob.StoreCloser, error) {
 }
 
 func TestRegistryOpen(t *testing.T) {
-	r := store.Registry{
+	r := registry.Registry{
 		"mem": newMemStore,
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// Opening an existing tag should succeed.
 	if s, err := r.Open(ctx, "mem"); err != nil {
@@ -54,8 +54,8 @@ func TestRegistryOpen(t *testing.T) {
 
 	// Opening a non-existing tag should fail.
 	s, err := r.Open(ctx, "http://localhost:8080")
-	if !errors.Is(err, store.ErrInvalidAddress) || s != nil {
+	if !errors.Is(err, registry.ErrInvalidAddress) || s != nil {
 		t.Errorf("Open(ctx, URL): got (%[1]T (%[1]p), %v), want (nil, %v)",
-			s, err, store.ErrInvalidAddress)
+			s, err, registry.ErrInvalidAddress)
 	}
 }
