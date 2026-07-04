@@ -34,9 +34,9 @@ import (
 )
 
 var flags = struct {
-	CacheDir     string `flag:"cache-dir,default=$FFS_GO_CACHE,Cache directory (required)"`
-	Store        string `flag:"store,default=$FFS_GO_STORE,Address of storage service (required)"`
-	RootName     string `flag:"root,default=$FFS_GO_ROOTNAME,Name of cache root (required)"`
+	CacheDir     string `flag:"cache-dir,default=$FFS_GOCACHE,Cache directory (required)"`
+	Store        string `flag:"store,default=$FFS_STORE,Address of storage service (required)"`
+	RootName     string `flag:"root,default=$FFS_ROOTNAME,Name of cache root (required)"`
 	Tasks        int    `flag:"nw,default=*,PRIVATE:Number of concurrent upload tasks"`
 	NoUpdate     bool   `flag:"no-update,Do not update the cache root at exit"`
 	PrintMetrics bool   `flag:"m,Print summary metrics to stderr at exit"`
