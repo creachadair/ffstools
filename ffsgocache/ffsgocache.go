@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"syscall"
+	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -202,10 +203,14 @@ func (c ffsCache) Put(ctx context.Context, req gocache.Object) (diskPath string,
 	}
 
 	c.start.Go(func() error {
+		mt := req.ModTime
+		if mt.IsZero() {
+			mt = time.Now()
+		}
 		fp := c.root.New(&file.NewOptions{
 			// Save the modification time to report back on Get, and since we are
 			// doing that anyway, persist a mode for cosmetics.
-			Stat:        &file.Stat{Mode: 0644, ModTime: req.ModTime.UTC()},
+			Stat:        &file.Stat{Mode: 0644, ModTime: mt.UTC()},
 			PersistStat: true,
 		})
 		fp.XAttr().Set(outputIDAttr, req.OutputID)
