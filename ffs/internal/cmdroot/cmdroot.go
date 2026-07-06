@@ -17,6 +17,7 @@ package cmdroot
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -60,12 +61,16 @@ If a <file-key> is specified, the new root points to that file (which must exist
 
 With --ref, the specified root/path is resolved, and root points to it.
 
-With --put, the specified filesystem path is copied, and root points to it.
+With --import, the specified filesystem path is copied, and root points to it.
 This copy is performed with default settings. For full control over the copy,
-use the "put" command separately.`,
+use the "import" command separately.`,
 
-			SetFlags: command.Flags(flax.MustBind, &createFlags),
-			Run:      command.Adapt(runCreate),
+			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
+				fs.BoolVar(&createFlags.Import, "put", false,
+					"PRIVATE:Obsolete alias for --import (will be removed in a future release)")
+				flax.MustBind(fs, &createFlags)
+			},
+			Run: command.Adapt(runCreate),
 		},
 		{
 			Name:  "copy",
@@ -198,19 +203,22 @@ var createFlags struct {
 	Replace bool   `flag:"replace,Replace an existing root name"`
 	Desc    string `flag:"desc,Set the human-readable description"`
 	Ref     bool   `flag:"ref,Treat the target as a root/path or file/path"`
-	Put     bool   `flag:"put,Treat the target as a local filesystem path to copy"`
+	Import  bool   `flag:"import,Treat the target as a local filesystem path to copy"`
 	Index   bool   `flag:"index,Create a blob index for the contents of the new root"`
 }
 
 func runCreate(env *command.Env, name string, rest ...string) error {
 	mode := "empty"
 	if len(rest) == 1 {
-		if createFlags.Ref && createFlags.Put {
-			return env.Usagef("the --ref and --put flags are mutually exclusive")
+		if createFlags.Ref && createFlags.Import {
+			return env.Usagef("the --ref and --import flags are mutually exclusive")
 		} else if createFlags.Ref {
 			mode = "ref"
-		} else if createFlags.Put {
-			mode = "put"
+		} else if createFlags.Import {
+			if env.IsFlagSet("put") {
+				fmt.Fprintln(env, "> WARNING: The --put flag is obsolete, use --import instead (continuing)")
+			}
+			mode = "import"
 		} else {
 			mode = "file-key"
 		}
@@ -241,7 +249,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 				return terr
 			}
 			fk = tf.File.Key()
-		case "put":
+		case "import":
 			ic := importlib.Config{FilterName: ".ffsignore"} // TODO(creachadair): Add a flag.
 			tf, terr := ic.ImportPath(env.Context(), s.Files(), rest[0])
 			if terr != nil {
