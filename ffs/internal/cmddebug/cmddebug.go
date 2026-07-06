@@ -337,7 +337,8 @@ func runShowObject(env *command.Env, storageKeys ...string) error {
 }
 
 var commandInfoFlags struct {
-	All bool `flag:"a,Include unlisted commands and private flags"`
+	All      bool `flag:"a,Include unlisted commands and private flags"`
+	RootOnly bool `flag:"root-only,Show only the root command, not subcommands"`
 }
 
 func runCommandInfo(env *command.Env, args []string) error {
@@ -368,6 +369,9 @@ func runCommandInfo(env *command.Env, args []string) error {
 			return fmt.Errorf("command %q has no subcommand %q", info.Name, arg)
 		}
 		info = info.Commands[pos]
+	}
+	if commandInfoFlags.RootOnly {
+		info.Commands = nil
 	}
 	return json.NewEncoder(os.Stdout).Encode(info)
 }
