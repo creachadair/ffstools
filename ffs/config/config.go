@@ -91,46 +91,16 @@ type StoreSpec struct {
 // As a special case, if the address has a "+name" suffix, the name without the
 // separator is used as a substore indicator.
 func (s *Settings) ResolveAddress(addr string) StoreSpec {
+	sub := s.Substore
+	if i := strings.LastIndex(addr, "+"); i >= 0 {
+		addr, sub = addr[:i], addr[i+1:]
+	}
 	tag, ok := strings.CutPrefix(addr, "@")
 	if ok {
-		sub := s.Substore
-		if i := strings.LastIndex(tag, "+"); i >= 0 {
-			tag, sub = tag[:i], tag[i+1:]
-		}
 		for _, st := range s.Stores {
 			if tag == st.Tag {
 				cp := *st
 				ExpandString(&cp.Address)
-				if cp.Prefix == "" {
-					cp.Prefix = s.ServicePrefix
-				}
-				if sub != "" {
-					cp.Substore = sub
-				} else if cp.Substore == "" {
-					cp.Substore = s.Substore
-				}
-				return cp
-			}
-		}
-	} else if i := strings.LastIndex(addr, "+"); i >= 0 {
-		return StoreSpec{Address: addr[:i], Prefix: s.ServicePrefix, Substore: addr[i+1:]}
-	}
-	return StoreSpec{Address: addr, Prefix: s.ServicePrefix, Substore: s.Substore}
-}
-
-// ResolveSpec resolves the given store spec against the settings.  If spec is
-// of the form @tag and that tag exists in the settings, the expanded form of
-// that spec is returned; otherwise it returns a verbatim spec.
-func (s *Settings) ResolveSpec(spec string) StoreSpec {
-	tag, ok := strings.CutPrefix(spec, "@")
-	if ok {
-		sub := s.Substore
-		if i := strings.LastIndex(tag, "+"); i >= 0 {
-			tag, sub = tag[:i], tag[i+1:]
-		}
-		for _, st := range s.Stores {
-			if tag == st.Tag {
-				cp := *st
 				ExpandString(&cp.Spec)
 				if cp.Prefix == "" {
 					cp.Prefix = s.ServicePrefix
@@ -143,8 +113,9 @@ func (s *Settings) ResolveSpec(spec string) StoreSpec {
 				return cp
 			}
 		}
+		return StoreSpec{} // unknown
 	}
-	return StoreSpec{Spec: spec, Prefix: s.ServicePrefix, Substore: s.Substore}
+	return StoreSpec{Address: addr, Spec: addr, Prefix: s.ServicePrefix, Substore: sub}
 }
 
 // OpenStore connects to the store service address in the configuration.  The

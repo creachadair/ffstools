@@ -141,7 +141,7 @@ func runStorage(env *command.Env, execArgs []string) error {
 		return env.Usagef("the --store flag must be set")
 	}
 	s := env.Config.(*config.Settings)
-	rs := s.ResolveSpec(s.DefaultStore)
+	rs := s.ResolveAddress(s.DefaultStore)
 	if rs.Spec == "" {
 		return env.Usagef("you must provide a --store spec")
 	}
