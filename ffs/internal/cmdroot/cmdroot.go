@@ -17,7 +17,6 @@ package cmdroot
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -65,12 +64,8 @@ With --import, the specified filesystem path is copied, and root points to it.
 This copy is performed with default settings. For full control over the copy,
 use the "import" command separately.`,
 
-			SetFlags: func(env *command.Env, fs *flag.FlagSet) {
-				fs.BoolVar(&createFlags.Import, "put", false,
-					"PRIVATE:Obsolete alias for --import (will be removed in a future release)")
-				flax.MustBind(fs, &createFlags)
-			},
-			Run: command.Adapt(runCreate),
+			SetFlags: command.Flags(flax.MustBind, &createFlags),
+			Run:      command.Adapt(runCreate),
 		},
 		{
 			Name:  "copy",
