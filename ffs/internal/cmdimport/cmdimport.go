@@ -98,7 +98,7 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 		keys := make([]string, len(env.Args))
 		for i, path := range env.Args {
 			if putConfig.Verbose {
-				log.Printf("begin put: %s", path)
+				log.Printf("begin import: %s", path)
 			}
 			f, err := putConfig.ImportPath(env.Context(), s.Files(), path)
 			if err != nil {
@@ -110,11 +110,11 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			}
 			keys[i] = key
 			if putConfig.Verbose {
-				log.Printf("done put: %s (%s)", path, config.FormatKey(key))
+				log.Printf("done import: %s (%s)", path, config.FormatKey(key))
 			}
 		}
 		for _, key := range keys {
-			fmt.Printf("put: %s\n", config.FormatKey(key))
+			fmt.Printf("import: %s\n", config.FormatKey(key))
 		}
 
 		if importFlags.Target != "" {

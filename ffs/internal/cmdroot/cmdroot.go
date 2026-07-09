@@ -254,7 +254,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			if terr != nil {
 				return terr
 			}
-			fmt.Printf("put: %s\n", config.FormatKey(fk))
+			fmt.Printf("import: %s\n", config.FormatKey(fk))
 		case "empty":
 			fk, err = file.New(s.Files(), &file.NewOptions{
 				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
