@@ -42,6 +42,7 @@ var flags = struct {
 	NoUpdate     bool   `flag:"no-update,Do not update the cache root at exit"`
 	PrintMetrics bool   `flag:"m,Print summary metrics to stderr at exit"`
 	Verbose      bool   `flag:"v,Enable verbose logging"`
+	DebugLog     bool   `flag:"debug,Enable detailed per-request debug logging (warning: noisy)"`
 }{
 	Tasks: runtime.NumCPU(),
 }
@@ -122,7 +123,8 @@ func runCache(env *command.Env) error {
 		Get:         fc.Get,
 		Put:         fc.Put,
 		MaxRequests: flags.Tasks,
-		Logf:        value.Cond(flags.Verbose, log.Printf, nil),
+		Logf:        value.Cond(flags.Verbose || flags.DebugLog, log.Printf, nil),
+		LogRequests: flags.DebugLog,
 	}
 	if err := gc.Run(env.Context(), os.Stdin, os.Stdout); err != nil {
 		return fmt.Errorf("cache server exited with error: %w", err)
