@@ -115,7 +115,7 @@ func New(config Config) *Service {
 	}
 
 	return &Service{
-		root:       chirp.NewPeer(),
+		root:       chirp.NewPeer().Detach(),
 		prefix:     config.MethodPrefix,
 		store:      store,
 		buffer:     config.Buffer,
