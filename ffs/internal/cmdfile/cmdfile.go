@@ -586,6 +586,7 @@ func runXAttr(env *command.Env, op string, argsAndSpecs ...string) error {
 			oldKey := of.BaseKey
 			xv := of.File.XAttr()
 
+			var modified bool
 			switch op {
 			case "list":
 				if xv.Len() != 0 {
@@ -593,9 +594,10 @@ func runXAttr(env *command.Env, op string, argsAndSpecs ...string) error {
 				}
 			case "clear":
 				if n := xv.Len(); n != 0 {
+					xv.Clear()
+					modified = true
 					fmt.Fprintf(env, "removed %d xattr\n", n)
 				}
-				xv.Clear()
 			case "get":
 				if xv.Has(args[0]) {
 					fmt.Println(xv.Get(args[0]))
@@ -603,19 +605,26 @@ func runXAttr(env *command.Env, op string, argsAndSpecs ...string) error {
 					fmt.Fprintf(env, "xattr %q not found\n", args[0])
 				}
 			case "delete":
-				xv.Remove(args[0])
+				if xv.Has(args[0]) {
+					xv.Remove(args[0])
+					modified = true
+					fmt.Fprintf(env, "removed xattr %q\n", args[0])
+				}
 			case "set":
 				xv.Set(args[0], args[1])
+				modified = true
 			default:
 				panic("unknown xattr spec: " + op) // unreachable
 			}
 
-			key, err := of.Flush(env.Context())
-			if err != nil {
-				return err
-			}
-			if key != oldKey {
-				fmt.Printf("xattr: %s\n", config.FormatKey(key))
+			if modified {
+				key, err := of.Flush(env.Context())
+				if err != nil {
+					return err
+				}
+				if key != oldKey {
+					fmt.Printf("xattr: %s\n", config.FormatKey(key))
+				}
 			}
 		}
 		return nil
