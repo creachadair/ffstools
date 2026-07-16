@@ -48,11 +48,20 @@ func (c Config) dprintf(msg string, args ...any) {
 	}
 }
 
+// rootPath returns the root prefix to prepend to all exported paths.
+func (c Config) rootPath(tree *filetree.PathInfo) string {
+	if strings.Contains(tree.Path, "/") {
+		return path.Join(c.Root, path.Base(tree.Path))
+	} else if c.Root != "" {
+		return c.Root
+	}
+	return path.Base(tree.Path)
+}
+
 // ExportToZIP recursively exports the contents of tree into zw.
 func (c Config) ExportToZIP(ctx context.Context, tree *filetree.PathInfo, zw *zip.Writer) error {
 	root := tree.File
-	if strings.Contains(tree.Path, "/") || c.Root != "" {
-		p := path.Join(c.Root, path.Base(tree.Path))
+	if p := c.rootPath(tree); p != "" {
 		root = tree.File.New(&file.NewOptions{Stat: dirStat})
 		if _, err := fpath.Set(ctx, root, p, &fpath.SetOptions{
 			Create:  true,
@@ -116,10 +125,7 @@ func fileType(fi fs.FileInfo) string {
 
 // ExportToTar recursively exports the contents of tree to tw.
 func (c Config) ExportToTar(ctx context.Context, tree *filetree.PathInfo, tw *tar.Writer) error {
-	tdir := c.Root
-	if strings.Contains(tree.Path, "/") {
-		tdir = path.Join(tdir, path.Base(tree.Path))
-	}
+	tdir := c.rootPath(tree)
 	root := tree.File
 
 	// This is a demi-clone of [tar.Writer.AddFS], but with less OS-specific nonsense.
