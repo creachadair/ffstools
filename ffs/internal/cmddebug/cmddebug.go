@@ -18,12 +18,14 @@ package cmddebug
 import (
 	"cmp"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"iter"
 	"os"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
@@ -73,6 +75,25 @@ root is also copied to the target.`,
 			Usage: "path ...",
 			Help:  "Show the splits of the specified file content into blocks.",
 			Run:   command.Adapt(runFileSplit),
+		},
+		{
+			Name:  "key",
+			Usage: "<storage-key>...",
+			Help: `Convert storage keys into the specified format.
+
+Each key must be an even-length hex string, a base64 string, a key32 string, or
+a literal (raw) string prefixed with "@":
+
+   @foo     encodes "foo"   (raw)
+   @@foo    encodes "@foo"  (raw)
+   414243   encodes "ABC"   (16, hex)
+   d6s81v46 encodes "apple" (32, key32)
+   eHl6enk= encodes "xyzzy" (64, key64)
+
+The --to flag specifies the target format to which each key is converted.
+THe results are written to stdout.`,
+			SetFlags: command.Flags(flax.MustBind, &keyFlags),
+			Run:      command.Adapt(runKey),
 		},
 		{
 			Name:     "show-object",
@@ -336,6 +357,38 @@ func runShowObject(env *command.Env, storageKeys ...string) error {
 		}
 		return nil
 	})
+}
+
+var keyFlags struct {
+	To string `flag:"to,default=32,Convert keys to this format (raw, hex, 32, 64)"`
+}
+
+func runKey(env *command.Env, keys ...string) error {
+	var formatKey func(string) string
+	switch strings.ToLower(keyFlags.To) {
+	case "hex", "16":
+		formatKey = func(key string) string { return hex.EncodeToString([]byte(key)) }
+	case "32", "k32", "key32", "b32", "base32":
+		formatKey = filetree.FormatKey32
+	case "64", "k64", "key64", "b64", "base64":
+		formatKey = filetree.FormatKey64
+	case "raw":
+		formatKey = func(s string) string { return s }
+	default:
+		return fmt.Errorf("unknown key format %q", keyFlags.To)
+	}
+	for i, key := range keys {
+		parsed, err := filetree.ParseKey(key)
+		if err != nil {
+			return fmt.Errorf("key %d: %w", i+1, err)
+		}
+		out := formatKey(parsed)
+		fmt.Print(out)
+		if utf8.ValidString(out) {
+			fmt.Println()
+		}
+	}
+	return nil
 }
 
 var commandInfoFlags struct {
