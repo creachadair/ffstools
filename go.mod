@@ -3,7 +3,7 @@ module github.com/creachadair/ffstools
 go 1.25.8
 
 require (
-	github.com/creachadair/atomicfile v0.4.1
+	github.com/creachadair/atomicfile v0.4.2
 	github.com/creachadair/badgerstore v0.10.6
 	github.com/creachadair/bitcaskstore v0.0.0-20260702150354-135308672866
 	github.com/creachadair/boltstore v0.0.0-20260702150432-283432be4698
@@ -11,7 +11,7 @@ require (
 	github.com/creachadair/chirp v0.4.11
 	github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e
 	github.com/creachadair/command v0.2.9
-	github.com/creachadair/ffs v0.17.15
+	github.com/creachadair/ffs v0.17.16
 	github.com/creachadair/ffuse v0.0.0-20260702150739-ded64163f68f
 	github.com/creachadair/flax v0.0.6
 	github.com/creachadair/gcsstore v0.0.0-20260702150452-4b7da96c83a9
@@ -29,9 +29,9 @@ require (
 	github.com/hanwen/go-fuse/v2 v2.10.1
 	github.com/klauspost/compress v1.19.0
 	github.com/pkg/xattr v0.4.12
-	golang.org/x/crypto v0.53.0
+	golang.org/x/crypto v0.54.0
 	golang.org/x/net v0.56.0
-	golang.org/x/sys v0.46.0
+	golang.org/x/sys v0.47.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -143,13 +143,13 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.21.0 // indirect
-	golang.org/x/term v0.44.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
+	golang.org/x/term v0.45.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.45.0 // indirect
+	golang.org/x/tools v0.47.0 // indirect
 	google.golang.org/api v0.286.0 // indirect
 	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260615183401-62b3387ff324 // indirect

@@ -109,7 +109,7 @@ store without roots.
 					idxs = append(idxs, rpi)
 					idx.Add(rp.IndexKey)
 					dprintf(env, "Loaded cached index for %q (%d keys, %s)\n",
-						key, rpi.Stats().NumKeys, config.FormatKey(rp.IndexKey),
+						key, rpi.Stats().NumKeys, filetree.FormatKey32(rp.IndexKey),
 					)
 					continue
 				}
@@ -128,7 +128,7 @@ store without roots.
 				idx.Add(rp.FileKey)
 
 				dprintf(env, "Scanning data reachable from %q (%s)...\n",
-					config.PrintableKey(key), config.FormatKey(rp.FileKey))
+					config.PrintableKey(key), filetree.FormatKey32(rp.FileKey))
 
 				// Avoid re-scanning repeats of the same file. But note: We do not
 				// want to use the index for this, as it is possible it may have a
@@ -207,7 +207,7 @@ store without roots.
 						if gcFlags.DataSize {
 							data, err := s.Files().Get(ctx, key)
 							if err != nil {
-								log.Printf("WARNING: size key %s: %v", config.FormatKey(key), err)
+								log.Printf("WARNING: size key %s: %v", filetree.FormatKey32(key), err)
 							}
 							dataSize.Add(int64(len(data)))
 						}
@@ -216,7 +216,7 @@ store without roots.
 							pb.SetMeta(numDrop.Add(1))
 							return nil
 						} else if !errors.Is(err, context.Canceled) {
-							log.Printf("WARNING: delete key %s: %v", config.FormatKey(key), err)
+							log.Printf("WARNING: delete key %s: %v", filetree.FormatKey32(key), err)
 						}
 						return err
 					})

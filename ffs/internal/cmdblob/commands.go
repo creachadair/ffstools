@@ -70,7 +70,7 @@ func hasCmd(env *command.Env) error {
 		has := stat.Slice()
 		slices.Sort(has)
 		for _, v := range has {
-			fmt.Println(config.FormatKey(v))
+			fmt.Println(filetree.FormatKey32(v))
 		}
 		return nil
 	})
@@ -92,11 +92,11 @@ func sizeCmd(env *command.Env) error {
 		for _, key := range parsed {
 			data, err := bs.Get(env.Context(), key)
 			if errors.Is(err, blob.ErrKeyNotFound) {
-				fmt.Print(config.FormatKey(key), "\tnot found\n")
+				fmt.Print(filetree.FormatKey32(key), "\tnot found\n")
 			} else if err != nil {
 				return err
 			} else {
-				fmt.Print(config.FormatKey(key), "\t", len(data), "\n")
+				fmt.Print(filetree.FormatKey32(key), "\t", len(data), "\n")
 			}
 		}
 		return nil
@@ -114,7 +114,7 @@ func delCmd(env *command.Env) error {
 
 		g, run := taskgroup.New(cancel).Limit(64)
 		c := taskgroup.Gather(run, func(key string) {
-			fmt.Println(config.FormatKey(key))
+			fmt.Println(filetree.FormatKey32(key))
 		})
 
 		for _, arg := range env.Args {
@@ -165,7 +165,7 @@ func listCmd(env *command.Env) error {
 			if listFlags.Raw {
 				fmt.Println(key)
 			} else {
-				fmt.Printf("%s\n", config.FormatKey(key))
+				fmt.Printf("%s\n", filetree.FormatKey32(key))
 			}
 			listed++
 			if listFlags.MaxKeys > 0 && listed == listFlags.MaxKeys {
@@ -241,7 +241,7 @@ func casPutCmd(env *command.Env) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(config.FormatKey(key))
+		fmt.Println(filetree.FormatKey32(key))
 		return nil
 	})
 }
@@ -261,7 +261,7 @@ func syncKeysCmd(env *command.Env, keys []string) error {
 			return err
 		}
 		for key := range need {
-			fmt.Println(config.FormatKey(key))
+			fmt.Println(filetree.FormatKey32(key))
 		}
 		return nil
 	})

@@ -74,7 +74,7 @@ func runIndex(env *command.Env) error {
 				return err
 			}
 
-			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, config.FormatKey(rp.FileKey))
+			fmt.Fprintf(env, "Scanning data reachable from %q (%s)...\n", key, filetree.FormatKey32(rp.FileKey))
 			start := time.Now()
 			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s, fp)
 			if err != nil {
@@ -103,7 +103,7 @@ func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (
 		scanned.Add(si.Data().Keys()...)
 		return true
 	}); err != nil {
-		return "", 0, fmt.Errorf("scanning %s: %w", config.FormatKey(fp.Key()), err)
+		return "", 0, fmt.Errorf("scanning %s: %w", filetree.FormatKey32(fp.Key()), err)
 	}
 
 	// Now that we know the size of the set, pack the keys into the index.

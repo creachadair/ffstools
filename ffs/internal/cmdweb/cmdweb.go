@@ -53,7 +53,7 @@ is terminated by a signal.`,
 					if err != nil {
 						return err
 					}
-					fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, config.FormatKey(pi.FileKey))
+					fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, filetree.FormatKey32(pi.FileKey))
 
 					fs := fpath.NewFS(env.Context(), pi.File)
 					srv := &http.Server{

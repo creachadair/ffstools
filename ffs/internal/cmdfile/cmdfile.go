@@ -242,11 +242,11 @@ func runShow(env *command.Env) error {
 				os.Stdout.Write(bits)
 			} else {
 				fmt.Println(config.ToJSON(struct {
-					S []byte `json:"storageKey"`
+					S string `json:"storageKey"`
 					N any    `json:"node"`
 					H []byte `json:"dataHash,omitempty"`
 				}{
-					S: []byte(of.FileKey),
+					S: filetree.FormatKey32(of.FileKey),
 					H: of.File.Data().Hash(),
 					N: msg.Value.(*wiretype.Object_Node).Node,
 				}))
@@ -271,7 +271,7 @@ func runHash(env *command.Env) error {
 				return err
 			}
 			fd := of.File.Data()
-			fmt.Print(config.FormatKey(string(fd.Hash())))
+			fmt.Print(filetree.FormatKey64(string(fd.Hash())))
 			if len(env.Args) > 1 {
 				fmt.Printf("\t%s\n", arg)
 			} else {
@@ -334,7 +334,7 @@ func runList(env *command.Env) error {
 func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) error {
 	if !listFlags.Long && !listFlags.JSON {
 		if listFlags.Key {
-			fmt.Print(config.FormatKey(of.Key()), "\t")
+			fmt.Print(filetree.FormatKey32(of.Key()), "\t")
 		}
 		fmt.Println(name)
 		return nil
@@ -386,7 +386,7 @@ func listFormat(f *file.File, name, target string) string {
 		}
 	}
 	if listFlags.Key {
-		skey = config.FormatKey(f.Key()) + "\t"
+		skey = filetree.FormatKey32(f.Key()) + "\t"
 	}
 
 	return fmt.Sprintf("%s%s%s\t%3d\t%s\t%s\v%9d\t%s\t%s%s\f",
@@ -418,14 +418,14 @@ func jsonFormat(f *file.File, name, target string) string {
 		Blocks int               `json:"blocks,omitempty"`
 		MTime  time.Time         `json:"modTime"`
 		Target string            `json:"linkTarget,omitempty"`
-		Key    []byte            `json:"storageKey,omitempty"`
+		Key    string            `json:"storageKey,omitempty"`
 		XAttr  map[string][]byte `json:"xattr,omitempty"`
 	}{
 		Name: name,
 		Type: tag, Mode: int64(s.Mode.Perm()), NLinks: 1 + f.Child().Len(),
 		Owner: nameOrID(s.OwnerName, s.OwnerID), Group: nameOrID(s.GroupName, s.GroupID),
 		Size: f.Data().Size(), Blocks: f.Data().Len(), MTime: s.ModTime.UTC(),
-		Target: target, Key: []byte(f.Key()), XAttr: xattr,
+		Target: target, Key: filetree.FormatKey32(f.Key()), XAttr: xattr,
 	})
 	if err != nil {
 		return "null"
@@ -481,7 +481,7 @@ func runSet(env *command.Env, originPath, target string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("set: %s\n", config.FormatKey(key))
+		fmt.Printf("set: %s\n", filetree.FormatKey32(key))
 		return nil
 	})
 }
@@ -510,7 +510,7 @@ func runRemove(env *command.Env) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("remove: %s\n", config.FormatKey(key))
+			fmt.Printf("remove: %s\n", filetree.FormatKey32(key))
 		}
 		return nil
 	})
@@ -563,7 +563,7 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("set-stat: %s\n", config.FormatKey(key))
+		fmt.Printf("set-stat: %s\n", filetree.FormatKey32(key))
 		return nil
 	})
 }
@@ -623,7 +623,7 @@ func runXAttr(env *command.Env, op string, argsAndSpecs ...string) error {
 					return err
 				}
 				if key != oldKey {
-					fmt.Printf("xattr: %s\n", config.FormatKey(key))
+					fmt.Printf("xattr: %s\n", filetree.FormatKey32(key))
 				}
 			}
 		}
@@ -662,7 +662,7 @@ func runResolve(env *command.Env, originPath string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%s\n", config.FormatKey(rf.File.Key()))
+			fmt.Printf("%s\n", filetree.FormatKey32(rf.File.Key()))
 			return nil
 		})
 	}
@@ -673,14 +673,14 @@ func runResolve(env *command.Env, originPath string) error {
 			return err
 		}
 		if rf.RootKey != "" {
-			fmt.Printf("%s %s\n", config.FormatKey(rf.Base.Key()), rf.RootKey)
+			fmt.Printf("%s %s\n", filetree.FormatKey32(rf.Base.Key()), rf.RootKey)
 		} else {
-			fmt.Printf("%s\n", config.FormatKey(rf.Base.Key()))
+			fmt.Printf("%s\n", filetree.FormatKey32(rf.Base.Key()))
 		}
 		parts := strings.Split(rest, "/")
 		pf, err := fpath.OpenPath(env.Context(), rf.Base, rest)
 		for i, f := range pf {
-			fmt.Printf("%s %s\n", config.FormatKey(f.Key()), parts[i])
+			fmt.Printf("%s %s\n", filetree.FormatKey32(f.Key()), parts[i])
 		}
 		return err
 	})
@@ -714,14 +714,14 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 				return err
 			}
 			if want.Has(e.File.Key()) {
-				fmt.Printf("file %q %s\n", e.Path, config.FormatKey(e.File.Key()))
+				fmt.Printf("file %q %s\n", e.Path, filetree.FormatKey32(e.File.Key()))
 				if !findFlags.All {
 					return errFindFound
 				}
 			}
 			for i, dkey := range e.File.Data().Keys() {
 				if want.Has(dkey) {
-					fmt.Printf("data %q [%d] %s\n", e.Path, i, config.FormatKey(dkey))
+					fmt.Printf("data %q [%d] %s\n", e.Path, i, filetree.FormatKey32(dkey))
 					if !findFlags.All {
 						return errFindFound
 					}
@@ -753,7 +753,7 @@ func runListPaths(env *command.Env, pathSpec string) error {
 				return e.Err
 			}
 			if listPathsFlags.Key {
-				fmt.Print(config.FormatKey(e.File.Key()), "\t")
+				fmt.Print(filetree.FormatKey32(e.File.Key()), "\t")
 			}
 			if listPathsFlags.Full {
 				fmt.Println(path.Join(of.Path, e.Path))
@@ -779,9 +779,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				return err
 			}
 			if of.Root == nil && of.Base == of.File {
-				fmt.Printf("check %s\n", config.FormatKey(of.FileKey))
+				fmt.Printf("check %s\n", filetree.FormatKey32(of.FileKey))
 			} else {
-				fmt.Printf("check %q %s\n", of.Path, config.FormatKey(of.File.Key()))
+				fmt.Printf("check %q %s\n", of.Path, filetree.FormatKey32(of.File.Key()))
 			}
 
 			start := time.Now()
@@ -802,10 +802,10 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			} else if of.Root.IndexKey == "" {
 				fmt.Printf("- root %q is not indexed (OK)\n", of.RootKey)
 			} else if idx, err := s.LoadIndex(env.Context(), of.Root.IndexKey); err != nil {
-				fmt.Printf("* index %s: %v\n", config.FormatKey(of.Root.IndexKey), err)
+				fmt.Printf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
 				nerrs++
 			} else {
-				fmt.Printf("- index %s OK\n", config.FormatKey(of.Root.IndexKey))
+				fmt.Printf("- index %s OK\n", filetree.FormatKey32(of.Root.IndexKey))
 				uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 				checkIndex = idx.Has
 			}
@@ -821,7 +821,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 
 				fkey := e.File.Key()
 				if !checkIndex(fkey) {
-					fmt.Printf("* index: missing file %s\n", config.FormatKey(fkey))
+					fmt.Printf("* index: missing file %s\n", filetree.FormatKey32(fkey))
 					nerrs++
 				}
 
@@ -841,7 +841,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 						if !ok {
 							bits, err := s.Files().Get(env.Context(), dk)
 							if err != nil {
-								fmt.Printf("* data: read %s: %v\n", config.FormatKey(dk), err)
+								fmt.Printf("* data: read %s: %v\n", filetree.FormatKey32(dk), err)
 								continue
 							}
 							sz = int64(len(bits))
@@ -860,7 +860,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				done.Add(fkey)
 				for dk := range want {
 					if !checkIndex(dk) {
-						fmt.Printf("* index: missing data %s\n", config.FormatKey(dk))
+						fmt.Printf("* index: missing data %s\n", filetree.FormatKey32(dk))
 						nerrs++
 					}
 				}
@@ -879,7 +879,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					want.RemoveAll(have)
 					if !want.IsEmpty() {
 						for m := range want {
-							fmt.Printf("* data missing %q %s\n", e.Path, config.FormatKey(m))
+							fmt.Printf("* data missing %q %s\n", e.Path, filetree.FormatKey32(m))
 							nlost++
 						}
 					}
@@ -1034,7 +1034,7 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 				fmt.Fprintf(env, "Scanning data reachable from root %q...\n", of.RootKey)
 				err = worklist.Root(env.Context(), of.RootKey, of.Root)
 			} else {
-				fmt.Fprintf(env, "Scanning data reachable from file %s ...\n", config.FormatKey(of.FileKey))
+				fmt.Fprintf(env, "Scanning data reachable from file %s ...\n", filetree.FormatKey32(of.FileKey))
 				err = worklist.File(env.Context(), of.File)
 			}
 			if err != nil {
@@ -1049,9 +1049,9 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 			for chunk := range worklist.Chunks(256) {
 				for _, key := range chunk {
 					if scanFlags.Type {
-						fmt.Printf("%c %s\n", worklist.Type(key), config.FormatKey(key))
+						fmt.Printf("%c %s\n", worklist.Type(key), filetree.FormatKey32(key))
 					} else {
-						fmt.Println(config.FormatKey(key))
+						fmt.Println(filetree.FormatKey32(key))
 					}
 				}
 			}
@@ -1097,7 +1097,7 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 		if err != nil {
 			return fmt.Errorf("saving index: %w", err)
 		}
-		fmt.Println(config.FormatKey(ikey))
+		fmt.Println(filetree.FormatKey32(ikey))
 		return nil
 	})
 }

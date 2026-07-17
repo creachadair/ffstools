@@ -40,7 +40,7 @@ func runWebDAV(env *command.Env, address, rootKey string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, config.FormatKey(pi.FileKey))
+		fmt.Fprintf(env, "Resolved %q to %s\n", rootKey, filetree.FormatKey32(pi.FileKey))
 
 		hostPort, servePath := parseAddress(address)
 		if hostPort == "" {
@@ -77,7 +77,7 @@ func runWebDAV(env *command.Env, address, rootKey string) error {
 			if err != nil {
 				return fmt.Errorf("flush file data: %w", err)
 			}
-			fmt.Printf("flush: %s\n", config.FormatKey(key))
+			fmt.Printf("flush: %s\n", filetree.FormatKey32(key))
 		}
 		return nil
 	})

@@ -254,7 +254,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 			if terr != nil {
 				return terr
 			}
-			fmt.Printf("import: %s\n", config.FormatKey(fk))
+			fmt.Printf("import: %s\n", filetree.FormatKey32(fk))
 		case "empty":
 			fk, err = file.New(s.Files(), &file.NewOptions{
 				Stat:        &file.Stat{Mode: os.ModeDir | 0755},
@@ -273,7 +273,7 @@ func runCreate(env *command.Env, name string, rest ...string) error {
 
 		var indexKey string
 		if createFlags.Index {
-			fmt.Fprintf(env, "Scanning data reachable from %s...\n", config.FormatKey(fk))
+			fmt.Fprintf(env, "Scanning data reachable from %s...\n", filetree.FormatKey32(fk))
 			start := time.Now()
 			ikey, numKeys, err := computeAndSaveIndex(env.Context(), s, tf)
 			if err != nil {

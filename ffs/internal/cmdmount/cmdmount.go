@@ -97,7 +97,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			if err := svc.Mount(ctx); err != nil {
 				return err
 			}
-			fmt.Printf("mount: %s\n", config.FormatKey(svc.Path.FileKey))
+			fmt.Printf("mount: %s\n", filetree.FormatKey32(svc.Path.FileKey))
 
 			// If the filesystem is read-only, we can run without follow-up.
 			if !svc.Writable {
@@ -112,7 +112,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			// calling context may be already terminated (e.g., by a signal).
 			if err := svc.Run(ctx); err != nil {
 				if key, err := svc.Path.Base.Flush(context.Background()); err == nil {
-					fmt.Printf("state: %s\n", config.FormatKey(key))
+					fmt.Printf("state: %s\n", filetree.FormatKey32(key))
 				} else {
 					log.Printf("WARNING: Flushing file state failed: %v", err)
 				}
@@ -124,7 +124,7 @@ the filesystem is automatically unmounted when the subprocess exits.
 			if err != nil {
 				return fmt.Errorf("flush file data: %w", err)
 			}
-			fmt.Printf("flush: %s\n", config.FormatKey(rk))
+			fmt.Printf("flush: %s\n", filetree.FormatKey32(rk))
 			return nil
 		})
 	}),

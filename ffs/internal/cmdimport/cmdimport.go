@@ -110,11 +110,11 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			}
 			keys[i] = key
 			if putConfig.Verbose {
-				log.Printf("done import: %s (%s)", path, config.FormatKey(key))
+				log.Printf("done import: %s (%s)", path, filetree.FormatKey32(key))
 			}
 		}
 		for _, key := range keys {
-			fmt.Printf("import: %s\n", config.FormatKey(key))
+			fmt.Printf("import: %s\n", filetree.FormatKey32(key))
 		}
 
 		if importFlags.Target != "" {
@@ -126,7 +126,7 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("set: %s\n", config.FormatKey(key))
+			fmt.Printf("set: %s\n", filetree.FormatKey32(key))
 		}
 		return nil
 	})
@@ -155,7 +155,7 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return fmt.Errorf("input %q: %w", path, err)
 			}
-			fmt.Printf("import: %s\n", config.FormatKey(root.Key()))
+			fmt.Printf("import: %s\n", filetree.FormatKey32(root.Key()))
 			lastRoot = root
 		}
 
@@ -167,7 +167,7 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("set: %s\n", config.FormatKey(key))
+			fmt.Printf("set: %s\n", filetree.FormatKey32(key))
 		}
 		return nil
 	})
@@ -196,7 +196,7 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 				c.Close()
 				return err
 			}
-			fmt.Printf("import: %s\n", config.FormatKey(root.Key()))
+			fmt.Printf("import: %s\n", filetree.FormatKey32(root.Key()))
 			lastRoot = root
 		}
 
@@ -208,7 +208,7 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("set: %s\n", config.FormatKey(key))
+			fmt.Printf("set: %s\n", filetree.FormatKey32(key))
 		}
 		return nil
 	})

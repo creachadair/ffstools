@@ -134,7 +134,7 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 				if pi.Root != nil && pi.File == pi.Base {
 					if pi.Root.IndexKey != "" {
 						fmt.Fprintf(env, "WARNING: Root index %s not copied, it must be re-generated\n",
-							config.FormatKey(pi.Root.IndexKey))
+							filetree.FormatKey32(pi.Root.IndexKey))
 					}
 					nr := root.New(tgt.Roots(), &root.Options{
 						FileKey:     rf.Key(),
@@ -145,8 +145,8 @@ func runRewrite(env *command.Env, sourceKeys ...string) error {
 						return fmt.Errorf("save root: %w", err)
 					}
 				}
-				fmt.Printf("src: %s\n", config.FormatKey(pi.File.Key()))
-				fmt.Printf("dst: %s\n", config.FormatKey(rfKey))
+				fmt.Printf("src: %s\n", filetree.FormatKey32(pi.File.Key()))
+				fmt.Printf("dst: %s\n", filetree.FormatKey32(rfKey))
 			}
 			return nil
 		})
@@ -229,7 +229,7 @@ func runFileHash(env *command.Env, paths ...string) error {
 		if len(paths) != 1 {
 			fmt.Print(path, "\t")
 		}
-		fmt.Println(config.FormatKey(string(h)))
+		fmt.Println(filetree.FormatKey64(string(h)))
 		if fileHashFlags.Verbose {
 			all := kv.Snapshot(nil)
 			var totalBytes int
@@ -248,7 +248,9 @@ func runFileSplit(env *command.Env, paths ...string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("#", path)
+		if len(paths) > 1 {
+			fmt.Println("#", path)
+		}
 		cas := blob.CASFromKV(new(logKV))
 		cf := file.New(cas, nil)
 		err = cf.SetData(env.Context(), f)
@@ -273,7 +275,7 @@ func (*logKV) List(context.Context, string) iter.Seq2[string, error] {
 
 func (kv *logKV) Put(_ context.Context, opts blob.PutOptions) error {
 	n := int64(len(opts.Data))
-	fmt.Printf("%d %d %s\n", kv.pos, n, config.FormatKey(opts.Key))
+	fmt.Printf("%d %d %s\n", kv.pos, n, filetree.FormatKey64(opts.Key))
 	kv.pos += n
 	return nil
 }
@@ -311,14 +313,14 @@ func runShowObject(env *command.Env, storageKeys ...string) error {
 					return err
 				}
 				fmt.Println(config.ToJSON(map[string]any{
-					"storageKey": []byte(key),
+					"storageKey": filetree.FormatKey32(key),
 					"data":       data,
 				}))
 				return nil
 			}
 
 			out := map[string]any{
-				"storageKey": []byte(key),
+				"storageKey": filetree.FormatKey32(key),
 			}
 			switch t := obj.Value.(type) {
 			case *wiretype.Object_Node:
@@ -328,7 +330,7 @@ func runShowObject(env *command.Env, storageKeys ...string) error {
 			case *wiretype.Object_Index:
 				out["index"] = t.Index
 			default:
-				return fmt.Errorf("unknown object type %T for %q", obj.Value, config.FormatKey(key))
+				return fmt.Errorf("unknown object type %T for %q", obj.Value, filetree.FormatKey32(key))
 			}
 			fmt.Println(config.ToJSON(out))
 		}
