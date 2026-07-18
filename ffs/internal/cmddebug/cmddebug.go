@@ -366,7 +366,7 @@ var keyFlags struct {
 func runKey(env *command.Env, keys ...string) error {
 	var formatKey func(string) string
 	switch strings.ToLower(keyFlags.To) {
-	case "hex", "16":
+	case "hex", "16", "key16", "k16":
 		formatKey = func(key string) string { return hex.EncodeToString([]byte(key)) }
 	case "32", "k32", "key32", "b32", "base32":
 		formatKey = filetree.FormatKey32
