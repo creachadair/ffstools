@@ -19,7 +19,6 @@ package config
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"iter"
@@ -204,7 +203,7 @@ func Load(path string) (*Settings, error) {
 func PrintableKey(key string) any {
 	for i := 0; i < len(key); i++ {
 		if key[i] < ' ' || key[i] > '~' {
-			return base64.StdEncoding.EncodeToString([]byte(key))
+			return filetree.FormatKey32(key)
 		}
 	}
 	return key
