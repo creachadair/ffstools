@@ -11,8 +11,8 @@ require (
 	github.com/creachadair/chirp v0.4.11
 	github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e
 	github.com/creachadair/command v0.2.9
-	github.com/creachadair/ffs v0.17.17
-	github.com/creachadair/ffuse v0.0.0-20260702150739-ded64163f68f
+	github.com/creachadair/ffs v0.17.18
+	github.com/creachadair/ffuse v0.0.0-20260718171101-e44770ed29a5
 	github.com/creachadair/flax v0.0.6
 	github.com/creachadair/gcsstore v0.0.0-20260702150452-4b7da96c83a9
 	github.com/creachadair/getpass v0.3.2
