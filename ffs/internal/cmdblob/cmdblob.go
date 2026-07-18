@@ -42,13 +42,11 @@ var Command = &command.C{
 	Name: "blob",
 	Help: `Manipulate the contents of a blob store.
 
-Since blob keys are usually binary, key arguments are assumed to be encoded.
+In addition to the standard key formats (see "help key-format"), you may specify
+a literal (raw) string prefixed with "@", e.g.,
 
-Rule                                                     Example
-- To specify blob keys literally, prefix them with "@"   @foo
-  To escape a leading @, double it                       @@foo
-- If the key is all hex digits, decode it as hex         666f6f0a
-- Otherwise, it is treated as base64.                    Zm9vCg==
+   @foo     encodes "foo"   (raw)
+   @@foo    encodes "@foo"  (raw)
 
 If the FFS_STORE environment variable is set, it is read to set the
 address of the storage server. Otherwise, --store must be set to either
