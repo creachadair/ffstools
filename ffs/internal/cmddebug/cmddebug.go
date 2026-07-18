@@ -81,14 +81,11 @@ root is also copied to the target.`,
 			Usage: "<storage-key>...",
 			Help: `Convert storage keys into the specified format.
 
-Each key must be an even-length hex string, a base64 string, a key32 string, or
-a literal (raw) string prefixed with "@":
+In addition to the standard key formats (see "help key-format"), you may specify
+a literal (raw) string prefixed with "@", e.g.,
 
    @foo     encodes "foo"   (raw)
    @@foo    encodes "@foo"  (raw)
-   414243   encodes "ABC"   (16, hex)
-   d6s81v46 encodes "apple" (32, key32)
-   eHl6enk= encodes "xyzzy" (64, key64)
 
 The --to flag specifies the target format to which each key is converted.
 THe results are written to stdout.`,
