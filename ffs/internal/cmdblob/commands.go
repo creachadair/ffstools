@@ -36,7 +36,7 @@ func getCmd(env *command.Env) error {
 	}
 	return withStoreFromEnv(env, func(bs blob.KV) error {
 		for _, arg := range env.Args {
-			key, err := filetree.ParseKey(arg)
+			key, err := parseKeyOrEmpty(arg)
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func hasCmd(env *command.Env) error {
 	}
 	var parsed []string
 	for _, raw := range env.Args {
-		key, err := filetree.ParseKey(raw)
+		key, err := parseKeyOrEmpty(raw)
 		if err != nil {
 			return err
 		}
@@ -82,7 +82,7 @@ func sizeCmd(env *command.Env) error {
 	}
 	var parsed []string
 	for _, raw := range env.Args {
-		key, err := filetree.ParseKey(raw)
+		key, err := parseKeyOrEmpty(raw)
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func delCmd(env *command.Env) error {
 			if dctx.Err() != nil {
 				break
 			}
-			key, err := filetree.ParseKey(arg)
+			key, err := parseKeyOrEmpty(arg)
 			if err != nil {
 				return err
 			}
@@ -140,11 +140,11 @@ func delCmd(env *command.Env) error {
 }
 
 func listCmd(env *command.Env) error {
-	start, err := filetree.ParseKey(listFlags.Start)
+	start, err := parseKeyOrEmpty(listFlags.Start)
 	if err != nil {
 		return err
 	}
-	pfx, err := filetree.ParseKey(listFlags.Prefix)
+	pfx, err := parseKeyOrEmpty(listFlags.Prefix)
 	if err != nil {
 		return err
 	}
@@ -189,11 +189,11 @@ func lenCmd(env *command.Env) error {
 
 func copyCmd(env *command.Env, srcArg, dstArg string) error {
 	return withStoreFromEnv(env, func(bs blob.KV) error {
-		srcKey, err := filetree.ParseKey(srcArg)
+		srcKey, err := parseKeyOrEmpty(srcArg)
 		if err != nil {
 			return err
 		}
-		dstKey, err := filetree.ParseKey(dstArg)
+		dstKey, err := parseKeyOrEmpty(dstArg)
 		if err != nil {
 			return err
 		}
@@ -213,7 +213,7 @@ func putCmd(env *command.Env, keyArg string, rest []string) (err error) {
 	if len(rest) > 1 {
 		return env.Usagef("extra arguments after path: %q", rest[1:])
 	}
-	key, err := filetree.ParseKey(keyArg)
+	key, err := parseKeyOrEmpty(keyArg)
 	if err != nil {
 		return err
 	}
@@ -249,7 +249,7 @@ func casPutCmd(env *command.Env) error {
 func syncKeysCmd(env *command.Env, keys []string) error {
 	var parsed []string
 	for _, key := range keys {
-		p, err := filetree.ParseKey(key)
+		p, err := parseKeyOrEmpty(key)
 		if err != nil {
 			return err
 		}
@@ -288,4 +288,11 @@ func withStoreFromEnv(env *command.Env, f func(blob.KV) error) error {
 		return fmt.Errorf("open kv %q: %w", blobFlags.KV, err)
 	}
 	return f(kv)
+}
+
+func parseKeyOrEmpty(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+	return filetree.ParseKey(s)
 }
