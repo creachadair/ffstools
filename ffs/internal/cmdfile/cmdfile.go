@@ -334,7 +334,7 @@ func runList(env *command.Env) error {
 func printOne(ctx context.Context, tw io.Writer, of *file.File, name string) error {
 	if !listFlags.Long && !listFlags.JSON {
 		if listFlags.Key {
-			fmt.Print(filetree.FormatKey32(of.Key()), "\t")
+			fmt.Print(config.DisplayKey(of.Key()), "\t")
 		}
 		fmt.Println(name)
 		return nil
@@ -386,7 +386,7 @@ func listFormat(f *file.File, name, target string) string {
 		}
 	}
 	if listFlags.Key {
-		skey = filetree.FormatKey32(f.Key()) + "\t"
+		skey = config.DisplayKey(f.Key()) + "\t"
 	}
 
 	return fmt.Sprintf("%s%s%s\t%3d\t%s\t%s\v%9d\t%s\t%s%s\f",
@@ -662,7 +662,7 @@ func runResolve(env *command.Env, originPath string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%s\n", filetree.FormatKey32(rf.File.Key()))
+			fmt.Printf("%s\n", config.DisplayKey(rf.File.Key()))
 			return nil
 		})
 	}
@@ -753,7 +753,7 @@ func runListPaths(env *command.Env, pathSpec string) error {
 				return e.Err
 			}
 			if listPathsFlags.Key {
-				fmt.Print(filetree.FormatKey32(e.File.Key()), "\t")
+				fmt.Print(config.DisplayKey(e.File.Key()), "\t")
 			}
 			if listPathsFlags.Full {
 				fmt.Println(path.Join(of.Path, e.Path))

@@ -179,7 +179,7 @@ func runList(env *command.Env) error {
 				} else {
 					fmt.Fprint(w, "[+]")
 				}
-				fmt.Fprint(w, "\t", filetree.FormatKey32(rp.FileKey))
+				fmt.Fprint(w, "\t", config.DisplayKey(rp.FileKey))
 				if rp.Description != "" {
 					d, _, ok := strings.Cut(rp.Description, "\n")
 					if ok {

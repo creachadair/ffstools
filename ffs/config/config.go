@@ -209,6 +209,9 @@ func PrintableKey(key string) any {
 	return key
 }
 
+// DisplayKey converts a storage key into an abbreviated human-readable key32 string.
+func DisplayKey(key string) string { return filetree.FormatKey32(key[:min(len(key), 16)]) }
+
 // ToJSON converts a value to indented JSON.
 func ToJSON(msg any) string {
 	bits, err := json.Marshal(msg)
