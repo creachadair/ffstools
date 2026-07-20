@@ -10,7 +10,7 @@ require (
 	github.com/creachadair/buntdbstore v0.0.0-20260702150711-8ac595348496
 	github.com/creachadair/chirp v0.4.11
 	github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e
-	github.com/creachadair/command v0.2.9
+	github.com/creachadair/command v0.2.10
 	github.com/creachadair/ffs v0.17.20
 	github.com/creachadair/ffuse v0.0.0-20260718171101-e44770ed29a5
 	github.com/creachadair/flax v0.0.6
@@ -19,7 +19,7 @@ require (
 	github.com/creachadair/gocache v0.0.0-20260702150643-ef492e4417cc
 	github.com/creachadair/keyring v0.2.4
 	github.com/creachadair/leveldbstore v0.0.0-20260702150554-c20277718233
-	github.com/creachadair/mds v0.30.2
+	github.com/creachadair/mds v0.30.4
 	github.com/creachadair/pebblestore v0.0.0-20260702150527-a80c08fc35a3
 	github.com/creachadair/rosedbstore v0.0.0-20260702150615-e45b5723bcb4
 	github.com/creachadair/s3store v0.0.0-20260702154346-bc3f0e1e43f1

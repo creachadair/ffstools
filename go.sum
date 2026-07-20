@@ -178,8 +178,8 @@ github.com/creachadair/chirp v0.4.11 h1:JvAo6DOY8zjcfnPGg/HWHRpKoSzV8MSifOpMngcO
 github.com/creachadair/chirp v0.4.11/go.mod h1:sCQ2a0bgjNcMDt6fORZlJcscjWdFQlQICGKnWZuz9ZY=
 github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e h1:XidixtVjYmPLLT4D3DG6KwLydthQqsCxFyyTACETjY0=
 github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e/go.mod h1:04cUx0Pfck/IM8fjYZ8/5Kg5oTOL0XsD+SrEW23rWW0=
-github.com/creachadair/command v0.2.9 h1:0SBcSpa5unLOaUE6z5rKWDuVikdDF6LTXTLdxSYvueo=
-github.com/creachadair/command v0.2.9/go.mod h1:nAflZ7hB5TAUpxGNm9w2iMn+GNCYVgDdzTJG08M+uhY=
+github.com/creachadair/command v0.2.10 h1:+qW9WcFTu8Cg8rM2RWa9pZU7Cv0sxdLQYjgMOTckD+M=
+github.com/creachadair/command v0.2.10/go.mod h1:p7iYfSCIAVz+oYYIsXsya1hjKgjitd3U/0eOrzTWkBQ=
 github.com/creachadair/ffs v0.17.20 h1:i+w5mZrDr5IZHwNhRg9YBz6qA9hRKuBuKHIP6S18LmQ=
 github.com/creachadair/ffs v0.17.20/go.mod h1:y4O8y9BTPqXOnu+9/g62d68jEjnWWmlb6hcoZ+z1zaw=
 github.com/creachadair/ffuse v0.0.0-20260718171101-e44770ed29a5 h1:x5rVpqx0Z2kY3hqzu+uHy52kVuA1+kpg90XrU1pMBTg=
@@ -196,8 +196,8 @@ github.com/creachadair/keyring v0.2.4 h1:fOFTHlPTrZ0TV9/i+b40yXloT7eIxNdVBir9itN
 github.com/creachadair/keyring v0.2.4/go.mod h1:zq9DS+JzMeItTZ7OsH5HOAnS2/x01+aFWlv3PDc8jpE=
 github.com/creachadair/leveldbstore v0.0.0-20260702150554-c20277718233 h1:c23NcfQb9+kw/efnrbKai5xZ9TXLkfl3aA9D7NmlWUA=
 github.com/creachadair/leveldbstore v0.0.0-20260702150554-c20277718233/go.mod h1:iwr2HL0PsouOnK0446OsKt5nPttTFWKmTxCyXYxZ/L4=
-github.com/creachadair/mds v0.30.2 h1:cOP0xkfYkk4mxqPl4SmjnrY+agrpgiEqsVygLnPvJto=
-github.com/creachadair/mds v0.30.2/go.mod h1:dMBTCSy3iS3dwh4Rb1zxeZz2d7K8+N24GCTsayWtQRI=
+github.com/creachadair/mds v0.30.4 h1:Wfc4KnlGMlhwT73R0SG449pW0L0+v/PSsq14odXrZM8=
+github.com/creachadair/mds v0.30.4/go.mod h1:dMBTCSy3iS3dwh4Rb1zxeZz2d7K8+N24GCTsayWtQRI=
 github.com/creachadair/msync v0.9.1 h1:LEomnt/hETiaVxmYeU9PQ3dW/qYZoSZ/HebPi4vFp3k=
 github.com/creachadair/msync v0.9.1/go.mod h1:Fw4SK/DMHsIz4uEmgBdg7evUQaGhcFrA/RKrrPz9fxM=
 github.com/creachadair/pebblestore v0.0.0-20260702150527-a80c08fc35a3 h1:KyZ/KGR6G41iGQF7c0cAhGOzjsKbTaW/WsZshDeNEWI=

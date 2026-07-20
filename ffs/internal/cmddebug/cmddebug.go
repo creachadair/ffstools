@@ -19,11 +19,9 @@ import (
 	"cmp"
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"iter"
 	"os"
-	"slices"
 	"strings"
 	"unicode/utf8"
 
@@ -99,13 +97,7 @@ THe results are written to stdout.`,
 			SetFlags: command.Flags(flax.MustBind, &showObjectFlags),
 			Run:      command.Adapt(runShowObject),
 		},
-		{
-			Name:     "command-info",
-			Usage:    "[subcommand ... [--flag]]",
-			Help:     "Dump the command structure as JSON.",
-			SetFlags: command.Flags(flax.MustBind, &commandInfoFlags),
-			Run:      command.Adapt(runCommandInfo),
-		},
+		command.InfoCommand("command-info"),
 	},
 }
 
@@ -386,44 +378,4 @@ func runKey(env *command.Env, keys ...string) error {
 		}
 	}
 	return nil
-}
-
-var commandInfoFlags struct {
-	All      bool `flag:"a,Include unlisted commands and private flags"`
-	RootOnly bool `flag:"root-only,Show only the root command, not subcommands"`
-}
-
-func runCommandInfo(env *command.Env, args []string) error {
-	cur := env
-	for cur.Parent != nil {
-		cur = cur.Parent
-	}
-	opts := value.Cond(commandInfoFlags.All, command.IncludeAll, command.IncludeCommands)
-	info := cur.Command.Info(opts)
-	for i, arg := range args {
-		if strings.HasPrefix(arg, "-") {
-			if i+1 < len(args) {
-				return fmt.Errorf("extra arguments after flag %q: %q", arg, args[i+1:])
-			}
-			clean := strings.TrimLeft(arg, "-")
-			pos := slices.IndexFunc(info.Flags, func(f command.FlagInfo) bool {
-				return f.Name == clean
-			})
-			if pos < 0 {
-				return fmt.Errorf("command %q has no flag %q", info.Name, arg)
-			}
-			return json.NewEncoder(os.Stdout).Encode(info.Flags[pos])
-		}
-		pos := slices.IndexFunc(info.Commands, func(c *command.CInfo) bool {
-			return c.Name == arg
-		})
-		if pos < 0 {
-			return fmt.Errorf("command %q has no subcommand %q", info.Name, arg)
-		}
-		info = info.Commands[pos]
-	}
-	if commandInfoFlags.RootOnly {
-		info.Commands = nil
-	}
-	return json.NewEncoder(os.Stdout).Encode(info)
 }
