@@ -5,32 +5,32 @@ go 1.25.8
 require (
 	github.com/creachadair/atomicfile v0.4.2
 	github.com/creachadair/badgerstore v0.10.6
-	github.com/creachadair/bitcaskstore v0.0.0-20260702150354-135308672866
-	github.com/creachadair/boltstore v0.0.0-20260702150432-283432be4698
-	github.com/creachadair/buntdbstore v0.0.0-20260702150711-8ac595348496
+	github.com/creachadair/bitcaskstore v0.0.0-20260708173720-a160780602c8
+	github.com/creachadair/boltstore v0.0.0-20260708173703-f45c87b2beea
+	github.com/creachadair/buntdbstore v0.0.0-20260714141107-3958dd5a0011
 	github.com/creachadair/chirp v0.4.11
-	github.com/creachadair/chirpstore v0.0.0-20260703211856-fd9aba92840e
+	github.com/creachadair/chirpstore v0.0.0-20260721014503-1a404d2ad5a7
 	github.com/creachadair/command v0.2.10
 	github.com/creachadair/ffs v0.17.20
-	github.com/creachadair/ffuse v0.0.0-20260718171101-e44770ed29a5
+	github.com/creachadair/ffuse v0.0.0-20260720191336-a18858cae489
 	github.com/creachadair/flax v0.0.6
-	github.com/creachadair/gcsstore v0.0.0-20260702150452-4b7da96c83a9
+	github.com/creachadair/gcsstore v0.0.0-20260712173628-bebdb33a26ed
 	github.com/creachadair/getpass v0.3.2
-	github.com/creachadair/gocache v0.0.0-20260702150643-ef492e4417cc
-	github.com/creachadair/keyring v0.2.4
-	github.com/creachadair/leveldbstore v0.0.0-20260702150554-c20277718233
+	github.com/creachadair/gocache v0.0.0-20260714141157-b91e912eda5e
+	github.com/creachadair/keyring v0.3.0
+	github.com/creachadair/leveldbstore v0.0.0-20260711154300-2430f29e7f98
 	github.com/creachadair/mds v0.30.4
-	github.com/creachadair/pebblestore v0.0.0-20260702150527-a80c08fc35a3
-	github.com/creachadair/rosedbstore v0.0.0-20260702150615-e45b5723bcb4
-	github.com/creachadair/s3store v0.0.0-20260702154346-bc3f0e1e43f1
-	github.com/creachadair/sqlitestore v0.0.0-20260702150709-1b5234ae5f7e
+	github.com/creachadair/pebblestore v0.0.0-20260709210047-c31ac41c3e31
+	github.com/creachadair/rosedbstore v0.0.0-20260709154404-5d7bdef340a7
+	github.com/creachadair/s3store v0.0.0-20260718204030-ba42dfcd6cdd
+	github.com/creachadair/sqlitestore v0.0.0-20260715192500-60fb1d3dfe10
 	github.com/creachadair/taskgroup v0.14.4
 	github.com/fortytw2/leaktest v1.3.0
-	github.com/hanwen/go-fuse/v2 v2.10.1
-	github.com/klauspost/compress v1.19.0
+	github.com/hanwen/go-fuse/v2 v2.11.0
+	github.com/klauspost/compress v1.19.1
 	github.com/pkg/xattr v0.4.12
 	golang.org/x/crypto v0.54.0
-	golang.org/x/net v0.56.0
+	golang.org/x/net v0.57.0
 	golang.org/x/sys v0.47.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
@@ -53,8 +53,8 @@ require (
 	github.com/abcum/lcp v0.0.0-20201209214815-7a3f3840be81 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.42.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.14 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.32.27 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.26 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.32.30 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.29 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.30 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.30 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.30 // indirect
@@ -63,11 +63,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.23 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.30 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.31 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.2.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.31.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.43.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.105.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.4.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.32.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.37.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.44.1 // indirect
 	github.com/aws/smithy-go v1.27.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
@@ -98,7 +98,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.16 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -150,11 +150,11 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
-	google.golang.org/api v0.286.0 // indirect
+	google.golang.org/api v0.288.0 // indirect
 	google.golang.org/genproto v0.0.0-20260519071638-aa98bba5eb94 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260615183401-62b3387ff324 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260615183401-62b3387ff324 // indirect
-	google.golang.org/grpc v1.81.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7 // indirect
+	google.golang.org/grpc v1.82.0 // indirect
 	honnef.co/go/tools v0.7.0 // indirect
 	modernc.org/libc v1.73.4 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
