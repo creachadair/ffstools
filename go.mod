@@ -4,7 +4,7 @@ go 1.25.8
 
 require (
 	github.com/creachadair/atomicfile v0.4.2
-	github.com/creachadair/badgerstore v0.10.6
+	github.com/creachadair/badgerstore v0.10.7
 	github.com/creachadair/bitcaskstore v0.0.0-20260708173720-a160780602c8
 	github.com/creachadair/boltstore v0.0.0-20260708173703-f45c87b2beea
 	github.com/creachadair/buntdbstore v0.0.0-20260714141107-3958dd5a0011
@@ -80,7 +80,7 @@ require (
 	github.com/cockroachdb/redact v1.1.8 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
 	github.com/creachadair/msync v0.9.1 // indirect
-	github.com/dgraph-io/badger/v4 v4.9.2 // indirect
+	github.com/dgraph-io/badger/v4 v4.9.5 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.37.0 // indirect
