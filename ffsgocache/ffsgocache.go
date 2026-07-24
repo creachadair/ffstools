@@ -73,7 +73,10 @@ func runCache(env *command.Env) error {
 	case flags.Store == "":
 		return env.Usagef("missing required --store address")
 	case flags.RootName == "":
-		return env.Usagef("missing required --root name")
+		if env.IsFlagSet("root") {
+			return env.Usagef("missing required --root name")
+		}
+		flags.RootName = "gocache"
 	}
 
 	// Create a local cache directory to send files to the toolchain.
