@@ -136,7 +136,8 @@ Allowed types include:
  b, block, bdev:   block device
  c, char, cdev:    character device
 
-If the origin is from a root, the root is updated with the changes.`,
+If the origin is from a root, the root is updated with the changes.
+As a special case, "create" allows "@" as the origin to create a new empty file.`,
 
 			Run: command.Adapt(runEdit),
 		},
@@ -528,6 +529,15 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		// If mod.create is set, treat "@" as a flag to create a new empty file.
+		if pathSpec == "@" && mod.create {
+			key, err := file.New(s.Files(), nil).Flush(env.Context())
+			if err != nil {
+				return err
+			}
+			pathSpec += filetree.FormatKey32(key)
+		}
+
 		tf, err := s.OpenPath(env.Context(), pathSpec)
 		if errors.Is(err, file.ErrChildNotFound) && mod.create {
 			// The specified path does not exist, but "create" is set, so do that,
