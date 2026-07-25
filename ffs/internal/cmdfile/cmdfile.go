@@ -107,24 +107,12 @@ the target.`,
 			Run: command.Adapt(runSet),
 		},
 		{
-			Name: "remove",
-			Usage: `<root-key>/<path> ...
-@<origin-key>/<path> ...`,
-			Help: `Remove the specified path from beneath the origin
-
-The storage key of the modified origin is printed to stdout.
-If the origin is from a root, the root is updated with the changes.
-`,
-
-			Run: runRemove,
-		},
-		{
-			Name: "set-stat",
+			Name: "edit",
 			Usage: `<root-key>/<path> <stat-spec>
 @<origin-key>/<path> <stat-spec>`,
-			Help: `Modify the stat message of the specified path beneath the origin.
+			Help: `Edit stat and content of the specified path beneath the origin.
 
-The stat spec is a list of fields to update, one or more of:
+The edit spec is a list of fields to update, one or more of:
 
  mode <perms>   -- set file permissions (e.g., 0755)
  type <type>    -- set file type (see below)
@@ -134,7 +122,9 @@ The stat spec is a list of fields to update, one or more of:
  owner <name>   -- set the owner name ("" to clear)
  group <name>   -- set the group name ("" to clear)
  persist <ok>   -- set or unset stat persistence
+ data <src>     -- set the file content to <src> ("" to clear, "-" for stdin, or path)
  clear          -- clear all current stat values to zero (applies first)
+ create         -- create the specified path if it does not exist (applies first)
 
 Allowed types include:
 
@@ -148,7 +138,19 @@ Allowed types include:
 
 If the origin is from a root, the root is updated with the changes.`,
 
-			Run: command.Adapt(runSetStat),
+			Run: command.Adapt(runEdit),
+		},
+		{
+			Name: "remove",
+			Usage: `<root-key>/<path> ...
+@<origin-key>/<path> ...`,
+			Help: `Remove the specified path from beneath the origin
+
+The storage key of the modified origin is printed to stdout.
+If the origin is from a root, the root is updated with the changes.
+`,
+
+			Run: runRemove,
 		},
 		{
 			Name: "xattr",
@@ -516,20 +518,54 @@ func runRemove(env *command.Env) error {
 	})
 }
 
-func runSetStat(env *command.Env, path string, mods []string) error {
+func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	if len(mods) == 0 {
-		return env.Usagef("missing stat spec")
+		return env.Usagef("missing edit spec")
 	}
-	mod, err := parseStatMod(mods)
+	mod, err := parseEditMod(mods)
 	if err != nil {
-		return fmt.Errorf("invalid mod spec: %w", err)
+		return fmt.Errorf("invalid edit spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		tf, err := s.OpenPath(env.Context(), path)
+		tf, err := s.OpenPath(env.Context(), pathSpec)
+		if errors.Is(err, file.ErrChildNotFound) && mod.create {
+			// The specified path does not exist, but "create" is set, so do that,
+			// then try to reopen the path.
+			_, err = s.SetPath(env.Context(), pathSpec, file.New(s.Files(), &file.NewOptions{
+				Name:        path.Base(pathSpec),
+				PersistStat: true,
+			}))
+			if err == nil {
+				tf, err = s.OpenPath(env.Context(), pathSpec)
+			}
+		}
 		if err != nil {
 			return err
 		}
+
+		// Set file data.
+		if mod.dataSpec != nil {
+			var derr error
+			switch *mod.dataSpec {
+			case "":
+				derr = tf.File.SetData(env.Context(), strings.NewReader(""))
+			case "-":
+				derr = tf.File.SetData(env.Context(), os.Stdin)
+			default:
+				f, err := os.Open(*mod.dataSpec)
+				if err != nil {
+					return fmt.Errorf("open data: %w", err)
+				}
+				derr = tf.File.SetData(env.Context(), f)
+				f.Close()
+			}
+			if derr != nil {
+				return fmt.Errorf("set data: %w", derr)
+			}
+		}
+
+		// Set various stat fields.
 		stat := tf.File.Stat()
 		if mod.clear {
 			stat = stat.Clear()
@@ -563,7 +599,7 @@ func runSetStat(env *command.Env, path string, mods []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("set-stat: %s\n", filetree.FormatKey32(key))
+		fmt.Printf("edit: %s\n", filetree.FormatKey32(key))
 		return nil
 	})
 }
@@ -907,31 +943,40 @@ func runFileCheck(env *command.Env, origins ...string) error {
 	})
 }
 
-type statMod struct {
+type editMod struct {
 	perms        *int64
 	ftype        *fs.FileMode
 	modTime      *time.Time
 	uid, gid     *int
 	owner, group *string
+	dataSpec     *string
 	persist      *bool
 	clear        bool
+	create       bool
 }
 
-func parseStatMod(args []string) (*statMod, error) {
-	var mod statMod
-
+func parseEditMod(args []string) (*editMod, error) {
+	var mod editMod
 	i := 0
 	for i < len(args) {
-		if args[i] == "clear" {
+		// Modifications that do not require an argument.
+		switch args[i] {
+		case "clear":
 			mod.clear = true
 			i++
 			continue
+		case "create":
+			mod.create = true
+			i++
+			continue
 		}
+
+		// Modifications that require an argument.
 		if i+1 >= len(args) {
 			return nil, errors.New("odd-length argument list")
 		}
 		switch args[i] {
-		case "mode":
+		case "mode", "perms":
 			v, err := strconv.ParseInt(args[i+1], 0, 32)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
@@ -960,7 +1005,7 @@ func parseStatMod(args []string) (*statMod, error) {
 			}
 			mod.ftype = &ftype
 
-		case "mtime":
+		case "mtime", "modtime":
 			var t time.Time
 			if args[i+1] == "now" {
 				t = time.Now()
@@ -1004,6 +1049,9 @@ func parseStatMod(args []string) (*statMod, error) {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
 			mod.persist = &v
+
+		case "data", "content":
+			mod.dataSpec = &args[i+1]
 
 		default:
 			return nil, fmt.Errorf("unknown stat field %q", args[i])
