@@ -531,7 +531,7 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		// If mod.create is set, treat "@" as a flag to create a new empty file.
 		if pathSpec == "@" && mod.create {
-			key, err := file.New(s.Files(), nil).Flush(env.Context())
+			key, err := file.New(s.Files(), &file.NewOptions{PersistStat: true}).Flush(env.Context())
 			if err != nil {
 				return err
 			}
