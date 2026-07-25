@@ -542,11 +542,16 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 		if errors.Is(err, file.ErrChildNotFound) && mod.create {
 			// The specified path does not exist, but "create" is set, so do that,
 			// then try to reopen the path.
-			_, err = s.SetPath(env.Context(), pathSpec, file.New(s.Files(), &file.NewOptions{
+			var pk string
+			pk, err = s.SetPath(env.Context(), pathSpec, file.New(s.Files(), &file.NewOptions{
 				Name:        path.Base(pathSpec),
 				PersistStat: true,
 			}))
 			if err == nil {
+				// If the original spec was a file tree origin, we have to update the path.
+				if first, rest := filetree.SplitPath(pathSpec); strings.HasPrefix(first, "@") {
+					pathSpec = path.Join("@"+filetree.FormatKey32(pk), rest)
+				}
 				tf, err = s.OpenPath(env.Context(), pathSpec)
 			}
 		}
