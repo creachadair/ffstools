@@ -133,7 +133,7 @@ func (s *Settings) openStoreAddress(ctx context.Context, spec StoreSpec) (filetr
 	a := storeclient.ParseAddress(spec.Address)
 	a.Substore = spec.Substore
 
-	var opts chirpstore.StoreOptions
+	opts := chirpstore.StoreOptions{MethodPrefix: s.ServicePrefix}
 	if s.EnableDebugLogging {
 		lg := log.New(log.Writer(), "[ffs] ", log.LstdFlags|log.Lmicroseconds)
 		lg.Printf("dial %q", spec.Address)
