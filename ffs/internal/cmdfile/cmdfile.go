@@ -662,7 +662,7 @@ func runResolve(env *command.Env, originPath string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%s\n", config.DisplayKey(rf.File.Key()))
+			fmt.Printf("%s\n", filetree.FormatKey32(rf.File.Key()))
 			return nil
 		})
 	}
