@@ -2,6 +2,7 @@
 
 See also https://github.com/creachadair/ffs.
 
+[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=sandybrown)](https://pkg.go.dev/github.com/creachadair/ffstools)
 [![CI](https://github.com/creachadair/ffstools/actions/workflows/go-presubmit.yml/badge.svg?event=push&branch=main)](https://github.com/creachadair/ffstools/actions/workflows/go-presubmit.yml)
 
 ## Overview
