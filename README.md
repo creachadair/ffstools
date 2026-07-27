@@ -116,7 +116,6 @@ The following storage backends can be enabled by building with the specified tag
 | bolt     | BoltDB               | [docs](https://godoc.org/go.etcd.io/bbolt)                        | B-tree, single-file, slow writes           |
 | buntdb   | BuntDB               | [docs](https://godoc.org/github.com/tidwall/buntdb)               | Log-structured, single-file                |
 | gcs      | Google Cloud Storage | [docs](https://godoc.org/cloud.google.com/go/storage)             | No local storage; requires GCP credentials |
-| leveldb  | LevelDB              | [docs](https://godoc.org/github.com/syndtr/goleveldb/leveldb)     | LSM, directory, not fast                   |
 | pebble   | PebbleDB             | [docs](https://godoc.org/github.com/cockroachdb/pebble)           | LSM, directory; RocksDB layout             |
 | rosedb   | RoseDB               | [docs](https://godoc.org/github.com/rosedblabs/rosedb/v2)         | LSM, multiple files, Bitcask layout        |
 | s3       | Amazon S3            | [docs](https://godoc.org/github.com/aws/aws-sdk-go-v2/service/s3) | No local storage; requires AWS credentials |

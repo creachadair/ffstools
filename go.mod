@@ -17,7 +17,6 @@ require (
 	github.com/creachadair/getpass v0.3.2
 	github.com/creachadair/gocache v0.0.0-20260714141157-b91e912eda5e
 	github.com/creachadair/keyring v0.3.0
-	github.com/creachadair/leveldbstore v0.0.0-20260711154300-2430f29e7f98
 	github.com/creachadair/mds v0.30.4
 	github.com/creachadair/pebblestore v0.0.0-20260709210047-c31ac41c3e31
 	github.com/creachadair/rosedbstore v0.0.0-20260709154404-5d7bdef340a7
@@ -114,7 +113,6 @@ require (
 	github.com/rosedblabs/rosedb/v2 v2.4.0 // indirect
 	github.com/rosedblabs/wal v1.3.8 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
-	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/btree v1.8.1 // indirect
 	github.com/tidwall/buntdb v1.3.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -149,7 +147,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260615183401-62b3387ff324 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7 // indirect
 	google.golang.org/grpc v1.82.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.7.0 // indirect
 	modernc.org/libc v1.73.4 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
