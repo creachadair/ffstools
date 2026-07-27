@@ -113,7 +113,6 @@ The following storage backends can be enabled by building with the specified tag
 | Type/Tag | Description          | Implementation                                                    | Notes                                      |
 |----------|----------------------|-------------------------------------------------------------------|--------------------------------------------|
 | badger   | BadgerDB             | [docs](https://godoc.org/github.com/dgraph-io/badger/v4)          | LSM, fast, directory layout                |
-| bitcask  | Bitcask              | [docs](https://godoc.org/git.mills.io/prologic/bitcask)           | LSM, directory layout                      |
 | bolt     | BoltDB               | [docs](https://godoc.org/go.etcd.io/bbolt)                        | B-tree, single-file, slow writes           |
 | buntdb   | BuntDB               | [docs](https://godoc.org/github.com/tidwall/buntdb)               | Log-structured, single-file                |
 | gcs      | Google Cloud Storage | [docs](https://godoc.org/cloud.google.com/go/storage)             | No local storage; requires GCP credentials |
