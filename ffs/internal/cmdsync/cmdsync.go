@@ -39,6 +39,7 @@ import (
 var syncFlags struct {
 	Target       string `flag:"to,Target store (required unless --from is set)"`
 	Source       string `flag:"from,Source store (required unless --to is set)"`
+	Quiet        bool   `flag:"q,Reduce diagnostic output"`
 	Verbose      bool   `flag:"v,Enable verbose logging"`
 	VVerbose     bool   `flag:"vv,PRIVATE:Enable detailed verbose logging"`
 	NoIndex      bool   `flag:"no-index,Do not use cached indices"`
@@ -55,6 +56,12 @@ func debug(msg string, args ...any) {
 
 func dprintf(w io.Writer, msg string, args ...any) {
 	if syncFlags.Verbose || syncFlags.VVerbose {
+		fmt.Fprintf(w, msg, args...)
+	}
+}
+
+func qprintf(w io.Writer, msg string, args ...any) {
+	if !syncFlags.Quiet {
 		fmt.Fprintf(w, msg, args...)
 	}
 }
@@ -92,10 +99,10 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 		return cfg.WithStoreAddress(env.Context(), otherSpec, func(other filetree.Store) error {
 			var src, tgt filetree.Store
 			if syncFlags.Target != "" {
-				fmt.Fprintf(env, "Target store: %q\n", syncFlags.Target)
+				qprintf(env, "Target store: %q\n", syncFlags.Target)
 				src, tgt = main, other
 			} else {
-				fmt.Fprintf(env, "Source store %q\n", syncFlags.Source)
+				qprintf(env, "Source store %q\n", syncFlags.Source)
 				src, tgt = other, main
 			}
 
@@ -122,13 +129,13 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 						dprintf(env, "Loaded cached index for %q (%d keys)\n", elt, idx.Len())
 						continue
 					}
-					fmt.Fprintf(env, "Scanning data reachable from root %q", of.RootKey)
+					qprintf(env, "Scanning data reachable from root %q", of.RootKey)
 					err = worklist.Root(env.Context(), of.RootKey, of.Root)
 				} else {
-					fmt.Fprintf(env, "Scanning data reachable from file %s", filetree.FormatKey32(of.FileKey))
+					qprintf(env, "Scanning data reachable from file %s", filetree.FormatKey32(of.FileKey))
 					err = worklist.File(env.Context(), of.File)
 				}
-				fmt.Fprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
+				qprintf(env, " [%v elapsed]\n", time.Since(scanStart).Round(time.Millisecond))
 				if err != nil {
 					return err
 				}
@@ -152,7 +159,7 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				dprintf(env, "Added %d reachable objects from %d indices\n", numAdded, len(indices))
 			}
 
-			fmt.Fprintf(env, "Found %d reachable objects\n", worklist.Len())
+			qprintf(env, "Found %d reachable objects\n", worklist.Len())
 			if worklist.Len() == 0 {
 				return errors.New("no matching objects")
 			}
@@ -175,10 +182,10 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 				}
 			}
 			dprintf(env, "Key scan processed %d spans, found %d missing keys\n", nspan, nmiss)
-			fmt.Fprintf(env, "Have %d objects to copy\n", worklist.Len())
+			qprintf(env, "Have %d objects to copy\n", worklist.Len())
 
 			var pb *pbar.Bar
-			if worklist.Len() > 1000 {
+			if worklist.Len() > 1000 && !syncFlags.Quiet {
 				pb = pbar.New(env, int64(worklist.Len())).Start()
 			}
 

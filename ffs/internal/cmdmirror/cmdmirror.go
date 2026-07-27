@@ -19,6 +19,7 @@ import (
 	"cmp"
 	"context"
 	"fmt"
+	"io"
 	"iter"
 	"sync/atomic"
 	"time"
@@ -37,6 +38,7 @@ var mirrorFlags struct {
 	Source  string `flag:"from,Source store (required unless --to is set)"`
 	NoRoots bool   `flag:"no-roots,Do not mirror root pointers"`
 	NoFiles bool   `flag:"no-files,Do not mirror file trees"`
+	Quiet   bool   `flag:"q,Reduce diagnostic output"`
 }
 
 var Command = &command.C{
@@ -63,16 +65,16 @@ func runMirror(env *command.Env) error {
 		return cfg.WithStoreAddress(env.Context(), otherSpec, func(other filetree.Store) error {
 			var src, tgt filetree.Store
 			if mirrorFlags.Target != "" {
-				fmt.Fprintf(env, "Target store: %q\n", mirrorFlags.Target)
+				dprintf(env, "Target store: %q\n", mirrorFlags.Target)
 				src, tgt = main, other
 			} else {
-				fmt.Fprintf(env, "Source store %q\n", mirrorFlags.Source)
+				dprintf(env, "Source store %q\n", mirrorFlags.Source)
 				src, tgt = other, main
 			}
 
 			// If requested, copy roots.
 			if mirrorFlags.NoRoots {
-				fmt.Fprintln(env, "Skipping root pointers")
+				dprintf(env, "Skipping root pointers")
 			} else {
 				start := time.Now()
 				var numRoots int
@@ -90,7 +92,7 @@ func runMirror(env *command.Env) error {
 
 			// If requested, copy files.
 			if mirrorFlags.NoFiles {
-				fmt.Fprintln(env, "Skipping file objects")
+				dprintf(env, "Skipping file objects")
 			} else {
 				ctx, cancel := context.WithCancel(env.Context())
 				defer cancel()
@@ -101,9 +103,9 @@ func runMirror(env *command.Env) error {
 				if err != nil {
 					return err
 				}
-				if n > 1000 {
+				if n > 1000 && !mirrorFlags.Quiet {
 					pb = pbar.New(env, n).Start()
-					fmt.Fprintf(env, "Scanning %d objects...\n", n)
+					dprintf(env, "Scanning %d objects...\n", n)
 				}
 
 				start := time.Now()
@@ -175,4 +177,10 @@ func forEachChunk[T any](seq iter.Seq2[T, error], n int, f func([]T) error) erro
 		return f(cur)
 	}
 	return nil
+}
+
+func dprintf(w io.Writer, msg string, args ...any) {
+	if !mirrorFlags.Quiet {
+		fmt.Fprintf(w, msg, args...)
+	}
 }
