@@ -16,15 +16,9 @@
 package cmdimport
 
 import (
-	"archive/tar"
-	"archive/zip"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/file"
@@ -32,7 +26,6 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/flax"
-	"github.com/klauspost/compress/zstd"
 )
 
 const intoHelp = `
@@ -144,14 +137,7 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 		}
 		var lastRoot *file.File
 		for _, path := range env.Args {
-			tf, c, err := openTar(path)
-			if err != nil {
-				return err
-			}
-			logPrintf("begin import tar %q", path)
-
-			root, err := putConfig.ImportTar(env.Context(), s.Files(), tf)
-			c.Close()
+			root, err := putConfig.ImportTarPath(env.Context(), s.Files(), path)
 			if err != nil {
 				return fmt.Errorf("input %q: %w", path, err)
 			}
@@ -185,15 +171,8 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 		}
 		var lastRoot *file.File
 		for _, path := range env.Args {
-			zf, c, err := openZIP(path)
+			root, err := putConfig.ImportZIPPath(env.Context(), s.Files(), path)
 			if err != nil {
-				return err
-			}
-			log.Printf("begin import zip: %q", path)
-
-			root, err := putConfig.ImportZIP(env.Context(), s.Files(), zf)
-			if err != nil {
-				c.Close()
 				return err
 			}
 			fmt.Printf("import: %s\n", filetree.FormatKey32(root.Key()))
@@ -212,52 +191,6 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 		}
 		return nil
 	})
-}
-
-func openTar(path string) (*tar.Reader, io.Closer, error) {
-	var r io.Reader
-	var c io.Closer
-	if path == "-" {
-		r, c = os.Stdin, os.Stdin
-	} else if f, err := os.Open(path); err != nil {
-		return nil, nil, err
-	} else {
-		r, c = f, f
-	}
-
-	ext := strings.ToLower(filepath.Ext(path))
-	if ext == ".zst" || ext == ".zstd" {
-		dec, err := zstd.NewReader(r)
-		if err != nil {
-			panic(fmt.Sprintf("zstd reader: %v", err)) // should not be possible
-		}
-		r = dec
-	}
-	return tar.NewReader(r), c, nil
-}
-
-func openZIP(path string) (*zip.Reader, io.Closer, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
-	}
-	fi, err := f.Stat()
-	if err != nil {
-		f.Close()
-		return nil, nil, err
-	}
-	zr, err := zip.NewReader(f, fi.Size())
-	if err != nil {
-		f.Close()
-		return nil, nil, fmt.Errorf("input %q: %w", path, err)
-	}
-	return zr, f, nil
-}
-
-func logPrintf(msg string, args ...any) {
-	if putConfig.Verbose {
-		log.Printf(msg, args...)
-	}
 }
 
 func checkTarget(env *command.Env, s filetree.Store, target string) error {
