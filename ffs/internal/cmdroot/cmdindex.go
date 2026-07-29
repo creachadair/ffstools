@@ -93,6 +93,13 @@ func runIndex(env *command.Env) error {
 }
 
 func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (string, int, error) {
+	n, err := s.Files().Len(ctx)
+	if err != nil {
+		return "", 0, fmt.Errorf("calculate filter length: %w", err)
+	}
+
+	// Now that we know the size of the set, pack the keys into the index.
+	idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.005})
 	var scanned mapset.Set[string]
 	if err := fp.Scan(ctx, func(si file.ScanItem) error {
 		key := si.Key()
@@ -100,20 +107,17 @@ func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (
 			return file.ErrSkipChildren // don't re-scan repeats of the same file
 		}
 		scanned.Add(key)
-		scanned.Add(si.Data().Keys()...)
+		idx.Add(key)
+		for _, dk := range si.Data().Keys() {
+			idx.Add(dk)
+		}
 		return nil
 	}); err != nil {
 		return "", 0, fmt.Errorf("scanning %s: %w", filetree.FormatKey32(fp.Key()), err)
-	}
-
-	// Now that we know the size of the set, pack the keys into the index.
-	idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
-	for key := range scanned {
-		idx.Add(key)
 	}
 	ikey, err := s.SaveIndex(ctx, idx)
 	if err != nil {
 		return "", 0, fmt.Errorf("saving index: %w", err)
 	}
-	return ikey, len(scanned), nil
+	return ikey, idx.Len(), nil
 }
