@@ -95,6 +95,17 @@ func (b *Bar) SetMeta(v int64) {
 	b.meta = v
 }
 
+// AddMeta adds v to the current value of the meta-counter.
+// The value may be negative.
+func (b *Bar) AddMeta(v int64) {
+	if b == nil {
+		return
+	}
+	b.μ.Lock()
+	defer b.μ.Unlock()
+	b.meta += v
+}
+
 // Add adds v to the current value of the bar. The offset may be negative.  If
 // the resulting value is less than zero it is pinned to zero. If the resulting
 // value exceeds the current maximum the bar length is extended.
