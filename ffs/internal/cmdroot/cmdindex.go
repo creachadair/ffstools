@@ -94,14 +94,14 @@ func runIndex(env *command.Env) error {
 
 func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (string, int, error) {
 	var scanned mapset.Set[string]
-	if err := fp.Scan(ctx, func(si file.ScanItem) bool {
+	if err := fp.Scan(ctx, func(si file.ScanItem) error {
 		key := si.Key()
 		if scanned.Has(key) {
-			return false // don't re-scan repeats of the same file
+			return file.ErrSkipChildren // don't re-scan repeats of the same file
 		}
 		scanned.Add(key)
 		scanned.Add(si.Data().Keys()...)
-		return true
+		return nil
 	}); err != nil {
 		return "", 0, fmt.Errorf("scanning %s: %w", filetree.FormatKey32(fp.Key()), err)
 	}

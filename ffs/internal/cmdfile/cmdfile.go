@@ -1137,14 +1137,14 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 			if err != nil {
 				return err
 			}
-			if err := of.File.Scan(env.Context(), func(si file.ScanItem) bool {
+			if err := of.File.Scan(env.Context(), func(si file.ScanItem) error {
 				key := si.Key()
 				if scanned.Has(key) {
-					return false // don't re-scan repeats of the same file
+					return file.ErrSkipChildren // don't re-scan repeats of the same file
 				}
 				scanned.Add(key)
 				scanned.Add(si.Data().Keys()...)
-				return true
+				return nil
 			}); err != nil {
 				return fmt.Errorf("scanning %q: %w", spec, err)
 			}

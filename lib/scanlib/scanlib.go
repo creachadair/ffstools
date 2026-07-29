@@ -61,10 +61,10 @@ func (s *Scanner) Root(ctx context.Context, rootKey string, rp *root.Root) error
 
 // File adds all the files and data blobs reachable from fp to s.
 func (s *Scanner) File(ctx context.Context, fp *file.File) error {
-	return fp.Scan(ctx, func(si file.ScanItem) bool {
+	return fp.Scan(ctx, func(si file.ScanItem) error {
 		key := si.Key()
 		if _, ok := s.keys[key]; ok {
-			return false // skip repeats of the same file
+			return file.ErrSkipChildren // skip repeats of the same file
 		}
 		s.keys[key] = File
 
@@ -72,7 +72,7 @@ func (s *Scanner) File(ctx context.Context, fp *file.File) error {
 		for _, dkey := range si.Data().Keys() {
 			s.Data(dkey)
 		}
-		return true
+		return nil
 	})
 }
 

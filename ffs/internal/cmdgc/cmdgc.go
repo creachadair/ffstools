@@ -137,17 +137,17 @@ store without roots.
 				scannedFiles := mapset.New[string]()
 
 				start := time.Now()
-				if err := rf.Scan(env.Context(), func(si file.ScanItem) bool {
+				if err := rf.Scan(env.Context(), func(si file.ScanItem) error {
 					key := si.Key()
 					if scannedFiles.Has(key) {
-						return false // already scanned
+						return file.ErrSkipChildren // already scanned
 					}
 					scannedFiles.Add(key)
 					idx.Add(key)
 					for _, dkey := range si.Data().Keys() {
 						idx.Add(dkey)
 					}
-					return true
+					return nil
 				}); err != nil {
 					return fmt.Errorf("scanning %q: %w", key, err)
 				}
