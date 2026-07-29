@@ -43,6 +43,7 @@ type Config struct {
 	// If it is nil, the config uses the standard library's [os] package.
 	// It may optionally also implement [fs.ReadLinkFS] if symlinks are supported.
 	// It may optionally also implement [XAttrFS] if extended attributes are supported.
+	// Note: In order to import ZIP files, files must also implement [io.ReaderAt].
 	FS fs.ReadDirFS
 }
 

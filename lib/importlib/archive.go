@@ -23,13 +23,84 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/fpath"
+	"github.com/klauspost/compress/zstd"
 )
+
+// ImportTarPath opens the specified path as a tar file and imports its
+// contents as per [Config.ImportTar].
+func (c Config) ImportTarPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
+	tr, tc, err := c.openTar(path)
+	if err != nil {
+		return nil, err
+	}
+	defer tc.Close()
+	c.logPrintf("begin import tar: %q", path)
+	return c.ImportTar(ctx, s, tr)
+}
+
+func (c Config) openTar(path string) (*tar.Reader, io.Closer, error) {
+	var r io.Reader
+	var fc io.Closer
+	if path == "-" {
+		r, fc = os.Stdin, os.Stdin
+	} else if f, err := c.getFS().Open(path); err != nil {
+		return nil, nil, err
+	} else {
+		r, fc = f, f
+	}
+
+	ext := strings.ToLower(filepath.Ext(path))
+	if ext == ".zst" || ext == ".zstd" {
+		dec, err := zstd.NewReader(r)
+		if err != nil {
+			panic(fmt.Sprintf("zstd reader: %v", err)) // should not be possible
+		}
+		r = dec
+	}
+	return tar.NewReader(r), fc, nil
+}
+
+// ImportZIPPath opens the specified path as a ZIP file and imports its
+// contents as per [Config.ImportZIP].
+func (c Config) ImportZIPPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
+	zr, zc, err := c.openZIP(path)
+	if err != nil {
+		return nil, err
+	}
+	defer zc.Close()
+	c.logPrintf("begin import zip: %q", path)
+	return c.ImportZIP(ctx, s, zr)
+}
+
+func (c Config) openZIP(path string) (*zip.Reader, io.Closer, error) {
+	f, err := c.getFS().Open(path)
+	if err != nil {
+		return nil, nil, err
+	}
+	fi, err := f.Stat()
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	ra, ok := f.(io.ReaderAt)
+	if !ok {
+		f.Close()
+		return nil, nil, errors.New("file is not random-access")
+	}
+	zr, err := zip.NewReader(ra, fi.Size())
+	if err != nil {
+		f.Close()
+		return nil, nil, fmt.Errorf("input %q: %w", path, err)
+	}
+	return zr, f, nil
+}
 
 // ImportZIP imports the complete contents of zr into a new file tree in s, and
 // returns the root of that tree. On success, the resulting root is flushed to
