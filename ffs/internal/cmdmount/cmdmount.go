@@ -23,7 +23,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/filetree"
@@ -46,7 +48,8 @@ With --writable, the filesystem is mounted as modifiable.
 
 If the file is based on a root key, then changes made while the filesystem
 is mounted are flushed back to that root upon exit. If the --auto-flush flag
-is set, changes are additionally flushed at the specified interval.
+is set, changes are additionally flushed at the specified interval. Sending
+SIGUSR1 to the mount process will also trigger an immediate flush.
 
 By default, the filesystem runs until the program is terminated by a signal
 or the filesystem is unmounted (e.g., by calling umount).  With --exec, the
@@ -103,6 +106,25 @@ the filesystem is automatically unmounted when the subprocess exits.
 			if !svc.Writable {
 				return svc.Run(ctx)
 			}
+
+			fc := make(chan os.Signal, 1)
+			signal.Notify(fc, syscall.SIGUSR1)
+			go func() {
+				defer signal.Ignore(syscall.SIGUSR1)
+				for {
+					select {
+					case <-env.Context().Done():
+						return
+					case <-fc:
+						newKey, err := svc.Path.Flush(env.Context())
+						if err != nil {
+							log.Printf("WARNING: Error flushing root: %v", err)
+						} else {
+							fmt.Fprintf(env, "flush: %s\n", filetree.FormatKey32(newKey))
+						}
+					}
+				}
+			}()
 
 			// Otherwise, we need to persist the root once the filesystem exits.
 			// If the filesystem failed, don't overwrite the root with changes,
