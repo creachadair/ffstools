@@ -35,6 +35,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
 	"github.com/creachadair/getpass"
+	"github.com/creachadair/getpass/gui"
 	"github.com/creachadair/keyring"
 	"github.com/creachadair/mds/shell"
 )
@@ -162,5 +163,10 @@ func getPassphrase(target string) (string, error) {
 		return strings.TrimSpace(string(data)), nil
 	}
 
-	return getpass.Prompt(fmt.Sprintf("Passphrase for %q: ", target))
+	ptext := fmt.Sprintf("Passphrase for %q: ", target)
+	pp, err := gui.Prompt(ptext)
+	if errors.Is(err, gui.ErrNoGUI) {
+		return getpass.Prompt(ptext)
+	}
+	return pp, err
 }
