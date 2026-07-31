@@ -499,7 +499,7 @@ func runRemove(env *command.Env) error {
 		for _, arg := range env.Args {
 			base, rest := filetree.SplitPath(arg)
 			if rest == "" || rest == "." {
-				return fmt.Errorf("missing path %q", arg)
+				return fmt.Errorf(`missing path %q (use "root delete" to delete a root)`, arg)
 			}
 			of, err := s.OpenPath(env.Context(), base) // N.B. No path; see below
 			if err != nil {
