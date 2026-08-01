@@ -98,6 +98,7 @@ func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 	syncStart := time.Now()
 	var indices []*index.Index
 	var roots []*filetree.PathInfo
+
 	for _, elt := range sourceKeys {
 		of, err := c.Source.OpenPath(ctx, elt)
 		if err != nil {
@@ -118,12 +119,12 @@ func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 				indices = append(indices, idx)
 				continue
 			}
-			c.infof("Scanning data reachable from root %q ", of.RootKey)
+			c.infof("Scanning data reachable from root %q ...\n", of.RootKey)
 		} else {
-			c.infof("Scanning data reachable from file %s ", filetree.FormatKey32(of.FileKey))
+			c.infof("Scanning data reachable from file %s ...\n", filetree.FormatKey32(of.FileKey))
 		}
-		nk, err := scanAndCopy(ctx, of.File, c.Source.Files(), c.Target.Sync(), run)
-		c.infof("[%d copied, %v elapsed]\n", nk, time.Since(scanStart).Round(time.Millisecond))
+		nk, err := c.scanAndCopy(ctx, of.File, run)
+		c.infof("Scan complete [%d copied, %v elapsed]\n", nk, time.Since(scanStart).Round(time.Millisecond))
 		stats.Copied += int64(nk)
 		if err != nil {
 			return stats, err
@@ -232,7 +233,7 @@ func moveBlob(ctx context.Context, src blob.KVCore, tgt blob.KV, oldKey, newKey 
 }
 
 // scanAndCopy scans all the content-addressed blobs reachable from root in
-// src, and copies any to tgt that are not already present there.
+// c.Source, and copies any to c.Target that are not already present there.
 //
 // Copies are executed concurrently via run.  It reports the total number of
 // copies successfully issued, but the caller must wait for the taskgroup to
@@ -242,9 +243,16 @@ func moveBlob(ctx context.Context, src blob.KVCore, tgt blob.KV, oldKey, newKey 
 // a store cache, since the file being visited is likely to be still warm when
 // we do the copy. This is especially helpful for remote stores, where the cost
 // of re-fetching a blob faulted out may be substantial.
-func scanAndCopy(ctx context.Context, root *file.File, src blob.KVCore, tgt blob.KV, run taskgroup.StartFunc) (int, error) {
+func (c Config) scanAndCopy(ctx context.Context, root *file.File, run taskgroup.StartFunc) (int, error) {
+	src := c.Source.Files()
+	tgt := c.Target.Sync()
+
 	var seen, data blob.KeySet
+	var nc int
 	var check []string
+	pt := time.NewTicker(10 * time.Second)
+	defer pt.Stop()
+	start := time.Now()
 	err := root.Scan(ctx, func(si file.ScanItem) error {
 		if ctx.Err() != nil {
 			return ctx.Err()
@@ -262,15 +270,30 @@ func scanAndCopy(ctx context.Context, root *file.File, src blob.KVCore, tgt blob
 		if err != nil {
 			return err
 		}
+		nc += need.Len()
+
+		// Do the file first, while it is still hot in the cache.
+		if need.Has(si.Key()) {
+			if err := copyBlob(ctx, src, tgt, si.Key(), false); err != nil {
+				return err
+			}
+			need.Remove(si.Key())
+			seen.Add(si.Key())
+		}
 		for missing := range need {
 			run(func() error {
 				return copyBlob(ctx, src, tgt, missing, false)
 			})
 		}
-		seen.Add(si.Key())
+		select {
+		case <-pt.C:
+			c.detailf("... [%v] scan progress: %d files, %d blocks\n",
+				time.Since(start).Round(time.Millisecond), len(seen), len(data))
+		default:
+		}
 		return nil
 	})
-	return len(seen) + len(data), err
+	return nc, err
 }
 
 // findMissing reports the set of all keys in src mentioned by one of the
