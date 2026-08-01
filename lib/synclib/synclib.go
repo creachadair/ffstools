@@ -83,7 +83,7 @@ type Stats struct {
 func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 	if len(sourceKeys) == 0 {
 		return Stats{}, nil // nothing to do
-	} else if c.Source == (filetree.Store{}) || c.Target == (filetree.Store{}) {
+	} else if !c.Source.IsValid() || !c.Target.IsValid() {
 		return Stats{}, errors.New("both Source and Target are required")
 	}
 
