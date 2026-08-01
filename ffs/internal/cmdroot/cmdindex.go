@@ -20,12 +20,12 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
-	"github.com/creachadair/mds/mapset"
 )
 
 var indexFlags struct {
@@ -100,16 +100,19 @@ func computeAndSaveIndex(ctx context.Context, s filetree.Store, fp *file.File) (
 
 	// Now that we know the size of the set, pack the keys into the index.
 	idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.005})
-	var scanned mapset.Set[string]
+	var files, data blob.KeySet
 	if err := fp.Scan(ctx, func(si file.ScanItem) error {
 		key := si.Key()
-		if scanned.Has(key) {
+		if files.Has(key) {
 			return file.ErrSkipChildren // don't re-scan repeats of the same file
 		}
-		scanned.Add(key)
+		files.Add(key)
 		idx.Add(key)
 		for _, dk := range si.Data().Keys() {
-			idx.Add(dk)
+			if !data.Has(dk) {
+				idx.Add(dk)
+				data.Add(dk)
+			}
 		}
 		return nil
 	}); err != nil {
