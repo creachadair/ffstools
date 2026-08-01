@@ -23,6 +23,7 @@ const (
 	File  Type = 'F' // A file record (Node)
 	Root  Type = 'R' // A root record (Root)
 	Index Type = 'I' // An index record (Index)
+	Chain Type = 'C' // A content-addressed root (Root)
 )
 
 // A Scanner scans all the blobs reachable from a collection of root and file
@@ -38,13 +39,20 @@ func NewScanner(src blob.CAS) *Scanner {
 }
 
 // RootOnly adds the specified root to the scan, including its index (if any),
-// but excluding any blobs reachable from its file pointer.
+// but excluding any blobs reachable from its file or chain pointers.
 //
 // Use [Scanner.Root] to completely scan a root.
 func (s *Scanner) RootOnly(rootKey string, rp *root.Root) {
 	s.keys[rootKey] = Root
+	s.rootLinks(rp)
+}
+
+func (s *Scanner) rootLinks(rp *root.Root) {
 	if ik := rp.IndexKey; ik != "" {
 		s.keys[rp.IndexKey] = Index
+	}
+	if ck := rp.ChainKey; ck != "" {
+		s.keys[rp.ChainKey] = Chain
 	}
 }
 
@@ -55,6 +63,26 @@ func (s *Scanner) Root(ctx context.Context, rootKey string, rp *root.Root) error
 	fp, err := rp.File(ctx, s.src)
 	if err != nil {
 		return err
+	}
+
+	// If rp has a chained root, follow the chain.
+	for cur := rp; cur.ChainKey != ""; {
+		if _, ok := s.keys[cur.ChainKey]; ok {
+			break // nothing more to do here
+		}
+		cp, err := cur.Chain(ctx, s.src)
+		if err != nil {
+			return err
+		}
+		s.rootLinks(cp)
+		cfp, err := cp.File(ctx, s.src)
+		if err != nil {
+			return err
+		}
+		if err := s.File(ctx, cfp); err != nil {
+			return err
+		}
+		cur = cp
 	}
 	return s.File(ctx, fp)
 }
