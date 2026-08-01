@@ -27,14 +27,13 @@ import (
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
-	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/pbar"
+	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
-	"github.com/creachadair/mds/mapset"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -89,7 +88,7 @@ store without roots.
 				return errors.New("the store is empty")
 			}
 			var idxs []*index.Index
-			idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.01})
+			scanner := scanlib.NewScanner(s.Files())
 			fmt.Fprintf(env, "Begin GC of %d objects from %d roots\n", n, len(keys))
 			dprintf(env, "Roots: %s\n", wrap(keys, 90, "  ", ", "))
 
@@ -99,6 +98,7 @@ store without roots.
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
+				scanner.RootOnly(key, rp)
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
@@ -107,7 +107,6 @@ store without roots.
 						return err
 					}
 					idxs = append(idxs, rpi)
-					idx.Add(rp.IndexKey)
 					dprintf(env, "Loaded cached index for %q (%d keys, %s)\n",
 						key, rpi.Stats().NumKeys, filetree.FormatKey32(rp.IndexKey),
 					)
@@ -120,49 +119,27 @@ store without roots.
 				}
 
 				// Otherwise, we need to compute the reachable set.
-				// TODO(creachadair): Maybe cache the results here too.
-				rf, err := rp.File(env.Context(), s.Files())
-				if err != nil {
-					return fmt.Errorf("opening %q: %w", rp.FileKey, err)
-				}
-				idx.Add(rp.FileKey)
-
+				start := time.Now()
+				prevLen := scanner.Len()
 				dprintf(env, "Scanning data reachable from %q (%s)...\n",
 					config.PrintableKey(key), filetree.FormatKey32(rp.FileKey))
-
-				// Avoid re-scanning repeats of the same file. But note: We do not
-				// want to use the index for this, as it is possible it may have a
-				// false positive. In that case we would incorrectly skip the file,
-				// so we want a true set.
-				scannedFiles := mapset.New[string]()
-
-				start := time.Now()
-				if err := rf.Scan(env.Context(), func(si file.ScanItem) error {
-					key := si.Key()
-					if scannedFiles.Has(key) {
-						return file.ErrSkipChildren // already scanned
-					}
-					scannedFiles.Add(key)
-					idx.Add(key)
-					for _, dkey := range si.Data().Keys() {
-						idx.Add(dkey)
-					}
-					return nil
-				}); err != nil {
-					return fmt.Errorf("scanning %q: %w", key, err)
+				if err := scanner.Root(env.Context(), key, rp); err != nil {
+					return fmt.Errorf("scanning root %q: %w", key, err)
 				}
 				dprintf(env, "Finished scanning %d objects [%v elapsed]\n",
-					idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
+					scanner.Len()-prevLen, time.Since(start).Truncate(10*time.Millisecond))
 			}
-			idxs = append(idxs, idx)
 
 			hasKey := func(key string) bool {
+				if scanner.Has(key) {
+					return true // true positive always
+				}
 				for _, idx := range idxs {
 					if idx.Has(key) {
-						return true
+						return true // true positive usually
 					}
 				}
-				return false
+				return false // true negative always
 			}
 
 			// Sweep phase: Remove objects not indexed.
@@ -176,7 +153,7 @@ store without roots.
 			var numKeep, numDrop, dataSize atomic.Int64
 
 			// Sweep phase 1: Collect all the keys eligible for deletion.
-			var toDrop mapset.Set[string]
+			var toDrop blob.KeySet
 			for key, err := range s.Files().List(ctx, "") {
 				if err != nil {
 					return err
