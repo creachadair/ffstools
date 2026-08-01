@@ -119,7 +119,9 @@ func runSync(env *command.Env, sourceKeys ...string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(env, "Copied %d objects [%v elapsed]\n", stats.Copied, stats.Elapsed.Truncate(10*time.Millisecond))
+			if stats.Copied != 0 || !syncFlags.Quiet {
+				fmt.Fprintf(env, "Copied %d objects [%v elapsed]\n", stats.Copied, stats.Elapsed.Truncate(10*time.Millisecond))
+			}
 			return nil
 		})
 	})
