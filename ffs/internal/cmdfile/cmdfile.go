@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"github.com/creachadair/command"
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/wiretype"
 	"github.com/creachadair/ffs/filetree"
@@ -1129,9 +1130,15 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(src filetree.Store) error {
-		scanned := mapset.New[string]()
 		start := time.Now()
 
+		n, err := src.Files().Len(env.Context())
+		if err != nil {
+			return fmt.Errorf("calculate filter length: %w", err)
+		}
+		idx := index.New(int(n), &index.Options{FalsePositiveRate: 0.005})
+
+		var files, data blob.KeySet
 		for _, spec := range sourceKeys {
 			of, err := src.OpenPath(env.Context(), spec)
 			if err != nil {
@@ -1139,23 +1146,25 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 			}
 			if err := of.File.Scan(env.Context(), func(si file.ScanItem) error {
 				key := si.Key()
-				if scanned.Has(key) {
+				if files.Has(key) {
 					return file.ErrSkipChildren // don't re-scan repeats of the same file
 				}
-				scanned.Add(key)
-				scanned.Add(si.Data().Keys()...)
+				files.Add(key)
+				idx.Add(key)
+				for _, dk := range si.Data().Keys() {
+					if !data.Has(dk) {
+						idx.Add(dk)
+						data.Add(dk)
+					}
+				}
 				return nil
 			}); err != nil {
-				return fmt.Errorf("scanning %q: %w", spec, err)
+				return fmt.Errorf("scanning %s: %w", filetree.FormatKey32(of.File.Key()), err)
 			}
 		}
 		fmt.Fprintf(env, "Finished scanning %d objects [%v elapsed]\n",
-			len(scanned), time.Since(start).Truncate(10*time.Millisecond))
+			idx.Len(), time.Since(start).Truncate(10*time.Millisecond))
 
-		idx := index.New(len(scanned), &index.Options{FalsePositiveRate: 0.01})
-		for key := range scanned {
-			idx.Add(key)
-		}
 		ikey, err := src.SaveIndex(env.Context(), idx)
 		if err != nil {
 			return fmt.Errorf("saving index: %w", err)
