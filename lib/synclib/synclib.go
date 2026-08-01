@@ -61,11 +61,11 @@ type Config struct {
 	RenameRoot func(string) string
 
 	// If set, report progress messages to this function.
-	// Only message types mentioned in Flags will be sent.
+	// Only message types covered by ProgressLevel will be sent.
 	Progress ProgressFunc
 
 	// What types of progress message will be sent if Progress is non-nil.
-	// Zero means ProgressInfo.  To omit all progress, set Progress = nil.
+	// Zero means ProgressInfo. To omit all progress logs, set Progress = nil.
 	ProgressLevel int
 
 	// If non-nil, write a progress bar to this writer when appropriate.
@@ -195,7 +195,7 @@ func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 }
 
 func (c Config) infof(msg string, args ...any) {
-	if c.Progress != nil {
+	if c.Progress != nil && c.ProgressLevel >= 0 {
 		c.Progress(ProgressInfo, msg, args...)
 	}
 }
