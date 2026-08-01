@@ -78,8 +78,30 @@ type Stats struct {
 	Elapsed time.Duration
 }
 
-// Sync synchronizes the file trees described by sourceKeys from c.Source to c.Target.
-// It copies all and only those objects that are not already present in the target.
+// Sync synchronizes the file trees described by sourceKeys from c.Source to
+// c.Target.  It copies all and only those objects recursively reachable, that
+// are not already present in the target.
+//
+// Each source key specifies the name of a root pointer, the content address of
+// a file tree, or a path descended from one or the other of these.
+//
+// For example:
+//
+//	files.backup
+//	files.backup/notes/laundry-list.txt
+//	@etv2mjn8wuf263d4xyegkveky1
+//	@etv2mjn8wuf263d4xyegkveky1/code/.git
+//
+// For a source key naming a root pointer, there are some special behaviors:
+//
+//   - By default, the root itself is copied along with the file tree.
+//     Set [Config.SkipRoots] to skip copying the root itself.
+//
+//   - If the root has an index, it is used to find the objects to copy.
+//     Set [Config.NoIndex] to ignore the index and re-scan the root.
+//
+//   - When copying a root, the name is preserved in the target. To use a
+//     different name, set [Config.RenameRoot].
 func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 	if len(sourceKeys) == 0 {
 		return Stats{}, nil // nothing to do
