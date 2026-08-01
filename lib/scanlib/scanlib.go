@@ -104,6 +104,9 @@ func (s *Scanner) File(ctx context.Context, fp *file.File) error {
 	})
 }
 
+// Has reports whether the specified key is present in s.
+func (s *Scanner) Has(key string) bool { _, ok := s.keys[key]; return ok }
+
 // Data adds the specified data blob to s.
 func (s *Scanner) Data(key string) { s.keys[key] = Data }
 
