@@ -145,16 +145,23 @@ func (c Config) ImportZIP(ctx context.Context, s blob.CAS, zr *zip.Reader) (*fil
 		},
 		PersistStat: !c.OmitStat,
 	})
+	dstat := make(map[*file.File]time.Time)
 	for _, entry := range zr.File {
 		hf, err := zipHeaderToFile(ctx, entry, root)
 		if err != nil {
 			return nil, err
+		}
+		if s := hf.Stat(); s.Mode.IsDir() && !s.ModTime.IsZero() {
+			dstat[hf] = s.ModTime
 		}
 		path := strings.TrimSuffix(entry.Name, "/") // directory names end in "/"
 		if _, err := fpath.Set(ctx, root, path, &fpath.SetOptions{File: hf}); err != nil {
 			return nil, fmt.Errorf("set %q: %w", path, err)
 		}
 		c.logPrintf("+ imported %s %q", hf.Stat().Mode, path)
+	}
+	for f, mt := range dstat {
+		f.Stat().WithModTime(mt).Update()
 	}
 	if _, err := root.Flush(ctx); err != nil {
 		return nil, err
@@ -202,6 +209,7 @@ func (c Config) ImportTar(ctx context.Context, s blob.CAS, tr *tar.Reader) (*fil
 		},
 		PersistStat: !c.OmitStat,
 	})
+	dstat := make(map[*file.File]time.Time)
 	for {
 		h, err := tr.Next()
 		if errors.Is(err, io.EOF) {
@@ -213,6 +221,9 @@ func (c Config) ImportTar(ctx context.Context, s blob.CAS, tr *tar.Reader) (*fil
 		if err != nil {
 			return nil, err
 		}
+		if s := hf.Stat(); s.Mode.IsDir() && !s.ModTime.IsZero() {
+			dstat[hf] = s.ModTime
+		}
 		path := strings.TrimSuffix(h.Name, "/") // directory names end in "/"
 		if _, err := fpath.Set(ctx, root, path, &fpath.SetOptions{
 			Create:  true,
@@ -222,6 +233,9 @@ func (c Config) ImportTar(ctx context.Context, s blob.CAS, tr *tar.Reader) (*fil
 			return nil, fmt.Errorf("set %q: %w", path, err)
 		}
 		c.logPrintf("+ imported %s %q", hf.Stat().Mode, path)
+	}
+	for f, mt := range dstat {
+		f.Stat().WithModTime(mt).Update()
 	}
 	if _, err := root.Flush(ctx); err != nil {
 		return nil, err
