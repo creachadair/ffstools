@@ -217,6 +217,13 @@ func (c Config) ImportTar(ctx context.Context, s blob.CAS, tr *tar.Reader) (*fil
 		} else if err != nil {
 			return nil, err
 		}
+
+		// Skip global headers, whose interpretation is context-specific.
+		// Do this before converting to a file, as such headers report as
+		// being plain files, cf. go/issues/22903.
+		if h.Typeflag == tar.TypeXGlobalHeader {
+			continue
+		}
 		hf, err := c.tarHeaderToFile(ctx, h, tr, root)
 		if err != nil {
 			return nil, err
