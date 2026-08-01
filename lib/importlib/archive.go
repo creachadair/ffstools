@@ -17,6 +17,9 @@ package importlib
 import (
 	"archive/tar"
 	"archive/zip"
+	"bufio"
+	"bytes"
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
@@ -56,15 +59,41 @@ func (c Config) openTar(path string) (*tar.Reader, io.Closer, error) {
 		r, fc = f, f
 	}
 
-	ext := strings.ToLower(filepath.Ext(path))
-	if ext == ".zst" || ext == ".zstd" {
-		dec, err := zstd.NewReader(r)
-		if err != nil {
-			panic(fmt.Sprintf("zstd reader: %v", err)) // should not be possible
-		}
-		r = dec
+	r, err := checkCompression(path, r)
+	if err != nil {
+		fc.Close()
+		return nil, nil, err
 	}
 	return tar.NewReader(r), fc, nil
+}
+
+// checkCompression checks path and a prefix of r to determine whether the
+// input should be treated as compressed, and returns either r itself or a
+// reader that decompresses the contents of r. It understands zstd and gzip.
+//
+// The input is treated as zstd if the path ends in ".zst" or ".zstd", or
+// if the input begins with 28 B5 2F FD (the zstd magic).
+//
+// The input is treated as gzip if the path ends in ".gz" or ".gzip", or
+// if the input begins with 1f 8b (the gzip magic).
+//
+// Otherwise, the input is treated as uncompressed.
+func checkCompression(path string, r io.Reader) (io.Reader, error) {
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".zst", ".zstd":
+		return zstd.NewReader(r)
+	case ".gz", ".gzip":
+		return gzip.NewReader(r)
+	}
+	br := bufio.NewReader(r)
+	magic, _ := br.Peek(4)
+	if bytes.HasPrefix(magic, []byte("\x1f\x8b")) {
+		return gzip.NewReader(br)
+	}
+	if bytes.HasPrefix(magic, []byte("\x28\xb5\x2f\xfd")) {
+		return zstd.NewReader(br)
+	}
+	return br, nil
 }
 
 // ImportZIPPath opens the specified path as a ZIP file and imports its
