@@ -348,9 +348,9 @@ func findMissing(ctx context.Context, indices []*index.Index, src blob.KVCore, t
 
 // Progress logging levels.
 const (
-	ProgressInfo   = 1 << iota // report informational messages
-	ProgressDetail             // report detail messages
-	ProgressDebug              // report debugging messages
+	ProgressInfo   = 1 + iota // report informational messages
+	ProgressDetail            // report detail messages
+	ProgressDebug             // report debugging messages
 )
 
 // A ProgressFunc is a callback used to report progress during a sync.
