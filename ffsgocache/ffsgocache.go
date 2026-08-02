@@ -44,7 +44,7 @@ var flags = struct {
 	Verbose      bool   `flag:"v,Enable verbose logging"`
 	DebugLog     bool   `flag:"debug,Enable detailed per-request debug logging (warning: noisy)"`
 }{
-	Tasks: runtime.NumCPU(),
+	Tasks: 2 * runtime.NumCPU(),
 }
 
 func main() {
