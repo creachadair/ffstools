@@ -133,7 +133,7 @@ func (c Config) openZIP(path string) (*zip.Reader, io.Closer, error) {
 
 // ImportZIP imports the complete contents of zr into a new file tree in s, and
 // returns the root of that tree. On success, the resulting root is flushed to
-// storage, so its [File.Key] method will report the storage key.
+// storage, so its [file.File.Key] method will report the storage key.
 func (c Config) ImportZIP(ctx context.Context, s blob.CAS, zr *zip.Reader) (*file.File, error) {
 	// Since the contents of a ZIP may not all be under the same
 	// directory, create a root directory to contain them all, so each

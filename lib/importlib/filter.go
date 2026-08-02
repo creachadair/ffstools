@@ -26,7 +26,7 @@ import (
 )
 
 // Filter is a collection of path filters used to control what parts of a file
-// tree get copied by "put" operations. Each line of a filter file specifies a
+// tree get copied by import operations. Each line of a filter file specifies a
 // glob matching file paths. By default, all files are included, and any path
 // matching a rule is filtered out.
 //
