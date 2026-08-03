@@ -333,7 +333,7 @@ func findMissing(ctx context.Context, indices []*index.Index, src blob.KVCore, t
 			}
 		}
 	}
-	for ch := range slices.Chunk(want.Slice(), 64) {
+	for ch := range slices.Chunk(want.Slice(), 128) {
 		if ctx.Err() != nil {
 			break
 		}
