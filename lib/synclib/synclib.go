@@ -333,17 +333,23 @@ func findMissing(ctx context.Context, indices []*index.Index, src blob.KVCore, t
 			}
 		}
 	}
-	for ch := range slices.Chunk(want.Slice(), 128) {
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	g, run := taskgroup.New(cancel).Limit(32)
+	c := taskgroup.Gather(run, func(have blob.KeySet) {
+		want.RemoveAll(have)
+	})
+	for ch := range slices.Chunk(want.Slice(), 64) {
 		if ctx.Err() != nil {
 			break
 		}
-		have, err := tgt.Has(ctx, ch...)
-		if err != nil {
-			return nil, err
-		}
-		want.RemoveAll(have)
+		c.Call(func() (blob.KeySet, error) {
+			return tgt.Has(ctx, ch...)
+		})
 	}
-	return want, nil
+	err := g.Wait()
+	return want, err
 }
 
 // Progress logging levels.
