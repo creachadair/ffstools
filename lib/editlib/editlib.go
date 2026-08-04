@@ -197,3 +197,18 @@ func (e *Edit) Apply(ctx context.Context, f *file.File) error {
 	stat.Update()
 	return nil
 }
+
+// ApplyRecursive applies e recursively to all files reachable from f.
+// On success, it flushes f to storage before returning.
+func (e *Edit) ApplyRecursive(ctx context.Context, f *file.File) error {
+	if e == nil {
+		return nil
+	}
+	if err := f.Scan(ctx, func(si file.ScanItem) error {
+		return e.Apply(ctx, si.File)
+	}); err != nil {
+		return err
+	}
+	_, err := f.Flush(ctx)
+	return err
+}
