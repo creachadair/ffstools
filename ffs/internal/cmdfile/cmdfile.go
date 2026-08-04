@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"math"
 	"os"
 	"os/user"
 	"path"
@@ -40,6 +39,7 @@ import (
 	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/editlib"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
@@ -524,14 +524,14 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	if len(mods) == 0 {
 		return env.Usagef("missing edit spec")
 	}
-	mod, err := parseEditMod(mods)
+	mod, err := editlib.ParseEdit(mods)
 	if err != nil {
 		return fmt.Errorf("invalid edit spec: %w", err)
 	}
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
 		// If mod.create is set, treat "@" as a flag to create a new empty file.
-		if pathSpec == "@" && mod.create {
+		if pathSpec == "@" && mod.Create {
 			key, err := file.New(s.Files(), &file.NewOptions{PersistStat: true}).Flush(env.Context())
 			if err != nil {
 				return err
@@ -540,7 +540,7 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 		}
 
 		tf, err := s.OpenPath(env.Context(), pathSpec)
-		if errors.Is(err, file.ErrChildNotFound) && mod.create {
+		if errors.Is(err, file.ErrChildNotFound) && mod.Create {
 			// The specified path does not exist, but "create" is set, so do that,
 			// then try to reopen the path.
 			var pk string
@@ -560,57 +560,9 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 			return err
 		}
 
-		// Set file data.
-		if mod.dataSpec != nil {
-			var derr error
-			switch *mod.dataSpec {
-			case "":
-				derr = tf.File.SetData(env.Context(), strings.NewReader(""))
-			case "-":
-				derr = tf.File.SetData(env.Context(), os.Stdin)
-			default:
-				f, err := os.Open(*mod.dataSpec)
-				if err != nil {
-					return fmt.Errorf("open data: %w", err)
-				}
-				derr = tf.File.SetData(env.Context(), f)
-				f.Close()
-			}
-			if derr != nil {
-				return fmt.Errorf("set data: %w", derr)
-			}
+		if err := mod.Apply(env.Context(), tf.File); err != nil {
+			return err
 		}
-
-		// Set various stat fields.
-		stat := tf.File.Stat()
-		if mod.clear {
-			stat = stat.Clear()
-		}
-		if mod.perms != nil {
-			stat = stat.WithMode((stat.Mode &^ fs.ModePerm) | fs.FileMode(*mod.perms))
-		}
-		if mod.ftype != nil {
-			stat = stat.WithMode((stat.Mode &^ fs.ModeType) | *mod.ftype)
-		}
-		if mod.modTime != nil {
-			stat = stat.WithModTime(*mod.modTime)
-		}
-		if mod.uid != nil {
-			stat = stat.WithOwnerID(*mod.uid)
-		}
-		if mod.gid != nil {
-			stat = stat.WithGroupID(*mod.gid)
-		}
-		if mod.owner != nil {
-			stat = stat.WithOwnerName(*mod.owner)
-		}
-		if mod.group != nil {
-			stat = stat.WithGroupName(*mod.group)
-		}
-		if mod.persist != nil {
-			stat.Persist(*mod.persist)
-		}
-		stat.Update()
 		key, err := tf.Flush(env.Context())
 		if err != nil {
 			return err
@@ -957,124 +909,6 @@ func runFileCheck(env *command.Env, origins ...string) error {
 		}
 		return nil
 	})
-}
-
-type editMod struct {
-	perms        *int64
-	ftype        *fs.FileMode
-	modTime      *time.Time
-	uid, gid     *int
-	owner, group *string
-	dataSpec     *string
-	persist      *bool
-	clear        bool
-	create       bool
-}
-
-func parseEditMod(args []string) (*editMod, error) {
-	var mod editMod
-	i := 0
-	for i < len(args) {
-		// Modifications that do not require an argument.
-		switch args[i] {
-		case "clear":
-			mod.clear = true
-			i++
-			continue
-		case "create":
-			mod.create = true
-			i++
-			continue
-		}
-
-		// Modifications that require an argument.
-		if i+1 >= len(args) {
-			return nil, errors.New("odd-length argument list")
-		}
-		switch args[i] {
-		case "mode", "perms":
-			v, err := strconv.ParseInt(args[i+1], 0, 32)
-			if err != nil {
-				return nil, fmt.Errorf("%s: %w", args[i], err)
-			}
-			mod.perms = &v
-
-		case "type":
-			var ftype fs.FileMode
-			switch args[i+1] {
-			case "f", "file":
-				// OK, this is the default
-			case "d", "dir":
-				ftype |= fs.ModeDir
-			case "l", "link", "symlink":
-				ftype |= fs.ModeSymlink
-			case "p", "pipe", "fifo":
-				ftype |= fs.ModeNamedPipe
-			case "s", "socket":
-				ftype |= fs.ModeSocket
-			case "b", "block", "bdev", "dev":
-				ftype |= fs.ModeDevice
-			case "c", "char", "cdev":
-				ftype |= fs.ModeDevice | fs.ModeCharDevice
-			default:
-				return nil, fmt.Errorf("invalid type %q", args[i+1])
-			}
-			mod.ftype = &ftype
-
-		case "mtime", "modtime":
-			var t time.Time
-			if args[i+1] == "now" {
-				t = time.Now()
-
-			} else if strings.HasPrefix(args[i+1], "@") {
-				v, err := strconv.ParseFloat(args[i+1][1:], 64)
-				if err != nil {
-					return nil, fmt.Errorf("%s: %w", args[i], err)
-				}
-				sec, rem := math.Modf(v)
-				nano := float64(time.Second) * rem
-				t = time.Unix(int64(sec), int64(nano))
-
-			} else if v, err := time.Parse(time.RFC3339Nano, args[i+1]); err == nil {
-				t = v
-
-			} else {
-				return nil, fmt.Errorf("%s: %w", args[i], err)
-			}
-			mod.modTime = &t
-
-		case "uid", "gid":
-			v, err := strconv.Atoi(args[i+1])
-			if err != nil {
-				return nil, fmt.Errorf("%s: %w", args[i], err)
-			} else if args[i] == "uid" {
-				mod.uid = &v
-			} else {
-				mod.gid = &v
-			}
-
-		case "owner":
-			mod.owner = &args[i+1]
-
-		case "group":
-			mod.group = &args[i+1]
-
-		case "persist":
-			v, err := strconv.ParseBool(args[i+1])
-			if err != nil {
-				return nil, fmt.Errorf("%s: %w", args[i], err)
-			}
-			mod.persist = &v
-
-		case "data", "content":
-			mod.dataSpec = &args[i+1]
-
-		default:
-			return nil, fmt.Errorf("unknown stat field %q", args[i])
-		}
-		i += 2
-	}
-	return &mod, nil
 }
 
 var scanFlags struct {
