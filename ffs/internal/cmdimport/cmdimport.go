@@ -16,6 +16,7 @@
 package cmdimport
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -24,8 +25,10 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/filetree"
 	"github.com/creachadair/ffstools/ffs/config"
+	"github.com/creachadair/ffstools/lib/editlib"
 	"github.com/creachadair/ffstools/lib/importlib"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/shell"
 )
 
 const intoHelp = `
@@ -38,6 +41,7 @@ var putConfig importlib.Config
 
 var importFlags struct {
 	Target string `flag:"into,Store the resulting object under this root/path or file/path"`
+	Edit   string `flag:"edit,Apply this edit to each imported file (see 'file edit')"`
 }
 
 var Command = &command.C{
@@ -82,6 +86,10 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 	if importFlags.Target != "" && len(rest) != 0 {
 		return env.Usagef("only one path is allowed when --into is set")
 	}
+	edit, err := parseEdit()
+	if err != nil {
+		return err
+	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
@@ -95,6 +103,9 @@ func runImport(env *command.Env, srcPath string, rest []string) error {
 			}
 			f, err := putConfig.ImportPath(env.Context(), s.Files(), path)
 			if err != nil {
+				return err
+			}
+			if err := edit.ApplyRecursive(env.Context(), f); err != nil {
 				return err
 			}
 			key, err := f.Flush(env.Context())
@@ -129,6 +140,10 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 	if importFlags.Target != "" && len(rest) != 0 {
 		return env.Usagef("only one path is allowed when --into is set")
 	}
+	edit, err := parseEdit()
+	if err != nil {
+		return err
+	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
@@ -140,6 +155,9 @@ func runImportTar(env *command.Env, srcPath string, rest []string) error {
 			root, err := putConfig.ImportTarPath(env.Context(), s.Files(), path)
 			if err != nil {
 				return fmt.Errorf("input %q: %w", path, err)
+			}
+			if err := edit.ApplyRecursive(env.Context(), root); err != nil {
+				return fmt.Errorf("edit %q: %w", path, err)
 			}
 			fmt.Printf("import: %s\n", filetree.FormatKey32(root.Key()))
 			lastRoot = root
@@ -163,6 +181,10 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 	if importFlags.Target != "" && len(rest) != 0 {
 		return env.Usagef("only one path is allowed when --into is set")
 	}
+	edit, err := parseEdit()
+	if err != nil {
+		return err
+	}
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
@@ -174,6 +196,9 @@ func runImportZIP(env *command.Env, srcPath string, rest []string) error {
 			root, err := putConfig.ImportZIPPath(env.Context(), s.Files(), path)
 			if err != nil {
 				return err
+			}
+			if err := edit.ApplyRecursive(env.Context(), root); err != nil {
+				return fmt.Errorf("edit %q: %w", path, err)
 			}
 			fmt.Printf("import: %s\n", filetree.FormatKey32(root.Key()))
 			lastRoot = root
@@ -202,4 +227,20 @@ func checkTarget(env *command.Env, s filetree.Store, target string) error {
 		}
 	}
 	return nil
+}
+
+func parseEdit() (*editlib.Edit, error) {
+	spec, ok := shell.Split(importFlags.Edit)
+	if !ok {
+		return nil, errors.New("unbalanced quotes in --edit spec")
+	} else if len(spec) == 0 {
+		return nil, nil // nothing to do
+	}
+	e, err := editlib.ParseEdit(spec)
+	if err != nil {
+		return nil, err
+	} else if e.DataSpec != nil || e.Create {
+		return nil, errors.New("the 'create' and 'data' --edit verbs are not supported")
+	}
+	return e, nil
 }
