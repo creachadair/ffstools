@@ -139,7 +139,11 @@ func ParseEdit(args []string) (*Edit, error) {
 // set the content of f; if e.DataSpec == nil, no error can occur.
 //
 // Note that the Create verb is not handled by Apply; f must not be nil.
+// If e == nil, Apply makes no changes to f without error.
 func (e *Edit) Apply(ctx context.Context, f *file.File) error {
+	if e == nil {
+		return nil
+	}
 	// Set file data.
 	if e.DataSpec != nil {
 		var derr error
