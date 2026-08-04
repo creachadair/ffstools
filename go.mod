@@ -1,6 +1,6 @@
 module github.com/creachadair/ffstools
 
-go 1.25.8
+go 1.26
 
 require (
 	github.com/creachadair/atomicfile v0.4.2
