@@ -55,7 +55,11 @@ info are recorded; use --nostat to disable this. Use --xattr to capture
 extended attributes.
 
 Symbolic links are captured, but devices, sockets, FIFO, and other
-special files are skipped.` + intoHelp,
+special files are skipped.` + intoHelp + `
+
+If --edit is set, the specified edit operations (see "file edit") are
+applied to each file tree imported, after the import is complete. The
+edit program is a single string, use quotes if calling from a shell.`,
 
 	SetFlags: func(_ *command.Env, fs *flag.FlagSet) {
 		fs.BoolVar(&putConfig.OmitStat, "nostat", false, "Omit file and directory stat")
