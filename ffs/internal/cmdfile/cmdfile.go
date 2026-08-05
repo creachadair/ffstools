@@ -140,7 +140,8 @@ Allowed types include:
 If the origin is from a root, the root is updated with the changes.
 As a special case, "create" allows "@" as the origin to create a new empty file.`,
 
-			Run: command.Adapt(runEdit),
+			SetFlags: command.Flags(flax.MustBind, &editFlags),
+			Run:      command.Adapt(runEdit),
 		},
 		{
 			Name: "remove",
@@ -520,6 +521,10 @@ func runRemove(env *command.Env) error {
 	})
 }
 
+var editFlags struct {
+	Recur bool `flag:"recur,Apply edits recursively (warning: risky)"`
+}
+
 func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	if len(mods) == 0 {
 		return env.Usagef("missing edit spec")
@@ -560,7 +565,12 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 			return err
 		}
 
-		if err := mod.Apply(env.Context(), tf.File); err != nil {
+		if editFlags.Recur {
+			err = mod.ApplyRecursive(env.Context(), tf.File)
+		} else {
+			err = mod.Apply(env.Context(), tf.File)
+		}
+		if err != nil {
 			return err
 		}
 		key, err := tf.Flush(env.Context())
