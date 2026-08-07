@@ -164,6 +164,7 @@ func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
 		} else if elt.IsDir() {
 			dirs = append(dirs, &entry{sub: sub, name: elt.Name()})
 		} else if t := elt.Type(); t != 0 && (t&fs.ModeSymlink == 0) {
+			c.logPrintf("skip (unsuported type %q): %s", t.String()[:1], sub)
 			continue // e.g., socket, pipe, device, fifo, etc.
 		} else if fi, err := elt.Info(); err != nil {
 			return nil, err
