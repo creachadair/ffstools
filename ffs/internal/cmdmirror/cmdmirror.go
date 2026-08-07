@@ -74,24 +74,6 @@ func runMirror(env *command.Env) error {
 				src, tgt = other, main
 			}
 
-			// If requested, copy roots.
-			if mirrorFlags.NoRoots {
-				dprintf(env, "Skipping root pointers")
-			} else {
-				start := time.Now()
-				var numRoots int
-				for key, err := range src.Roots().List(env.Context(), "") {
-					if err != nil {
-						return err
-					}
-					if err := copyBlob(env.Context(), src.Roots(), tgt.Roots(), key, true); err != nil {
-						return err
-					}
-					numRoots++
-				}
-				fmt.Fprintf(env, "Copied %d roots (%v elapsed)\n", numRoots, time.Since(start).Truncate(time.Millisecond))
-			}
-
 			// If requested, copy files.
 			if mirrorFlags.NoFiles {
 				dprintf(env, "Skipping file objects")
@@ -138,7 +120,27 @@ func runMirror(env *command.Env) error {
 				pb.Stop()
 				fmt.Fprintf(env, "Copied %d objects (%d batches, %d objects, %v elapsed)\n",
 					numBlobs, numBatches, n, time.Since(start).Truncate(time.Millisecond))
-				return cerr
+				if cerr != nil {
+					return cerr
+				}
+
+				// If requested, copy roots.
+				if mirrorFlags.NoRoots {
+					dprintf(env, "Skipping root pointers")
+				} else {
+					start := time.Now()
+					var numRoots int
+					for key, err := range src.Roots().List(env.Context(), "") {
+						if err != nil {
+							return err
+						}
+						if err := copyBlob(env.Context(), src.Roots(), tgt.Roots(), key, true); err != nil {
+							return err
+						}
+						numRoots++
+					}
+					fmt.Fprintf(env, "Copied %d roots (%v elapsed)\n", numRoots, time.Since(start).Truncate(time.Millisecond))
+				}
 			}
 			return nil
 		})
