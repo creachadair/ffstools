@@ -46,9 +46,11 @@ var Command = &command.C{
 	Help: `Mirror files and roots between stores.
 
 Transfer all the file and root objects between the source and target stores.
+Unlike "sync", this transfers all objects, and does not consider reachability.
+
+Exactly one of --to and --from must be set.
 If --to=target is set, objects are copied from --store to the specified target;
-if --from=source is set, objects are copied from source to the --store.
-Exactly one of --to and --from must be set.`,
+if --from=source is set, objects are copied from source to the --store.`,
 
 	SetFlags: command.Flags(flax.MustBind, &mirrorFlags),
 	Run:      command.Adapt(runMirror),
