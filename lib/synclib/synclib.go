@@ -137,11 +137,13 @@ func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 				if err != nil {
 					return stats, err
 				}
-				c.detailf("Loaded cached index for %q (%d keys)\n", elt, idx.Len())
+				c.infof("Loaded cached index for root %q (%s, %d keys)\n",
+					elt, filetree.FormatKey32(of.Root.FileKey), idx.Len())
 				indices = append(indices, idx)
 				continue
 			}
-			c.infof("Scanning data reachable from root %q ...\n", of.RootKey)
+			c.infof("Scanning data reachable from root %q (%s) ...\n",
+				of.RootKey, filetree.FormatKey32(of.FileKey))
 		} else {
 			c.infof("Scanning data reachable from file %s ...\n", filetree.FormatKey32(of.FileKey))
 		}
