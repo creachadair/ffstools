@@ -854,7 +854,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 						sz, ok := dataSize[dk]
 						if !ok {
 							bits, err := s.Files().Get(env.Context(), dk)
-							if err != nil {
+							if errors.Is(err, context.Canceled) {
+								return err
+							} else if err != nil {
 								fmt.Printf("* data: read %s: %v\n", filetree.FormatKey32(dk), err)
 								continue
 							}
