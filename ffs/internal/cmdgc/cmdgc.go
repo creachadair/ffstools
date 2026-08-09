@@ -98,7 +98,7 @@ store without roots.
 				if err != nil {
 					return fmt.Errorf("opening %q: %w", key, err)
 				}
-				scanner.RootOnly(key, rp)
+				scanner.AddBareRoot(key, rp)
 
 				// If this root has a cached index, use that instead of scanning.
 				if rp.IndexKey != "" {
@@ -123,7 +123,7 @@ store without roots.
 				prevLen := scanner.Len()
 				dprintf(env, "Scanning data reachable from %q (%s)...\n",
 					config.PrintableKey(key), filetree.FormatKey32(rp.FileKey))
-				if err := scanner.Root(env.Context(), key, rp); err != nil {
+				if err := scanner.ScanRoot(env.Context(), key, rp); err != nil {
 					return fmt.Errorf("scanning root %q: %w", key, err)
 				}
 				dprintf(env, "Finished scanning %d objects [%v elapsed]\n",

@@ -38,11 +38,11 @@ func NewScanner(src blob.CAS) *Scanner {
 	return &Scanner{keys: make(map[string]Type), src: src}
 }
 
-// RootOnly adds the specified root to the scan, including its index (if any),
-// but excluding any blobs reachable from its file or chain pointers.
+// AddBareRoot adds the specified root to the scan, including its index (if
+// any), but excluding any blobs reachable from its file or chain pointers.
 //
-// Use [Scanner.Root] to completely scan a root.
-func (s *Scanner) RootOnly(rootKey string, rp *root.Root) {
+// Use [Scanner.ScanRoot] to completely scan a root.
+func (s *Scanner) AddBareRoot(rootKey string, rp *root.Root) {
 	s.keys[rootKey] = Root
 	s.rootLinks(rp)
 }
@@ -56,10 +56,10 @@ func (s *Scanner) rootLinks(rp *root.Root) {
 	}
 }
 
-// Root adds the specified root, its index (if any), and all files reachable
+// ScanRoot adds the specified root, its index (if any), and all files reachable
 // from its file pointer to s.
-func (s *Scanner) Root(ctx context.Context, rootKey string, rp *root.Root) error {
-	s.RootOnly(rootKey, rp)
+func (s *Scanner) ScanRoot(ctx context.Context, rootKey string, rp *root.Root) error {
+	s.AddBareRoot(rootKey, rp)
 	fp, err := rp.File(ctx, s.src)
 	if err != nil {
 		return err
@@ -79,16 +79,16 @@ func (s *Scanner) Root(ctx context.Context, rootKey string, rp *root.Root) error
 		if err != nil {
 			return err
 		}
-		if err := s.File(ctx, cfp); err != nil {
+		if err := s.ScanFile(ctx, cfp); err != nil {
 			return err
 		}
 		cur = cp
 	}
-	return s.File(ctx, fp)
+	return s.ScanFile(ctx, fp)
 }
 
-// File adds all the files and data blobs reachable from fp to s.
-func (s *Scanner) File(ctx context.Context, fp *file.File) error {
+// AddFile adds all the files and data blobs reachable from fp to s.
+func (s *Scanner) ScanFile(ctx context.Context, fp *file.File) error {
 	return fp.Scan(ctx, func(si file.ScanItem) error {
 		key := si.Key()
 		if _, ok := s.keys[key]; ok {

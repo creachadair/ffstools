@@ -945,10 +945,10 @@ func runScan(env *command.Env, sourceKeys ...string) error {
 
 			if of.Root != nil && of.Base == of.File {
 				fmt.Fprintf(env, "Scanning data reachable from root %q...\n", of.RootKey)
-				err = worklist.Root(env.Context(), of.RootKey, of.Root)
+				err = worklist.ScanRoot(env.Context(), of.RootKey, of.Root)
 			} else {
 				fmt.Fprintf(env, "Scanning data reachable from file %s ...\n", filetree.FormatKey32(of.FileKey))
-				err = worklist.File(env.Context(), of.File)
+				err = worklist.ScanFile(env.Context(), of.File)
 			}
 			if err != nil {
 				return err
