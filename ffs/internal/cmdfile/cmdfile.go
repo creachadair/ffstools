@@ -908,7 +908,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}
 			totalUnique := done.Len() + uniq.Len() // N.B. unique includes the index, if there was one
 			if fsckFlags.DataSize {
-				fmt.Printf("- total data size: %d bytes, %d unique (%.1f%%)\n", totalDataBytes, totalUniqueDataBytes,
+				fmt.Printf("- total data size: %s bytes, %s unique (%.1f%%)\n",
+					formatBytes(totalDataBytes), formatBytes(totalUniqueDataBytes),
 					100*(float64(totalUniqueDataBytes)/float64(totalDataBytes)))
 			}
 			fmt.Printf("%s: %d objects: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
@@ -1016,4 +1017,17 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 		fmt.Println(filetree.FormatKey32(ikey))
 		return nil
 	})
+}
+
+func formatBytes(n int64) string {
+	if n < 1<<20 {
+		return fmt.Sprintf("%d", n)
+	}
+	const unit = "KMGTPEZY" // lol
+	i, fn := -1, float64(n)
+	for fn > 1024 {
+		fn /= 1024
+		i++
+	}
+	return fmt.Sprintf("%d (%.1f%siB)", n, fn, unit[i:i+1])
 }
