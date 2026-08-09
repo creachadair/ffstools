@@ -819,7 +819,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				fmt.Printf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
 				nerrs++
 			} else {
-				fmt.Printf("- index %s OK\n", filetree.FormatKey32(of.Root.IndexKey))
+				st := idx.Stats()
+				fmt.Printf("- index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
+					st.NumKeys, st.FilterBits, st.NumHashes)
 				uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 				checkIndex = idx.Has
 			}
