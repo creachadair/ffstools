@@ -137,7 +137,7 @@ func (c Config) Sync(ctx context.Context, sourceKeys []string) (Stats, error) {
 				if err != nil {
 					return stats, err
 				}
-				c.infof("Loaded cached index for root %q (%s, %d keys)\n",
+				c.detailf("Loaded cached index for root %q (%s, %d keys)\n",
 					elt, filetree.FormatKey32(of.Root.FileKey), idx.Len())
 				indices = append(indices, idx)
 				continue
