@@ -211,7 +211,13 @@ func (c Config) ExportToOS(ctx context.Context, tree *filetree.PathInfo) error {
 	outputPath := c.Root
 	if outputPath == "" {
 		return errors.New("empty output path not allowed")
+	} else if c.FullPath {
+		outputPath = filepath.Join(outputPath, tree.Path)
 	}
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0700); err != nil {
+		return err
+	}
+
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	g, start := taskgroup.New(cancel).Limit(runtime.NumCPU())
