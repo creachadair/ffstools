@@ -265,7 +265,7 @@ func (c Config) exportFile(ctx context.Context, f *file.File, path string) error
 	if mode.IsDir() {
 		c.dprintf("create directory %q", path)
 		if err := os.Mkdir(path, 0700); err != nil {
-			if !c.Update || !os.IsExist(err) {
+			if !c.Update && !os.IsExist(err) {
 				return err
 			}
 		}
