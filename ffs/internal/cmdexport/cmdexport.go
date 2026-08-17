@@ -46,14 +46,15 @@ var exportFlags struct {
 
 var Command = &command.C{
 	Name:  "export",
-	Usage: "<root-key>[/path/...]\n@<file-key>[/path/...]",
+	Usage: "<root-key>[/path/...]\n@<file-key>[/path/...] ...",
 	Help: `
-Export a file tree to the local filesystem.
+Export file trees to the local filesystem.
 
-Recursively export the file indicated by the selected root or file storage
-key to the path indicated by --to. By default, stat information (permissions,
-modification time, etc.) is copied to the output; use --nostat to omit this.
-Use --xattr to export extended attributes, if any are stored.`,
+Recursively export the files indicated by the selected root or file storage keys to
+the path indicated by --to. By default, stat information (permissions, modification
+time, etc.) is copied to the output; use --nostat to omit this. Unless --update is
+set, the outputs must not already exist. Use --xattr to export extended attributes,
+if any are stored.`,
 
 	SetFlags: command.Flags(flax.MustBind, &exportFlags),
 	Run:      command.Adapt(runExport),
@@ -89,24 +90,25 @@ Unless --update is set, the specified ZIP file name must not already exist.`,
 	}},
 }
 
-func runExport(env *command.Env, originPath string) error {
+func runExport(env *command.Env, originPaths ...string) error {
 	if exportFlags.Target == "" {
 		return env.Usagef("missing required --to path")
 	}
 
-	// Create leading components of the target directory path, as required.
-	if err := os.MkdirAll(filepath.Dir(exportFlags.Target), 0700); err != nil {
-		return err
-	}
-
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		of, err := s.OpenPath(env.Context(), originPath)
-		if err != nil {
-			return err
-		}
 		ec := exportConfig(env, exportFlags.Target, nil)
-		return ec.ExportToOS(env.Context(), of)
+		ec.FullPath = len(originPaths) > 1
+		for _, originPath := range originPaths {
+			of, err := s.OpenPath(env.Context(), originPath)
+			if err != nil {
+				return err
+			}
+			if err := ec.ExportToOS(env.Context(), of); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 
