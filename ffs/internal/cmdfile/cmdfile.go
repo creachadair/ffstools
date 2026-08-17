@@ -820,7 +820,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				nerrs++
 			} else {
 				st := idx.Stats()
-				fmt.Printf("- index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
+				fmt.Printf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
 					st.NumKeys, st.FilterBits, st.NumHashes)
 				uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 				checkIndex = idx.Has
@@ -912,15 +912,16 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}
 			totalUnique := done.Len() + uniq.Len() // N.B. unique includes the index, if there was one
 			if fsckFlags.DataSize {
-				fmt.Printf("- total data size: %s bytes, %s unique (%.1f%%)\n",
-					formatBytes(totalDataBytes), formatBytes(totalUniqueDataBytes),
-					100*(float64(totalUniqueDataBytes)/float64(totalDataBytes)))
+				fmt.Printf("▷ total data size: %s, %s (%.1f%%)\n",
+					formatBytes(totalDataBytes, "bytes"), formatBytes(totalUniqueDataBytes, "unique"),
+					percent(totalUniqueDataBytes, totalDataBytes))
 			}
-			fmt.Printf("%s: %d objects: %d files (%d unique), %d blocks (%d unique), %d lost, %d errors [%v elapsed]\n\n",
+			fmt.Printf("%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
+				"%d lost, %d errors\n",
 				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
-				totalUnique, nfile, done.Len(), ndata, uniq.Len(), nlost, nerrs,
-				time.Since(start).Round(time.Millisecond),
-			)
+				totalUnique, nfile, done.Len(), percent(done.Len(), nfile),
+				ndata, uniq.Len(), percent(uniq.Len(), ndata), nlost, nerrs)
+			fmt.Printf("🕖 %v elapsed\n\n", time.Since(start).Round(time.Millisecond))
 		}
 		return nil
 	})
@@ -1023,9 +1024,9 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 	})
 }
 
-func formatBytes(n int64) string {
+func formatBytes(n int64, label string) string {
 	if n < 1<<20 {
-		return fmt.Sprintf("%d", n)
+		return fmt.Sprintf("%d %s", n, label)
 	}
 	const unit = "KMGTPEZY" // lol
 	i, fn := -1, float64(n)
@@ -1033,5 +1034,7 @@ func formatBytes(n int64) string {
 		fn /= 1024
 		i++
 	}
-	return fmt.Sprintf("%d (%.1f%siB)", n, fn, unit[i:i+1])
+	return fmt.Sprintf("%d %s [%.1f%siB]", n, label, fn, unit[i:i+1])
 }
+
+func percent[N ~int | ~int64](v, total N) float64 { return 100 * (float64(v) / float64(total)) }
