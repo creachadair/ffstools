@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/exportlib"
 	"github.com/creachadair/flax"
+	"github.com/creachadair/mds/mapset"
 	"github.com/klauspost/compress/zstd"
 )
 
@@ -103,14 +105,15 @@ func runExport(env *command.Env, originPath string) error {
 		if err != nil {
 			return err
 		}
-		ec := exportConfig(env, exportFlags.Target)
+		ec := exportConfig(env, exportFlags.Target, nil)
 		return ec.ExportToOS(env.Context(), of)
 	})
 }
 
-func exportConfig(env *command.Env, root string) exportlib.Config {
+func exportConfig(env *command.Env, root string, args []string) exportlib.Config {
 	ec := exportlib.Config{
 		Root:         root,
+		FullPath:     wantFullPath(args),
 		IncludeXAttr: exportFlags.XAttr,
 		OmitStat:     exportFlags.NoStat,
 		Update:       exportFlags.Update,
@@ -146,7 +149,7 @@ func runZipExport(env *command.Env, originPaths ...string) (retErr error) {
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		ec := exportConfig(env, zipFlags.Root)
+		ec := exportConfig(env, zipFlags.Root, originPaths)
 		for _, originPath := range originPaths {
 			of, err := s.OpenPath(env.Context(), originPath)
 			if err != nil {
@@ -209,8 +212,8 @@ func runTarExport(env *command.Env, originPath string, rest ...string) (retErr e
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		ec := exportConfig(env, tarFlags.Root)
-		for _, originPath := range env.Args {
+		ec := exportConfig(env, tarFlags.Root, rest)
+		for _, originPath := range rest {
 			of, err := s.OpenPath(env.Context(), originPath)
 			if err != nil {
 				return err
@@ -233,4 +236,17 @@ func (m mcloser) Close() error {
 		}
 	}
 	return errors.Join(errs...)
+}
+
+// wantFullPath reports whether the output should use the full export path in an archive.
+func wantFullPath(args []string) bool {
+	var seen mapset.Set[string]
+	for _, arg := range args {
+		base := path.Base(arg)
+		if seen.Has(base) {
+			return true
+		}
+		seen.Add(base)
+	}
+	return false
 }
