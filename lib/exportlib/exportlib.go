@@ -33,6 +33,7 @@ var dirStat = &file.Stat{Mode: fs.ModeDir | 0755}
 // A zero value is ready for use.
 type Config struct {
 	Root         string    // prefix output paths with this directory
+	FullPath     bool      // preserve the full source path
 	IncludeXAttr bool      // include extended attributes, if possible
 	OmitStat     bool      // omit permissions and modification times
 	Update       bool      // update or replace existing targets
@@ -50,7 +51,9 @@ func (c Config) dprintf(msg string, args ...any) {
 
 // rootPath returns the root prefix to prepend to all exported paths.
 func (c Config) rootPath(tree *filetree.PathInfo) string {
-	if strings.Contains(tree.Path, "/") {
+	if c.FullPath {
+		return path.Join(c.Root, tree.Path)
+	} else if strings.Contains(tree.Path, "/") {
 		return path.Join(c.Root, path.Base(tree.Path))
 	} else if c.Root != "" {
 		return c.Root
