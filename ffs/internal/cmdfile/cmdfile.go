@@ -198,9 +198,35 @@ If the origin is from a root, the root is updated with the changes.`,
 			Run:      command.Adapt(runListPaths),
 		},
 		{
-			Name:     "fsck",
-			Usage:    fileCmdUsage,
-			Help:     "Check file tree integrity.",
+			Name:  "fsck",
+			Usage: fileCmdUsage,
+			Help: `Check file tree integrity.
+
+For each specified origin, fsck recursively walks the corresponding file tree
+and verifies that all the objects referenced by it exist in the underlying store.
+If the origin includes a root pointer, and that root has an index, it also checks
+that the index exists and that each referenced object is claimed by the index.
+
+Any missing objects are logged, as well as any referenced objects not covered by
+the index, if one is present.  After scanning, a summary is printed indicating
+the numbers of objects found, categorized by type:
+
+  objects: total number of objects of all types
+  files:   number of file trees (total and unique)
+  blocks:  number of data blobs (total and unique)
+  lost:    number of distinct objects that could not be loaded
+  errors:  number of errors of all kinds
+
+With --data-size, it also computes the total size in bytes of all the data blocks,
+both overall (including repeats) and unique (excluding repeats). Note that this
+may greatly increase the time required to perform the scan, in a large file tree.
+
+The scan succeeds if there were no errors, and no objects were lost.
+Note that the totals presented will not be accurate if any errors occurred.
+
+A failed scan indicates a corrupt or incomplete file tree. Index errors can often
+be fixed by re-generating the index ("ffs root index"); missing objects must be
+recovered or re-created separately.`,
 			SetFlags: command.Flags(flax.MustBind, &fsckFlags),
 			Run:      command.Adapt(runFileCheck),
 		},
@@ -800,9 +826,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 
 			start := time.Now()
 			dataSize := make(map[string]int64)
-			var done mapset.Set[string]
-			var uniq mapset.Set[string]
-			var nfile, ndata, nlost, nerrs int
+			var done, uniq, lost mapset.Set[string]
+			var nfile, ndata, nerrs int
 			var totalDataBytes int64
 
 			// If this file came from a root pointer, and the root has an index,
@@ -817,6 +842,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				fmt.Printf("- root %q is not indexed (OK)\n", of.RootKey)
 			} else if idx, err := s.LoadIndex(env.Context(), of.Root.IndexKey); err != nil {
 				fmt.Printf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
+				lost.Add(of.Root.IndexKey)
 				nerrs++
 			} else {
 				st := idx.Stats()
@@ -830,9 +856,14 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			// blocks exist in the store (without fetching them).
 			if err := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
 				if e.Err != nil {
-					fmt.Printf("* error %q: %v\n", e.Path, e.Err)
+					msg := e.Err.Error()
+					if e, ok := errors.AsType[*blob.KeyError](e.Err); ok {
+						msg = filetree.FormatKey32(e.Key)
+						lost.Add(e.Key)
+					}
+					fmt.Printf("* file missing %s %q\n", msg, e.Path)
 					nerrs++
-					return e.Err
+					return fpath.ErrSkipChildren // continue scanning
 				}
 
 				fkey := e.File.Key()
@@ -852,6 +883,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 				// If we are asked to compute data size, read each data blob we
 				// have not seen before and cache its size.
 				if fsckFlags.DataSize {
+					want.RemoveAll(lost) // exclude keys already known to be lost (we already reported them)
 					for dk := range want {
 						sz, ok := dataSize[dk]
 						if !ok {
@@ -859,7 +891,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 							if errors.Is(err, context.Canceled) {
 								return err
 							} else if err != nil {
-								fmt.Printf("* data: read %s: %v\n", filetree.FormatKey32(dk), err)
+								fmt.Printf("* data missing %s %q\n", filetree.FormatKey32(dk), e.Path)
+								lost.Add(dk)
 								continue
 							}
 							sz = int64(len(bits))
@@ -897,8 +930,8 @@ func runFileCheck(env *command.Env, origins ...string) error {
 					want.RemoveAll(have)
 					if !want.IsEmpty() {
 						for m := range want {
-							fmt.Printf("* data missing %q %s\n", e.Path, filetree.FormatKey32(m))
-							nlost++
+							fmt.Printf("* data missing %s %q\n", filetree.FormatKey32(m), e.Path)
+							lost.Add(m)
 						}
 					}
 				}
@@ -918,9 +951,9 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}
 			fmt.Printf("%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
 				"%d lost, %d errors\n",
-				value.Cond(nerrs == 0 && nlost == 0, "✅ OK", "❌ FAILED"),
+				value.Cond(nerrs == 0 && lost.Len() == 0, "✅ OK", "❌ FAILED"),
 				totalUnique, nfile, done.Len(), percent(done.Len(), nfile),
-				ndata, uniq.Len(), percent(uniq.Len(), ndata), nlost, nerrs)
+				ndata, uniq.Len(), percent(uniq.Len(), ndata), lost.Len(), nerrs)
 			fmt.Printf("🕖 %v elapsed\n\n", time.Since(start).Round(time.Millisecond))
 		}
 		return nil
