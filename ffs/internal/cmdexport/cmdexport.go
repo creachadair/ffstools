@@ -46,7 +46,7 @@ var exportFlags struct {
 
 var Command = &command.C{
 	Name:  "export",
-	Usage: "<root-key>[/path/...]\n@<file-key>[/path/...] ...",
+	Usage: "<root-key>[/path/...] ...\n@<file-key>[/path/...] ...",
 	Help: `
 Export file trees to the local filesystem.
 
