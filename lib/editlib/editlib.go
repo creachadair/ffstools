@@ -18,6 +18,7 @@ import (
 // An Edit specifies a set of edits to apply to a [file.File].
 type Edit struct {
 	Perms        *uint32
+	Mask         *uint32
 	Type         *fs.FileMode
 	ModTime      *time.Time
 	UID, GID     *int
@@ -51,11 +52,18 @@ func ParseEdit(args []string) (*Edit, error) {
 		}
 		switch args[i] {
 		case "mode", "perms":
-			v, err := strconv.ParseInt(args[i+1], 0, 32)
+			v, err := strconv.ParseUint(args[i+1], 0, 32)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
 			mod.Perms = new(uint32(v))
+
+		case "mask":
+			v, err := strconv.ParseUint(args[i+1], 0, 32)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", args[i], err)
+			}
+			mod.Mask = new(uint32(v))
 
 		case "type":
 			var ftype fs.FileMode
@@ -171,7 +179,12 @@ func (e *Edit) Apply(ctx context.Context, f *file.File) error {
 		stat = stat.Clear()
 	}
 	if e.Perms != nil {
-		stat = stat.WithMode((stat.Mode &^ fs.ModePerm) | fs.FileMode(*e.Perms))
+		mask, perms := fs.ModePerm, *e.Perms
+		if e.Mask != nil {
+			mask = fs.FileMode(*e.Mask) // keep bits mentioned by the mask
+			perms &= *e.Mask            // discard bits not mentioned by the mask
+		}
+		stat = stat.WithMode((stat.Mode &^ mask) | fs.FileMode(perms))
 	}
 	if e.Type != nil {
 		stat = stat.WithMode((stat.Mode &^ fs.ModeType) | *e.Type)
