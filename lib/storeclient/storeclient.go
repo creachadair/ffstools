@@ -118,7 +118,7 @@ func (a Address) dialPipe(ctx context.Context) (chirp.Channel, error) {
 	), nil
 }
 
-// Connect connects to the specfied address and returns a [blob.Store]
+// Connect connects to the specified address and returns a [blob.Store]
 // constructed using the provided options.  The provided context governs only
 // the connection and initialization of the store, and not its lifecycle once
 // created.
