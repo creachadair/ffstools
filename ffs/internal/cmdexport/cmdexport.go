@@ -174,7 +174,7 @@ var tarFlags struct {
 	Root     string `flag:"root,Prefix all output paths with this directory name"`
 }
 
-func runTarExport(env *command.Env, originPath string, rest ...string) (retErr error) {
+func runTarExport(env *command.Env, originPaths ...string) (retErr error) {
 	var mc mcloser
 	defer func() {
 		err := mc.Close()
@@ -214,8 +214,8 @@ func runTarExport(env *command.Env, originPath string, rest ...string) (retErr e
 
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
-		ec := exportConfig(env, tarFlags.Root, rest)
-		for _, originPath := range rest {
+		ec := exportConfig(env, tarFlags.Root, originPaths)
+		for _, originPath := range originPaths {
 			of, err := s.OpenPath(env.Context(), originPath)
 			if err != nil {
 				return err
