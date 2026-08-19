@@ -35,7 +35,6 @@ import (
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/cache"
-	"github.com/creachadair/mds/value"
 	"github.com/creachadair/taskgroup"
 )
 
@@ -169,7 +168,7 @@ func rewriteRecursive(ctx context.Context, f *file.File, tgt filetree.Store, see
 	}
 	nf := file.New(tgt.Files(), &file.NewOptions{
 		Name:        f.Name(),
-		Stat:        value.Ptr(f.Stat()),
+		Stat:        new(f.Stat()),
 		PersistStat: f.Stat().Persistent(),
 	})
 	var g taskgroup.Group
