@@ -116,6 +116,7 @@ the target.`,
 The edit spec is a list of fields to update, one or more of:
 
  mode <perms>   -- set file permissions (e.g., 0755)
+ mask <perms>   -- file permissions mask (e.g., 0700, see below)
  type <type>    -- set file type (see below)
  mtime <time>   -- update file timestamp ("now", @<seconds>, or RFC3339)
  uid <id>       -- set the owner UID
@@ -127,7 +128,17 @@ The edit spec is a list of fields to update, one or more of:
  clear          -- clear all current stat values to zero (applies first)
  create         -- create the specified path if it does not exist (applies first)
 
-Allowed types include:
+By default, "mode" applies to the entire permissions word. With "mask", only
+the bits mentioned by the mask are updated. For example:
+
+  mode 050 mask 070   -- set only group permissions to r-x (g+rx)
+  mode 0 mask 7       -- clear world permissions (o-rwx)
+  mask 0444 mode 0777 -- set only r bits (ugo+r)
+
+Bits in the existing mode word not mentioned by the mask are unmodified.
+Bits in the new mode word not mentioned by the mask are ignored.
+
+Allowed "type" values include:
 
  f, file:          regular file
  d, dir:           directory
