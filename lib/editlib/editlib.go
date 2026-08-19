@@ -17,16 +17,48 @@ import (
 
 // An Edit specifies a set of edits to apply to a [file.File].
 type Edit struct {
-	Perms        *uint32
-	Mask         *uint32
-	Type         *fs.FileMode
-	ModTime      *time.Time
-	UID, GID     *int
+	// If non-nil, permission bits to apply to the mode word.  If Mask == nil,
+	// this value fully replaces the permissions; otherwise the masked bits of
+	// Perms are applied to the corresponding bits of the mode word.
+	Perms *uint32
+
+	// If non-nil, specify which bits of the mode word will be affected by Perms.
+	// This is ignored if Perms == nil.
+	Mask *uint32
+
+	// If non-nil, the file type to apply to the mode word.  Only the type
+	// component is used, any other bits in the value are ignored (see Perms).
+	Type *fs.FileMode
+
+	// If non-nil, set the modification timestamp to this value.
+	ModTime *time.Time
+
+	// If non-nil, set the UID and GID to these values.
+	// See also Owner and Group.
+	UID, GID *int
+
+	// If non-nil, set the Owner and Group names to these values.
+	// See also UID and GID.
 	Owner, Group *string
-	DataSpec     *string
-	Persist      *bool
-	Clear        bool
-	Create       bool
+
+	// If non-nil, replace the contents of the file as specified.
+	// If the spec is "", the file is truncated to 0 bytes.
+	// If the spec is "-", the contents of stdin replace the file contents.
+	// Otherwise, the spec must name a file that will be copied to replace the
+	// file contents.
+	DataSpec *string
+
+	// If non-nil, set stat persistence for the file.
+	Persist *bool
+
+	// If true, all existing stat information is cleared before any other edits
+	// described in this config.
+	Clear bool
+
+	// If true, a new empty file should be created if it does not exist before
+	// applying other edits described in this config. This field is not used by
+	// the Apply method.
+	Create bool
 }
 
 // ParseEdit parses an [Edit] specification from the given arguments.
