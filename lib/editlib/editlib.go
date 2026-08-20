@@ -16,6 +16,7 @@ import (
 )
 
 // An Edit specifies a set of edits to apply to a [file.File].
+// A nil *Edit is valid and applies no changes.
 type Edit struct {
 	// If non-nil, permission bits to apply to the mode word.  If Mask == nil,
 	// this value fully replaces the permissions; otherwise the masked bits of
@@ -63,6 +64,9 @@ type Edit struct {
 
 // ParseEdit parses an [Edit] specification from the given arguments.
 func ParseEdit(args []string) (*Edit, error) {
+	if len(args) == 0 {
+		return nil, nil
+	}
 	var mod Edit
 	i := 0
 	for i < len(args) {
