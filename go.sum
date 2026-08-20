@@ -110,8 +110,8 @@ github.com/creachadair/ffuse v0.0.0-20260819171809-835bbda919ad h1:nLxc7lKvK4FLw
 github.com/creachadair/ffuse v0.0.0-20260819171809-835bbda919ad/go.mod h1:VD7RGfJ5Sc7PUNW6Vpr3Zonzjy07bnBph795MUXnyr0=
 github.com/creachadair/flax v0.0.6 h1:IFUdRdfKynNTyR5SRlrHMUGnxxMZZen8RVpwcDq/ftk=
 github.com/creachadair/flax v0.0.6/go.mod h1:F1PML0JZLXSNDMNiRGK2yjm5f+L9QCHchyHBldFymj8=
-github.com/creachadair/gcsstore v0.0.0-20260815032052-5e8b35fe490c h1:Hi8q3hV/K+HAjDcdbi1P7FQPqKF660MLpMOuLxIwSpg=
-github.com/creachadair/gcsstore v0.0.0-20260815032052-5e8b35fe490c/go.mod h1:90GhBhjNvVUSYBc8n+WDanuFGjSxtm5qMh6w4hIGldM=
+github.com/creachadair/gcsstore v0.0.0-20260820160112-9ef6ffedcba1 h1:zmbRfoLqoOy72LBvvM2mTAKmEgXk0MmyUgMrorDPDk0=
+github.com/creachadair/gcsstore v0.0.0-20260820160112-9ef6ffedcba1/go.mod h1:90GhBhjNvVUSYBc8n+WDanuFGjSxtm5qMh6w4hIGldM=
 github.com/creachadair/getpass v0.3.6 h1:7z4XwK15TX9blHN/vMSHCGiMt37+8CaAdbwg25vvshI=
 github.com/creachadair/getpass v0.3.6/go.mod h1:Lgc/8/lJI2LuMVkOuG+yYxC8iMwBj3uB7PaK+dB39Yk=
 github.com/creachadair/gocache v0.0.0-20260803044833-060af7b2d093 h1:G4WrsLMSIV7jxN2bF9fYYHOaHJZMhUD1kgam5IoOJFA=
