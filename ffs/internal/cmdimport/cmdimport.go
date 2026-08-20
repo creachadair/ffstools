@@ -237,13 +237,11 @@ func parseEdit() (*editlib.Edit, error) {
 	spec, ok := shell.Split(importFlags.Edit)
 	if !ok {
 		return nil, errors.New("unbalanced quotes in --edit spec")
-	} else if len(spec) == 0 {
-		return nil, nil // nothing to do
 	}
 	e, err := editlib.ParseEdit(spec)
 	if err != nil {
 		return nil, err
-	} else if e.DataSpec != nil || e.Create {
+	} else if e != nil && (e.DataSpec != nil || e.Create) {
 		return nil, errors.New("the 'create' and 'data' --edit verbs are not supported")
 	}
 	return e, nil
