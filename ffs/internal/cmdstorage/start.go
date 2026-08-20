@@ -46,7 +46,7 @@ func openStore(ctx context.Context, store config.StoreSpec) (bs, buf blob.StoreC
 	if err != nil {
 		return nil, nil, fmt.Errorf("open store: %w", err)
 	}
-	defer closeOnError(bs, &oerr)
+	defer closeOnError(bs, &oerr)()
 	if store.Substore != "" {
 		sub, err := bs.Sub(ctx, store.Substore)
 		if err != nil {

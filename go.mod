@@ -1,6 +1,6 @@
 module github.com/creachadair/ffstools
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/creachadair/atomicfile v0.4.2
@@ -143,10 +143,11 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260807164820-c8921c73eeea // indirect
 	google.golang.org/grpc v1.83.0 // indirect
-	honnef.co/go/tools v0.7.0 // indirect
+	honnef.co/go/tools v0.8.0 // indirect
 )
 
 retract (
+	v0.20.22 // broken CI check under staticcheck
 	[v0.19.19, v0.19.20] // missing invalidation in file rename
 	v0.19.18 // missing invalidation in file removal
 	v0.16.2 // incorrect rewrite caching
