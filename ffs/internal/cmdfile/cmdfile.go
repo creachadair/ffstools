@@ -1069,7 +1069,7 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 }
 
 func formatBytes(n int64, label string) string {
-	if n < 1<<20 {
+	if n < 1<<10 {
 		return fmt.Sprintf("%d %s", n, label)
 	}
 	const unit = "KMGTPEZY" // lol
