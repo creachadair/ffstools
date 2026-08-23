@@ -38,6 +38,7 @@ type Config struct {
 	IncludeXAttr bool   // capture extended attributes
 	OmitStat     bool   // do not capture stat metadata
 	FilterName   string // name of filter file to read
+	FilterText   string // base filter text to parse
 
 	// A filesystem implementation to read from, or nil.
 	// If it is nil, the config uses the standard library's [os] package.
@@ -102,7 +103,15 @@ func (c Config) importFile(ctx context.Context, st state) (*file.File, error) {
 // ImportPath imports a single file, directory, or symlink into the store.
 // If path names a directory, its contents are imported recursively.
 func (c Config) ImportPath(ctx context.Context, s blob.CAS, path string) (*file.File, error) {
-	return c.importPath(ctx, state{s: s, path: path, fs: c.getFS()})
+	var baseFilter *Filter
+	if c.FilterText != "" {
+		f, err := parseFilter(path, []byte(c.FilterText))
+		if err != nil {
+			return nil, fmt.Errorf("invalid filter text: %w", err)
+		}
+		baseFilter = f
+	}
+	return c.importPath(ctx, state{s: s, path: path, filter: baseFilter, fs: c.getFS()})
 }
 
 func (c Config) importPath(ctx context.Context, st state) (*file.File, error) {
