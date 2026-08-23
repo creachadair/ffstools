@@ -31,6 +31,7 @@ import (
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/codecs/encrypted"
+	"github.com/creachadair/ffs/storage/restricted"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/ffs/internal/cmdstorage/registry"
 	"github.com/creachadair/ffstools/lib/storeservice"
@@ -46,6 +47,7 @@ func openStore(ctx context.Context, store config.StoreSpec) (bs, buf blob.StoreC
 	if err != nil {
 		return nil, nil, fmt.Errorf("open store: %w", err)
 	}
+	bs = restricted.NewStore(bs, store.Access)
 	defer closeOnError(bs, &oerr)()
 	if store.Substore != "" {
 		sub, err := bs.Sub(ctx, store.Substore)
