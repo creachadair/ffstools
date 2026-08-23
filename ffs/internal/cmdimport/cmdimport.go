@@ -65,7 +65,8 @@ edit program is a single string, use quotes if calling from a shell.`,
 		fs.BoolVar(&putConfig.OmitStat, "nostat", false, "Omit file and directory stat")
 		fs.BoolVar(&putConfig.IncludeXAttr, "xattr", false, "Capture extended attributes")
 		fs.BoolVar(&putConfig.Verbose, "v", false, "Enable verbose logging")
-		fs.StringVar(&putConfig.FilterName, "filter", ".ffsignore", "Read ignore rules from this file")
+		fs.StringVar(&putConfig.FilterName, "filter-name", ".ffsignore", "Read ignore rules from this file")
+		fs.StringVar(&putConfig.FilterText, "filter", "", "Base filter rules to apply")
 		flax.MustBind(fs, &importFlags)
 	},
 	Run: command.Adapt(runImport),
