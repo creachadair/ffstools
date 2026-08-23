@@ -310,6 +310,8 @@ func (t *Duration) UnmarshalText(text []byte) error {
 
 // Policy describes an access policy for a store (see [restricted.Policy]).
 // An empty policy allows access to all substores and keyspaces.
+// A non-empty policy allows access to only those substores matched by
+// at least one rule.
 type Policy []PolicyRule
 
 // A PolicyRule defines which keyspaces are allowed for a given substore path.
@@ -322,28 +324,19 @@ type PolicyRule struct {
 	// components must match the pattern exactly.
 	Path []string `json:"path" yaml:"path"`
 
-	// The names of keyspaces that are allowed, or "*" to allow all names not
-	// explicitly listed in Deny. A name listed both in Allow and Deny is allowed.
+	// The names of keyspaces that are allowed. If empty, all names are allowed;
+	// otherwise only the names listed are allowed.
 	Allow []string `json:"allow,omitempty" yaml:"allow"`
-
-	// The names of keyspaces that are denied, when Allow is "*".
-	// A name listed in both Allow and Deny is allowed.
-	Deny []string `json:"deny,omitempty" yaml:"deny"`
 }
 
-// matchesPath reports whether r applies to the specified path.  This is true
-// if r.Path equals path exactly, or if r.Path ends in "*" and the rest is a
-// prefix of path.
+// matchesPath reports whether r applies to the specified path.
 func (r PolicyRule) matchesPath(path []string) bool { return pathMatchesPattern(path, r.Path) }
 
 // checkName reports whether name is allowed by r.
 // A name is allowed if it is explicitly listed in r.Allow, or if
 // r.Allow is "*" and name is not listed in r.Deny.
-func (r PolicyRule) checkName(name string) (allow, deny bool) {
-	isGlob := len(r.Allow) == 1 && r.Allow[0] == "*"
-	allow = isGlob || slices.Contains(r.Allow, name)
-	deny = isGlob && slices.Contains(r.Deny, name)
-	return
+func (r PolicyRule) checkName(name string) bool {
+	return len(r.Allow) == 0 || slices.Contains(r.Allow, name)
 }
 
 // CheckSub implements part of the [restricted.Policy] interface.
@@ -365,20 +358,10 @@ func (p Policy) CheckKV(ctx context.Context, path []string, name string) error {
 	if len(p) == 0 {
 		return nil
 	}
-	var accept, deny = -1, -1
 	for _, r := range p {
-		if r.matchesPath(path) {
-			y, n := r.checkName(name)
-			if y && len(r.Path) > accept {
-				accept = len(r.Path)
-			}
-			if n && len(r.Path) > deny {
-				deny = len(r.Path)
-			}
+		if r.matchesPath(path) && r.checkName(name) {
+			return nil
 		}
-	}
-	if accept >= 0 && accept > deny {
-		return nil
 	}
 	return restricted.ErrNoAccess
 }

@@ -24,14 +24,13 @@ import (
 
 func TestPolicyRule(t *testing.T) {
 	type rule struct {
-		path, allow, deny string
+		path, allow string
 	}
-	r2p := func(rs []rule) (out config.Policy) {
+	r2p := func(rs ...rule) (out config.Policy) {
 		for _, r := range rs {
 			out = append(out, config.PolicyRule{
 				Path:  strings.Fields(r.path),
 				Allow: strings.Fields(r.allow),
-				Deny:  strings.Fields(r.deny),
 			})
 		}
 		return
@@ -40,44 +39,72 @@ func TestPolicyRule(t *testing.T) {
 	kv := config.Policy.CheckKV
 	tests := []struct {
 		label      string
-		rules      []rule
+		policy     config.Policy
 		path, name string
 		call       func(config.Policy, context.Context, []string, string) error
 		wantOK     bool
 	}{
-		{"Empty/Sub", nil, "a b c", "d", sub, true},
-		{"Empty/KV", nil, "a b c", "d", kv, true},
-		{"RootOnly/Sub", []rule{{"", "*", ""}}, "", "x", sub, false},
-		{"RootOnly/KV", []rule{{"", "*", ""}}, "", "x", kv, true},
-		{"Root1/Sub2", []rule{{"?", "*", ""}}, "w", "x", sub, false},
-		{"Root1/Sub1", []rule{{"?", "*", ""}}, "", "2", sub, true},
-		{"Root1/KV", []rule{{"?", "*", ""}}, "w", "x", kv, true},
-		{"Root1/KVdeny", []rule{{"?", "*", "q"}}, "w", "q", kv, false},
-		{"Root1/KVdeny", []rule{{"?", "*", "q"}}, "w", "r", kv, true},
-		{"Root/Deep0", []rule{{"a * b", "*", ""}}, "a", "b", sub, true},
-		{"Root/Deep1", []rule{{"a * b", "*", ""}}, "a c", "b", sub, true},
-		{"Root/Deep2", []rule{{"a * b", "*", ""}}, "a c d", "b", sub, true},
-		{"Root/Q0", []rule{{"a ?", "*", ""}}, "", "a", sub, false},
-		{"Root/Q1", []rule{{"a ?", "*", ""}}, "a", "x", sub, true},
-		{"Root/Qkv", []rule{{"a ?", "*", ""}}, "a x", "b", kv, true},
-		{"Override/Top/Y", []rule{
-			{"*", "xyzzy", ""}, {"a b *", "*", "xyzzy"},
-		}, "a", "xyzzy", kv, true},
-		{"Override/Top/N", []rule{
-			{"*", "xyzzy", ""}, {"a b *", "*", "xyzzy"},
-		}, "a", "bad", kv, false},
-		{"Override/Inner/Y", []rule{
-			{"*", "xyzzy", ""}, {"a b *", "*", "xyzzy"},
-		}, "a b", "other", kv, true},
-		{"Override/Inner/N", []rule{
-			{"*", "xyzzy", ""}, {"a b *", "*", "xyzzy"},
-		}, "a b", "xyzzy", kv, false},
+		{"empty/1sub", nil, "", "x", sub, true},
+		{"empty/0kv", nil, "", "x", kv, true},
+		{"empty/Nsub", nil, "a b c", "d", sub, true},
+		{"empty/Nkv", nil, "a b c", "x", kv, true},
+
+		{"root_only/sub", r2p(rule{path: ""}), "", "a", sub, false},
+		{"root_only/kv", r2p(rule{path: ""}), "", "x", kv, true},
+
+		{"root_only_allow/sub", r2p(rule{"", "x y"}), "", "a", sub, false},
+		{"root_only_allow/0kv/y", r2p(rule{"", "x y"}), "", "x", kv, true},
+		{"root_only_allow/0kv/n", r2p(rule{"", "x y"}), "", "z", kv, false},
+
+		{"no_root/1sub/y", r2p(rule{path: "a"}, rule{path: "b"}), "", "a", sub, true},
+		{"no_root/1sub/n", r2p(rule{path: "a"}, rule{path: "b"}), "", "c", sub, false},
+		{"no_root/0kv/n", r2p(rule{path: "a"}, rule{path: "b"}), "", "x", kv, false},
+		{"no_root/1kv/y", r2p(rule{path: "a"}, rule{path: "b"}), "a", "x", kv, true},
+		{"no_root/1kv/n", r2p(rule{path: "a"}, rule{path: "b"}), "c", "x", kv, false},
+
+		{"no_root_allow/1kv/ya", r2p(
+			rule{path: "a", allow: "x y"}, rule{path: "b", allow: "z"},
+		), "a", "x", kv, true},
+		{"no_root_allow/1kv/na", r2p(
+			rule{path: "a", allow: "x y"}, rule{path: "b", allow: "z"},
+		), "a", "z", kv, false},
+		{"no_root_allow/1kv/yb", r2p(
+			rule{path: "a", allow: "x y"}, rule{path: "b", allow: "z"},
+		), "b", "z", kv, true},
+		{"no_root_allow/1kv/nb", r2p(
+			rule{path: "a", allow: "x y"}, rule{path: "b", allow: "z"},
+		), "b", "x", kv, false},
+
+		{"no_root_allow/all_x/1kv/ya", r2p(
+			rule{path: "? *", allow: "x"}, rule{path: "a", allow: "y z"},
+		), "a", "x", kv, true},
+		{"no_root_allow/all_x/1kv/yc", r2p(
+			rule{path: "? *", allow: "x"}, rule{path: "a", allow: "y z"},
+		), "c", "x", kv, true},
+		{"no_root_allow/all_x/1kv/nb", r2p(
+			rule{path: "? *", allow: "x"}, rule{path: "a", allow: "y z"},
+		), "b", "z", kv, false},
+		{"no_root_allow/all_x/1kv/ya", r2p(
+			rule{path: "? *", allow: "x"}, rule{path: "a", allow: "y z"},
+		), "a", "z", kv, true},
+
+		{"open_bucket/0kv/y", r2p(
+			rule{path: "", allow: "x y"}, rule{path: "open"},
+		), "", "x", kv, true},
+		{"open_bucket/0kv/n", r2p(
+			rule{path: "", allow: "x y"}, rule{path: "open"},
+		), "", "z", kv, false},
+		{"open_bucket/1kv/yx", r2p(
+			rule{path: "", allow: "x y"}, rule{path: "open"},
+		), "open", "x", kv, true},
+		{"open_bucket/1kv/yz", r2p(
+			rule{path: "", allow: "x y"}, rule{path: "open"},
+		), "open", "z", kv, true},
 	}
 	for _, tc := range tests {
 		t.Run(tc.label, func(t *testing.T) {
-			p := r2p(tc.rules)
 			input := strings.Fields(tc.path)
-			got := tc.call(p, t.Context(), input, tc.name)
+			got := tc.call(tc.policy, t.Context(), input, tc.name)
 			if (got == nil) != tc.wantOK {
 				t.Errorf("Check %q %q: err=%v, want %v", input, tc.name, got, tc.wantOK)
 			}
