@@ -24,6 +24,7 @@ import (
 	"iter"
 	"log"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/creachadair/chirpstore"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffs/storage/restricted"
 	"github.com/creachadair/ffstools/lib/storeclient"
 	"github.com/creachadair/mds/mstr"
 	yaml "gopkg.in/yaml.v3"
@@ -78,6 +80,7 @@ type StoreSpec struct {
 	Spec     string `json:"spec" yaml:"spec"`         // the desired storage URL
 	Prefix   string `json:"prefix" yaml:"prefix"`     // service method name prefix
 	Substore string `json:"substore" yaml:"substore"` // substore name (optional)
+	Access   Policy `json:"access" yaml:"access"`     // access policy rules (empty allows all)
 }
 
 // ResolveAddress resolves the given address against the settings. If addr is
@@ -303,4 +306,99 @@ func (t *Duration) UnmarshalText(text []byte) error {
 	}
 	*t = Duration(d)
 	return nil
+}
+
+// Policy describes an access policy for a store (see [restricted.Policy]).
+// An empty policy allows access to all substores and keyspaces.
+type Policy []PolicyRule
+
+// A PolicyRule defines which keyspaces are allowed for a given substore path.
+type PolicyRule struct {
+	// The path of subspaces from the root for which this rule applies.
+	//
+	// An empty Path denotes the root store. Otherwise, each path component is
+	// either a name, "*", or "?". A "*" matches zero or more path components, a
+	// "?" matches any single path component. Otherwise, all corresponding path
+	// components must match the pattern exactly.
+	Path []string `json:"path" yaml:"path"`
+
+	// The names of keyspaces that are allowed, or "*" to allow all names not
+	// explicitly listed in Deny. A name listed both in Allow and Deny is allowed.
+	Allow []string `json:"allow,omitempty" yaml:"allow"`
+
+	// The names of keyspaces that are denied, when Allow is "*".
+	// A name listed in both Allow and Deny is allowed.
+	Deny []string `json:"deny,omitempty" yaml:"deny"`
+}
+
+// matchesPath reports whether r applies to the specified path.  This is true
+// if r.Path equals path exactly, or if r.Path ends in "*" and the rest is a
+// prefix of path.
+func (r PolicyRule) matchesPath(path []string) bool { return pathMatchesPattern(path, r.Path) }
+
+// checkName reports whether name is allowed by r.
+// A name is allowed if it is explicitly listed in r.Allow, or if
+// r.Allow is "*" and name is not listed in r.Deny.
+func (r PolicyRule) checkName(name string) (allow, deny bool) {
+	isGlob := len(r.Allow) == 1 && r.Allow[0] == "*"
+	allow = isGlob || slices.Contains(r.Allow, name)
+	deny = isGlob && slices.Contains(r.Deny, name)
+	return
+}
+
+// CheckSub implements part of the [restricted.Policy] interface.
+func (p Policy) CheckSub(ctx context.Context, path []string, name string) error {
+	if len(p) == 0 {
+		return nil
+	}
+	cpath := append(path, name)
+	for _, r := range p {
+		if r.matchesPath(cpath) {
+			return nil
+		}
+	}
+	return restricted.ErrNoAccess
+}
+
+// CheckKV implements part of the [restricted.Policy] interface.
+func (p Policy) CheckKV(ctx context.Context, path []string, name string) error {
+	if len(p) == 0 {
+		return nil
+	}
+	var accept, deny = -1, -1
+	for _, r := range p {
+		if r.matchesPath(path) {
+			y, n := r.checkName(name)
+			if y && len(r.Path) > accept {
+				accept = len(r.Path)
+			}
+			if n && len(r.Path) > deny {
+				deny = len(r.Path)
+			}
+		}
+	}
+	if accept >= 0 && accept > deny {
+		return nil
+	}
+	return restricted.ErrNoAccess
+}
+
+func pathMatchesPattern(path, pattern []string) bool {
+	if len(pattern) == 0 {
+		return len(path) == 0
+	} else if len(path) == 0 {
+		return len(pattern) == 1 && pattern[0] == "*"
+	}
+
+	// reaching here, both path and pattern are non-empty
+	if pattern[0] == "*" {
+		if pathMatchesPattern(path[1:], pattern) || pathMatchesPattern(path, pattern[1:]) {
+			return true
+		}
+	} else if pattern[0] == "?" {
+		// OK, wildcard matches any single item
+	} else if len(path) == 0 || path[0] != pattern[0] {
+		return false
+	}
+	return pathMatchesPattern(path[1:], pattern[1:])
 }
