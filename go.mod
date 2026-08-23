@@ -10,7 +10,7 @@ require (
 	github.com/creachadair/chirp v0.4.12
 	github.com/creachadair/chirpstore v0.0.0-20260808224329-f0df8d9fab89
 	github.com/creachadair/command v0.2.11
-	github.com/creachadair/ffs v0.18.2
+	github.com/creachadair/ffs v0.18.3
 	github.com/creachadair/ffuse v0.0.0-20260819171809-835bbda919ad
 	github.com/creachadair/flax v0.0.6
 	github.com/creachadair/gcsstore v0.0.0-20260820160112-9ef6ffedcba1
@@ -42,7 +42,6 @@ require (
 	cloud.google.com/go/iam v1.11.0 // indirect
 	cloud.google.com/go/monitoring v1.29.0 // indirect
 	cloud.google.com/go/storage v1.64.0 // indirect
-	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
 	github.com/DataDog/zstd v1.5.7 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.33.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.57.0 // indirect
