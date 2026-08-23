@@ -131,7 +131,7 @@ func parseFilter(base string, data []byte) (*Filter, error) {
 func makePattern(raw string) string {
 	r := strings.NewReplacer(
 		`\\`, `\\`,
-		`\**`, `\\**`, `**`, `.*`,
+		`\**`, `\\*\\*`, `**/`, `(?:.*/)*`, `**`, `.*`,
 		`\*`, `\*`, `*`, `[^/]*`,
 		`\?`, `\?`, `?`, `[^/]`,
 	)
