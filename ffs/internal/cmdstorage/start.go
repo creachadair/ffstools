@@ -147,9 +147,12 @@ type subCloser struct {
 }
 
 func getPassphrase(target string) (string, error) {
-	pp, ok := os.LookupEnv("FFS_PASSPHRASE")
-	if ok {
-		return pp, nil
+	if fp, ok := os.LookupEnv("FFS_PASSPHRASE"); ok {
+		pp, err := os.ReadFile(fp)
+		if err != nil {
+			return "", fmt.Errorf("read passphrase: %w", err)
+		}
+		return strings.TrimSpace(string(pp)), nil
 	}
 
 	gp, ok := os.LookupEnv("FFS_GETPASS")

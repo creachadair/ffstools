@@ -87,9 +87,9 @@ With --cache, the server provides a memory cache over the primary store.
 With --key, the store is opened with chacha20-poly1305 encryption.
 The contents of the --key file are used as the cipher key.
 If the file is in the [keyring] format, it is unlocked with a passphrase.
-The passphrase is read from the FFS_PASSPHRASE environment or prompted at
-the terminal. Otherwise if it is exactly 32 bytes (the size of a
-chacha20-poly1305 key) its contents are used verbatim.
+The passphrase is read from the file named by FFS_PASSPHRASE environment,
+or prompted via the terminal. Otherwise if it is exactly 32 bytes (the
+size of a chacha20-poly1305 key) its contents are used verbatim.
 
 Use --buffer to enable a local write-behind buffer. The syntax of its
 argument is the same as for --store. This is suitable for primary stores
