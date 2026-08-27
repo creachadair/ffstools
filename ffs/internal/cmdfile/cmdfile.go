@@ -44,6 +44,7 @@ import (
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
+	"github.com/creachadair/mds/value"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -820,6 +821,7 @@ func runListPaths(env *command.Env, pathSpec string) error {
 var fsckFlags struct {
 	DataSize bool `flag:"data-size,Compute the aggregate sizes of data blocks (WARNING: expensive)"`
 	JSON     bool `flag:"json,Write result as JSON"`
+	Verbose  bool `flag:"v,Enable verbose progress output"`
 }
 
 func runFileCheck(env *command.Env, origins ...string) error {
@@ -831,7 +833,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			Progress:        os.Stdout,
 		}
 		if fsckFlags.JSON {
-			fc.Progress = nil
+			fc.Progress = value.Cond(fsckFlags.Verbose, os.Stderr, nil)
 		}
 		for _, org := range origins {
 			r, err := fc.Check(env.Context(), org)
@@ -840,8 +842,6 @@ func runFileCheck(env *command.Env, origins ...string) error {
 			}
 			if fsckFlags.JSON {
 				json.NewEncoder(os.Stdout).Encode(r)
-			} else {
-				r.Report(os.Stdout)
 			}
 		}
 		return nil

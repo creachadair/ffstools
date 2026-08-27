@@ -170,6 +170,12 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 	r.UniqueData = uniq.Len()
 	r.NumLost = lost.Len()
 	r.Elapsed = time.Since(start)
+	c.pprintf("%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
+		"%d lost, %d errors\n",
+		value.Cond(r.NumErrors == 0 && r.NumLost == 0, "✅ OK", "❌ FAILED"),
+		r.TotalObjects, r.TotalFiles, r.UniqueFiles, percent(r.UniqueFiles, r.TotalFiles),
+		r.TotalData, r.UniqueData, percent(r.UniqueData, r.TotalData), r.NumLost, r.NumErrors)
+	c.pprintf("🕖 %v elapsed\n", r.Elapsed.Round(time.Millisecond))
 	return r, nil
 }
 
@@ -190,16 +196,6 @@ type Result struct {
 	NumErrors int           `json:"errors,omitzero"` // number of errors
 	NumLost   int           `json:"lost,omitzero"`   // number of lost objects
 	Elapsed   time.Duration `json:"elapsed"`         // total time elapsed
-}
-
-// Report emits a textual report of r to w.
-func (r Result) Report(w io.Writer) {
-	fmt.Fprintf(w, "%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
-		"%d lost, %d errors\n",
-		value.Cond(r.NumErrors == 0 && r.NumLost == 0, "✅ OK", "❌ FAILED"),
-		r.TotalObjects, r.TotalFiles, r.UniqueFiles, percent(r.UniqueFiles, r.TotalFiles),
-		r.TotalData, r.UniqueData, percent(r.UniqueData, r.TotalData), r.NumLost, r.NumErrors)
-	fmt.Fprintf(w, "🕖 %v elapsed\n\n", r.Elapsed.Round(time.Millisecond))
 }
 
 func (c Config) pprintf(msg string, args ...any) { fmtPrintf(c.Progress, msg, args...) }
