@@ -63,8 +63,12 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 		r.NumErrors++
 	} else {
 		st := idx.Stats()
-		c.pprintf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
-			st.NumKeys, st.FilterBits, st.NumHashes)
+		r.Index.Key = filetree.FormatKey32(of.Root.IndexKey)
+		r.Index.NumKeys = st.NumKeys
+		r.Index.FilterBits = st.FilterBits
+		r.Index.NumHashes = st.NumHashes
+		c.pprintf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", r.Index.Key,
+			r.Index.NumKeys, r.Index.FilterBits, r.Index.NumHashes)
 		uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 		r.TotalData++
 		checkIndex = idx.Has
@@ -184,6 +188,13 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 type Result struct {
 	Path   string `json:"path,omitzero"` // the path from which this was generated
 	Origin string `json:"origin"`        // the storage key of the file tree
+
+	Index struct {
+		Key        string `json:"key,omitzero"`       // the storage key of the index, if set
+		NumKeys    int    `json:"numKeys,omitzero"`   // number of keys recorded in index
+		FilterBits int    `json:"numBits,omitzero"`   // number of filter bits in index
+		NumHashes  int    `json:"numHashes,omitzero"` // number of hashes in index
+	} `json:"index,omitzero"`
 
 	TotalObjects    int   `json:"objects"`         // total number of objects
 	TotalFiles      int   `json:"files"`           // total number of files
