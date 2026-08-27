@@ -242,7 +242,7 @@ func parseEdit() (*editlib.Config, error) {
 	e, err := editlib.ParseConfig(spec)
 	if err != nil {
 		return nil, err
-	} else if e != nil && (e.DataSpec != nil || e.Create) {
+	} else if e != nil && (e.Content != nil || e.Create) {
 		return nil, errors.New("the 'create' and 'data' --edit verbs are not supported")
 	}
 	return e, nil

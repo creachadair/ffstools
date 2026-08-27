@@ -2,9 +2,11 @@
 package editlib
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"math"
 	"os"
@@ -42,12 +44,9 @@ type Config struct {
 	// See also UID and GID.
 	Owner, Group *string
 
-	// If non-nil, replace the contents of the file as specified.
-	// If the spec is "", the file is truncated to 0 bytes.
-	// If the spec is "-", the contents of stdin replace the file contents.
-	// Otherwise, the spec must name a file that will be copied to replace the
-	// file contents.
-	DataSpec *string
+	// If non-nil, replace the contents of the target file with the contents of
+	// this reader.
+	Content io.Reader
 
 	// If non-nil, set stat persistence for the file.
 	Persist *bool
@@ -60,6 +59,8 @@ type Config struct {
 	// applying other edits described in this config. This field is not used by
 	// the Apply method.
 	Create bool
+
+	closer io.Closer // set by ParseConfig
 }
 
 // ParseConfig parses a [Config] specification from the given arguments.
@@ -169,7 +170,19 @@ func ParseConfig(args []string) (*Config, error) {
 			mod.Persist = &v
 
 		case "data", "content":
-			mod.DataSpec = &args[i+1]
+			switch args[i+1] {
+			case "":
+				mod.Content = bytes.NewReader(nil)
+			case "-":
+				mod.Content = os.Stdin
+			default:
+				f, err := os.Open(args[i+1])
+				if err != nil {
+					return nil, fmt.Errorf("invalid data file: %w", err)
+				}
+				mod.Content = f
+				mod.closer = f
+			}
 
 		default:
 			return nil, fmt.Errorf("unknown stat field %q", args[i])
@@ -180,7 +193,7 @@ func ParseConfig(args []string) (*Config, error) {
 }
 
 // Apply applies the specified edits to f. An error is reported if e fails to
-// set the content of f; if e.DataSpec == nil, no error can occur.
+// set the content of f; if e.Content == nil, no error can occur.
 //
 // Note that the Create verb is not handled by Apply; f must not be nil.
 // If e == nil, Apply makes no changes to f without error.
@@ -189,20 +202,10 @@ func (e *Config) Apply(ctx context.Context, f *file.File) error {
 		return nil
 	}
 	// Set file data.
-	if e.DataSpec != nil {
-		var derr error
-		switch *e.DataSpec {
-		case "":
-			derr = f.SetData(ctx, strings.NewReader(""))
-		case "-":
-			derr = f.SetData(ctx, os.Stdin)
-		default:
-			df, err := os.Open(*e.DataSpec)
-			if err != nil {
-				return fmt.Errorf("open data: %w", err)
-			}
-			derr = f.SetData(ctx, df)
-			df.Close()
+	if e.Content != nil {
+		derr := f.SetData(ctx, e.Content)
+		if e.closer != nil {
+			e.closer.Close()
 		}
 		if derr != nil {
 			return fmt.Errorf("set data: %w", derr)
