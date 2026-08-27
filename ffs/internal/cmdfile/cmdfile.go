@@ -40,10 +40,10 @@ import (
 	"github.com/creachadair/ffs/index"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/editlib"
+	"github.com/creachadair/ffstools/lib/fscklib"
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
-	"github.com/creachadair/mds/value"
 )
 
 const fileCmdUsage = `<root-key>[/path] ...
@@ -824,149 +824,16 @@ var fsckFlags struct {
 func runFileCheck(env *command.Env, origins ...string) error {
 	cfg := env.Config.(*config.Settings)
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		fc := fscklib.Config{
+			Store:           s,
+			ComputeDataSize: fsckFlags.DataSize,
+			Output:          os.Stdout,
+		}
 		for _, org := range origins {
-			of, err := s.OpenPath(env.Context(), org)
+			_, err := fc.Check(env.Context(), org)
 			if err != nil {
 				return err
 			}
-			if of.Root == nil && of.Base == of.File {
-				fmt.Printf("check %s\n", filetree.FormatKey32(of.FileKey))
-			} else {
-				fmt.Printf("check %q %s\n", of.Path, filetree.FormatKey32(of.File.Key()))
-			}
-
-			start := time.Now()
-			dataSize := make(map[string]int64)
-			var done, uniq, lost mapset.Set[string]
-			var nfile, ndata, nerrs int
-			var totalDataBytes int64
-
-			// If this file came from a root pointer, and the root has an index,
-			// verify that we can load the index data successfully.
-			//
-			// If we do have an index, we will also verify that all the reachable
-			// file and data blobs are recorded there.
-			checkIndex := func(string) bool { return true } // fail open
-			if of.Root == nil {
-				// no root is invoolved
-			} else if of.Root.IndexKey == "" {
-				fmt.Printf("- root %q is not indexed (OK)\n", of.RootKey)
-			} else if idx, err := s.LoadIndex(env.Context(), of.Root.IndexKey); err != nil {
-				fmt.Printf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
-				lost.Add(of.Root.IndexKey)
-				nerrs++
-			} else {
-				st := idx.Stats()
-				fmt.Printf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
-					st.NumKeys, st.FilterBits, st.NumHashes)
-				uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
-				ndata++
-				checkIndex = idx.Has
-			}
-
-			// Verify that all reachable files are loadable, and that their data
-			// blocks exist in the store (without fetching them).
-			if err := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
-				if e.Err != nil {
-					msg := e.Err.Error()
-					if e, ok := errors.AsType[*blob.KeyError](e.Err); ok {
-						msg = filetree.FormatKey32(e.Key)
-						lost.Add(e.Key)
-					}
-					fmt.Printf("* file missing %s %q\n", msg, e.Path)
-					nerrs++
-					return fpath.ErrSkipChildren // continue scanning
-				}
-
-				fkey := e.File.Key()
-				if !checkIndex(fkey) {
-					fmt.Printf("* index: missing file %s\n", filetree.FormatKey32(fkey))
-					nerrs++
-				}
-
-				// Count each occurrence of a file and its data blocks even if we've already seen it.
-				nfile++
-				fd := e.File.Data()
-
-				want := mapset.New(fd.Keys()...)
-				uniq.AddAll(want)
-				ndata += fd.Len()
-
-				// If we are asked to compute data size, read each data blob we
-				// have not seen before and cache its size.
-				if fsckFlags.DataSize {
-					want.RemoveAll(lost) // exclude keys already known to be lost (we already reported them)
-					for dk := range want {
-						sz, ok := dataSize[dk]
-						if !ok {
-							bits, err := s.Files().Get(env.Context(), dk)
-							if errors.Is(err, context.Canceled) {
-								return err
-							} else if err != nil {
-								fmt.Printf("* data missing %s %q\n", filetree.FormatKey32(dk), e.Path)
-								lost.Add(dk)
-								continue
-							}
-							sz = int64(len(bits))
-							dataSize[dk] = sz
-						}
-						totalDataBytes += sz
-					}
-				}
-
-				// If (and only if) this is the first time we've seen this file,
-				// make sure its data blocks are stored.
-				if done.Has(e.File.Key()) {
-					return nil // data blocks already checked
-				}
-
-				done.Add(fkey)
-				for dk := range want {
-					if !checkIndex(dk) {
-						fmt.Printf("* index: missing data %s\n", filetree.FormatKey32(dk))
-						nerrs++
-					}
-				}
-
-				// Check that all the data block keys are at least nominally
-				// present in the store.  We don't need to do this if --data-size
-				// is set, however, because we've already fetched them all in that
-				// case in order to determine their size.
-				if !fsckFlags.DataSize {
-					have, err := s.Files().Has(env.Context(), fd.Keys()...)
-					if err != nil {
-						fmt.Printf("* check data %q: %v", e.Path, err)
-						nerrs++
-						return nil
-					}
-					want.RemoveAll(have)
-					if !want.IsEmpty() {
-						for m := range want {
-							fmt.Printf("* data missing %s %q\n", filetree.FormatKey32(m), e.Path)
-							lost.Add(m)
-						}
-					}
-				}
-				return nil
-			}); err != nil {
-				return err
-			}
-			var totalUniqueDataBytes int64
-			for _, v := range dataSize {
-				totalUniqueDataBytes += v
-			}
-			totalUnique := done.Len() + uniq.Len() // N.B. unique includes the index, if there was one
-			if fsckFlags.DataSize {
-				fmt.Printf("▷ total data size: %s, %s (%.1f%%)\n",
-					formatBytes(totalDataBytes, "bytes"), formatBytes(totalUniqueDataBytes, "unique"),
-					percent(totalUniqueDataBytes, totalDataBytes))
-			}
-			fmt.Printf("%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
-				"%d lost, %d errors\n",
-				value.Cond(nerrs == 0 && lost.Len() == 0, "✅ OK", "❌ FAILED"),
-				totalUnique, nfile, done.Len(), percent(done.Len(), nfile),
-				ndata, uniq.Len(), percent(uniq.Len(), ndata), lost.Len(), nerrs)
-			fmt.Printf("🕖 %v elapsed\n\n", time.Since(start).Round(time.Millisecond))
 		}
 		return nil
 	})
@@ -1068,18 +935,3 @@ func runIndex(env *command.Env, sourceKeys ...string) error {
 		return nil
 	})
 }
-
-func formatBytes(n int64, label string) string {
-	if n < 1<<10 {
-		return fmt.Sprintf("%d %s", n, label)
-	}
-	const unit = "KMGTPEZY" // lol
-	i, fn := -1, float64(n)
-	for fn > 1024 {
-		fn /= 1024
-		i++
-	}
-	return fmt.Sprintf("%d %s [%.1f%siB]", n, label, fn, unit[i:i+1])
-}
-
-func percent[N ~int | ~int64](v, total N) float64 { return 100 * (float64(v) / float64(total)) }
