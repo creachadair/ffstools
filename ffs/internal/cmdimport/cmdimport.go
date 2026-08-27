@@ -234,12 +234,12 @@ func checkTarget(env *command.Env, s filetree.Store, target string) error {
 	return nil
 }
 
-func parseEdit() (*editlib.Edit, error) {
+func parseEdit() (*editlib.Config, error) {
 	spec, ok := shell.Split(importFlags.Edit)
 	if !ok {
 		return nil, errors.New("unbalanced quotes in --edit spec")
 	}
-	e, err := editlib.ParseEdit(spec)
+	e, err := editlib.ParseConfig(spec)
 	if err != nil {
 		return nil, err
 	} else if e != nil && (e.DataSpec != nil || e.Create) {

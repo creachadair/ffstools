@@ -567,7 +567,7 @@ func runEdit(env *command.Env, pathSpec string, mods []string) error {
 	if len(mods) == 0 {
 		return env.Usagef("missing edit spec")
 	}
-	mod, err := editlib.ParseEdit(mods)
+	mod, err := editlib.ParseConfig(mods)
 	if err != nil {
 		return fmt.Errorf("invalid edit spec: %w", err)
 	}

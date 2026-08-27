@@ -15,9 +15,9 @@ import (
 	"github.com/creachadair/ffs/file"
 )
 
-// An Edit specifies a set of edits to apply to a [file.File].
-// A nil *Edit is valid and applies no changes.
-type Edit struct {
+// A Config specifies a set of edits to apply to a [file.File].
+// A nil *Config is valid and applies no changes.
+type Config struct {
 	// If non-nil, permission bits to apply to the mode word.  If Mask == nil,
 	// this value fully replaces the permissions; otherwise the masked bits of
 	// Perms are applied to the corresponding bits of the mode word.
@@ -62,12 +62,12 @@ type Edit struct {
 	Create bool
 }
 
-// ParseEdit parses an [Edit] specification from the given arguments.
-func ParseEdit(args []string) (*Edit, error) {
+// ParseConfig parses a [Config] specification from the given arguments.
+func ParseConfig(args []string) (*Config, error) {
 	if len(args) == 0 {
 		return nil, nil
 	}
-	var mod Edit
+	var mod Config
 	i := 0
 	for i < len(args) {
 		// Modifications that do not require an argument.
@@ -184,7 +184,7 @@ func ParseEdit(args []string) (*Edit, error) {
 //
 // Note that the Create verb is not handled by Apply; f must not be nil.
 // If e == nil, Apply makes no changes to f without error.
-func (e *Edit) Apply(ctx context.Context, f *file.File) error {
+func (e *Config) Apply(ctx context.Context, f *file.File) error {
 	if e == nil {
 		return nil
 	}
@@ -249,7 +249,7 @@ func (e *Edit) Apply(ctx context.Context, f *file.File) error {
 
 // ApplyRecursive applies e recursively to all files reachable from f.
 // On success, it flushes f to storage before returning.
-func (e *Edit) ApplyRecursive(ctx context.Context, f *file.File) error {
+func (e *Config) ApplyRecursive(ctx context.Context, f *file.File) error {
 	if e == nil {
 		return nil
 	}
