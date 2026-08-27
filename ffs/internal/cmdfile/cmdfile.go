@@ -819,6 +819,7 @@ func runListPaths(env *command.Env, pathSpec string) error {
 
 var fsckFlags struct {
 	DataSize bool `flag:"data-size,Compute the aggregate sizes of data blocks (WARNING: expensive)"`
+	JSON     bool `flag:"json,Write result as JSON"`
 }
 
 func runFileCheck(env *command.Env, origins ...string) error {
@@ -827,12 +828,20 @@ func runFileCheck(env *command.Env, origins ...string) error {
 		fc := fscklib.Config{
 			Store:           s,
 			ComputeDataSize: fsckFlags.DataSize,
-			Output:          os.Stdout,
+			Progress:        os.Stdout,
+		}
+		if fsckFlags.JSON {
+			fc.Progress = nil
 		}
 		for _, org := range origins {
-			_, err := fc.Check(env.Context(), org)
+			r, err := fc.Check(env.Context(), org)
 			if err != nil {
 				return err
+			}
+			if fsckFlags.JSON {
+				json.NewEncoder(os.Stdout).Encode(r)
+			} else {
+				r.Report(os.Stdout)
 			}
 		}
 		return nil

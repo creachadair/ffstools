@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"time"
 
@@ -20,7 +21,8 @@ import (
 type Config struct {
 	Store           filetree.Store // the store to read from (required)
 	ComputeDataSize bool           // whether to compute total data size (expensive)
-	Output          io.Writer      // where to write diagnostic output (nil to discard)
+	Progress        io.Writer      // write progress updates here (nil to discard)
+	Errors          io.Writer      // write error diagnostics here (nil means stderr)
 }
 
 // Check checks the integrity of the file tree described by origin.  The origin
@@ -34,9 +36,12 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 		return r, err
 	}
 	if of.Root == nil && of.Base == of.File {
-		c.dprintf("check %s\n", filetree.FormatKey32(of.FileKey))
+		r.Origin = filetree.FormatKey32(of.FileKey)
+		c.pprintf("check %s\n", r.Origin)
 	} else {
-		c.dprintf("check %q %s\n", of.Path, filetree.FormatKey32(of.File.Key()))
+		r.Path = of.Path
+		r.Origin = filetree.FormatKey32(of.File.Key())
+		c.pprintf("check %q %s\n", r.Path, r.Origin)
 	}
 	start := time.Now()
 	dataSize := make(map[string]int64)
@@ -51,14 +56,14 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 	if of.Root == nil {
 		// no root is invoolved
 	} else if of.Root.IndexKey == "" {
-		c.dprintf("- root %q is not indexed (OK)\n", of.RootKey)
+		c.eprintf("- root %q is not indexed (OK)\n", of.RootKey)
 	} else if idx, err := c.Store.LoadIndex(ctx, of.Root.IndexKey); err != nil {
-		c.dprintf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
+		c.eprintf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
 		lost.Add(of.Root.IndexKey)
 		r.NumErrors++
 	} else {
 		st := idx.Stats()
-		c.dprintf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
+		c.pprintf("▷ index %s OK (%d keys, %d bits, %d hashes)\n", filetree.FormatKey32(of.Root.IndexKey),
 			st.NumKeys, st.FilterBits, st.NumHashes)
 		uniq.Add(of.Root.IndexKey) // lives in the content-addressed store
 		r.TotalData++
@@ -74,14 +79,14 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 				msg = filetree.FormatKey32(e.Key)
 				lost.Add(e.Key)
 			}
-			c.dprintf("* file missing %s %q\n", msg, e.Path)
+			c.eprintf("* file missing %s %q\n", msg, e.Path)
 			r.NumErrors++
 			return fpath.ErrSkipChildren // continue scanning
 		}
 
 		fkey := e.File.Key()
 		if !checkIndex(fkey) {
-			c.dprintf("* index: missing file %s\n", filetree.FormatKey32(fkey))
+			c.eprintf("* index: missing file %s\n", filetree.FormatKey32(fkey))
 			r.NumErrors++
 		}
 
@@ -104,7 +109,7 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 					if errors.Is(err, context.Canceled) {
 						return err
 					} else if err != nil {
-						c.dprintf("* data missing %s %q\n", filetree.FormatKey32(dk), e.Path)
+						c.eprintf("* data missing %s %q\n", filetree.FormatKey32(dk), e.Path)
 						lost.Add(dk)
 						continue
 					}
@@ -124,7 +129,7 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 		done.Add(fkey)
 		for dk := range want {
 			if !checkIndex(dk) {
-				c.dprintf("* index: missing data %s\n", filetree.FormatKey32(dk))
+				c.eprintf("* index: missing data %s\n", filetree.FormatKey32(dk))
 				r.NumErrors++
 			}
 		}
@@ -136,14 +141,14 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 		if !c.ComputeDataSize {
 			have, err := c.Store.Files().Has(ctx, fd.Keys()...)
 			if err != nil {
-				c.dprintf("* check data %q: %v", e.Path, err)
+				c.eprintf("* check data %q: %v", e.Path, err)
 				r.NumErrors++
 				return nil
 			}
 			want.RemoveAll(have)
 			if !want.IsEmpty() {
 				for m := range want {
-					c.dprintf("* data missing %s %q\n", filetree.FormatKey32(m), e.Path)
+					c.eprintf("* data missing %s %q\n", filetree.FormatKey32(m), e.Path)
 					lost.Add(m)
 				}
 			}
@@ -157,7 +162,7 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 	}
 	r.TotalObjects = done.Len() + uniq.Len() // N.B. unique includes the index, if there was one
 	if c.ComputeDataSize {
-		c.dprintf("▷ total data size: %s, %s (%.1f%%)\n",
+		c.pprintf("▷ total data size: %s, %s (%.1f%%)\n",
 			formatBytes(r.TotalDataBytes, "bytes"), formatBytes(r.UniqueDataBytes, "unique"),
 			percent(r.UniqueDataBytes, r.TotalDataBytes))
 	}
@@ -165,18 +170,15 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 	r.UniqueData = uniq.Len()
 	r.NumLost = lost.Len()
 	r.Elapsed = time.Since(start)
-	c.dprintf("%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
-		"%d lost, %d errors\n",
-		value.Cond(r.NumErrors == 0 && r.NumLost == 0, "✅ OK", "❌ FAILED"),
-		r.TotalObjects, r.TotalFiles, r.UniqueFiles, percent(r.UniqueFiles, r.TotalFiles),
-		r.TotalData, r.UniqueData, percent(r.UniqueData, r.TotalData), r.NumLost, r.NumErrors)
-	c.dprintf("🕖 %v elapsed\n\n", r.Elapsed.Round(time.Millisecond))
 	return r, nil
 }
 
 // Result is the result of a successful [Config.Check] operation.  Note that a
 // check may succeed even if there are integrity errors.
 type Result struct {
+	Path   string `json:"path,omitzero"` // the path from which this was generated
+	Origin string `json:"origin"`        // the storage key of the file tree
+
 	TotalObjects    int   `json:"objects"`         // total number of objects
 	TotalFiles      int   `json:"files"`           // total number of files
 	UniqueFiles     int   `json:"uniqueFiles"`     // number of distinct files
@@ -190,14 +192,33 @@ type Result struct {
 	Elapsed   time.Duration `json:"elapsed"`         // total time elapsed
 }
 
-func (c Config) dprintf(msg string, args ...any) {
-	if c.Output == nil {
+// Report emits a textual report of r to w.
+func (r Result) Report(w io.Writer) {
+	fmt.Fprintf(w, "%s: %d objects: %d files (%d unique, %.1f%%), %d blocks (%d unique, %.1f%%), "+
+		"%d lost, %d errors\n",
+		value.Cond(r.NumErrors == 0 && r.NumLost == 0, "✅ OK", "❌ FAILED"),
+		r.TotalObjects, r.TotalFiles, r.UniqueFiles, percent(r.UniqueFiles, r.TotalFiles),
+		r.TotalData, r.UniqueData, percent(r.UniqueData, r.TotalData), r.NumLost, r.NumErrors)
+	fmt.Fprintf(w, "🕖 %v elapsed\n\n", r.Elapsed.Round(time.Millisecond))
+}
+
+func (c Config) pprintf(msg string, args ...any) { fmtPrintf(c.Progress, msg, args...) }
+
+func (c Config) eprintf(msg string, args ...any) {
+	if c.Errors == nil {
+		fmtPrintf(os.Stderr, msg, args...)
+	}
+	fmtPrintf(c.Errors, msg, args...)
+}
+
+func fmtPrintf(w io.Writer, msg string, args ...any) {
+	if w == nil {
 		return
 	}
 	if !strings.HasSuffix(msg, "\n") {
 		msg += "\n"
 	}
-	fmt.Fprintf(c.Output, msg, args...)
+	fmt.Fprintf(w, msg, args...)
 }
 
 func formatBytes(n int64, label string) string {
