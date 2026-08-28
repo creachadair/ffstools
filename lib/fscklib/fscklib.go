@@ -189,6 +189,7 @@ type Result struct {
 	Path   string `json:"path,omitzero"` // the path from which this was generated
 	Origin string `json:"origin"`        // the storage key of the file tree
 
+	// Populated when checking a path that transits an indexed root.
 	Index struct {
 		Key        string `json:"key,omitzero"`       // the storage key of the index, if set
 		NumKeys    int    `json:"numKeys,omitzero"`   // number of keys recorded in index
@@ -196,13 +197,16 @@ type Result struct {
 		NumHashes  int    `json:"numHashes,omitzero"` // number of hashes in index
 	} `json:"index,omitzero"`
 
-	TotalObjects    int   `json:"objects"`         // total number of objects
-	TotalFiles      int   `json:"files"`           // total number of files
-	UniqueFiles     int   `json:"uniqueFiles"`     // number of distinct files
-	TotalData       int   `json:"data"`            // total number of data blocks
-	UniqueData      int   `json:"uniqueData"`      // number of distinct data blocks
-	TotalDataBytes  int64 `json:"dataBytes"`       // total number of data bytes
-	UniqueDataBytes int64 `json:"uniqueDataBytes"` // total number of unique data bytes
+	// Always populated, but may be incomplete in case of errors or lost objects.
+	TotalObjects int `json:"objects"`     // total number of objects
+	TotalFiles   int `json:"files"`       // total number of files
+	UniqueFiles  int `json:"uniqueFiles"` // number of distinct files
+	TotalData    int `json:"data"`        // total number of data blocks
+	UniqueData   int `json:"uniqueData"`  // number of distinct data blocks
+
+	// Populated only when ComputeDataBytes is true.
+	TotalDataBytes  int64 `json:"dataBytes,omitzero"`       // total number of data bytes
+	UniqueDataBytes int64 `json:"uniqueDataBytes,omitzero"` // total number of unique data bytes
 
 	NumErrors int           `json:"errors,omitzero"` // number of errors
 	NumLost   int           `json:"lost,omitzero"`   // number of lost objects
