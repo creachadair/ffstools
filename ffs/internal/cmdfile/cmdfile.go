@@ -776,18 +776,22 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 		werr := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
 			if e.Err != nil {
 				return err
+			} else if want.Len() == 0 {
+				return errFindFound // nothing more to find
 			}
-			if want.Has(e.File.Key()) {
-				fmt.Printf("file %q %s\n", e.Path, filetree.FormatKey32(e.File.Key()))
+			if fk := e.File.Key(); want.Has(fk) {
+				fmt.Printf("file %q %s\n", e.Path, filetree.FormatKey32(fk))
 				if !findFlags.All {
-					return errFindFound
+					want.Remove(fk)
+					return nil
 				}
 			}
 			for i, dkey := range e.File.Data().Keys() {
 				if want.Has(dkey) {
 					fmt.Printf("data %q [%d] %s\n", e.Path, i, filetree.FormatKey32(dkey))
 					if !findFlags.All {
-						return errFindFound
+						want.Remove(dkey)
+						return nil
 					}
 				}
 			}
