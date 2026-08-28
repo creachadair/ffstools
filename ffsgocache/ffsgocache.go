@@ -26,7 +26,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
-	"github.com/creachadair/ffstools/lib/storeclient"
+	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/gocache"
 	"github.com/creachadair/gocache/cachedir"
@@ -35,6 +35,7 @@ import (
 )
 
 var flags = struct {
+	ConfigPath   string `flag:"config,default=*,Configuration file path [env: FFS_CONFIG]"`
 	CacheDir     string `flag:"cache-dir,default=$FFS_GOCACHE,Cache directory (required)"`
 	Store        string `flag:"store,default=$FFS_STORE,Address of storage service (required)"`
 	RootName     string `flag:"root,default=$FFS_ROOTNAME,Name of cache root (required)"`
@@ -44,7 +45,8 @@ var flags = struct {
 	Verbose      bool   `flag:"v,Enable verbose logging"`
 	DebugLog     bool   `flag:"debug,Enable detailed per-request debug logging (warning: noisy)"`
 }{
-	Tasks: 2 * runtime.NumCPU(),
+	Tasks:      2 * runtime.NumCPU(),
+	ConfigPath: config.Path(),
 }
 
 func main() {
@@ -53,7 +55,19 @@ func main() {
 		Usage:    "<flags>\nhelp",
 		Help:     `Serve the GOCACHEPROG protocol on stdio to an FFS store.`,
 		SetFlags: command.Flags(flax.MustBind, &flags),
-		Run:      command.Adapt(runCache),
+		Init: func(env *command.Env) error {
+			cfg, err := config.Load(flags.ConfigPath)
+			if err != nil {
+				return err
+			}
+			if flags.Store != "" {
+				cfg.DefaultStore = flags.Store
+			}
+			config.ExpandString(&cfg.DefaultStore)
+			env.Config = cfg
+			return nil
+		},
+		Run: command.Adapt(runCache),
 		Commands: []*command.C{
 			command.HelpCommand(nil),
 			command.VersionCommand(),
@@ -70,8 +84,6 @@ func runCache(env *command.Env) error {
 		return env.Usagef("missing required --cache-dir")
 	case !filepath.IsAbs(flags.CacheDir):
 		return env.Usagef("the --cache-dir must be an absolute path")
-	case flags.Store == "":
-		return env.Usagef("missing required --store address")
 	case flags.RootName == "":
 		if env.IsFlagSet("root") {
 			return env.Usagef("missing required --root name")
@@ -87,72 +99,66 @@ func runCache(env *command.Env) error {
 	}
 
 	// Connect to the storage service for the backing store.
-	st, err := storeclient.ParseAddress(flags.Store).Connect(env.Context(), nil)
-	if err != nil {
-		return fmt.Errorf("dial store: %w", err)
-	}
-	ft, err := filetree.NewStore(env.Context(), st)
-	if err != nil {
-		return err
-	}
-
-	// Each invocation of the tool specifies which cache root it will use.
-	// If that root already exists, the cache will be its existing contents;
-	// otherwise we create a new empty one.
-	rp, err := root.Open(env.Context(), ft.Roots(), flags.RootName)
-	if blob.IsKeyNotFound(err) {
-		rp = root.New(ft.Roots(), nil) // OK, create a new one
-	} else if err != nil {
-		return fmt.Errorf("open root: %w", err)
-	}
-	fp, err := rp.File(env.Context(), ft.Files())
-	if errors.Is(err, root.ErrNoData) {
-		fp = file.New(ft.Files(), &file.NewOptions{
-			Stat:        &file.Stat{Mode: fs.ModeDir | 0755}, // for cosmetics
-			PersistStat: true,
-		}) // OK, create a new one
-	} else if err != nil {
-		return fmt.Errorf("open root file: %w", err)
-	}
-
-	// Maintain a limited pool of goroutines for writing data back to the store.
-	g, start := taskgroup.New(func(err error) {
-		log.Printf("WARNING: writeback error: %v", err)
-	}).Limit(flags.Tasks)
-	defer g.Wait()
-
-	fc := ffsCache{dir: cd, root: fp, start: start}
-	gc := &gocache.Server{
-		Get:         fc.Get,
-		Put:         fc.Put,
-		MaxRequests: flags.Tasks,
-		Logf:        value.Cond(flags.Verbose || flags.DebugLog, log.Printf, nil),
-		LogRequests: flags.DebugLog,
-	}
-	if err := gc.Run(env.Context(), os.Stdin, os.Stdout); err != nil {
-		return fmt.Errorf("cache server exited with error: %w", err)
-	}
-	g.Wait() // wait for writes to settle
-
-	// Unless we were instructed not to, update the specified root with the
-	// final state of the cache at exit.
-	if !flags.NoUpdate {
-		fk, err := fp.Flush(env.Context())
-		if err != nil {
-			return fmt.Errorf("flush cache: %w", err)
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(ft filetree.Store) error {
+		// Each invocation of the tool specifies which cache root it will use.
+		// If that root already exists, the cache will be its existing contents;
+		// otherwise we create a new empty one.
+		rp, err := root.Open(env.Context(), ft.Roots(), flags.RootName)
+		if blob.IsKeyNotFound(err) {
+			rp = root.New(ft.Roots(), nil) // OK, create a new one
+		} else if err != nil {
+			return fmt.Errorf("open root: %w", err)
 		}
-		if rp.FileKey != fk {
-			rp.FileKey = fk
-			rp.IndexKey = "" // invalidate
-			if err := rp.Save(env.Context(), flags.RootName); err != nil {
-				return fmt.Errorf("update cache root: %w", err)
+		fp, err := rp.File(env.Context(), ft.Files())
+		if errors.Is(err, root.ErrNoData) {
+			fp = file.New(ft.Files(), &file.NewOptions{
+				Stat:        &file.Stat{Mode: fs.ModeDir | 0755}, // for cosmetics
+				PersistStat: true,
+			}) // OK, create a new one
+		} else if err != nil {
+			return fmt.Errorf("open root file: %w", err)
+		}
+
+		// Maintain a limited pool of goroutines for writing data back to the store.
+		g, start := taskgroup.New(func(err error) {
+			log.Printf("WARNING: writeback error: %v", err)
+		}).Limit(flags.Tasks)
+		defer g.Wait()
+
+		fc := ffsCache{dir: cd, root: fp, start: start}
+		gc := &gocache.Server{
+			Get:         fc.Get,
+			Put:         fc.Put,
+			MaxRequests: flags.Tasks,
+			Logf:        value.Cond(flags.Verbose || flags.DebugLog, log.Printf, nil),
+			LogRequests: flags.DebugLog,
+		}
+		if err := gc.Run(env.Context(), os.Stdin, os.Stdout); err != nil {
+			return fmt.Errorf("cache server exited with error: %w", err)
+		}
+		g.Wait() // wait for writes to settle
+
+		// Unless we were instructed not to, update the specified root with the
+		// final state of the cache at exit.
+		if !flags.NoUpdate {
+			fk, err := fp.Flush(env.Context())
+			if err != nil {
+				return fmt.Errorf("flush cache: %w", err)
+			}
+			if rp.FileKey != fk {
+				rp.FileKey = fk
+				rp.IndexKey = "" // invalidate
+				if err := rp.Save(env.Context(), flags.RootName); err != nil {
+					return fmt.Errorf("update cache root: %w", err)
+				}
 			}
 		}
-	}
-	if flags.Verbose || flags.PrintMetrics {
-		fmt.Fprintln(env, gc.Metrics())
-	}
-	return nil
+		if flags.Verbose || flags.PrintMetrics {
+			fmt.Fprintln(env, gc.Metrics())
+		}
+		return nil
+	})
 }
 
 type ffsCache struct {
