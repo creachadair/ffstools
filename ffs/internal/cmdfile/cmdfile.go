@@ -44,6 +44,7 @@ import (
 	"github.com/creachadair/ffstools/lib/scanlib"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/mds/mapset"
+	"github.com/creachadair/mds/slice"
 	"github.com/creachadair/mds/value"
 )
 
@@ -739,7 +740,8 @@ func runResolve(env *command.Env, originPath string) error {
 }
 
 var findFlags struct {
-	All bool `flag:"all,Find all occurrences"`
+	All     bool `flag:"all,Find all occurrences"`
+	NoIndex bool `flag:"no-index,Do not use cached indexes"`
 }
 
 var errFindFound = errors.New("found")
@@ -759,6 +761,16 @@ func runFindKeys(env *command.Env, origin string, keys ...string) error {
 		of, err := s.OpenPath(env.Context(), origin)
 		if err != nil {
 			return err
+		}
+		if !findFlags.NoIndex && of.Root != nil && of.Root.IndexKey != "" {
+			idx, err := s.LoadIndex(env.Context(), of.Root.IndexKey)
+			if err != nil {
+				return err
+			}
+			parsed = slice.Partition(parsed, idx.Has)
+			if len(parsed) == 0 {
+				return nil
+			}
 		}
 		want := mapset.New(parsed...)
 		werr := fpath.Walk(env.Context(), of.File, func(e fpath.Entry) error {
