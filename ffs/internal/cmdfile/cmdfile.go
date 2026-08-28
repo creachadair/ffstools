@@ -748,16 +748,20 @@ var errFindFound = errors.New("found")
 
 func runFindKeys(env *command.Env, origin string, keys ...string) error {
 	cfg := env.Config.(*config.Settings)
-	var parsed []string
-	for i, key := range keys {
-		p, err := filetree.ParseKey(key)
-		if err != nil {
-			return fmt.Errorf("key %d: %w", i+1, err)
-		}
-		parsed = append(parsed, p)
-	}
-
 	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		var parsed []string
+		for i, key := range keys {
+			p, err := filetree.ParseKey(key)
+			if err != nil {
+				return fmt.Errorf("key %d: %w", i+1, err)
+			}
+			u, err := s.ResolveStorageKey(env.Context(), p)
+			if err != nil {
+				return fmt.Errorf("key %d: %w", i+1, err)
+			}
+			parsed = append(parsed, u)
+		}
+
 		of, err := s.OpenPath(env.Context(), origin)
 		if err != nil {
 			return err
