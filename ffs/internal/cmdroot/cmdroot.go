@@ -297,29 +297,35 @@ var copyFlags struct {
 }
 
 func runCopy(env *command.Env, src, dst string) error {
-	na, err := getNameArgs(env, env.Args)
-	if err != nil {
-		return err
-	} else if na.Args[0] == na.Key {
-		return fmt.Errorf("target %q has the same name as the source", na.Args[0])
-	}
-	defer na.Close()
-
-	if !copyFlags.Replace {
-		r, err := na.Store.Roots().Has(env.Context(), dst)
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		sr, err := root.Open(env.Context(), s.Roots(), src)
 		if err != nil {
 			return err
-		} else if r.Has(dst) {
-			return fmt.Errorf("root %q: already exists", dst)
+		} else if src == dst {
+			return fmt.Errorf("target %q is same as source", dst)
 		}
-	}
+		if !copyFlags.Replace {
+			hs, err := s.Roots().Has(env.Context(), dst)
+			if err != nil {
+				return err
+			} else if hs.Has(dst) {
+				return fmt.Errorf("root %q: already exists", dst)
+			}
+		}
+		if err := sr.Save(env.Context(), dst); err != nil {
+			return err
+		} else if env.Command.Name == "rename" {
+			return s.Roots().Delete(env.Context(), src)
+		}
 
-	if err := na.Root.Save(env.Context(), na.Args[0]); err != nil {
-		return err
-	} else if env.Command.Name == "rename" {
-		return na.Store.Roots().Delete(env.Context(), na.Key)
-	}
-	return nil
+		if err := sr.Save(env.Context(), dst); err != nil {
+			return err
+		} else if env.Command.Name == "rename" {
+			return s.Roots().Delete(env.Context(), src)
+		}
+		return nil
+	})
 }
 
 func runDelete(env *command.Env) error {
@@ -341,69 +347,36 @@ func runDelete(env *command.Env) error {
 }
 
 func runEditDesc(env *command.Env, target string, rest ...string) error {
-	na, err := getNameArgs(env, env.Args)
-	if err != nil {
-		return err
-	}
-	defer na.Close()
-	na.Root.Description = strings.Join(na.Args, " ")
-	return na.Root.Save(env.Context(), na.Key)
-}
-
-func runEditFile(env *command.Env, root, target string) error {
-	na, err := getNameArgs(env, env.Args)
-	if err != nil {
-		return err
-	}
-	defer na.Close()
-
-	var key string
-	if len(na.Args) != 1 {
-		return env.Usagef("incorrect arguments")
-	} else {
-		key, err = filetree.ParseKey(na.Args[0])
-	}
-	if err != nil {
-		return err
-	} else if _, err := file.Open(env.Context(), na.Store.Files(), key); err != nil {
-		return err
-	}
-
-	if key != na.Root.FileKey {
-		na.Root.IndexKey = "" // invalidate the index
-	}
-	na.Root.FileKey = key
-	return na.Root.Save(env.Context(), na.Key)
-}
-
-type rootArgs struct {
-	Key   string
-	Args  []string
-	Root  *root.Root
-	Store filetree.Store
-	Close func()
-}
-
-func getNameArgs(env *command.Env, args []string) (*rootArgs, error) {
-	if len(args) < 2 {
-		return nil, env.Usagef("incorrect arguments")
-	}
-	key := args[0]
 	cfg := env.Config.(*config.Settings)
-	bs, err := cfg.OpenStore(env.Context())
-	if err != nil {
-		return nil, err
-	}
-	rp, err := root.Open(env.Context(), bs.Roots(), key)
-	if err != nil {
-		bs.Close(env.Context())
-		return nil, err
-	}
-	return &rootArgs{
-		Key:   key,
-		Args:  args[1:],
-		Root:  rp,
-		Store: bs,
-		Close: func() { bs.Close(env.Context()) },
-	}, nil
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		rt, err := root.Open(env.Context(), s.Roots(), target)
+		if err != nil {
+			return err
+		}
+		rt.Description = strings.Join(rest, " ")
+		return rt.Save(env.Context(), target)
+	})
+}
+
+func runEditFile(env *command.Env, rootName, target string) error {
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(s filetree.Store) error {
+		r, err := root.Open(env.Context(), s.Roots(), rootName)
+		if err != nil {
+			return err
+		}
+		tkey, err := filetree.ParseKey(target)
+		if err != nil {
+			return err
+		}
+		tkey, err = s.ResolveStorageKey(env.Context(), tkey)
+		if err != nil {
+			return err
+		}
+		if tkey != r.FileKey {
+			r.IndexKey = "" // invalidate the index
+		}
+		r.FileKey = tkey
+		return r.Save(env.Context(), rootName)
+	})
 }
