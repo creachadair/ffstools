@@ -24,11 +24,11 @@ type Config struct {
 	// If present, permission bits to apply to the mode word.  If Mask is absent
 	// this value fully replaces the permissions; otherwise the masked bits of
 	// Perms are applied to the corresponding bits of the mode word.
-	Perms value.Maybe[uint32]
+	Perms value.Maybe[fs.FileMode]
 
 	// If present, specify which bits of the mode word will be affected by
 	// Perms.  This is ignored if Perms is absent.
-	Mask value.Maybe[uint32]
+	Mask value.Maybe[fs.FileMode]
 
 	// If present, the file type to apply to the mode word.  Only the type
 	// component is used, any other bits in the value are ignored (see Perms).
@@ -94,14 +94,14 @@ func ParseConfig(args []string) (*Config, error) {
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.Perms = value.Just(uint32(v))
+			mod.Perms = value.Just(fs.FileMode(v))
 
 		case "mask":
 			v, err := strconv.ParseUint(args[i+1], 0, 32)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.Mask = value.Just(uint32(v))
+			mod.Mask = value.Just(fs.FileMode(v))
 
 		case "type":
 			var ftype fs.FileMode
@@ -219,12 +219,9 @@ func (e *Config) Apply(ctx context.Context, f *file.File) error {
 		stat = stat.Clear()
 	}
 	if perms, ok := e.Perms.GetOK(); ok {
-		mask := fs.ModePerm
-		if m, ok := e.Mask.GetOK(); ok {
-			mask = fs.FileMode(m) // keep bits mentioned by the mask
-			perms &= m            // discard bits not mentioned by the mask
-		}
-		stat = stat.WithMode((stat.Mode &^ mask) | fs.FileMode(perms))
+		mask := e.Mask.Or(fs.ModePerm).Get()
+		perms &= mask // discard bits not mentioned by the mask
+		stat = stat.WithMode((stat.Mode &^ mask) | perms)
 	}
 	if t, ok := e.Type.GetOK(); ok {
 		stat = stat.WithMode((stat.Mode &^ fs.ModeType) | t)
