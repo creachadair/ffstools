@@ -15,41 +15,42 @@ import (
 	"time"
 
 	"github.com/creachadair/ffs/file"
+	"github.com/creachadair/mds/value"
 )
 
 // A Config specifies a set of edits to apply to a [file.File].
 // A nil *Config is valid and applies no changes.
 type Config struct {
-	// If non-nil, permission bits to apply to the mode word.  If Mask == nil,
+	// If present, permission bits to apply to the mode word.  If Mask is absent
 	// this value fully replaces the permissions; otherwise the masked bits of
 	// Perms are applied to the corresponding bits of the mode word.
-	Perms *uint32
+	Perms value.Maybe[uint32]
 
-	// If non-nil, specify which bits of the mode word will be affected by Perms.
-	// This is ignored if Perms == nil.
-	Mask *uint32
+	// If present, specify which bits of the mode word will be affected by
+	// Perms.  This is ignored if Perms is absent.
+	Mask value.Maybe[uint32]
 
-	// If non-nil, the file type to apply to the mode word.  Only the type
+	// If present, the file type to apply to the mode word.  Only the type
 	// component is used, any other bits in the value are ignored (see Perms).
-	Type *fs.FileMode
+	Type value.Maybe[fs.FileMode]
 
-	// If non-nil, set the modification timestamp to this value.
-	ModTime *time.Time
+	// If present, set the modification timestamp to this value.
+	ModTime value.Maybe[time.Time]
 
-	// If non-nil, set the UID and GID to these values.
+	// If present, set the UID and GID to these values.
 	// See also Owner and Group.
-	UID, GID *int
+	UID, GID value.Maybe[int]
 
-	// If non-nil, set the Owner and Group names to these values.
+	// If present, set the Owner and Group names to these values.
 	// See also UID and GID.
-	Owner, Group *string
+	Owner, Group value.Maybe[string]
 
 	// If non-nil, replace the contents of the target file with the contents of
 	// this reader.
 	Content io.Reader
 
-	// If non-nil, set stat persistence for the file.
-	Persist *bool
+	// If present, set stat persistence for the file.
+	Persist value.Maybe[bool]
 
 	// If true, all existing stat information is cleared before any other edits
 	// described in this config.
@@ -93,14 +94,14 @@ func ParseConfig(args []string) (*Config, error) {
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.Perms = new(uint32(v))
+			mod.Perms = value.Just(uint32(v))
 
 		case "mask":
 			v, err := strconv.ParseUint(args[i+1], 0, 32)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.Mask = new(uint32(v))
+			mod.Mask = value.Just(uint32(v))
 
 		case "type":
 			var ftype fs.FileMode
@@ -122,7 +123,7 @@ func ParseConfig(args []string) (*Config, error) {
 			default:
 				return nil, fmt.Errorf("invalid type %q", args[i+1])
 			}
-			mod.Type = &ftype
+			mod.Type = value.Just(ftype)
 
 		case "mtime", "modtime":
 			var t time.Time
@@ -144,30 +145,30 @@ func ParseConfig(args []string) (*Config, error) {
 			} else {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.ModTime = &t
+			mod.ModTime = value.Just(t)
 
 		case "uid", "gid":
 			v, err := strconv.Atoi(args[i+1])
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			} else if args[i] == "uid" {
-				mod.UID = &v
+				mod.UID = value.Just(v)
 			} else {
-				mod.GID = &v
+				mod.GID = value.Just(v)
 			}
 
 		case "owner":
-			mod.Owner = &args[i+1]
+			mod.Owner = value.Just(args[i+1])
 
 		case "group":
-			mod.Group = &args[i+1]
+			mod.Group = value.Just(args[i+1])
 
 		case "persist":
 			v, err := strconv.ParseBool(args[i+1])
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", args[i], err)
 			}
-			mod.Persist = &v
+			mod.Persist = value.Just(v)
 
 		case "data", "content":
 			switch args[i+1] {
@@ -217,34 +218,34 @@ func (e *Config) Apply(ctx context.Context, f *file.File) error {
 	if e.Clear {
 		stat = stat.Clear()
 	}
-	if e.Perms != nil {
-		mask, perms := fs.ModePerm, *e.Perms
-		if e.Mask != nil {
-			mask = fs.FileMode(*e.Mask) // keep bits mentioned by the mask
-			perms &= *e.Mask            // discard bits not mentioned by the mask
+	if perms, ok := e.Perms.GetOK(); ok {
+		mask := fs.ModePerm
+		if m, ok := e.Mask.GetOK(); ok {
+			mask = fs.FileMode(m) // keep bits mentioned by the mask
+			perms &= m            // discard bits not mentioned by the mask
 		}
 		stat = stat.WithMode((stat.Mode &^ mask) | fs.FileMode(perms))
 	}
-	if e.Type != nil {
-		stat = stat.WithMode((stat.Mode &^ fs.ModeType) | *e.Type)
+	if t, ok := e.Type.GetOK(); ok {
+		stat = stat.WithMode((stat.Mode &^ fs.ModeType) | t)
 	}
-	if e.ModTime != nil {
-		stat = stat.WithModTime(*e.ModTime)
+	if m, ok := e.ModTime.GetOK(); ok {
+		stat = stat.WithModTime(m)
 	}
-	if e.UID != nil {
-		stat = stat.WithOwnerID(*e.UID)
+	if u, ok := e.UID.GetOK(); ok {
+		stat = stat.WithOwnerID(u)
 	}
-	if e.GID != nil {
-		stat = stat.WithGroupID(*e.GID)
+	if g, ok := e.GID.GetOK(); ok {
+		stat = stat.WithGroupID(g)
 	}
-	if e.Owner != nil {
-		stat = stat.WithOwnerName(*e.Owner)
+	if o, ok := e.Owner.GetOK(); ok {
+		stat = stat.WithOwnerName(o)
 	}
-	if e.Group != nil {
-		stat = stat.WithGroupName(*e.Group)
+	if g, ok := e.Group.GetOK(); ok {
+		stat = stat.WithGroupName(g)
 	}
-	if e.Persist != nil {
-		stat.Persist(*e.Persist)
+	if p, ok := e.Persist.GetOK(); ok {
+		stat.Persist(p)
 	}
 	stat.Update()
 	return nil
