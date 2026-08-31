@@ -183,6 +183,9 @@ func (c ffsCache) Get(ctx context.Context, actionID string) (outputID, diskPath 
 		return "", "", err
 	}
 	outputID = fp.XAttr().Get(outputIDAttr)
+	if outputID == "" {
+		return "", "", nil // treat as cache miss
+	}
 	diskPath, err = c.dir.Put(ctx, gocache.Object{
 		ActionID: actionID,
 		OutputID: outputID,
