@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 	"path/filepath"
 	"runtime"
 	"syscall"
@@ -26,6 +27,7 @@ import (
 	"github.com/creachadair/ffs/file"
 	"github.com/creachadair/ffs/file/root"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffs/fpath"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/flax"
 	"github.com/creachadair/gocache"
@@ -173,7 +175,8 @@ func (c ffsCache) Get(ctx context.Context, actionID string) (outputID, diskPath 
 	if objID, diskPath, err := c.dir.Get(ctx, actionID); err == nil && objID != "" && diskPath != "" {
 		return objID, diskPath, nil // cache hit, OK
 	}
-	fp, err := c.root.Open(ctx, actionID)
+	ap := path.Join(actionID[:3], actionID)
+	fp, err := fpath.Open(ctx, c.root, ap)
 	if errors.Is(err, file.ErrChildNotFound) {
 		return "", "", nil // cache miss
 	} else if err != nil {
@@ -228,8 +231,17 @@ func (c ffsCache) Put(ctx context.Context, req gocache.Object) (diskPath string,
 		if err := fp.SetData(ctx, bytes.NewReader(data)); err != nil {
 			return fmt.Errorf("action %q: write data: %w", req.ActionID, err)
 		}
-		c.root.Child().Set(req.ActionID, fp)
-		return nil
+		ap := path.Join(req.ActionID[:3], req.ActionID)
+		_, err := fpath.Set(ctx, c.root, ap, &fpath.SetOptions{
+			Create: true,
+			SetStat: func(s *file.Stat) {
+				s.Mode = fs.ModeDir | 0755
+				s.ModTime = time.Now()
+				s.Persist(true).Update()
+			},
+			File: fp,
+		})
+		return err
 	})
 	return diskPath, nil
 }
