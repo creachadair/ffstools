@@ -1,14 +1,14 @@
 module github.com/creachadair/ffstools
 
-go 1.26.0
+go 1.27
 
 require (
 	github.com/creachadair/atomicfile v0.4.2
 	github.com/creachadair/badgerstore v0.10.7
 	github.com/creachadair/boltstore v0.0.0-20260809201416-6d3444f2a8f8
 	github.com/creachadair/buntdbstore v0.0.0-20260816225523-21657e258737
-	github.com/creachadair/chirp v0.4.12
-	github.com/creachadair/chirpstore v0.0.0-20260808224329-f0df8d9fab89
+	github.com/creachadair/chirp v0.4.13
+	github.com/creachadair/chirpstore v0.0.0-20260902232230-593d741ed88f
 	github.com/creachadair/command v0.2.11
 	github.com/creachadair/ffs v0.18.6
 	github.com/creachadair/ffuse v0.0.0-20260828151208-1dc69751f8a6

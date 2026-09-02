@@ -73,15 +73,14 @@ func runMirror(env *command.Env) error {
 				dprintf(env, "Source store %q\n", mirrorFlags.Source)
 				src, tgt = other, main
 			}
+			ctx, cancel := context.WithCancel(env.Context())
+			defer cancel()
 
 			// If requested, copy files.
 			if mirrorFlags.NoFiles {
 				dprintf(env, "Skipping file objects")
 			} else {
-				ctx, cancel := context.WithCancel(env.Context())
-				defer cancel()
 				g, run := taskgroup.New(cancel).Limit(64)
-
 				var pb *pbar.Bar
 				n, err := src.Files().Len(ctx)
 				if err != nil {
@@ -99,7 +98,7 @@ func runMirror(env *command.Env) error {
 					if ctx.Err() != nil {
 						return ctx.Err()
 					}
-					need, err := blob.SyncKeys(env.Context(), tgt.Sync(), keys)
+					need, err := blob.SyncKeys(ctx, tgt.Sync(), keys)
 					if err != nil {
 						return err
 					}
@@ -107,7 +106,7 @@ func runMirror(env *command.Env) error {
 					for key := range need {
 						run(func() error {
 							defer func() { pb.SetMeta(atomic.AddInt64(&numCopied, 1)) }()
-							return copyBlob(env.Context(), src.Sync(), tgt.Sync(), key, true)
+							return copyBlob(ctx, src.Sync(), tgt.Sync(), key, true)
 						})
 					}
 					pb.Add(int64(len(keys)))
@@ -130,11 +129,11 @@ func runMirror(env *command.Env) error {
 				} else {
 					start := time.Now()
 					var numRoots int
-					for key, err := range src.Roots().List(env.Context(), "") {
+					for key, err := range src.Roots().List(ctx, "") {
 						if err != nil {
 							return err
 						}
-						if err := copyBlob(env.Context(), src.Roots(), tgt.Roots(), key, true); err != nil {
+						if err := copyBlob(ctx, src.Roots(), tgt.Roots(), key, true); err != nil {
 							return err
 						}
 						numRoots++
@@ -173,7 +172,7 @@ func forEachChunk(ctx context.Context, kv blob.KVCore, n int, f func([]string) e
 			}
 			cur = cur[:0]
 		}
-		return nil
+		return ctx.Err()
 	}); err != nil {
 		return err
 	}
