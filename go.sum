@@ -104,8 +104,8 @@ github.com/creachadair/chirpstore v0.0.0-20260808224329-f0df8d9fab89 h1:rhskH9aY
 github.com/creachadair/chirpstore v0.0.0-20260808224329-f0df8d9fab89/go.mod h1:u3iQ5aVVb1UM7iRBXb0pdOgtF2UepWOuroqLHHg2Mmk=
 github.com/creachadair/command v0.2.11 h1:YPpsfKHDgVvOWs0kzlZz1RviLbuyb/tBT39yzbtRSAU=
 github.com/creachadair/command v0.2.11/go.mod h1:p7iYfSCIAVz+oYYIsXsya1hjKgjitd3U/0eOrzTWkBQ=
-github.com/creachadair/ffs v0.18.4 h1:wBRx5O+CySK/+v39ZDrWvTmzMYwZbTXa/ukFNiF22iA=
-github.com/creachadair/ffs v0.18.4/go.mod h1:+utW86JHlWTJzZS1ht4MTkmnGwYIjfI2dt3qxquw5RA=
+github.com/creachadair/ffs v0.18.6 h1:RLSC0pJB1exB03Hfs7DwPDpZd+Eqv6Nu0CZ2n+K8FwI=
+github.com/creachadair/ffs v0.18.6/go.mod h1:B/AMRpNQQvl0SNDMbGEAktI+SnlGUugfbzI+gbc3/Eg=
 github.com/creachadair/ffuse v0.0.0-20260828151208-1dc69751f8a6 h1:dBwD5DEvOy97+pynmq5sZpNBQiIvndbZnh/9fIMEJdE=
 github.com/creachadair/ffuse v0.0.0-20260828151208-1dc69751f8a6/go.mod h1:Z3FjgzXoNBtl10HVHP2NcjrBQodHI0E8S3L45KaaPlw=
 github.com/creachadair/flax v0.0.6 h1:IFUdRdfKynNTyR5SRlrHMUGnxxMZZen8RVpwcDq/ftk=
@@ -118,10 +118,10 @@ github.com/creachadair/gocache v0.0.0-20260803044833-060af7b2d093 h1:G4WrsLMSIV7
 github.com/creachadair/gocache v0.0.0-20260803044833-060af7b2d093/go.mod h1:xGouAOtIINNOo+M36CcaoAUGrY/3PYNWyV6va1DEbGM=
 github.com/creachadair/keyring v0.3.2 h1:UgimIKDRVi+eEK/7tJCSyfdQS5NMfuGpraUPxx6cd6k=
 github.com/creachadair/keyring v0.3.2/go.mod h1:lEue1rOUhow870v2oq9GgfpLtq73Hnuh43Jov9v3Tik=
-github.com/creachadair/mds v0.30.5 h1:JtylThbC3wUndriq7yZiY23AD0L7ZaKSvx3XQwQk8FI=
-github.com/creachadair/mds v0.30.5/go.mod h1:NGUd6kGUG0qQd2kgGOqb8NzakLnSmWZ5be2pHZsrBN4=
-github.com/creachadair/msync v0.10.0 h1:2RlGs187RQN5tzyluKEkbkXq+LRK2KIR+An6FoB9x+M=
-github.com/creachadair/msync v0.10.0/go.mod h1:J+4p7as+O7NWydXYGJNrigY67qj1F1GB0CcTWyV/5AE=
+github.com/creachadair/mds v0.31.0 h1:h4SXXgallvZfD8CFQnQNAOtBkUGpZjPwNBRQpHpHM/g=
+github.com/creachadair/mds v0.31.0/go.mod h1:IZ3oLffgVNZ4O5WXTPxx7EX5ilSl1ypdv5FekYyynyI=
+github.com/creachadair/msync v0.10.1 h1:14jT5Ujob64Zp2D3ZcUidayDMoXikhmYN8xBxEuPKPk=
+github.com/creachadair/msync v0.10.1/go.mod h1:dFf4Z0cxE2nibFmAdq5OqTuGn++GgEqA9JuKH+7ceSA=
 github.com/creachadair/pebblestore v0.0.0-20260812122153-1719b680adc5 h1:00ugNCSlYnkxn1FGsvf4PkVYGts+WwkXVftV1PhcfPQ=
 github.com/creachadair/pebblestore v0.0.0-20260812122153-1719b680adc5/go.mod h1:3CiapF7C7SIXeEQH3YEUrqoErAt4J/PO4yiMMgER25k=
 github.com/creachadair/rosedbstore v0.0.0-20260812122128-b41a569c1a9a h1:FWPpI5qyxMcfFzetJM2bvlkJuQOBcjHwIbg0UaMv5+4=

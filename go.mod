@@ -10,14 +10,14 @@ require (
 	github.com/creachadair/chirp v0.4.12
 	github.com/creachadair/chirpstore v0.0.0-20260808224329-f0df8d9fab89
 	github.com/creachadair/command v0.2.11
-	github.com/creachadair/ffs v0.18.4
+	github.com/creachadair/ffs v0.18.6
 	github.com/creachadair/ffuse v0.0.0-20260828151208-1dc69751f8a6
 	github.com/creachadair/flax v0.0.6
 	github.com/creachadair/gcsstore v0.0.0-20260820160112-9ef6ffedcba1
 	github.com/creachadair/getpass v0.3.6
 	github.com/creachadair/gocache v0.0.0-20260803044833-060af7b2d093
 	github.com/creachadair/keyring v0.3.2
-	github.com/creachadair/mds v0.30.5
+	github.com/creachadair/mds v0.31.0
 	github.com/creachadair/pebblestore v0.0.0-20260812122153-1719b680adc5
 	github.com/creachadair/rosedbstore v0.0.0-20260812122128-b41a569c1a9a
 	github.com/creachadair/s3store v0.0.0-20260803225842-4faa05b89f1f
@@ -74,7 +74,7 @@ require (
 	github.com/cockroachdb/pebble v1.1.5 // indirect
 	github.com/cockroachdb/redact v1.1.8 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
-	github.com/creachadair/msync v0.10.0 // indirect
+	github.com/creachadair/msync v0.10.1 // indirect
 	github.com/dgraph-io/badger/v4 v4.9.5 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

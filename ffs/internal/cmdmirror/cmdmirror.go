@@ -20,13 +20,13 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"iter"
 	"sync/atomic"
 	"time"
 
 	"github.com/creachadair/command"
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/filetree"
+	"github.com/creachadair/ffs/storage/storeutil"
 	"github.com/creachadair/ffstools/ffs/config"
 	"github.com/creachadair/ffstools/lib/pbar"
 	"github.com/creachadair/flax"
@@ -95,7 +95,7 @@ func runMirror(env *command.Env) error {
 				start := time.Now()
 				var numBatches, numBlobs, numCopied int64
 
-				if err := forEachChunk(src.Sync().List(ctx, ""), 512, func(keys []string) error {
+				if err := forEachChunk(ctx, src.Sync(), 512, func(keys []string) error {
 					if ctx.Err() != nil {
 						return ctx.Err()
 					}
@@ -163,12 +163,9 @@ func copyBlob(ctx context.Context, src, tgt blob.KV, key string, replace bool) e
 	return err
 }
 
-func forEachChunk[T any](seq iter.Seq2[T, error], n int, f func([]T) error) error {
-	var cur []T
-	for key, err := range seq {
-		if err != nil {
-			return err
-		}
+func forEachChunk(ctx context.Context, kv blob.KVCore, n int, f func([]string) error) error {
+	var cur []string
+	if err := storeutil.ListAllKeys(ctx, kv, func(key string) error {
 		cur = append(cur, key)
 		if len(cur) == n {
 			if err := f(cur); err != nil {
@@ -176,6 +173,9 @@ func forEachChunk[T any](seq iter.Seq2[T, error], n int, f func([]T) error) erro
 			}
 			cur = cur[:0]
 		}
+		return nil
+	}); err != nil {
+		return err
 	}
 	if len(cur) != 0 {
 		return f(cur)
