@@ -56,7 +56,7 @@ func (c Config) Check(ctx context.Context, origin string) (r Result, _ error) {
 	if of.Root == nil {
 		// no root is invoolved
 	} else if of.Root.IndexKey == "" {
-		c.eprintf("- root %q is not indexed (OK)\n", of.RootKey)
+		c.pprintf("- root %q is not indexed (OK)\n", of.RootKey)
 	} else if idx, err := c.Store.LoadIndex(ctx, of.Root.IndexKey); err != nil {
 		c.eprintf("* index %s: %v\n", filetree.FormatKey32(of.Root.IndexKey), err)
 		lost.Add(of.Root.IndexKey)
