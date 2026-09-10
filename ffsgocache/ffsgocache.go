@@ -43,7 +43,7 @@ var flags = struct {
 	RootName     string `flag:"root,default=$FFS_ROOTNAME,Name of cache root (required)"`
 	Tasks        int    `flag:"nw,default=*,PRIVATE:Number of concurrent upload tasks"`
 	NoUpdate     bool   `flag:"no-update,Do not update the cache root at exit"`
-	PrintMetrics bool   `flag:"m,Print summary metrics to stderr at exit"`
+	PrintMetrics bool   `flag:"m,default=$FFS_METRICS,Print summary metrics to stderr at exit"`
 	Verbose      bool   `flag:"v,Enable verbose logging"`
 	DebugLog     bool   `flag:"debug,default=$FS_DEBUG,Enable detailed per-request debug logging (warning: noisy)"`
 }{
