@@ -45,7 +45,7 @@ var flags = struct {
 	NoUpdate     bool   `flag:"no-update,Do not update the cache root at exit"`
 	PrintMetrics bool   `flag:"m,Print summary metrics to stderr at exit"`
 	Verbose      bool   `flag:"v,Enable verbose logging"`
-	DebugLog     bool   `flag:"debug,Enable detailed per-request debug logging (warning: noisy)"`
+	DebugLog     bool   `flag:"debug,default=$FS_DEBUG,Enable detailed per-request debug logging (warning: noisy)"`
 }{
 	Tasks:      2 * runtime.NumCPU(),
 	ConfigPath: config.Path(),
