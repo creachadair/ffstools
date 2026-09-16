@@ -69,7 +69,8 @@ edit program is a single string, use quotes if calling from a shell.`,
 		fs.StringVar(&putConfig.FilterText, "filter", "", "Base filter rules to apply")
 		flax.MustBind(fs, &importFlags)
 	},
-	Run: command.Adapt(runImport),
+	Init: func(env *command.Env) error { log.SetFlags(log.Ltime | log.Lmicroseconds); return nil },
+	Run:  command.Adapt(runImport),
 
 	Commands: []*command.C{{
 		Name:  "tar",
