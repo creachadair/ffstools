@@ -114,8 +114,8 @@ github.com/creachadair/gcsstore v0.0.0-20260831040351-8734be9a9ed8 h1:e9b39ZLxeb
 github.com/creachadair/gcsstore v0.0.0-20260831040351-8734be9a9ed8/go.mod h1:QzCSGoUKNNGlsMhEh5Kb84sW1fwjJiHCjhnQKB8phhI=
 github.com/creachadair/getpass v0.4.0 h1:0ovOUZLVwjnC9oiMpg1z6SivDoAwhny6kZkmRfHxmj8=
 github.com/creachadair/getpass v0.4.0/go.mod h1:ocMKYsF3z0CoUhxmdd8Z4c9ug8UufNji6mrxJmhJB10=
-github.com/creachadair/gocache v0.0.0-20260901053742-f8f9cba7e9aa h1:kfpLuBFJ9ydWfdYLeP9IK2wZqs0bdgQ0g3KYQYMF3Mg=
-github.com/creachadair/gocache v0.0.0-20260901053742-f8f9cba7e9aa/go.mod h1:rjBXLCpKFeN/hAPVFoYaF1lP1sbv7EhkQpG4MOdKbTk=
+github.com/creachadair/gocache v0.0.0-20260917152409-48ba1bceb6b8 h1:ExDGnbcOkQr4QAtSX6TnBSgwD+j4zVJ7hx64xDADS5A=
+github.com/creachadair/gocache v0.0.0-20260917152409-48ba1bceb6b8/go.mod h1:bzh7HmgHqCpvqIwwZz/BJsD06bQaEyL8If3qvBj3Nwg=
 github.com/creachadair/keyring v0.3.3 h1:FJvvZu/1NVbyqxGT30gjPMl2wqEEBWV9B+tI31vUaac=
 github.com/creachadair/keyring v0.3.3/go.mod h1:ypMhfzlDUzKj9wOLUTRxkXO8h/j3vBVn38luvrAv+28=
 github.com/creachadair/mds v0.31.0 h1:h4SXXgallvZfD8CFQnQNAOtBkUGpZjPwNBRQpHpHM/g=
