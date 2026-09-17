@@ -8,6 +8,7 @@ package main
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -71,6 +72,12 @@ func main() {
 		},
 		Run: command.Adapt(runCache),
 		Commands: []*command.C{
+			{
+				Name:     "prune",
+				Help:     "Prune actions from the cache.",
+				SetFlags: command.Flags(flax.MustBind, &pruneFlags),
+				Run:      command.Adapt(runPrune),
+			},
 			command.HelpCommand(nil),
 			command.VersionCommand(),
 		},
@@ -144,21 +151,98 @@ func runCache(env *command.Env) error {
 		// Unless we were instructed not to, update the specified root with the
 		// final state of the cache at exit.
 		if !flags.NoUpdate {
-			fk, err := fp.Flush(env.Context())
-			if err != nil {
-				return fmt.Errorf("flush cache: %w", err)
-			}
-			if rp.FileKey != fk {
-				rp.FileKey = fk
-				rp.IndexKey = "" // invalidate
-				if err := rp.Save(env.Context(), flags.RootName); err != nil {
-					return fmt.Errorf("update cache root: %w", err)
-				}
+			if err := flushRoot(env.Context(), rp, flags.RootName, fp); err != nil {
+				return err
 			}
 		}
 		if flags.Verbose || flags.PrintMetrics {
 			fmt.Fprintln(env, gc.Metrics())
 		}
+		return nil
+	})
+}
+
+var pruneFlags struct {
+	MaxAge time.Duration `flag:"age,Prune entries older than this"`
+}
+
+func runPrune(env *command.Env) error {
+	if pruneFlags.MaxAge <= 0 {
+		return env.Usagef("--age must be positive")
+	}
+	if flags.CacheDir != "" {
+		cd, err := cachedir.New(flags.CacheDir)
+		if err != nil {
+			return fmt.Errorf("open cache directory: %w", err)
+		}
+		ctx := env.Context()
+		if flags.Verbose {
+			ctx = gocache.WithLogf(ctx, log.Printf)
+		}
+		s, err := cd.PruneEntries(ctx, pruneFlags.MaxAge)
+		if err != nil {
+			return fmt.Errorf("prune cache directory: %w", err)
+		}
+		fmt.Fprintf(env, "cachedir: pruned %d actions, %d objects (%d bytes) [%v elapsed]\n",
+			s.ActionsPruned, s.ObjectsPruned, s.BytesPruned, s.Elapsed.Round(time.Millisecond))
+	}
+	if flags.Store == "" {
+		return nil // nothing more to do
+	}
+
+	rootName := cmp.Or(flags.RootName, "gocache")
+	cfg := env.Config.(*config.Settings)
+	return cfg.WithStore(env.Context(), func(ft filetree.Store) error {
+		rp, err := root.Open(env.Context(), ft.Roots(), rootName)
+		if blob.IsKeyNotFound(err) {
+			return nil // nothing to do
+		} else if err != nil {
+			return err
+		}
+
+		start := time.Now()
+		fp, err := rp.File(env.Context(), ft.Files())
+		if err != nil {
+			return err
+		}
+		var numDrop, numDir, bytesDrop int64
+		cutoff := time.Now().Add(-pruneFlags.MaxAge)
+		if err := fpath.Walk(env.Context(), fp, func(e fpath.Entry) error {
+			if e.Err != nil {
+				return e.Err
+			} else if s := e.File.Stat(); !s.Mode.IsRegular() || !s.ModTime.Before(cutoff) {
+				return nil // nothing to do, keep going
+			}
+			if flags.Verbose {
+				log.Printf("- expire action %q (%d bytes)", e.File.Name(), e.File.Data().Size())
+			}
+			numDrop++
+			bytesDrop += e.File.Data().Size()
+			return fpath.Remove(env.Context(), fp, e.Path)
+		}); err != nil {
+			return err
+		}
+		if err := fpath.Walk(env.Context(), fp, func(e fpath.Entry) error {
+			if e.Err != nil {
+				return e.Err
+			} else if s := e.File.Stat(); s.Mode.IsDir() && e.File.Child().Len() == 0 {
+				if flags.Verbose {
+					log.Printf("- remove empty directory %q", e.File.Name())
+				}
+				numDir++
+				return fpath.Remove(env.Context(), fp, e.Path)
+			}
+			return nil
+		}); err != nil {
+			return err
+		}
+		if numDrop != 0 || numDir != 0 {
+			if err := flushRoot(env.Context(), rp, rootName, fp); err != nil {
+				return err
+			}
+		}
+		fmt.Fprintf(env, "cache: pruned %d actions (%d bytes), %d dirs [%v elapsed]\n",
+			numDrop, bytesDrop, numDir, time.Since(start).Round(time.Millisecond))
 		return nil
 	})
 }
@@ -247,4 +331,19 @@ func (c ffsCache) Put(ctx context.Context, req gocache.Object) (diskPath string,
 		return err
 	})
 	return diskPath, nil
+}
+
+func flushRoot(ctx context.Context, rp *root.Root, rootName string, fp *file.File) error {
+	fk, err := fp.Flush(ctx)
+	if err != nil {
+		return fmt.Errorf("flush cache: %w", err)
+	}
+	if rp.FileKey != fk {
+		rp.FileKey = fk
+		rp.IndexKey = "" // invalidate
+		if err := rp.Save(ctx, rootName); err != nil {
+			return fmt.Errorf("update cache root: %w", err)
+		}
+	}
+	return nil
 }
