@@ -7,7 +7,7 @@ See also https://github.com/creachadair/ffs.
 
 ## Overview
 
-- The [`ffs`](https://github.com/creachadair/ffstools/tree/main/ffs) tool
+- The [`ffs`](./ffs) tool
   supports running and communicating with a blob storage service, and provides
   commands to manipulate the contents of the store as FFS specific messages.
 
@@ -19,13 +19,22 @@ See also https://github.com/creachadair/ffs.
   When installing, you may want to specify build `--tags` to enable other
   storage backends. See [Storage Backends](#storage-backends).
 
-- The [`file2json`](https://github.com/creachadair/ffstools/tree/main/file2json)
+- The [`file2json`](./file2json)
   tool decodes wire-format node messages and translates them to JSON for easier
   reading by humans.
 
   ```sh
   # To install:
   go install github.com/creachadair/ffstools/file2json@latest
+  ```
+
+- The [`ffsgocache`](./ffsgocache)
+  tool implements a cache server for the GOCACHEPROG plugin protocol, using an
+  FFS store as storage.
+
+  ```sh
+  # To install:
+  go install github.com/creachadair/ffstools/ffsgocache@latest
   ```
 
 ## Installation and Usage
