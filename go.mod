@@ -15,7 +15,7 @@ require (
 	github.com/creachadair/flax v0.1.0
 	github.com/creachadair/gcsstore v0.0.0-20260831040351-8734be9a9ed8
 	github.com/creachadair/getpass v0.4.0
-	github.com/creachadair/gocache v0.0.0-20260917152409-48ba1bceb6b8
+	github.com/creachadair/gocache v0.0.0-20260919024057-fcaeb30adcdc
 	github.com/creachadair/keyring v0.3.3
 	github.com/creachadair/mds v0.31.0
 	github.com/creachadair/pebblestore v0.0.0-20260828145151-17e34ab20ade
