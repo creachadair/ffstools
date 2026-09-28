@@ -5,26 +5,26 @@ go 1.27
 require (
 	github.com/creachadair/atomicfile v0.4.2
 	github.com/creachadair/badgerstore v0.10.7
-	github.com/creachadair/boltstore v0.0.0-20260827161658-ec999ce52f34
-	github.com/creachadair/buntdbstore v0.0.0-20260902151145-0252e7bcb5a7
+	github.com/creachadair/boltstore v0.0.0-20260914162652-153b090b7fce
+	github.com/creachadair/buntdbstore v0.0.0-20260920151808-8ea5a0dfb0c8
 	github.com/creachadair/chirp v0.4.13
 	github.com/creachadair/chirpstore v0.0.0-20260909144612-f28f3f7a1e2c
 	github.com/creachadair/command v0.2.11
 	github.com/creachadair/ffs v0.18.6
 	github.com/creachadair/ffuse v0.0.0-20260905153319-e4e5c1dbbe09
 	github.com/creachadair/flax v0.1.0
-	github.com/creachadair/gcsstore v0.0.0-20260831040351-8734be9a9ed8
+	github.com/creachadair/gcsstore v0.0.0-20260916145346-5bea65c7fb39
 	github.com/creachadair/getpass v0.4.0
 	github.com/creachadair/gocache v0.0.0-20260919024057-fcaeb30adcdc
 	github.com/creachadair/keyring v0.3.3
 	github.com/creachadair/mds v0.31.0
-	github.com/creachadair/pebblestore v0.0.0-20260828145151-17e34ab20ade
-	github.com/creachadair/rosedbstore v0.0.0-20260828145130-d6cbf5d13cfe
-	github.com/creachadair/s3store v0.0.0-20260910051445-365c8947d6f5
+	github.com/creachadair/pebblestore v0.0.0-20260915145248-f614771446c6
+	github.com/creachadair/rosedbstore v0.0.0-20260913160505-c5b4b5680395
+	github.com/creachadair/s3store v0.0.0-20260924025537-b345059253ac
 	github.com/creachadair/taskgroup v0.14.4
 	github.com/fortytw2/leaktest v1.3.0
 	github.com/hanwen/go-fuse/v2 v2.11.0
-	github.com/klauspost/compress v1.20.0
+	github.com/klauspost/compress v1.20.1
 	github.com/pkg/xattr v0.4.12
 	golang.org/x/crypto v0.57.0
 	golang.org/x/net v0.59.0
@@ -41,28 +41,28 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.12.0 // indirect
 	cloud.google.com/go/monitoring v1.30.0 // indirect
-	cloud.google.com/go/storage v1.66.0 // indirect
+	cloud.google.com/go/storage v1.67.1 // indirect
 	github.com/DataDog/zstd v1.5.7 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.33.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.57.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.57.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.46.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.47.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.20 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.33.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.3 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.19.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.2 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.33.5 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.5 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.19 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.111.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.9.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.37.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.42.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.49.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.10.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.38.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.43.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.51.0 // indirect
 	github.com/aws/smithy-go v1.28.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
@@ -138,7 +138,7 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
-	google.golang.org/api v0.295.0 // indirect
+	google.golang.org/api v0.298.0 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260819154853-08b0e4226688 // indirect
