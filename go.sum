@@ -106,8 +106,8 @@ github.com/creachadair/command v0.2.11 h1:YPpsfKHDgVvOWs0kzlZz1RviLbuyb/tBT39yzb
 github.com/creachadair/command v0.2.11/go.mod h1:p7iYfSCIAVz+oYYIsXsya1hjKgjitd3U/0eOrzTWkBQ=
 github.com/creachadair/ffs v0.18.6 h1:RLSC0pJB1exB03Hfs7DwPDpZd+Eqv6Nu0CZ2n+K8FwI=
 github.com/creachadair/ffs v0.18.6/go.mod h1:B/AMRpNQQvl0SNDMbGEAktI+SnlGUugfbzI+gbc3/Eg=
-github.com/creachadair/ffuse v0.0.0-20260905153319-e4e5c1dbbe09 h1:HpMN4h1pUulA7tPqbAGCoStg0Bk5+/YRCBLmDbGD5y0=
-github.com/creachadair/ffuse v0.0.0-20260905153319-e4e5c1dbbe09/go.mod h1:erBG+HXaLEhsMzPV/usbdiUxiJdgYZTMnLvWHMBI1MI=
+github.com/creachadair/ffuse v0.0.0-20261012173319-32d39bab6c68 h1:tfU/W/8XxFOrwLxaUW5LyvVhTX7UqVsR6ay97tHgnPQ=
+github.com/creachadair/ffuse v0.0.0-20261012173319-32d39bab6c68/go.mod h1:O7PEKdPgG12WCAYeyHBqFas/hf/INZ0K4ZB0AlixGB0=
 github.com/creachadair/flax v0.1.0 h1:smGIMMdPK21WiN2hwHE8FqdfkfSaIEZGpZyEnPa5jsU=
 github.com/creachadair/flax v0.1.0/go.mod h1:F1PML0JZLXSNDMNiRGK2yjm5f+L9QCHchyHBldFymj8=
 github.com/creachadair/gcsstore v0.0.0-20260916145346-5bea65c7fb39 h1:o3qmzXeOjrWU8SCukPbBnHYPWAJbp2NUKFRfWeQHPtg=
@@ -188,8 +188,8 @@ github.com/googleapis/enterprise-certificate-proxy v0.3.20 h1:t/xL64VUoN69MuMRQu
 github.com/googleapis/enterprise-certificate-proxy v0.3.20/go.mod h1:L3D/IQExI6LqEjBdXcZQ1WluSgigQmSwBboFstVPM4w=
 github.com/googleapis/gax-go/v2 v2.24.0 h1:myMaPYyF9MecEmvQqMqomIwn9t/4KCZN9qnwsS76wlg=
 github.com/googleapis/gax-go/v2 v2.24.0/go.mod h1:IaTHBDd7NHxSCiu0vEs8pQZu4dGZrWwuSoxCnk16OFM=
-github.com/hanwen/go-fuse/v2 v2.11.0 h1:CGVkJh9gRz0pTRMADNcqdFl3ec/5QbE/Vx1Gl7ESozM=
-github.com/hanwen/go-fuse/v2 v2.11.0/go.mod h1:aU7NkGYZUmuJrZapoI3mEcNve7PZTySUOLBuch/vR6U=
+github.com/hanwen/go-fuse/v2 v2.12.0 h1:RG1UFajZR/hb6JRbfhSkPtCqghbe2caq8F4x+bb1Y6s=
+github.com/hanwen/go-fuse/v2 v2.12.0/go.mod h1:Jhm1VRAQoI4MYiawzVhc0K3StCLBob07TTT37CwmNpM=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/klauspost/compress v1.20.1 h1:T7kKElXUMXrUJ2E9QhQhxFtcK5rPyLdsGZvdbLMPdiQ=
