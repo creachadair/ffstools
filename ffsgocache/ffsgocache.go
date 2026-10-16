@@ -65,9 +65,6 @@ func main() {
 			}
 			// Note: Do this unconditionally, so that the cache plugin does not
 			// land on the default store unless the user really wants that.
-			if flags.Store == "" {
-				return env.Usagef("a non-empty --store is required")
-			}
 			cfg.DefaultStore = flags.Store
 			config.ExpandString(&cfg.DefaultStore)
 			env.Config = cfg
@@ -92,6 +89,8 @@ func main() {
 
 func runCache(env *command.Env) error {
 	switch {
+	case flags.Store == "":
+		return env.Usagef("a non-empty --store is required")
 	case flags.CacheDir == "":
 		return env.Usagef("missing required --cache-dir")
 	case !filepath.IsAbs(flags.CacheDir):

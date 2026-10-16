@@ -147,6 +147,7 @@ require (
 )
 
 retract (
+	v0.21.15 // misplaced flag check
 	v0.20.22 // broken CI check under staticcheck
 	[v0.19.19, v0.19.20] // missing invalidation in file rename
 	v0.19.18 // missing invalidation in file removal
