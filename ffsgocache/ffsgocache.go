@@ -73,8 +73,17 @@ func main() {
 		Run: command.Adapt(runCache),
 		Commands: []*command.C{
 			{
-				Name:     "prune",
-				Help:     "Prune actions from the cache.",
+				Name: "prune",
+				Help: `Prune actions from the cache.
+
+Discard cached actions whose last modification time is older than
+the specified --age.
+
+If --cache-dir is set, the disk cache is pruned.
+If --store and --root are set, the FFS storage is pruned.
+
+After pruning the disk cache, any orphaned outputs (those not referenced
+by any remaining action)are discarded.`,
 				SetFlags: command.Flags(flax.MustBind, &pruneFlags),
 				Run:      command.Adapt(runPrune),
 			},
