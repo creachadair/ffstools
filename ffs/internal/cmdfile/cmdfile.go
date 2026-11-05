@@ -850,7 +850,7 @@ func runFileCheck(env *command.Env, origins ...string) error {
 		fc := fscklib.Config{
 			Store:           s,
 			ComputeDataSize: fsckFlags.DataSize,
-			Progress:        os.Stdout,
+			Progress:        value.Cond(fsckFlags.Verbose, os.Stdout, nil),
 		}
 		if fsckFlags.JSON {
 			fc.Progress = value.Cond(fsckFlags.Verbose, os.Stderr, nil)
