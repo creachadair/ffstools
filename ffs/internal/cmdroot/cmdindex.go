@@ -29,12 +29,17 @@ import (
 )
 
 var indexFlags struct {
-	Force   bool `flag:"f,Force reindexing"`
+	All     bool `flag:"all,Index all roots"`
+	Force   bool `flag:"force,Force reindexing"`
 	Discard bool `flag:"discard,Discard cached index if present"`
 }
 
 func runIndex(env *command.Env) error {
-	if len(env.Args) == 0 {
+	if indexFlags.All {
+		if len(env.Args) != 0 {
+			return env.Usagef("extra arguments after command")
+		}
+	} else if len(env.Args) == 0 {
 		return env.Usagef("missing required <root-key>")
 	} else if indexFlags.Force && indexFlags.Discard {
 		return env.Usagef("the --discard and --force flags are mutually exclusive")
